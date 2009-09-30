@@ -1,0 +1,71 @@
+/*
+ * LDAP Chai API
+ * Copyright (c) 2006-2009 Novell, Inc.
+ * Copyright (c) 2009 Jason D. Rivard
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+package com.novell.ldapchai.tests;
+
+import junit.framework.TestCase;
+
+import java.io.File;
+import java.lang.reflect.Method;
+
+public class ExampleTester extends TestCase {
+// -------------------------- OTHER METHODS --------------------------
+
+    protected void setUp()
+            throws Exception
+    {
+        TestHelper.setUp();
+    }
+
+    /**
+     * Test each of the published examples.
+     *
+     * @throws Exception if anything goes wrong
+     */
+    public void testExamples()
+            throws Exception
+    {
+        final File exampleDirectory = new File("examples\\");
+        final File[] exampleFiles = exampleDirectory.listFiles();
+
+        for (final File loopFile : exampleFiles) {
+            if (loopFile.getName().endsWith(".java")) {
+                final String javaClassName = loopFile.getName().substring(0, loopFile.getName().length() - 5);
+
+                final Class loopClass = Class.forName(javaClassName);
+
+
+                final String[] args = new String[]{"args"};
+
+                final Method loopMethod = loopClass.getMethod("main", args.getClass());
+
+
+                System.out.println("]]]] Executing main(String[] args) method in " + loopClass.getName());
+                try {
+                    loopMethod.invoke(null, (Object) args);
+                } catch (Exception e) {
+                    System.out.println("Error while executing " + loopClass.getName() + " " + e.getMessage());
+                    throw e;
+                }
+                System.out.println("");
+            }
+        }
+    }
+}

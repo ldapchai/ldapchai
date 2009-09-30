@@ -1,0 +1,166 @@
+<!--
+  ~ LDAP Chai API
+  ~ Copyright (c) 2006-2009 Novell, Inc.
+  ~ Copyright (c) 2009 Jason D. Rivard
+  ~
+  ~ This library is free software; you can redistribute it and/or
+  ~ modify it under the terms of the GNU Lesser General Public
+  ~ License as published by the Free Software Foundation; either
+  ~ version 2.1 of the License, or (at your option) any later version.
+  ~
+  ~ This library is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this library; if not, write to the Free Software
+  ~ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  -->
+
+<project default="makeJAR">
+    <target name="init">
+        <property name="src.root" value="."/>
+        <property name="destination" value="./build"/>
+        <property name="testBinaries" value="${destination}/binAux"/>
+
+        <echo>using:</echo>
+        <echo>source root: ${src.root}</echo>
+        <echo>destination: ${destination}</echo>
+    </target>
+
+    <target name="all" depends="clean,makeZIP" description="clean+makeZIP"/>
+
+    <target name="clean" depends="init">
+        <delete dir="${destination}"/>
+    </target>
+
+    <target name="compileCode" depends="init">
+        <mkdir dir="${destination}/bin"/>
+        <javac srcdir="${src.root}/src" destdir="${destination}/bin"
+               source="1.5" target="1.5" debug="true">
+            <classpath>
+                <fileset dir="${src.root}/lib" includes="*.jar"/>
+                <fileset dir="${src.root}/build-lib" includes="*.jar"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="javadoc" depends="init,javadoc-public,javadoc-private"/>
+
+    <target name="javadoc-public" depends="init">
+        <mkdir dir="${destination}/javadoc-public"/>
+        <javadoc packagenames="com.novell.ldapchai.*"
+                 sourcepath="${src.root}/src"
+                 overview="overview.html"
+                 destdir="${destination}/javadoc-public"
+                 access="public"
+                 defaultexcludes="yes"
+                 description="public documentation">
+            <doctitle>LDAP Chai API</doctitle>
+            <header>LDAP Chai API</header>
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+            <classpath>
+                <fileset dir="${src.root}/lib" includes="*.jar"/>
+            </classpath>
+            <excludepackage name="com.novell.ldapchai.schema"/>
+            <excludepackage name="com.novell.ldapchai.cr.nmasAuth"/>
+            <excludepackage name="com.novell.ldapchai.impl.*"/>           
+        </javadoc>
+    </target>
+
+    <target name="javadoc-private" depends="init">
+
+        <mkdir dir="${destination}/javadoc-private"/>
+        <javadoc packagenames="com.novell.ldapchai.*"
+                 sourcepath="${src.root}/src"
+                 overview="overview.html"
+                 destdir="${destination}/javadoc-private"
+                 access="private">
+            <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+            <doctitle>LDAP Chai API</doctitle>
+            <header>LDAP Chai API</header>
+            <classpath>
+                <fileset dir="${src.root}/lib" includes="*.jar"/>
+            </classpath>
+        </javadoc>
+    </target>
+
+    <target name="makeJAR" depends="init,compileCode">
+        <jar zipfile="${destination}/ldapChai.jar" filesonly="true" manifest="${src.root}/MANIFEST.MF" compress="true">
+            <zipfileset dir="${destination}/bin" includes="**/*.class"/>
+            <zipfileset dir="${src.root}/src" includes="**/*.properties"/>
+            <zipfileset dir="${src.root}/src" prefix="src"/>
+        </jar>
+    </target>
+
+    <target name="makeZIP" depends="init,incrementBuild,makeJAR,javadoc">
+        <zip zipfile="${destination}/ldapChai.zip" filesonly="true">
+            <zipfileset file="${destination}/ldapChai.jar"/>
+            <zipfileset file="${src.root}/build.xml"/>
+            <zipfileset dir="${destination}/javadoc-public" prefix="javadoc-public"/>
+            <zipfileset dir="${destination}/javadoc-private" prefix="javadoc-private"/>
+            <zipfileset dir="${src.root}/lib" prefix="lib" excludes="CVS"/>
+            <zipfileset dir="${src.root}/src" prefix="src" includes="**/*.java"/>
+            <zipfileset dir="${src.root}/examples" prefix="examples" includes="**/*.java"/>
+            <zipfileset dir="${src.root}/tests" prefix="tests" includes="**/*.java"/>
+        </zip>
+    </target>
+
+    <target name="incrementBuild" depends="init">
+        <property name="buildFilename" value="${src.root}/src/com/novell/ldapchai/BuildInformation.properties"/>
+        <propertyfile file="${buildFilename}">
+            <entry key="java.vendor" value="${java.vendor}"/>
+            <entry key="java.version" value="${java.version}"/>
+            <entry key="build.time" type="date" value="now" pattern="yyyy.MM.dd HH:mm:ss z"/>
+            <entry key="build.user" value="${user.name}"/>
+        </propertyfile>
+        <buildnumber file="${buildFilename}"/>
+        <echo>build number: ${build.number}</echo>
+    </target>
+
+    <target name="compileTestsAndExamples" depends="init,compileCode">
+
+        <!-- compile test cases -->
+        <mkdir dir="${testBinaries}"/>
+        <javac srcdir="${src.root}/tests" destdir="${testBinaries}"
+               source="1.5" target="1.5" debug="true">
+            <classpath>
+                <fileset dir="${src.root}/lib" includes="*.jar"/>
+                <fileset dir="${src.root}/build-lib" includes="*.jar"/>
+                <path path="${destination}/bin"/>
+            </classpath>
+        </javac>
+
+        <!-- compile example code -->
+        <mkdir dir="${testBinaries}"/>
+        <javac srcdir="${src.root}/examples" destdir="${testBinaries}"
+               source="1.5" target="1.5" debug="true">
+            <classpath>
+                <fileset dir="${src.root}/lib" includes="*.jar"/>
+                <fileset dir="${src.root}/build-lib" includes="*.jar"/>
+                <path path="${destination}/bin"/>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="executeTests" depends="init,compileTestsAndExamples">
+        <junit printsummary="yes" haltonfailure="yes">
+            <classpath>
+                <pathelement location="${testBinaries}"/>
+                <pathelement location="${destination}/bin"/>
+                <fileset dir="${src.root}/lib" includes="*.jar"/>
+                <fileset dir="${src.root}/build-lib" includes="*.jar"/>
+            </classpath>
+
+            <formatter type="plain"/>
+
+            <batchtest fork="yes" todir="${destination}">
+                <fileset dir="${testBinaries}/com/novell/ldapchai/tests">
+                    <include name="**/*Test*"/>
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+
+</project>

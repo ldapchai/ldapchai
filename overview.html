@@ -1,0 +1,73 @@
+<!--
+  ~ LDAP Chai API
+  ~ Copyright (c) 2006-2009 Novell, Inc.
+  ~ Copyright (c) 2009 Jason D. Rivard
+  ~
+  ~ This library is free software; you can redistribute it and/or
+  ~ modify it under the terms of the GNU Lesser General Public
+  ~ License as published by the Free Software Foundation; either
+  ~ version 2.1 of the License, or (at your option) any later version.
+  ~
+  ~ This library is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  ~ Lesser General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU Lesser General Public
+  ~ License along with this library; if not, write to the Free Software
+  ~ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  -->
+
+<body>
+The LDAP Chai API, easy to use LDAP for Java developers.  See also the <a href="http://developer.novell.com/wiki/index.php/LDAP_Chai">LDAP Chai Project Page</a>.
+<p/>
+LDAP Chai is a wrapper library that makes using ldap services as simple and easy as it can be.
+LDAP Chai has methods for commonly used functions, and relieves developers of the need to write code that has been written many times before.
+<p/>
+Several useful features make LDAP Chai an ideal choice for building ldap applications:
+<ul>
+    <li><b>ldap fail-over</b> - allows your application to easily take advantage of
+        mirrored/replicated ldap directories that are common in enterprise environemnts.
+        see {@link com.novell.ldapchai.provider.ChaiSetting#FAILOVER_ENABLE}.
+    </li>
+    <li><b>idle connection watchdog</b> - closes and re-opens ldap connections (sockets)
+        automatically based on activity, keeping the connection count lower than it would
+        be otherwise
+        {@link com.novell.ldapchai.provider.ChaiSetting#WATCHDOG_ENABLE}.
+    </li>
+    <li><b>pluggable provider interface</b> - wraps commonly used low level LDAP APIs such
+        as JNDI ldap api or JLDAP api for maximum compatibility.
+        {@link com.novell.ldapchai.provider.ChaiSetting#PROVIDER_IMPLEMENTATION}.
+    </li>
+</ul>
+
+<p/>
+LDAP Chai also has a rich library of password mangement, policy and forgotten password methods.
+<p/>
+{@link com.novell.ldapchai.provider.ChaiProvider} is the foundation interface for LDAP Chai, and contains
+the basic ldap accessor methods.  Direct use of {@code ChaiProvider} is discouraged, instead
+use the wrapper class {@link com.novell.ldapchai.ChaiEntry} and its subclasses wherever practical.  {@code ChaiEntry} instances
+wrap an LDAP DN, and relieve the caller of the necessity of working directly with String DNs.
+<p/>
+{@code ChaiProvider} instances can be obtained using {@link com.novell.ldapchai.provider.ChaiProviderFactory}.  Similarly,
+{@code ChaiEntry} instances can be obtained using {@link com.novell.ldapchai.ChaiFactory}.
+<p/>
+<h4>License</h4>
+<pre>
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+</pre>
+@author Jason D. Rivard
+</body>
+
