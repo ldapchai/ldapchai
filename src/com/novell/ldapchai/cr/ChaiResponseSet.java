@@ -26,7 +26,7 @@ import com.novell.ldapchai.exception.ChaiErrorCode;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
-import com.novell.ldapchai.util.Base64Util;
+import com.novell.ldapchai.util.internal.Base64Util;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
 import org.jdom.*;

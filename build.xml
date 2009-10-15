@@ -66,7 +66,8 @@
             </classpath>
             <excludepackage name="com.novell.ldapchai.schema"/>
             <excludepackage name="com.novell.ldapchai.cr.nmasAuth"/>
-            <excludepackage name="com.novell.ldapchai.impl.*"/>           
+            <excludepackage name="com.novell.ldapchai.util.internal"/>
+            <excludepackage name="com.novell.ldapchai.impl.*"/>
         </javadoc>
     </target>
 
