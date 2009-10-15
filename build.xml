@@ -33,6 +33,7 @@
 
     <target name="clean" depends="init">
         <delete dir="${destination}"/>
+        <!--<delete dir="${src.root}/javadoc" file="*"/>-->
     </target>
 
     <target name="compileCode" depends="init">
@@ -49,11 +50,11 @@
     <target name="javadoc" depends="init,javadoc-public,javadoc-private"/>
 
     <target name="javadoc-public" depends="init">
-        <mkdir dir="${destination}/javadoc-public"/>
+        <mkdir dir="${src.root}/javadoc"/>
         <javadoc packagenames="com.novell.ldapchai.*"
                  sourcepath="${src.root}/src"
                  overview="overview.html"
-                 destdir="${destination}/javadoc-public"
+                 destdir="${src.root}/javadoc"
                  access="public"
                  defaultexcludes="yes"
                  description="public documentation">
