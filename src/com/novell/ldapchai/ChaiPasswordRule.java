@@ -63,7 +63,7 @@ public enum ChaiPasswordRule {
     MinimumSpecial("chai.pwrule.special.min", RuleType.MIN, "0"),
     MaximumSpecial("chai.pwrule.special.max", RuleType.MAX, "0"),
     AllowFirstCharSpecial("chai.pwrule.special.allowFirst", RuleType.BOOLEAN, "true"),
-    AllowLastCharSpecial("chai.pwrule.special.allowLast", RuleType.BOOLEAN, "truem"),
+    AllowLastCharSpecial("chai.pwrule.special.allowLast", RuleType.BOOLEAN, "true"),
     MaximumRepeat("chai.pwrule.repeat.max", RuleType.MAX,"0"),
     MaximumSequentialRepeat("chai.pwrule.sequentialRepeat.max", RuleType.MAX,"0"),
     ChangeMessage("chai.pwrule.changeMessage", RuleType.TEXT, ""),

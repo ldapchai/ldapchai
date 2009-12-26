@@ -25,6 +25,7 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -224,7 +225,7 @@ class FailOverWrapper implements InvocationHandler {
      * Despite the last known good cache, every rotation machine maintains an unrelated state.  The cache
      * is only used for setting the initial slot used when a new rotation machine is created.
      */
-    private static class RotationMachine {
+    private static class RotationMachine implements Serializable {
         private enum FAILSTATE {
             NEW, OKAY, SEEKING, FAILED
         }
@@ -240,6 +241,8 @@ class FailOverWrapper implements InvocationHandler {
         private static final Map<Integer,Integer> LAST_KNOWN_GOOD_CACHE = new LinkedHashMap<Integer,Integer>();
         private static final int MAX_SIZE_LNG_CACHE = 50;
         private static long lngLastPopulateTime = System.currentTimeMillis();
+
+        private Exception lastConnectionException;
 
         private volatile FAILSTATE failState = FAILSTATE.NEW;
 
@@ -321,7 +324,13 @@ class FailOverWrapper implements InvocationHandler {
                 }
             }
 
-            throw new ChaiUnavailableException("unable to connect to any configured ldap url", ChaiErrorCode.COMMUNICATION);
+            final StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("unable to connect to any configured ldap url");
+            if (lastConnectionException != null) {
+                errorMsg.append(", last error: ");
+                errorMsg.append(lastConnectionException.getMessage());
+            }
+            throw new ChaiUnavailableException(errorMsg.toString(), ChaiErrorCode.COMMUNICATION);
         }
 
         public synchronized void reportBrokenProvider(final ChaiProvider provider)
@@ -382,6 +391,7 @@ class FailOverWrapper implements InvocationHandler {
                         makeNewProvider(activeSlot);
                         success = true;
                     } catch (ChaiUnavailableException e) {
+                        lastConnectionException = e;
                         if (settings.failOverHelper.errorIsRetryable(e)) {
                             LOGGER.debug("error connecting to ldap server, will retry, " + e.getMessage());
                         } else {
@@ -409,7 +419,7 @@ class FailOverWrapper implements InvocationHandler {
             } catch (ChaiUnavailableException e) {
                 throw e;
             } catch (Exception e) {
-                final String errorMsg = "unexepected error createding new chaiprovider: " + e.getMessage();
+                final String errorMsg = "unexepected error creating new FailOver ChaiProvider: " + e.getMessage();
                 LOGGER.error(errorMsg);
                 throw new IllegalStateException(errorMsg, e);
             }

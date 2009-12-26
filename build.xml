@@ -50,11 +50,11 @@
     <target name="javadoc" depends="init,javadoc-public,javadoc-private"/>
 
     <target name="javadoc-public" depends="init">
-        <mkdir dir="${src.root}/javadoc"/>
+        <mkdir dir="${destination}/javadoc-public"/>
         <javadoc packagenames="com.novell.ldapchai.*"
                  sourcepath="${src.root}/src"
                  overview="overview.html"
-                 destdir="${src.root}/javadoc"
+                 destdir="${destination}/javadoc-public"
                  access="public"
                  defaultexcludes="yes"
                  description="public documentation">

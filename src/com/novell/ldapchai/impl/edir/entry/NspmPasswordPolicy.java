@@ -298,15 +298,14 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 null),
 
         /**
-         * The maximum number of passwords allowed in the user's password history list (true/false).
-         * While stored in this {@code PasswordPolicy}, values are seperated by {@link Character#LINE_SEPARATOR}.
+         * While stored in this {@code PasswordPolicy}, values are separated by {@link Character#LINE_SEPARATOR}.
          * This rule is not directly enforced by the Chai API.
          */
         PASSWORD_EXCLUDE_LIST(
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_EXCLUDE_LIST,
-                String.valueOf(Character.LINE_SEPARATOR),
-                null),
+                "",
+                ChaiPasswordRule.DisallowedValues),
 
         /**
          * Bitmask of policy options.

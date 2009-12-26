@@ -174,7 +174,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
             }
         }
 
-        //special read to for multivaled attributes:
+        //special read to for multivalued attributes:
         {
             final List<String> results = entryValues.get(Attribute.DISALLOWED_ATTRIBUTES.getLdapAttribute());
             if (results != null) {

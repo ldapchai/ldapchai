@@ -278,7 +278,7 @@ public interface ChaiUser extends ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Convienence method to read this ChaiUser last login time.
+     * Convenience method to read this ChaiUser last login time.
      *
      * @return The value of the attribute, or null if no value
      * @throws ChaiOperationException   If there is an error during the operation
@@ -288,17 +288,17 @@ public interface ChaiUser extends ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Retreive the user's current password.  This method is likely to fail if a variety of conditons are not met:
+     * Retrieve the user's current password.  This method is likely to fail if a variety of conditions are not met:
      * <ol>
      * <li>The connection to the server is SSL</li>
-     * <li>The ChaiProvider's {@link com.novell.ldapchai.provider.ChaiConfiguration#setSecurityMode(com.novell.ldapchai.provider.ChaiConfiguration.SECURITY_MODE)}
-     * is set to {@link com.novell.ldapchai.provider.ChaiConfiguration.SECURITY_MODE#NMAS}</li>
-     * <li>The user entry's assigned password policy supports user or admin retreival of passwords
-     * <li>The connection has rights to retreive the password</li>
+     * <li>The ChaiProvider's {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS}
+     * is set to true.
+     * <li>The user entry's assigned password policy supports user or admin retrieval of passwords
+     * <li>The connection has rights to retrieve the password</li>
      * </ol>
      *
      * @return the users password
-     * @throws UnsupportedOperationException If the configuration of the provider is not suitable for retreiving passwords.
+     * @throws UnsupportedOperationException If the configuration of the provider is not suitable for retrieving passwords.
      * @throws ChaiOperationException        If there is an error during the operation
      * @throws ChaiUnavailableException      If the directory server(s) are unavailable
      */
