@@ -109,6 +109,7 @@ public interface ChaiProvider {
         GENERIC,
         NOVELL_EDIRECTORY,
         MICROSOFT_ACTIVE_DIRECTORY,
+        OPEN_LDAP
     }
 
 // -------------------------- OTHER METHODS --------------------------

@@ -26,9 +26,9 @@ import com.novell.ldapchai.exception.ChaiErrorCode;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
-import com.novell.ldapchai.util.internal.Base64Util;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
+import com.novell.ldapchai.util.internal.Base64Util;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -39,10 +39,9 @@ import java.io.StringReader;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 class ChaiResponseSet extends AbstractResponseSet {
 // ----------------------------- CONSTANTS ----------------------------
@@ -99,6 +98,7 @@ class ChaiResponseSet extends AbstractResponseSet {
     private final static String XML_NODE_ANSWER_VALUE = "answer";
 
     private final static String XML_ATTRIBUTE_VERSION = "version";
+    private final static String XML_ATTRIBUTE_CHAI_VERSION = "chaiVersion";
     private final static String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
     private final static String XML_ATTRIBUTE_REQUIRED = "required";
     private final static String XNL_ATTRIBUTE_CONTENT_FORMAT = "format";
@@ -106,10 +106,19 @@ class ChaiResponseSet extends AbstractResponseSet {
     private final static String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
     private final static String XNL_ATTRIBUTE_MAX_LENGTH = "maxLength";
     private final static String XML_ATTRIBUTE_CASE_INSENSITIVE = "caseInsensitive";
-    private final static String XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER = "challengeSetID"; // identifer from challenge set.
+    private final static String XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER = "challengeSetID"; // identifier from challenge set.
+    private final static String XML_ATTRIBUTE_TIMESTAMP = "time";
+
+    private final static String VALUE_VERSION = "2";
+
+    private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
     private FormatType formatType;
     private boolean caseInsensitive;
+
+    static {
+        DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("Zulu"));
+    }
 
 // -------------------------- STATIC METHODS --------------------------
 
@@ -163,6 +172,7 @@ class ChaiResponseSet extends AbstractResponseSet {
         ChaiResponseSet.FormatType respFormat = ChaiResponseSet.FormatType.TEXT;
         boolean caseInsensitive = false;
         String csIdentifier = null;
+        Date timestamp = null;
 
         try {
             final SAXBuilder builder = new SAXBuilder();
@@ -179,11 +189,25 @@ class ChaiResponseSet extends AbstractResponseSet {
             }
 
             {
-                final Attribute caseAttr = rootElement.getAttribute(XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER);
-                if (caseAttr != null) {
-                    csIdentifier = caseAttr.getValue();
+                final Attribute csIdentiferAttr = rootElement.getAttribute(XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER);
+                if (csIdentiferAttr != null) {
+                    csIdentifier = csIdentiferAttr.getValue();
                 }
             }
+
+            {
+                final Attribute timeAttr = rootElement.getAttribute(XML_ATTRIBUTE_TIMESTAMP);
+                if (timeAttr != null) {
+                    String timeStr = timeAttr.getValue();
+                    try {
+                        timestamp = DATE_FORMATTER.parse(timeStr);
+                    } catch (ParseException e) {
+                        LOGGER.error("unexpected error attempting to parse timestamp: " + e.getMessage());
+                    }
+                }
+            }
+
+
 
             for (final Object o : rootElement.getChildren()) {
                 final Element loopElement = (Element) o;
@@ -221,7 +245,7 @@ class ChaiResponseSet extends AbstractResponseSet {
             challengeLocale = new Locale(localeAttr.getValue());
         }
 
-        return new ChaiResponseSet(crMap, challengeLocale, minRandRequired, STATE.READ, user, respFormat, caseInsensitive, csIdentifier);
+        return new ChaiResponseSet(crMap, challengeLocale, minRandRequired, STATE.READ, user, respFormat, caseInsensitive, csIdentifier, timestamp);
     }
 
 // --------------------------- CONSTRUCTORS ---------------------------
@@ -234,13 +258,15 @@ class ChaiResponseSet extends AbstractResponseSet {
             final ChaiUser user,
             final FormatType formatType,
             final boolean caseInsensitive,
-            final String csIdentifer
+            final String csIdentifer,
+            final Date timestamp
     )
             throws ChaiValidationException
     {
         super(crMap, locale, minimumRandomRequired, state, user, csIdentifer);
         this.formatType = formatType == null ? FormatType.SHA1 : formatType;
         this.caseInsensitive = caseInsensitive;
+        this.timestamp = timestamp;
     }
 
 // ------------------------ CANONICAL METHODS ------------------------
@@ -403,7 +429,8 @@ class ChaiResponseSet extends AbstractResponseSet {
         final Element rootElement = new Element(XML_NODE_ROOT);
         rootElement.setAttribute(XML_ATTRIBUTE_MIN_RANDOM_REQUIRED, String.valueOf(rs.getChallengeSet().getMinRandomRequired()));
         rootElement.setAttribute(XML_ATTRIBUTE_LOCALE, rs.getChallengeSet().getLocale().toString());
-        rootElement.setAttribute(XML_ATTRIBUTE_VERSION, ChaiConstant.CHAI_API_VERSION);
+        rootElement.setAttribute(XML_ATTRIBUTE_VERSION, VALUE_VERSION);
+        rootElement.setAttribute(XML_ATTRIBUTE_CHAI_VERSION, ChaiConstant.CHAI_API_VERSION);
 
         if (rs.caseInsensitive) {
             rootElement.setAttribute(XML_ATTRIBUTE_CASE_INSENSITIVE, "true");
@@ -411,6 +438,10 @@ class ChaiResponseSet extends AbstractResponseSet {
 
         if (rs.csIdentifier != null) {
             rootElement.setAttribute(XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER, rs.csIdentifier);
+        }
+
+        if (rs.timestamp != null) {
+            rootElement.setAttribute(XML_ATTRIBUTE_TIMESTAMP, DATE_FORMATTER.format(rs.timestamp));
         }
 
         for (final Challenge loopChallenge : rs.crMap.keySet()) {

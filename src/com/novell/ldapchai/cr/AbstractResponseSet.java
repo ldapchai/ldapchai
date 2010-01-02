@@ -61,6 +61,7 @@ abstract class AbstractResponseSet implements ResponseSet {
     protected Locale locale;
     protected int minimumRandomRequired;
     protected String csIdentifier;
+    protected Date timestamp;
 
     protected STATE state;
 
@@ -84,6 +85,8 @@ abstract class AbstractResponseSet implements ResponseSet {
         this.crMap = crMap;
         this.user = user;
         this.csIdentifier = csIdentifier;
+
+        this.timestamp = new Date();
 
         this.isValid();
 
@@ -210,7 +213,7 @@ abstract class AbstractResponseSet implements ResponseSet {
                 case CHAI_SHA1_SALT:
                 case CHAI_TEXT:
                     final boolean caseInsensitive = Boolean.parseBoolean(user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.CHAI_CASE_INSENSITIVE));
-                    loopResponseSet = new ChaiResponseSet(this.crMap, this.locale, this.minimumRandomRequired, STATE.NEW, user, ChaiResponseSet.FormatType.forCrMode(crMode), caseInsensitive, csIdentifier);
+                    loopResponseSet = new ChaiResponseSet(this.crMap, this.locale, this.minimumRandomRequired, STATE.NEW, user, ChaiResponseSet.FormatType.forCrMode(crMode), caseInsensitive, csIdentifier, new Date());
                     break;
                 default:
                     throw new IllegalStateException("unknwon CR Mode");
@@ -239,6 +242,10 @@ abstract class AbstractResponseSet implements ResponseSet {
     public Locale getLocale()
     {
         return locale;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
     }
 
     // -------------------------- OTHER METHODS --------------------------

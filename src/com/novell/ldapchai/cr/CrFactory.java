@@ -131,12 +131,12 @@ public final class CrFactory {
         final Properties properties = user.getChaiProvider().getChaiConfiguration().getCrSettings();
         final boolean caseInsensitive = StringHelper.convertStrToBoolean(properties.getProperty(CrSetting.CASE_INSENSITIVE.getKey()));
         final ChaiResponseSet.FormatType formatType = ChaiResponseSet.FormatType.forCrMode(CrMode.CHAI_SHA1_SALT);
-        return new ChaiResponseSet(challengeResponseMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, user, formatType, caseInsensitive, csIdentifier);
+        return new ChaiResponseSet(challengeResponseMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, user, formatType, caseInsensitive, csIdentifier, new Date());
     }
 
 
     /**
-     * A convience wrapper for {@link #readAssignedChallengeSet(com.novell.ldapchai.provider.ChaiProvider, com.novell.ldapchai.ChaiPasswordPolicy)}.  This
+     * A convenience wrapper for {@link #readAssignedChallengeSet(com.novell.ldapchai.provider.ChaiProvider, com.novell.ldapchai.ChaiPasswordPolicy)}.  This
      * method will first read the user's password policy using {@link com.novell.ldapchai.ChaiUser#getPasswordPolicy()},
      *
      * @param theUser ChaiUser to read policy for
@@ -161,7 +161,7 @@ public final class CrFactory {
 
 
     /**
-     * A convience wrapper for {@link #readAssignedChallengeSet(com.novell.ldapchai.provider.ChaiProvider, com.novell.ldapchai.ChaiPasswordPolicy)}.  This
+     * A convenience wrapper for {@link #readAssignedChallengeSet(com.novell.ldapchai.provider.ChaiProvider, com.novell.ldapchai.ChaiPasswordPolicy)}.  This
      * method will first read the user's password policy using {@link com.novell.ldapchai.ChaiUser#getPasswordPolicy()},
      * and use the default locale.
      *

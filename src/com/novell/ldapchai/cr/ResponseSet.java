@@ -24,6 +24,7 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 
+import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
@@ -135,4 +136,15 @@ public interface ResponseSet {
      */
     Locale getLocale()
             throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
+
+    /**
+     * Get the timestamp of the response.  Generally indicates when the responseset was created.
+     * @return the Locale used to save the response set.
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     * @throws ChaiOperationException   If there is an error during the write operation
+     * @throws IllegalStateException    if this response set is not suitable for writing, for example, if it has already been written, or was obtained by reading from ldap
+     */
+    Date getTimestamp()
+            throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
+
 }

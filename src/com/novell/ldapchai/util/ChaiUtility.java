@@ -376,7 +376,7 @@ public class ChaiUtility {
     public static ChaiProvider.DIRECTORY_VENDOR determineDirectoryVendor(final ChaiEntry rootDSE)
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String[] interestingAttributes = { "vendorVersion", "rootDomainNamingContext" };
+        final String[] interestingAttributes = { "vendorVersion", "rootDomainNamingContext", "objectClass" };
 
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setAttributes(interestingAttributes);
@@ -384,19 +384,36 @@ public class ChaiUtility {
         searchHelper.setMaxResults(1);
         searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
 
-        final Map<String,Properties> readAttributes = rootDSE.getChaiProvider().search("",searchHelper);
+        final Map<String,Map<String,List<String>>> results = rootDSE.getChaiProvider().searchMultiValues("",searchHelper);
 
-        if (readAttributes != null && readAttributes.size() == 1) {
-            final Properties dseAttrs = readAttributes.get("");
-            if (dseAttrs != null) {
-                final String vendorVersion = dseAttrs.getProperty("vendorVersion","");
-                if (vendorVersion.contains("Novell eDirectory")) {
-                    return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
+        if (results != null && results.size() == 1) {
+            final Map<String,List<String>> rootDseSearchResults = results.get("");
+            if (rootDseSearchResults != null) {
+                final List<String> vendorVersions = rootDseSearchResults.get("vendorVersion");
+                if (vendorVersions != null && vendorVersions.size() > 0) {
+                    for (final String vendorVersionValue : vendorVersions) {
+                        if (vendorVersionValue.contains("Novell eDirectory")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
+                        }
+                    }
                 }
 
-                final String rootDomainNamingContext = dseAttrs.getProperty("rootDomainNamingContext","");
-                if (rootDomainNamingContext.contains("DC=")) {
-                    return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
+                final List<String> rootDomainNamingContexts = rootDseSearchResults.get("rootDomainNamingContext");
+                if (rootDomainNamingContexts != null && rootDomainNamingContexts.size() > 0) {
+                    for (final String rootDomainNamingContextValue : rootDomainNamingContexts) {
+                        if (rootDomainNamingContextValue.contains("DC=")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
+                        }
+                    }
+                }
+
+                final List<String> objectClasses = rootDseSearchResults.get("objectClass");
+                if (objectClasses != null && objectClasses.size() > 0) {
+                    for (final String objectClassValue : objectClasses) {
+                        if (objectClassValue.contains("OpenLDAProotDSE")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP;
+                        }
+                    }
                 }
             }
         }

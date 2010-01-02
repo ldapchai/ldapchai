@@ -140,7 +140,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
     {
         final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
         if (!useNmasSetting) {
-            throw new UnsupportedOperationException("readPassword() is notsupported with non-nmas ChaiConfiguration.securityMode()");
+            throw new UnsupportedOperationException("readPassword() is not supported when ChaiSetting.EDIRECTORY_ENABLE_NMAS is false");
         }
 
         final GetPwdRequest request = new GetPwdRequest("", this.getEntryDN());

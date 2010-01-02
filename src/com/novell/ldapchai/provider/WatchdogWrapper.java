@@ -350,7 +350,9 @@ class WatchdogWrapper implements InvocationHandler {
         private static void checkProvider(final WatchdogWrapper wdWrapper)
         {
             try {
-                wdWrapper.checkStatus();
+                if (wdWrapper != null) {
+                    wdWrapper.checkStatus();
+                }
             } catch (Exception e) {
                 final StringBuilder sb = new StringBuilder();
                 sb.append("error during watchdog provider idle check: ");
