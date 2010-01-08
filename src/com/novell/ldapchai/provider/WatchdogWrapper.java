@@ -371,7 +371,7 @@ class WatchdogWrapper implements InvocationHandler {
                 final Collection<WatchdogWrapper> c = new HashSet<WatchdogWrapper>(activeWrappers);
                 for (final WatchdogWrapper wdWrapper : c) {
                     try {
-                    checkProvider(wdWrapper);
+                        checkProvider(wdWrapper);
                     } catch (Exception e) {
                         try {
                             LOGGER.error("error during watchdog timer check: " + e.getMessage(),e);

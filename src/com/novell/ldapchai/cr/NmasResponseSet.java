@@ -96,29 +96,22 @@ class NmasResponseSet extends AbstractResponseSet {
         }
 
         // convert the xml 'display' elements to a map of locales/strings
-        final Map<String, String> localizedStringMap = new HashMap<String, String>();
+        final Map<Locale, String> localizedStringMap = new HashMap<Locale, String>();
         for (final Object aDisplayChildren : displayChildren) {
             final Element loopDisplay = (Element) aDisplayChildren;
             final Attribute localeAttr = loopDisplay.getAttribute("lang",XML_NAMESPACE);
             if (localeAttr != null) {
                 final String localeStr = localeAttr.getValue();
                 final String displayStr = loopDisplay.getText();
-                localizedStringMap.put(localeStr, displayStr);
+                final Locale localeKey = parseLocaleString(localeStr);
+                localizedStringMap.put(localeKey, displayStr);
             }
         }
 
-        // create the three "possible" values of the key based on the desired locale.
-        final String[] testStrings = new String[]{
-                locale.getLanguage() + "_" + locale.getCountry() + "_" + locale.getVariant(),
-                locale.getLanguage() + "_" + locale.getCountry(),
-                locale.getLanguage()
-        };
+        final Locale matchedLocale = localeResolver(locale, localizedStringMap.keySet());
 
-        // try to find the appropriate key.
-        for (final String lookupKey : testStrings) {
-            if (localizedStringMap.containsKey(lookupKey)) {
-                return localizedStringMap.get(lookupKey);
-            }
+        if (matchedLocale != null) {
+            return localizedStringMap.get(matchedLocale);
         }
 
         // none found, so just return the default string.
@@ -291,6 +284,63 @@ class NmasResponseSet extends AbstractResponseSet {
         }
 
         return success;
+    }
+
+    public static Locale localeResolver(final Locale desiredLocale, final Collection<Locale> localePool) {
+        if (desiredLocale == null || localePool == null || localePool.isEmpty()) {
+            return null;
+        }
+
+        for (final Locale loopLocale : localePool) {
+            if (loopLocale.getLanguage().equalsIgnoreCase(desiredLocale.getLanguage())) {
+                if (loopLocale.getCountry().equalsIgnoreCase(desiredLocale.getCountry())) {
+                    if (loopLocale.getVariant().equalsIgnoreCase(desiredLocale.getVariant())) {
+                        return loopLocale;
+                    }
+                }
+            }
+        }
+
+        for (final Locale loopLocale : localePool) {
+            if (loopLocale.getLanguage().equalsIgnoreCase(desiredLocale.getLanguage())) {
+                if (loopLocale.getCountry().equalsIgnoreCase(desiredLocale.getCountry())) {
+                    return loopLocale;
+                }
+            }
+        }
+
+        for (final Locale loopLocale : localePool) {
+            if (loopLocale.getLanguage().equalsIgnoreCase(desiredLocale.getLanguage())) {
+                return loopLocale;
+            }
+        }
+
+        return null;
+    }
+
+    public static Locale parseLocaleString(final String localeString) {
+        if (localeString == null) {
+            return new Locale("");
+        }
+
+        final StringTokenizer st = new StringTokenizer(localeString, "_");
+
+        if (!st.hasMoreTokens()) {
+            return new Locale("");
+        }
+
+        final String language = st.nextToken();
+        if (!st.hasMoreTokens()) {
+            return new Locale(language);
+        }
+
+        final String country = st.nextToken();
+        if (!st.hasMoreTokens()) {
+            return new Locale(language, country);
+        }
+
+        final String variant = st.nextToken("");
+        return new Locale(language, country, variant);
     }
 
 
