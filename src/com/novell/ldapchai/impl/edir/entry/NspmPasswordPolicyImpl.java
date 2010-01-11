@@ -90,7 +90,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
 
     public String getChallengeSetDN() {
         final List<String> dnValues = allEntryValues.get(Attribute.CHALLENGE_SET_DN.getLdapAttribute());
-        return  (dnValues != null && !dnValues.isEmpty()) ? dnValues.get(0) : "";
+        return (dnValues != null && !dnValues.isEmpty()) ? dnValues.get(0) : "";
     }
 
     public String getSourceDN() {

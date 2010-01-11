@@ -220,7 +220,6 @@ public final class CrFactory {
             throws ChaiUnavailableException, ChaiOperationException, ChaiValidationException
     {
         final String challengeSetDN;
-        final String identifier;
 
         try {
             challengeSetDN = ((NspmPasswordPolicy)passwordPolicy).getChallengeSetDN();
@@ -234,8 +233,7 @@ public final class CrFactory {
             return null;
         }
 
-        identifier = ((NspmPasswordPolicy)passwordPolicy).readStringAttribute("nsimChallengeSetGUID");
-
+        final String identifier = ((NspmPasswordPolicy)passwordPolicy).readStringAttribute("nsimChallengeSetGUID");
         return readNmasAssignedChallengeSetPolicy(provider, challengeSetDN, locale, identifier);
     }
 
