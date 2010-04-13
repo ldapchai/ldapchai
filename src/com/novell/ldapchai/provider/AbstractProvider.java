@@ -485,6 +485,19 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        public final void writeStringAttributes(final String entryDN, final Properties attributeValueProps, final boolean overwrite)
+        {
+            if (entryDN == null) {
+                throw new NullPointerException("entryDN must not be null");
+            }
+            if (attributeValueProps == null) {
+                throw new NullPointerException("attributeValueProps must not be null");
+            }
+            if (attributeValueProps.isEmpty()) {
+                throw new NullPointerException("attributeValueProps must not be empty");
+            }
+        }
+
         public DIRECTORY_VENDOR getDirectoryVendor() throws ChaiUnavailableException {
             return null;
         }

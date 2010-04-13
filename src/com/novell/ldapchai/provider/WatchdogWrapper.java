@@ -376,8 +376,6 @@ class WatchdogWrapper implements InvocationHandler {
                         try {
                             LOGGER.error("error during watchdog timer check: " + e.getMessage(),e);
                         } catch (Exception e2) {
-                            System.err.println("unexpected error while logging unexpected error during watchdog timer check: ");
-                            e2.printStackTrace(System.err);
                         }
                     }
                 }

@@ -753,6 +753,43 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @LdapOperation
+    @ModifyOperation
+    public final void writeStringAttributes(final String entryDN, final Properties attributeValueProps, final boolean overwrite)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        activityPreCheck();
+        INPUT_VALIDATOR.writeStringAttributes(entryDN, attributeValueProps, overwrite);
+
+        // Determine the modification type, if replace, only replace on the first attribute, the rest just get added.
+        final int modType = overwrite ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
+
+        // Create the ModificationItem
+        final List<ModificationItem> modificationItems = new ArrayList<ModificationItem>();
+        for (Enumeration propEnum = attributeValueProps.propertyNames(); propEnum.hasMoreElements(); ) {
+            final String attrName = (String)propEnum.nextElement();
+
+            // Create a BasicAttribute for the object.
+            final BasicAttribute attributeToReplace = new BasicAttribute(attrName, attributeValueProps.getProperty(attrName));
+
+            // Populate the ModificationItem object with the flag & the attribute to replace.
+            modificationItems.add(new ModificationItem(modType, attributeToReplace));
+        }
+
+        // convert to array
+        final ModificationItem[] modificationItemArray = modificationItems.toArray(new ModificationItem[modificationItems.size()]);
+
+        // get ldap connection
+        final LdapContext ldapConnection = getLdapConnection();
+
+        // Modify the Attributes.
+        try {
+            ldapConnection.modifyAttributes(entryDN, modificationItemArray);
+        } catch (NamingException e) {
+            convertNamingException(e);
+        }
+    }
+
 // --------------------- Interface ChaiProviderImplementor ---------------------
 
     /**

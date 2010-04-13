@@ -448,6 +448,21 @@ public interface ChaiProvider {
     public void writeStringAttribute(String entryDN, String attribute, String[] values, boolean overwrite)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
+    /**
+     * Write multiple string values to the specified object's specified attributes.
+     *
+     * @param entryDN   A valid entryDN
+     * @param attributeValueProps A map of attribute names and values
+     * @param overwrite Overwrite existing values
+     * @throws ChaiOperationException   If an error is encountered during the operation
+     * @throws ChaiUnavailableException If no directory servers are reachable
+     * @throws IllegalStateException    If the underlying connection is not in an available state
+     * @see com.novell.ldapchai.ChaiEntry#writeStringAttributes(java.util.Properties)
+     */
+    @ChaiProviderImplementor.LdapOperation
+    @ChaiProviderImplementor.ModifyOperation
+    public void writeStringAttributes(String entryDN, Properties attributeValueProps, boolean overwrite)
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
      * Discovers and returns the Chai API's interpretation of the vendor of the configured directory.

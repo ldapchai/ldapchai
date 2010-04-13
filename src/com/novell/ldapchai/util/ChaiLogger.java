@@ -28,8 +28,8 @@ package com.novell.ldapchai.util;
 public class ChaiLogger {
 // ------------------------------ FIELDS ------------------------------
 
-    private String name;
-    private org.apache.log4j.Logger logger;
+    private final String name;
+    private final org.apache.log4j.Logger logger;
 
 // -------------------------- STATIC METHODS --------------------------
 

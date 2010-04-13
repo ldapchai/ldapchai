@@ -26,10 +26,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.SearchHelper;
 
 import java.net.InetAddress;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * {@code ChaiEntry} instances represent ldap entries.  Most other {@code Chai*} interfaces in this package inherit from
@@ -382,20 +379,33 @@ public interface ChaiEntry {
      * @param attributeValue New value for the attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
      */
     void writeStringAttribute(String attributeName, String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Removes all existing values, if any, and sets the new values.
+     * Removes all existing values, if any, and sets the new values
      *
      * @param attributeName   Name of the attribute
      * @param attributeValues New values for the attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
      */
     void writeStringAttribute(String attributeName, Set<String> attributeValues)
+            throws ChaiOperationException, ChaiUnavailableException;
+
+    /**
+     * Removes all existing values, if any, and sets the new value.
+     *
+     * @param attributeValueProps  Name of the attributes and values to set on the entry.  Any existing values will
+     * be replaced.
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttributes(String, java.util.Properties, boolean)
+     */
+    void writeStringAttributes(Properties attributeValueProps)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**

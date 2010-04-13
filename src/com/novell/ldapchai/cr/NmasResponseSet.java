@@ -342,7 +342,5 @@ class NmasResponseSet extends AbstractResponseSet {
         final String variant = st.nextToken("");
         return new Locale(language, country, variant);
     }
-
-
 }
 

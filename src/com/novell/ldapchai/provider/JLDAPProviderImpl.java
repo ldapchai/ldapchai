@@ -479,6 +479,34 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
+    @LdapOperation
+    @ModifyOperation
+    public final void writeStringAttributes(final String entryDN, final Properties attributeValueProps, final boolean overwrite)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        activityPreCheck();
+        INPUT_VALIDATOR.writeStringAttributes(entryDN, attributeValueProps, overwrite);
+
+
+        final int modOption = overwrite ? LDAPModification.REPLACE : LDAPModification.ADD;
+
+        final List<LDAPModification> modifications = new ArrayList<LDAPModification>();
+        for (Enumeration propEnum = attributeValueProps.propertyNames(); propEnum.hasMoreElements(); ) {
+            final String attrName = (String)propEnum.nextElement();
+            final LDAPAttribute ldapAttr = new LDAPAttribute(attrName, attributeValueProps.getProperty(attrName));
+            final LDAPModification mod = new LDAPModification(modOption, ldapAttr);
+            modifications.add(mod);
+        }
+
+        final LDAPModification[] modificationArray = modifications.toArray(new LDAPModification[modifications.size()]);
+
+        try {
+            ldapConnection.modify(entryDN, modificationArray);
+        } catch (LDAPException e) {
+            throw ChaiOperationException.forErrorMessage(e.getLDAPErrorMessage());
+        }
+    }
+
 // --------------------- Interface ChaiProviderImplementor ---------------------
 
     public Object getConnectionObject()

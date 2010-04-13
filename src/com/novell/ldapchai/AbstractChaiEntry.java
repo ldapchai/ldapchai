@@ -359,6 +359,12 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         chaiProvider.writeStringAttribute(this.entryDN, attributeName, new String[]{attributeValue}, true);
     }
 
+    public final void writeStringAttributes(final Properties attributeValueProps)
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        chaiProvider.writeStringAttributes(this.entryDN, attributeValueProps, true);
+    }
+
     public final void writeStringAttribute(final String attributeName, final Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException
     {

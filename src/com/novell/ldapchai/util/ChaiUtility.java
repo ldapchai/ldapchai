@@ -246,7 +246,7 @@ public class ChaiUtility {
      *   ChaiUser theUser =                                                                     // create a new chai user.
      *      ChaiFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
      * <p/>
-     *   theUser.writeStringAttribute("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
+     *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
      * <p/>
      *   final int maximumWaitTime = 120 * 1000;                                                // maximum time to wait for replication
      *   final int pauseTime = 3 * 1000;                                                        // time between iterations
