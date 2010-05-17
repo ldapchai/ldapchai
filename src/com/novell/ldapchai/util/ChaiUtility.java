@@ -394,8 +394,12 @@ public class ChaiUtility {
         if (results != null && results.size() == 1) {
             final Map<String,List<String>> rootDseSearchResults = results.get("");
             if (rootDseSearchResults != null) {
-                final List<String> vendorVersions = rootDseSearchResults.get("vendorVersion");
-                if (vendorVersions != null && vendorVersions.size() > 0) {
+                final List<String> vendorVersions = rootDseSearchResults.get("vendorVersion") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("vendorVersion");
+                final List<String> vendorNames = rootDseSearchResults.get("vendorName") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("vendorName");
+                final List<String> rootDomainNamingContexts = rootDseSearchResults.get("rootDomainNamingContext") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("rootDomainNamingContext");
+                final List<String> objectClasses = rootDseSearchResults.get("objectClass") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("objectClass");
+
+                { // try to detect Novell eDirectory
                     for (final String vendorVersionValue : vendorVersions) {
                         if (vendorVersionValue.contains("Novell eDirectory")) {
                             return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
@@ -403,17 +407,7 @@ public class ChaiUtility {
                     }
                 }
 
-                final List<String> vendorNames = rootDseSearchResults.get("vendorNames");
-                if (vendorVersions != null && vendorVersions.size() > 0) {
-                    for (final String vendorNamesValue : vendorNames) {
-                        if (vendorNamesValue.contains("389 Project")) {
-                            return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
-                        }
-                    }
-                }
-
-                final List<String> rootDomainNamingContexts = rootDseSearchResults.get("rootDomainNamingContext");
-                if (rootDomainNamingContexts != null && rootDomainNamingContexts.size() > 0) {
+                { // try to detect ms-active directory
                     for (final String rootDomainNamingContextValue : rootDomainNamingContexts) {
                         if (rootDomainNamingContextValue.contains("DC=")) {
                             return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
@@ -421,8 +415,21 @@ public class ChaiUtility {
                     }
                 }
 
-                final List<String> objectClasses = rootDseSearchResults.get("objectClass");
-                if (objectClasses != null && objectClasses.size() > 0) {
+
+                { // try to detect 389 Directory
+                    for (final String vendorNamesValue : vendorNames) {
+                        if (vendorNamesValue.contains("389 Project")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
+                        }
+                    }
+                    for (final String vendorVersionsValue : vendorVersions) {
+                        if (vendorVersionsValue.contains("389-Directory")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
+                        }
+                    }
+                }
+
+                { // try to detect openLDAP
                     for (final String objectClassValue : objectClasses) {
                         if (objectClassValue.contains("OpenLDAProotDSE")) {
                             return ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP;
