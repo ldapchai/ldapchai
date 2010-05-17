@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -28,6 +28,7 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
 import com.novell.ldapchai.util.StringHelper;
@@ -35,7 +36,7 @@ import com.novell.ldapchai.util.StringHelper;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-public class UserImpl extends AbstractChaiUser implements User {
+class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
     private static int COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT = 0x0010;
     private static int COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED = 0x800000;
@@ -44,11 +45,6 @@ public class UserImpl extends AbstractChaiUser implements User {
     UserImpl(final String userDN, final ChaiProvider chaiProvider)
     {
         super(userDN, chaiProvider);
-    }
-
-    public Date readDateAttribute(String attributeName) throws ChaiUnavailableException, ChaiOperationException {
-        final String attrValue = readStringAttribute(attributeName);
-        return attrValue == null ? null : ADEntries.convertWinEpochToDate(attrValue);
     }
 
     public void addGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {

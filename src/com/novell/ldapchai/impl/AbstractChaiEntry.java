@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,11 +18,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai;
+package com.novell.ldapchai.impl;
 
+import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.exception.ChaiErrorCode;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
@@ -34,7 +38,7 @@ import java.util.*;
 /**
  * A complete implementation of {@code ChaiEntry} interface.
  * <p/>
- * Clients looking to obtain a {@code ChaiEntry} instance should look to {@link ChaiFactory}.
+ * Clients looking to obtain a {@code ChaiEntry} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
  * <p/>
  * @author Jason D. Rivard
  */
@@ -196,16 +200,17 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     }
 
     public final ChaiEntry getParentEntry()
-        {
-            final StringBuilder sb = new StringBuilder(this.getEntryDN());
-            final int firstCommaPos = this.getEntryDN().indexOf(",");
-            if (firstCommaPos == -1) {
-                return null;
-            }
-            sb.delete(0, firstCommaPos + 1);
-            final String parentDN = sb.toString();
-            return ChaiFactory.createChaiEntry(parentDN,getChaiProvider());
+            throws ChaiUnavailableException
+    {
+        final StringBuilder sb = new StringBuilder(this.getEntryDN());
+        final int firstCommaPos = this.getEntryDN().indexOf(",");
+        if (firstCommaPos == -1) {
+            return null;
         }
+        sb.delete(0, firstCommaPos + 1);
+        final String parentDN = sb.toString();
+        return ChaiFactory.createChaiEntry(parentDN,getChaiProvider());
+    }
 
     public final boolean isValid()
     {
@@ -389,10 +394,19 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         chaiProvider.writeBinaryAttribute(this.entryDN, attributeName, attributeValues, true);
     }
 
-    public final void replaceBinaryAttribute(final String attributeName, final byte[] oldValue, final byte[] newValue)
+    public void replaceBinaryAttribute(final String attributeName, final byte[] oldValue, final byte[] newValue)
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.replaceBinaryAttribute(this.entryDN, attributeName, oldValue, newValue);
     }
-    
+
+    public Date readDateAttribute(final String attributeName)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        final String lastLoginTimeStr = this.readStringAttribute(attributeName);
+        if (lastLoginTimeStr != null) {
+            return EdirEntries.convertZuluToDate(lastLoginTimeStr);
+        }
+        return null;
+    }
 }

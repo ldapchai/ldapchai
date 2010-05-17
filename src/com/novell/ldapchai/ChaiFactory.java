@@ -22,10 +22,15 @@ package com.novell.ldapchai;
 
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.ad.entry.ADEntryFactory;
+import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389EntryFactory;
 import com.novell.ldapchai.impl.edir.entry.EdirEntryFactory;
+import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.util.ChaiLogger;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Factory for {@link ChaiEntry} and its subclasses.  Instances are returned based
@@ -46,8 +51,14 @@ public final class ChaiFactory {
 // ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiFactory.class);
+    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ChaiEntryFactory> ENTRY_FACTORY_MAP = new HashMap<ChaiProvider.DIRECTORY_VENDOR,ChaiEntryFactory>();
 
-
+    static {
+        ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY, new EdirEntryFactory());
+        ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY, new ADEntryFactory());
+        ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389, new DirectoryServer389EntryFactory());
+        ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.GENERIC, new GenericEntryFactory());
+    }
 // -------------------------- STATIC METHODS --------------------------
 
     /**
@@ -59,8 +70,10 @@ public final class ChaiFactory {
      * @return A valid {@code ChaiEntry}
      */
     public static ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider)
+            throws ChaiUnavailableException
     {
-        return EdirEntryFactory.createEntry(entryDN, provider);
+        final ChaiEntryFactory entryFactory = getChaiEntryFactory(provider.getDirectoryVendor());
+        return entryFactory.createChaiEntry(entryDN, provider);
     }
 
     /**
@@ -72,8 +85,10 @@ public final class ChaiFactory {
      * @return A valid {@code ChaiGroup}
      */
     public static ChaiGroup createChaiGroup(final String groupDN, final ChaiProvider provider)
+            throws ChaiUnavailableException
     {
-        return EdirEntryFactory.createGroupOfNames(groupDN, provider);
+        final ChaiEntryFactory entryFactory = getChaiEntryFactory(provider.getDirectoryVendor());
+        return entryFactory.createChaiGroup(groupDN, provider);
     }
 
     /**
@@ -85,19 +100,10 @@ public final class ChaiFactory {
      * @return A valid {@code ChaiUser}
      */
     public static ChaiUser createChaiUser(final String userDN, final ChaiProvider provider)
+            throws ChaiUnavailableException
     {
-        ChaiProvider.DIRECTORY_VENDOR directoryVendor = ChaiProvider.DIRECTORY_VENDOR.GENERIC;
-        try {
-            directoryVendor = provider.getDirectoryVendor();
-        } catch (Exception e) {
-            LOGGER.warn("error while reading directory vendor: " + e.getMessage(),e);
-        }
-
-        if (directoryVendor == ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY) {
-            return ADEntryFactory.createUser(userDN, provider);
-        }
-
-        return EdirEntryFactory.createInetOrgPerson(userDN, provider);
+        final ChaiEntryFactory entryFactory = getChaiEntryFactory(provider.getDirectoryVendor());
+        return entryFactory.createChaiUser(userDN, provider);
     }
 
     /**
@@ -118,10 +124,28 @@ public final class ChaiFactory {
         return ChaiProviderFactory.quickProvider(ldapURL, bindDN, password);
     }
 
+    private static ChaiEntryFactory getChaiEntryFactory(final ChaiProvider.DIRECTORY_VENDOR vendor) {
+        final ChaiEntryFactory returnEntryFactory =  ENTRY_FACTORY_MAP.get(vendor);
+        if (returnEntryFactory == null) {
+            return ENTRY_FACTORY_MAP.get(ChaiProvider.DIRECTORY_VENDOR.GENERIC);
+        }
+        return returnEntryFactory;
+    }
+
 // --------------------------- CONSTRUCTORS ---------------------------
 
     private ChaiFactory()
     {
+    }
+
+    public interface ChaiEntryFactory {
+        ChaiUser createChaiUser(final String entryDN, final ChaiProvider provider);
+
+        ChaiGroup createChaiGroup(final String entryDN, final ChaiProvider provider);
+
+        ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider);
+
+        ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor();
     }
 }
 

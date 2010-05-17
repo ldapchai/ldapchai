@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai;
+package com.novell.ldapchai.impl;
 
+import com.novell.ldapchai.*;
+import com.novell.ldapchai.cr.ChallengeSet;
+import com.novell.ldapchai.cr.ResponseSet;
 import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
@@ -28,12 +32,12 @@ import com.novell.ldapchai.provider.ChaiSetting;
 import java.util.*;
 
 /**
-* A complete implementation of {@code ChaiUser} interface.
-* <p/>
-* Clients looking to obtain a {@code ChaiUser} instance should look to {@link ChaiFactory}.
-* <p/>
+ * A complete implementation of {@code ChaiUser} interface.
+ * <p/>
+ * Clients looking to obtain a {@code ChaiUser} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
+ * <p/>
  * @author Jason D. Rivard
-*/
+ */
 
 public abstract class AbstractChaiUser extends AbstractChaiEntry implements ChaiUser {
     /**
@@ -96,15 +100,15 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     }
 
 
-    /*
-    public final PasswordPolicy getPasswordPolicy()
-            throws ChaiUnavailableException, ChaiOperationException
+    public boolean testPassword(final String password)
+            throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
-
-        return ChaiUtility.readPasswordPolicy(this);
+        try {
+            return this.compareStringAttribute(ATTR_PASSWORD, password);
+        } catch (ChaiOperationException e) {
+            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        }
     }
-    */
-
 
     public Properties readStandardIdentityAttributes()
             throws ChaiOperationException, ChaiUnavailableException
@@ -123,6 +127,84 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readStringAttribute(ATTR_COMMON_NAME);
+    }
+
+    public void addGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+        this.addAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, theGroup.getEntryDN());
+        theGroup.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    }
+
+    public void removeGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+        this.deleteAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, theGroup.getEntryDN());
+        theGroup.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    }
+
+    public String readGivenName()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return this.readStringAttribute(ATTR_GIVEN_NAME);
+    }
+
+    public void setPassword(final String newPassword)
+            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
+    {
+        try {
+            writeStringAttribute(ATTR_PASSWORD, newPassword);
+        } catch (ChaiOperationException e) {
+            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        }
+    }
+
+    public void changePassword(final String oldPassword, final String newPassword)
+            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
+    {
+        try {
+            writeStringAttribute(ATTR_PASSWORD, newPassword);
+        } catch (ChaiOperationException e) {
+            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        }
+    }
+
+    public void expirePassword() throws ChaiOperationException, ChaiUnavailableException {
+    }
+
+    public ChaiPasswordPolicy getPasswordPolicy() throws ChaiUnavailableException, ChaiOperationException {
+        return null;
+    }
+
+    public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
+        return false;
+    }
+
+    public ChallengeSet readAssignedChallengeSet() throws ChaiUnavailableException, ChaiOperationException {
+        return null;
+    }
+
+    public Date readLastLoginTime() throws ChaiOperationException, ChaiUnavailableException {
+        return null;
+    }
+
+    public String readPassword() throws ChaiUnavailableException, ChaiOperationException {
+        return null;
+    }
+
+    public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+        return null;
+    }
+
+    public ResponseSet readResponseSet() throws ChaiUnavailableException, ChaiOperationException {
+        return null;
+    }
+
+    public boolean testPasswordPolicy(final String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {
+        return true;
+    }
+
+    public void unlock() throws ChaiOperationException, ChaiUnavailableException {
+    }
+
+    public boolean isLocked() throws ChaiOperationException, ChaiUnavailableException {
+        return false;
     }
 
 }

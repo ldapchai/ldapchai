@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -157,7 +157,8 @@ public interface ChaiEntry {
      *
      * @return An ChaiEntryImpl representing the parent entry.  If there is no parent, then null is returned.
      */
-    ChaiEntry getParentEntry();
+    ChaiEntry getParentEntry()
+            throws ChaiUnavailableException, ChaiOperationException;
 
     /**
      * Indicates if the instance of this object actually references a live object in the directory.  If any error

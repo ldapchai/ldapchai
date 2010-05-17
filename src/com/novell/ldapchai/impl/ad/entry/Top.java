@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,5 +22,5 @@ package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 
-public interface Top extends ADEntry, ChaiEntry {
+interface Top extends ADEntry, ChaiEntry {
 }

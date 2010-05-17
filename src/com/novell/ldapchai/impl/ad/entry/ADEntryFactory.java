@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,13 +20,27 @@
 
 package com.novell.ldapchai.impl.ad.entry;
 
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class ADEntryFactory {
-    private ADEntryFactory() {
-    }
+public class ADEntryFactory implements ChaiFactory.ChaiEntryFactory {
 
-    public static User createUser(final String userDN, final ChaiProvider chaiProvider) {
+    public User createChaiUser(final String userDN, final ChaiProvider chaiProvider) {
         return new UserImpl(userDN, chaiProvider);
     }
+
+    public ChaiGroup createChaiGroup(final String entryDN, final ChaiProvider provider) {
+        return new GroupImpl(entryDN, provider);
+    }
+
+    public ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider) {
+        return new TopImpl(entryDN, provider);
+    }
+
+    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
+        return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
+    }
+
 }

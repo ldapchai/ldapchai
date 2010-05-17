@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -376,7 +376,12 @@ public class ChaiUtility {
     public static ChaiProvider.DIRECTORY_VENDOR determineDirectoryVendor(final ChaiEntry rootDSE)
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String[] interestingAttributes = { "vendorVersion", "rootDomainNamingContext", "objectClass" };
+        final String[] interestingAttributes = {
+                "vendorVersion",
+                "vendorName",
+                "rootDomainNamingContext",
+                "objectClass"
+        };
 
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setAttributes(interestingAttributes);
@@ -394,6 +399,15 @@ public class ChaiUtility {
                     for (final String vendorVersionValue : vendorVersions) {
                         if (vendorVersionValue.contains("Novell eDirectory")) {
                             return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
+                        }
+                    }
+                }
+
+                final List<String> vendorNames = rootDseSearchResults.get("vendorNames");
+                if (vendorVersions != null && vendorVersions.size() > 0) {
+                    for (final String vendorNamesValue : vendorNames) {
+                        if (vendorNamesValue.contains("389 Project")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
                         }
                     }
                 }

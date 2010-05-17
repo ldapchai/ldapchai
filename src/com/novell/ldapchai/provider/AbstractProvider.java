@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -21,10 +21,10 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.exception.ChaiErrorCode;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
@@ -596,7 +596,12 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
                 rootDSEChaiConfig.setSetting(ChaiSetting.BIND_URLS,newUrlConfig.toString());
                 final ChaiProvider rootDseProvider = currentURLsHavePath ? ChaiProviderFactory.createProvider(rootDSEChaiConfig) : this;
-                final ChaiEntry rootDseEntry = ChaiFactory.createChaiEntry("",rootDseProvider);
+
+                // can not call the ChaiFactory here, because ChaiFactory in turn calls this method to get the
+                // directory vendor.  Instead, we will go directly to the Generic ChaiFactory
+
+                final GenericEntryFactory genericEntryFactory = new GenericEntryFactory();
+                final ChaiEntry rootDseEntry = genericEntryFactory.createChaiEntry("",rootDseProvider);
                 cachedDirectoryVendor = ChaiUtility.determineDirectoryVendor(rootDseEntry);
             } catch (ChaiOperationException e) {
                 LOGGER.warn("error while attempting to determine directory vendor: " + e.getMessage());

@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,27 +20,18 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-import com.novell.ldapchai.AbstractChaiGroup;
 import com.novell.ldapchai.ChaiConstant;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class performs various actions on the LDAP Group object.
  */
 class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames {
-
-    static {
-        EdirEntryFactory.registerImplementation(GroupOfNames.OBJECT_CLASS_VALUE, GroupOfNamesImpl.class);
-    }
 
     public String getLdapObjectClassName()
     {
@@ -66,49 +57,10 @@ class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames {
         return this.compareStringAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS, ChaiConstant.OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP);
     }
 
-
-    public final Date readDateAttribute(final String attributeName)
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final String lastLoginTimeStr = this.readStringAttribute(attributeName);
-        if (lastLoginTimeStr != null) {
-            return EdirEntries.convertZuluToDate(lastLoginTimeStr);
-        }
-        return null;
-    }
-
     public void addMember(final ChaiUser theUser)
             throws ChaiUnavailableException, ChaiOperationException
     {
         EdirEntries.writeGroupMembership(theUser, this);
-    }
-
-    public Set<ChaiUser> getMembers()
-            throws ChaiOperationException, ChaiUnavailableException
-    {
-        // Search for the User DN object.
-        final Set<String> memberDNs = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER);
-
-        // Search for the User DN object.
-        final Set<ChaiUser> returnSet = new HashSet<ChaiUser>(memberDNs.size());
-
-        for (final String userDN : memberDNs) {
-            // Create the ChaiUserImpl object and add it to the ArrayList.
-            returnSet.add(ChaiFactory.createChaiUser(userDN, this.getChaiProvider()));
-        }
-        return Collections.unmodifiableSet(returnSet);
-    }
-
-    /**
-     * This function returns name of the Group
-     *
-     * @return String name of the group.
-     * @throws com.novell.ldapchai.exception.ChaiOperationException
-     */
-    public final String readGroupName()
-            throws ChaiOperationException, ChaiUnavailableException
-    {
-        return this.readStringAttribute(ChaiConstant.ATTR_LDAP_DESCRIPTION);
     }
 
     public void removeMember(final ChaiUser theUser)
@@ -116,7 +68,4 @@ class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames {
     {
         EdirEntries.removeGroupMembership(theUser, this);
     }
-
-
-    
 }

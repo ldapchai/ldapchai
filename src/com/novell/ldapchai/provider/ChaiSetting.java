@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -60,7 +60,10 @@ public enum ChaiSetting {
      * Unless {@link #FAILOVER_ENABLE} is set to <i>true</i>, the use of values by a {@code ChaiProvider}
      * beyond the first value is unspecified.
      * <p/>
-     * <i>Default: </i><b>ldap://localhost</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.bind.URLs</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>ldap://localhost</td></tr>
+     * </table>
      * @see #FAILOVER_ENABLE
      */
     BIND_URLS("chai.bind.URLs", "ldap://localhost", true, new Validator() {
@@ -95,7 +98,10 @@ public enum ChaiSetting {
      * cn=administrator,ou=container,o=Organization
      * </pre>
      * <p/>
-     * <i>Default: </i><b>(empty string)</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.bind.dn</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>(blank)</td></tr>
+     * </table>
      */
     BIND_DN("chai.bind.dn", "", true, null),
 
@@ -103,7 +109,10 @@ public enum ChaiSetting {
      * Password to use during chai LDAP bind.  An empty password will cause an anonymous connection
      * to be used.
      * <p/>
-     * <i>Default: </i><b>(empty string)</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.bind.password</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>(blank)</td></tr>
+     * </table>
      */
     BIND_PASSWORD("chai.bind.password", "", false, null),
 
@@ -129,21 +138,30 @@ public enum ChaiSetting {
      * In particular, no cache synchronization is performed between providers, which can cause unexpected
      * results if not carefully gaurded against.
      * <p/>
-     * <i>Default: </i><b>false</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cache.enable</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
+     * </table>
      */
-    CACHE_ENABLE("chai.cache.enable", "false", true, null),  //@tdo morejavadoc
+    CACHE_ENABLE("chai.cache.enable", "false", true, null), 
 
     /**
      * Maximum number of cached results to retain in memory.
      * <p/>
-     * <i>Default: </i><b>128</b> (1 minute)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cache.maximumSize</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>128</td></tr>
+     * </table>
      */
     CACHE_MAXIMUM_SIZE("chai.cache.maximumSize", "128", true, Validator.INTEGER_VALIDATOR),
 
     /**
      * Maximum amount of time to cache results.
      * <p/>
-     * <i>Default: </i><b>1000</b> (1 second)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cache.maximumAge</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
+     * </table>
      */
     CACHE_MAXIMUM_AGE("chai.cache.maximumAge", "1000", true, Validator.INTEGER_VALIDATOR),
 
@@ -152,6 +170,10 @@ public enum ChaiSetting {
      * available via {@link com.novell.ldapchai.provider.ChaiProvider#getProviderStatistics()}.
      * <p/>
      * <i>Default: </i><b>true</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.statistics.enable</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
+     * </table>
      *
      * @see ProviderStatistics
      */
@@ -166,7 +188,10 @@ public enum ChaiSetting {
      * Note that if this setting is enabled, a lightweight watchdog thread will be running so long as their are any
      * {@code ChaiProvider} instances open.
      * <p/>
-     * <i>Default: </i><b>true</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.enable</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
+     * </table>
      */
     WATCHDOG_ENABLE("chai.watchdog.enable", "true", true, Validator.BOOLEAN_VALIDATOR),
 
@@ -175,7 +200,10 @@ public enum ChaiSetting {
      * be closed.  Future ldap api's called to the ChaiProvider will attempt to re-open a new
      * ldap connection.
      * <p/>
-     * <i>Default: </i><b>60000</b> (1 minute)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.operationTimeout</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>60000</td></tr>
+     * </table>
      */
     WATCHDOG_OPERATION_TIMEOUT("chai.watchdog.operationTimeout", "60000", true, Validator.INTEGER_VALIDATOR),
 
@@ -185,7 +213,10 @@ public enum ChaiSetting {
      * be closed.  Future ldap api's called to the ChaiProvider will attempt to re-open a new
      * ldap connection.
      * <p/>
-     * <i>Default: </i><b>30000</b> (30 seconds)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.idleTimeout</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>30000</td></tr>
+     * </table>
      */
     WATCHDOG_IDLE_TIMEOUT("chai.watchdog.idleTimeout", "30000", true, Validator.INTEGER_VALIDATOR),
 
@@ -197,7 +228,10 @@ public enum ChaiSetting {
      * <p/>
      * Note that this setting MUST be set before any ChaiProvider instances are created.
      * <p/>
-     * <i>Default: </i><b>5000</b> (5 seconds)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.watchdog.frequency</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
+     * </table>
      */
     WATCHDOG_CHECK_FREQUENCY("chai.connection.watchdog.frequency", "5000", true, Validator.INTEGER_VALIDATOR),
 
@@ -210,7 +244,10 @@ public enum ChaiSetting {
      * This setting is intented for use with development environments only, and should not be enabled for
      * production usage.
      * <p/>
-     * <i>Default: </i><b>false</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.promiscuousSSL</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
+     * </table>
      */
     PROMISCUOUS_SSL("chai.connection.promiscuousSSL", "false", true, Validator.BOOLEAN_VALIDATOR),
 
@@ -221,7 +258,10 @@ public enum ChaiSetting {
      * <b>WARNING:</b> Enabling this setting will cause all data values to be output to debug mode, including
      * sensitive values such as passwords.  Enable this setting with care!
      * <p/>
-     * <i>Default: </i><b>false</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.wireDebug.enable</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
+     * </table>
      */
     WIRETRACE_ENABLE("chai.wireDebug.enable", "false", true, Validator.BOOLEAN_VALIDATOR),
 
@@ -229,8 +269,10 @@ public enum ChaiSetting {
      * Enable fail over when multiple servers are present.  Also allows retries to a single server
      * in case of connection problems.
      * <p/>
-     * <p/>
-     * <i>Default: </i><b>true</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.enable</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
+     * </table>
      */
     FAILOVER_ENABLE("chai.failover.enable", "true", true, Validator.BOOLEAN_VALIDATOR),
 
@@ -238,14 +280,20 @@ public enum ChaiSetting {
     /**
      * Minimum time Chai will wait before retrying a server marked as down.  Time is in milliseconds.
      * <p/>
-     * <i>Default: </i><b>90000</b> (90 seconds)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.failBackTime</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>90000</td></tr>
+     * </table>
      */
     FAILOVER_MINIMUM_FAILBACK_TIME("chai.failover.failBackTime", "90000", true, Validator.INTEGER_VALIDATOR),
 
     /**
      * Minimum number of attempts Chai will make to contact a server if there is a communication problem.
      * <p/>
-     * <i>Default: </i><b>4</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.connectRetries</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>4</td></tr>
+     * </table>
      */
     FAILOVER_CONNECT_RETRIES("chai.failover.connectRetries", "4", true, Validator.INTEGER_VALIDATOR),
 
@@ -256,7 +304,10 @@ public enum ChaiSetting {
      * See <a href="http://java.sun.com/products/jndi/tutorial/ldap/misc/aliases.html">JNDI alias
      * documentation</a>
      * <p/>
-     * <i>Default: </i><b>never</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.dereferenceAliases</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>never</td></tr>
+     * </table>
      */
     LDAP_DEREFENCE_ALIAS("chai.ldap.dereferenceAliases", "never", true, null),
 
@@ -264,7 +315,10 @@ public enum ChaiSetting {
     /**
      * Ldap socket timeout, if supported by the ChaiProvider implementation.  Time is in milliseconds.
      * <p/>
-     * <i>Default: </i><b>5000</b> (5 seconds)
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.ldapTimeout</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
+     * </table>
      */
     LDAP_CONNECT_TIMEOUT("chai.ldap.ldapTimeout", "5000", true, Validator.INTEGER_VALIDATOR),
 
@@ -272,7 +326,10 @@ public enum ChaiSetting {
      * Set the fully qualified class name of the {@code ChaiProvider} class name to be used.  By default this is
      * the class name for the {@link JNDIProviderImpl} class.
      * <p/>
-     * <i>Default: </i><b>com.novell.ldapchai.provider.JNDIProviderImpl</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.implementation</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>com.novell.ldapchai.provider.JNDIProviderImpl</td></tr>
+     * </table>
      *
      * @see com.novell.ldapchai.provider.JNDIProviderImpl, com.novell.ldapchai.provider.JLDAPProviderImpl
      */
@@ -282,12 +339,22 @@ public enum ChaiSetting {
      * Enable NMAS support for Novell eDirectory.  NMAS support makes some operations more efficient,
      * and provides more descriptive error messages.
      * <p/>
-     * <i>Default: </i><b>false</b>
-     *
-     * @see
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.edirectory.enableNMAS</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
+     * </table>
      */
     EDIRECTORY_ENABLE_NMAS("chai.edirectory.enableNMAS", "false", true, Validator.BOOLEAN_VALIDATOR),
 
+    /**
+     * Cache failed operations due to unknown extended operations.  Once an unknown extended operation for a
+     * given {@link ChaiProvider} occurs it will not be retried.
+     * <p/>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.extendedOperation.failureCache</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
+     * </table>
+     */
     EXTENDED_OPERATION_FAILURE_CACHE("chai.provider.extendedOperation.failureCache", "true", true, Validator.BOOLEAN_VALIDATOR),
 
     /**
@@ -295,12 +362,15 @@ public enum ChaiSetting {
      * type {@link com.novell.ldapchai.exception.ChaiErrorCode#READ_ONLY_VIOLATION}.  This error will also be occured for operations that are only potentially "write"
      * operations such s {@link ChaiProvider#extendedOperation(javax.naming.ldap.ExtendedRequest)}.
      * <p/>
-     * <i>Default: </i><b>false</b>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.readonly</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
+     * </table>
      */
-    READONLY("chai.readonly", "false", true, Validator.BOOLEAN_VALIDATOR),
+    READONLY("chai.provider.readonly", "false", true, Validator.BOOLEAN_VALIDATOR),
 
     /**
-     * A comma seperated list of attribute names to be used by {@link com.novell.ldapchai.ChaiUser#readStandardIdentityAttributes()}.
+     * A comma separated list of attribute names to be used by {@link com.novell.ldapchai.ChaiUser#readStandardIdentityAttributes()}.
      * <p/> 
      * By default, this list includes:
      * <ul>
@@ -313,6 +383,11 @@ public enum ChaiSetting {
      * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_TELEPHONE_NUMBER}</li>
      * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_WORFORCE_ID}</li>
      * </ul>
+     * <p/>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.default.identityAttributes</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>cn,uid,givenName,initials,sn,mail,telephoneNumber,workforceID</td></tr>
+     * </table>
      */
     STANDARD_IDENTITY_ATTRS("chai.default.identityAttributes",
             ChaiConstant.ATTR_LDAP_COMMON_NAME
@@ -324,7 +399,7 @@ public enum ChaiSetting {
                     + ',' + ChaiConstant.ATTR_LDAP_TELEPHONE_NUMBER
                     + ',' + ChaiConstant.ATTR_LDAP_WORFORCE_ID,
             true, new Validator() {
-                public void validate(String value) {
+                public void validate(final String value) {
                     if (value == null) {
                         throw new IllegalArgumentException("value may not be null");
                     }
@@ -338,10 +413,15 @@ public enum ChaiSetting {
      * <p/>
      * The value must exactly match a known value for {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR}.
      * <p/>
-     * <i>Default: </i><b>(empty string)</b>
+     * <i>Default: </i><b>(blank)</b>
+     * <p/>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.vendor.default</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>(blank)</td></tr>
+     * </table>
      */
     DEFAULT_VENDOR("chai.vendor.default", "", true, new Validator() {
-        public void validate(String value) {
+        public void validate(final String value) {
             if (value == null || value.length() < 1) {
                 return;
             }
@@ -361,10 +441,10 @@ public enum ChaiSetting {
 
 // ------------------------------ FIELDS ------------------------------
 
-    private String key;
-    private String defaultValue;
-    private boolean visable;
-    private Validator validator;
+    private final String key;
+    private final String defaultValue;
+    private final boolean visable;
+    private final Validator validator;
 
 // -------------------------- STATIC METHODS --------------------------
 

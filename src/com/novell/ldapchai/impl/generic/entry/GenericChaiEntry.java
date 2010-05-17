@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -18,27 +18,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai;
+package com.novell.ldapchai.impl.generic.entry;
 
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-/**
-* A complete implementation of {@code ChaiGroup} interface.
-* <p/>
-* Clients looking to obtain a {@code ChaiGroup} instance should look to {@link ChaiFactory}.
-* <p/>
- * @author Jason D. Rivard
-*/
-public abstract class AbstractChaiGroup extends AbstractChaiEntry implements ChaiGroup {
-    
-    /**
-     * This construtor is used to instantiate an ChaiUserImpl instance representing an inetOrgPerson user object in ldap.
-     *
-     * @param groupDN       The DN of the user
-     * @param chaiProvider Helper to connect to LDAP.
-     */
-    public AbstractChaiGroup(final String groupDN, final ChaiProvider chaiProvider)
-    {
-        super(groupDN, chaiProvider);
+class GenericChaiEntry extends AbstractChaiEntry implements ChaiEntry {
+    public GenericChaiEntry(String entryDN, ChaiProvider chaiProvider) {
+        super(entryDN, chaiProvider);
     }
 }

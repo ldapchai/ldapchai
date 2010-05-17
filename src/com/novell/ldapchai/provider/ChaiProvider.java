@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -109,7 +109,8 @@ public interface ChaiProvider {
         GENERIC,
         NOVELL_EDIRECTORY,
         MICROSOFT_ACTIVE_DIRECTORY,
-        OPEN_LDAP
+        OPEN_LDAP,
+        DIRECTORY_SERVER_389
     }
 
 // -------------------------- OTHER METHODS --------------------------

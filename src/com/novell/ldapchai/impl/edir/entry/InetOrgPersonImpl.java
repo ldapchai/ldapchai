@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,7 +20,7 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-import com.novell.ldapchai.AbstractChaiUser;
+import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
@@ -40,10 +40,6 @@ import java.util.HashSet;
 import java.util.Properties;
 
 class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
-    static {
-        EdirEntryFactory.registerImplementation(InetOrgPerson.OBJECT_CLASS_VALUE, AbstractChaiUser.class);
-    }
-
     public String getLdapObjectClassName()
     {
         return InetOrgPerson.OBJECT_CLASS_VALUE;
@@ -60,15 +56,6 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
         return EdirEntries.readPasswordPolicy(this);
     }
 
-    public boolean testPassword(final String password)
-            throws ChaiUnavailableException, ChaiPasswordPolicyException
-    {
-        try {
-            return this.compareStringAttribute(ATTR_PASSWORD, password);
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
-        }
-    }
 
     public boolean testPasswordPolicy(final String password)
             throws ChaiUnavailableException, ChaiPasswordPolicyException
@@ -111,17 +98,6 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
             this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING, limit);
         }
     }
-
-    public final Date readDateAttribute(final String attributeName)
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final String lastLoginTimeStr = this.readStringAttribute(attributeName);
-        if (lastLoginTimeStr != null) {
-            return EdirEntries.convertZuluToDate(lastLoginTimeStr);
-        }
-        return null;
-    }
-
 
     public final void addGroupMembership(final ChaiGroup theGroup)
             throws ChaiOperationException, ChaiUnavailableException
@@ -234,12 +210,6 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
             LOGGER.info("Validation error reading Chai Assigned associations sets " + e.getValidationError().getDebugDescription());
             return null;
         }
-    }
-
-    public final String readGivenName()
-            throws ChaiOperationException, ChaiUnavailableException
-    {
-        return this.readStringAttribute(ATTR_GIVEN_NAME);
     }
 
     public final Date readLastLoginTime()

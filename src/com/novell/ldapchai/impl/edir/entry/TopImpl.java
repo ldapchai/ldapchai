@@ -1,7 +1,7 @@
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009 Jason D. Rivard
+ * Copyright (c) 2009-2010 The LDAP Chai Project
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -20,12 +20,8 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-import com.novell.ldapchai.AbstractChaiEntry;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
-
-import java.util.Date;
 
 abstract class TopImpl extends AbstractChaiEntry implements Top {
     
@@ -34,15 +30,5 @@ abstract class TopImpl extends AbstractChaiEntry implements Top {
         super(entryDN, chaiProvider);
     }
 
-    public final Date readDateAttribute(final String attributeName)
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final String lastLoginTimeStr = this.readStringAttribute(attributeName);
-        if (lastLoginTimeStr != null) {
-            return EdirEntries.convertZuluToDate(lastLoginTimeStr);
-        }
-        return null;
-    }
 
-    
 }
