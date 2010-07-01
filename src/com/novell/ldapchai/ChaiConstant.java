@@ -1,8 +1,7 @@
 
 /*
  * LDAP Chai API
- * Copyright (c) 2006-2009 Novell, Inc.
- * Copyright (c) 2009-2010 The LDAP Chai Project
+ * Copyright (c) 2006-2010 Novell, Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
