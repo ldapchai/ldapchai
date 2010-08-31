@@ -21,10 +21,12 @@ package com.novell.ldapchai.impl;
 
 import com.novell.ldapchai.*;
 import com.novell.ldapchai.cr.ChallengeSet;
+import com.novell.ldapchai.cr.CrFactory;
 import com.novell.ldapchai.cr.ResponseSet;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 
@@ -175,8 +177,15 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return false;
     }
 
-    public ChallengeSet readAssignedChallengeSet() throws ChaiUnavailableException, ChaiOperationException {
-        return null;
+    public ChallengeSet readAssignedChallengeSet()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        try {
+            return CrFactory.readAssignedChallengeSet(this);
+        } catch (ChaiValidationException e) {
+            LOGGER.info("Validation error reading assigned challenge sets " + e.getValidationError().getDebugDescription());
+            return null;
+        }
     }
 
     public Date readLastLoginTime() throws ChaiOperationException, ChaiUnavailableException {
@@ -191,8 +200,15 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return null;
     }
 
-    public ResponseSet readResponseSet() throws ChaiUnavailableException, ChaiOperationException {
-        return null;
+    public ResponseSet readResponseSet()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        try {
+            return CrFactory.readResponseSet(this);
+        } catch (ChaiValidationException e) {
+            LOGGER.info("Validation error reading chai response set " + e.getValidationError().getDebugDescription());
+            return null;
+        }
     }
 
     public boolean testPasswordPolicy(final String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {

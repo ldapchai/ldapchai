@@ -19,14 +19,15 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
-import com.novell.ldapchai.cr.ChallengeSet;
-import com.novell.ldapchai.cr.CrFactory;
-import com.novell.ldapchai.cr.ResponseSet;
-import com.novell.ldapchai.exception.*;
+import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.StringHelper;
@@ -38,7 +39,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
 
-class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
+class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser {
     public String getLdapObjectClassName()
     {
         return InetOrgPerson.OBJECT_CLASS_VALUE;
@@ -200,32 +201,10 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson {
         return false;
     }
 
-    public ChallengeSet readAssignedChallengeSet()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        try {
-            return CrFactory.readAssignedChallengeSet(this);
-        } catch (ChaiValidationException e) {
-            LOGGER.info("Validation error reading Chai Assigned associations sets " + e.getValidationError().getDebugDescription());
-            return null;
-        }
-    }
-
     public final Date readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute(ATTR_LAST_LOGIN);
-    }
-
-    public ResponseSet readResponseSet()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        try {
-            return CrFactory.readResponseSet(this);
-        } catch (ChaiValidationException e) {
-            LOGGER.info("Validation error reading Chai Assigned associations sets " + e.getValidationError().getDebugDescription());
-            return null;
-        }
     }
 
     public final void changePassword(final String oldPassword, final String newPassword)

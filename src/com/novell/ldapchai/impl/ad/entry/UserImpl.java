@@ -20,13 +20,9 @@
 package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.*;
-import com.novell.ldapchai.cr.ChallengeSet;
-import com.novell.ldapchai.cr.CrFactory;
-import com.novell.ldapchai.cr.ResponseSet;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
@@ -113,17 +109,6 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     }
 
 
-    public ChallengeSet readAssignedChallengeSet()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        try {
-            return CrFactory.readAssignedChallengeSet(this);
-        } catch (ChaiValidationException e) {
-            LOGGER.info("Validation error reading Chai Assigned associations sets " + e.getValidationError().getDebugDescription());
-            return null;
-        }
-    }
-
     public final String readGivenName()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -134,17 +119,6 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute(ATTR_LAST_LOGIN);
-    }
-
-    public ResponseSet readResponseSet()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        try {
-            return CrFactory.readResponseSet(this);
-        } catch (ChaiValidationException e) {
-            LOGGER.info("Validation error reading Chai Assigned associations sets " + e.getValidationError().getDebugDescription());
-            return null;
-        }
     }
 
     public final void changePassword(final String oldPassword, final String newPassword)

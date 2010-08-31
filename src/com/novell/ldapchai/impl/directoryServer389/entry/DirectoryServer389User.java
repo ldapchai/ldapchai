@@ -26,6 +26,8 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
+import java.util.Date;
+
 class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
     public DirectoryServer389User(final String userDN, final ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
@@ -51,5 +53,16 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
         } catch (ChaiOperationException e) {
             throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         }
+    }
+
+    @Override
+    public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+        return readDateAttribute(ATTR_PASSWORD_EXPIRE_TIME);
+    }
+
+    @Override
+    public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
+        final Date expireDate = readPasswordExpirationDate();
+        return !(expireDate == null || expireDate.before(new Date()));
     }
 }
