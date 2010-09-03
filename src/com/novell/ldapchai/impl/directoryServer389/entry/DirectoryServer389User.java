@@ -63,6 +63,11 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
     @Override
     public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
         final Date expireDate = readPasswordExpirationDate();
-        return !(expireDate == null || expireDate.before(new Date()));
+
+        if (expireDate == null) {
+            return false;
+        }
+
+        return expireDate.before(new Date());
     }
 }
