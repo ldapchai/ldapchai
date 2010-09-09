@@ -79,7 +79,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             final PwdPolicyCheckResponse setResponse = (PwdPolicyCheckResponse) response;
             final int responseCode = setResponse.getNmasRetCode();
             if (responseCode != 0) {
-                LOGGER.debug("error while testing nmas password: " + responseCode);
+                LOGGER.debug("nmas response code returned from server while testing nmas password: " + responseCode);
                 throw ChaiPasswordPolicyException.forErrorCode(responseCode);
             }
         }

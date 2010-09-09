@@ -41,7 +41,7 @@ public class ChaiPasswordPolicyException extends Exception {
         PREVIOUSLYUSED("Password_PreviouslyUsed", ChaiErrorCode.DUPLICATE_PASSWORD.getErrorCode()),
         BADOLDPASSWORD("Password_BadOldPassword", ChaiErrorCode.FAILED_AUTHENTICATION.getErrorCode()),
         BADPASSWORD("Password_BadPassword", ChaiErrorCode.BAD_PASSWORD.getErrorCode()),
-        TOO_SHORT("Password_TooShort", ChaiErrorCode.PASSWORD_TOO_SHORT.getErrorCode()),
+        TOO_SHORT("Password_TooShort", -216),
         TOO_LONG("Password_TooLong", NMASConstants.NMAS_E_PASSWORD_TOO_LONG),
         NOT_ENOUGH_NUM("Password_NotEnoughNum", NMASConstants.NMAS_E_PASSWORD_NUMERIC_MIN),
         NOT_ENOUGH_SPECIAL("Password_NotEnoughSpecial", NMASConstants.NMAS_E_PASSWORD_SPECIAL_MIN),
@@ -62,7 +62,7 @@ public class ChaiPasswordPolicyException extends Exception {
         INVALID_CHAR("Password_InvalidChar", NMASConstants.NMAS_E_PASSWORD_EXTENDED_DISALLOWED),
         INWORDLIST("Password_InWordlist", NMASConstants.NMAS_E_PASSWORD_EXCLUDE),
         SAMEASATTR("Password_SameAsAttr", NMASConstants.NMAS_E_PASSWORD_ATTR_VALUE),
-        HISTORY_FULL("Password_HistoryFull", -1696),
+        HISTORY_FULL("Password_HistoryFull", NMASConstants.NMAS_E_PASSWORD_HISTORY_FULL),
         NUMERIC_DISALLOWED("Password_NumericDisallowed", NMASConstants.NMAS_E_PASSWORD_NUMERIC_DISALLOWED),
         SPECIAL_DISALLOWED("Password_SpecialDisallowed", NMASConstants.NMAS_E_PASSWORD_SPECIAL_DISALLOWED),
         TOO_SOON("Password_TooSoon", NMASConstants.NMAS_E_PASSWORD_LIFE_MIN)

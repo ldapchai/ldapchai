@@ -24,19 +24,14 @@ import com.novell.ldapchai.ChaiPasswordRule;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.edir.value.nspmComplexityRules;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
 import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.*;
 
 
@@ -107,42 +102,14 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
 
     private static Map<String,String> createRuleMapUsingComplexityRules(final String input) {
         final Map<String, String> returnMap = new HashMap<String,String>();
-        returnMap.put(ChaiPasswordRule.ADComplexity.getKey(),String.valueOf(true));
 
-        final String XML_ATTR_MIN_LENGTH = "MinPwdLen";
-        final String XML_ATTR_MAX_LENGTH = "MaxPwdLen";
-
-        try {
-            final SAXBuilder builder = new SAXBuilder();
-            final Document doc = builder.build(new StringReader(input));
-            final Element rootElement = doc.getRootElement();
-
-            final Element policyElement = rootElement.getChild("Policy");
-
-            for (Object ruleSetObjects : policyElement.getChildren("RuleSet")) {
-                for (Object ruleObject : ((Element)ruleSetObjects).getChildren("Rule")) {
-                    final Element loopRuleElement = (Element)ruleObject;
-                    {
-                        final org.jdom.Attribute attr = loopRuleElement.getAttribute(XML_ATTR_MAX_LENGTH);
-                        if (attr != null && attr.getValue().length() > 0) {
-                            returnMap.put(ChaiPasswordRule.MaximumLength.getKey(),attr.getValue());
-                        }
-                    }
-                    {
-                        final org.jdom.Attribute attr = loopRuleElement.getAttribute(XML_ATTR_MIN_LENGTH);
-                        if (attr != null && attr.getValue().length() > 0) {
-                            returnMap.put(ChaiPasswordRule.MinimumLength.getKey(),attr.getValue());
-                        }
-                    }
-                }
-            }
-        } catch (JDOMException e) {
-            LOGGER.debug("error parsing stored response record: " + e.getMessage());
-        } catch (IOException e) {
-            LOGGER.debug("error parsing stored response record: " + e.getMessage());
-        } catch (NullPointerException e) {
-            LOGGER.debug("error parsing stored response record: " + e.getMessage());
+        final nspmComplexityRules complexityRules = new nspmComplexityRules(input);
+        if (complexityRules.isMsComplexityPolicy()) {
+            returnMap.put(ChaiPasswordRule.ADComplexity.getKey(),String.valueOf(true));
+            return returnMap;
         }
+
+        returnMap.put(ChaiPasswordRule.NovellComplexityRules.getKey(),input);
         return returnMap;
     }
 
@@ -173,7 +140,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
             }
         }
 
-        //special read to for multivalued attributes:
+        //special read for multivalued attributes:
         {
             final List<String> results = entryValues.get(Attribute.DISALLOWED_ATTRIBUTES.getLdapAttribute());
             if (results != null) {
@@ -367,5 +334,4 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
     public ChaiEntry getPolicyEntry() {
         return this;
     }
-   
 }
