@@ -32,7 +32,7 @@
  * An alternative method for managing challenge/response sets is to use a standard ldap attribute to
  * store user responses. The Chai Format does just that, using an XML blob and optionally hashing
  * response values for security. The Chai Format is also the same format used by the popular
- * <a href="http://developer.novell.com/wiki/index.php/Pwm">PWM</a> utility.
+ * <a href="http://code.google.com/p/pwm/">PWM</a> utility.
  * <p/>
  * The classes in this package perform operations based on a {@code ChaiConfiguration} setting
  * embedded in the {@code ChaiProvider} supplied during construction. Two configuration operations
@@ -43,7 +43,7 @@
  * the specified formats will be written to during a call to {@link com.novell.ldapchai.cr.ResponseSet#write()}.
  *
  * <h4>Chai Format Detail</h4>
- * The Chai Format is built using an extensible XML record.   When used by <a href="http://developer.novell.com/wiki/index.php/Pwm">PWM</a>,
+ * The Chai Format is built using an extensible XML record.   When used by <a href="http://code.google.com/p/ldapchai/">PWM</a>,
  * the record is stored in ldap using {@link com.novell.ldapchai.util.ConfigObjectRecord} with a type of "0002" and no
  * guids. By default,
  * LDAP Chai will use the <i>carLicense</i> attribute to read and write the values, however this can be

@@ -131,7 +131,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             littleEndianEncodedOldPwd = quotedOldPwd.getBytes("UTF-16LE");
             littleEndianEncodedNewPwd = quotedNewPwd.getBytes("UTF-16LE");
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("unexpected error, missing 'UTF-16KE' character encoder",e);
+            throw new IllegalStateException("unexpected error, missing 'UTF-16LE' character encoder",e);
         }
         replaceBinaryAttribute("unicodePwd", littleEndianEncodedOldPwd, littleEndianEncodedNewPwd);
     }

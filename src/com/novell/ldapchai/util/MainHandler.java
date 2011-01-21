@@ -37,6 +37,7 @@ class MainHandler {
 
     private static final ResourceBundle buildInfoBundle = ResourceBundle.getBundle("com.novell.ldapchai.BuildInformation");
     private static final String CHAI_VERSION = buildInfoBundle.getString("chai.version");
+    private static final String CHAI_WEBSITE = buildInfoBundle.getString("chai.website");
 
 // --------------------------- main() method ---------------------------
 
@@ -71,7 +72,7 @@ class MainHandler {
         }
 
         sb.append("\n");
-        sb.append("LDAP Chai project page: http://developer.novell.com/wiki/index.php/Ldapapis\n");
+        sb.append("LDAP Chai project page: " + CHAI_WEBSITE + "\n");
         sb.append("\n");
         sb.append("source files are included inside jar archive");
 
