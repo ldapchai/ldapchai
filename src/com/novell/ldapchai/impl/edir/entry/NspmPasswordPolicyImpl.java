@@ -21,8 +21,8 @@ package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiPasswordRule;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.value.nspmComplexityRules;
 import com.novell.ldapchai.provider.ChaiProvider;
@@ -91,7 +91,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
         return this.getEntryDN();
     }
 
-    public List<ChaiPasswordPolicyException.PASSWORD_ERROR> testPasswordForErrors(final String password) {
+    public List<ChaiError> testPasswordForErrors(final String password) {
         //@todo implement this
         throw new UnsupportedOperationException("not implemented");
     }

@@ -19,8 +19,12 @@
 
 package com.novell.ldapchai.exception;
 
-interface ErrorMap {
-    ChaiErrorCode errorForMessage(String message);
+import com.novell.ldapchai.provider.ChaiProvider;
+
+public interface ErrorMap {
+    ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor();
+
+    ChaiError errorForMessage(String message);
 
     boolean isPermenant(String message);
 

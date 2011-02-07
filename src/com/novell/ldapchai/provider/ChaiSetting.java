@@ -358,7 +358,7 @@ public enum ChaiSetting {
 
     /**
      * Set to read-only mode.   When enabled, no "write" opertions will be permitted, and will fail with an {@link com.novell.ldapchai.exception.ChaiOperationException} of
-     * type {@link com.novell.ldapchai.exception.ChaiErrorCode#READ_ONLY_VIOLATION}.  This error will also be occured for operations that are only potentially "write"
+     * type {@link com.novell.ldapchai.exception.ChaiError#READ_ONLY_VIOLATION}.  This error will also be occured for operations that are only potentially "write"
      * operations such s {@link ChaiProvider#extendedOperation(javax.naming.ldap.ExtendedRequest)}.
      * <p/>
      * <table border="0">

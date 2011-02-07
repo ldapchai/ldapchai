@@ -21,7 +21,7 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
@@ -415,7 +415,7 @@ class ChaiResponseSet extends AbstractResponseSet {
             throw e;
         } catch (ChaiValidationException e) {
             LOGGER.warn("validation error",e);
-            throw new ChaiOperationException(e.getMessage(), ChaiErrorCode.UNKNOWN);
+            throw new ChaiOperationException(e.getMessage(), ChaiError.UNKNOWN);
         }
 
         LOGGER.info("successfully wrote Chai challenge/response set for user " + user.getEntryDN());

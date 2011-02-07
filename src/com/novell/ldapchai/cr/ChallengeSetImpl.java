@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiValidationException;
 
 import java.io.Serializable;
@@ -53,11 +54,11 @@ class ChallengeSetImpl implements ChallengeSet, Serializable {
             throws ChaiValidationException
     {
         if (this.minRandomRequired > this.getRandomChallenges().size()) {
-            throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.NOT_ENOUGH_RANDOM_RESPONSES);
+            throw new ChaiValidationException("number of required responses greater then count of supplied random challenges", ChaiError.CR_NOT_ENOUGH_RANDOM_RESPONSES);
         }
 
         if (this.minRandomRequired + this.getRequiredChallenges().size() < 1) {
-            throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.TOO_FEW_CHALLENGES);
+            throw new ChaiValidationException("too few challenges are required", ChaiError.CR_TOO_FEW_CHALLENGES);
         }
     }
 

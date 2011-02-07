@@ -20,7 +20,7 @@
 package com.novell.ldapchai.tests;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.provider.*;
 import junit.framework.Assert;
@@ -67,7 +67,7 @@ public class ChaiProviderTester extends TestCase {
                     provider.deleteStringAttributeValue(testUserDN, testAttribute, "value2");
                     Assert.fail("missing exception during delete of non-existant value");
                 } catch (ChaiOperationException e) {
-                    Assert.assertEquals("missing NO_SUCH_VALUE error", e.getErrorCode(), ChaiErrorCode.NO_SUCH_VALUE);
+                    Assert.assertEquals("missing NO_SUCH_VALUE error", e.getErrorCode(), ChaiError.NO_SUCH_VALUE);
                 }
             }
         }

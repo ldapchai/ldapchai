@@ -23,10 +23,7 @@ import com.novell.ldapchai.*;
 import com.novell.ldapchai.cr.ChallengeSet;
 import com.novell.ldapchai.cr.CrFactory;
 import com.novell.ldapchai.cr.ResponseSet;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.exception.*;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 
@@ -107,7 +104,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         try {
             return this.compareStringAttribute(ATTR_PASSWORD, password);
         } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+            throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
         }
     }
 
@@ -183,7 +180,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         try {
             return CrFactory.readAssignedChallengeSet(this);
         } catch (ChaiValidationException e) {
-            LOGGER.info("Validation error reading assigned challenge sets " + e.getValidationError().getDebugDescription());
+            LOGGER.info("validation error reading assigned challenge sets " + e.getMessage());
             return null;
         }
     }
@@ -206,7 +203,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         try {
             return CrFactory.readResponseSet(this);
         } catch (ChaiValidationException e) {
-            LOGGER.info("Validation error reading chai response set " + e.getValidationError().getDebugDescription());
+            LOGGER.info("validation error reading chai response set " + e.getMessage());
             return null;
         }
     }

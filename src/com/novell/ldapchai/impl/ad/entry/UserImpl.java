@@ -30,6 +30,8 @@ import com.novell.ldapchai.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
@@ -54,6 +56,16 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         policyMap.put(ChaiPasswordRule.AllowNumeric, String.valueOf(true));
         policyMap.put(ChaiPasswordRule.AllowSpecial, String.valueOf(true));
         policyMap.put(ChaiPasswordRule.CaseSensitive, String.valueOf(true));
+
+        //read minimum password length from domain
+        final Matcher domainMatcher = Pattern.compile("(dc=[a-z0-9]+[,]*)+", Pattern.CASE_INSENSITIVE).matcher(this.getEntryDN());
+        if (domainMatcher.find()) {
+            final String domainDN = domainMatcher.group();
+            final String minPwdLength = this.getChaiProvider().readStringAttribute(domainDN, "minPwdLength");
+            if (minPwdLength != null && minPwdLength.length() > 0) {
+                policyMap.put(ChaiPasswordRule.MinimumLength, minPwdLength);
+            }
+        }
 
         return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicyByRule(policyMap);
     }
@@ -91,6 +103,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             throw new IllegalStateException("unexpected error, missing 'UTF-16KE' character encoder",e);
         }
         final byte[][] multiBA = new byte[][] { littleEndianEncodedPwd };
+
         writeBinaryAttribute("unicodePwd",multiBA);
     }
 

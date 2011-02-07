@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -100,7 +100,7 @@ class FailOverWrapper implements InvocationHandler {
         } catch (Exception e) {
             throw new ChaiUnavailableException(
                     "unable to create a required concrete provider for the failover wrapper",
-                    ChaiErrorCode.CHAI_INTERNAL_ERROR);
+                    ChaiError.CHAI_INTERNAL_ERROR);
         }
 
         this.settings = new FailOverSettings(failOverHelper);
@@ -156,7 +156,7 @@ class FailOverWrapper implements InvocationHandler {
             // Check to make sure we haven't been closed while looping.
             if (closed || rotationMachine == null) {
                 LOGGER.debug("close detected while inside retry loop, throwing ChaiUnavailableException");
-                throw new ChaiUnavailableException("FailOverWrapper closed while retrying connection", ChaiErrorCode.COMMUNICATION);
+                throw new ChaiUnavailableException("FailOverWrapper closed while retrying connection", ChaiError.COMMUNICATION);
             }
 
             // fetch the current active provider from the machine.  If unable to reach
@@ -166,7 +166,7 @@ class FailOverWrapper implements InvocationHandler {
                 currentProvider = rotationMachine.getCurrentProvider();
             } catch (NullPointerException e) {
                 LOGGER.debug("RotationMachine unavailable");
-                throw new ChaiUnavailableException("RotationMachine unavailable while retrying connection", ChaiErrorCode.COMMUNICATION);
+                throw new ChaiUnavailableException("RotationMachine unavailable while retrying connection", ChaiError.COMMUNICATION);
             }
 
             try {
@@ -188,7 +188,7 @@ class FailOverWrapper implements InvocationHandler {
             attempts++;
         }
 
-        throw new ChaiUnavailableException("unable to reach any configured server, maximum retries exceeded", ChaiErrorCode.COMMUNICATION);
+        throw new ChaiUnavailableException("unable to reach any configured server, maximum retries exceeded", ChaiError.COMMUNICATION);
     }
 
 
@@ -329,7 +329,7 @@ class FailOverWrapper implements InvocationHandler {
                 errorMsg.append(", last error: ");
                 errorMsg.append(lastConnectionException.getMessage());
             }
-            throw new ChaiUnavailableException(errorMsg.toString(), ChaiErrorCode.COMMUNICATION);
+            throw new ChaiUnavailableException(errorMsg.toString(), ChaiError.COMMUNICATION);
         }
 
         public synchronized void reportBrokenProvider(final ChaiProvider provider)

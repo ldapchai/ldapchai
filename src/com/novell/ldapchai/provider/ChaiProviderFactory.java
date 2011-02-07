@@ -21,7 +21,7 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
@@ -170,7 +170,7 @@ public final class ChaiProviderFactory {
             }
         } catch (Exception e) {
             LOGGER.debug("unable to create connection: " + e.getClass().getName() + ":" + e.getMessage());
-            throw new ChaiUnavailableException("unable to create connection: " + e.getMessage(), ChaiErrorCode.UNKNOWN);
+            throw new ChaiUnavailableException("unable to create connection: " + e.getMessage(), ChaiError.UNKNOWN);
         }
 
         providerImpl = addProviderWrappers(providerImpl);
@@ -191,10 +191,10 @@ public final class ChaiProviderFactory {
         final Class providerClass = Class.forName(className);
         final Object impl = providerClass.newInstance();
         if (!(impl instanceof ChaiProvider)) {
-            throw new ChaiUnavailableException("unable to create new ChaiProvider, " + className + " is not instance of " + ChaiProvider.class.getName(), ChaiErrorCode.UNKNOWN);
+            throw new ChaiUnavailableException("unable to create new ChaiProvider, " + className + " is not instance of " + ChaiProvider.class.getName(), ChaiError.UNKNOWN);
         }
         if (!(impl instanceof ChaiProviderImplementor)) {
-            throw new ChaiUnavailableException("unable to create new ChaiProvider, " + className + " is not instance of " + ChaiProviderImplementor.class.getName(), ChaiErrorCode.UNKNOWN);
+            throw new ChaiUnavailableException("unable to create new ChaiProvider, " + className + " is not instance of " + ChaiProviderImplementor.class.getName(), ChaiError.UNKNOWN);
         }
         providerImpl = (ChaiProviderImplementor) impl;
 

@@ -21,7 +21,7 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldap.*;
 import com.novell.ldapchai.ChaiConstant;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -92,7 +92,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         } catch (LDAPException e) {
             final String message = e.getMessage();
             if (message.contains("Connect Error")) {
-                throw new ChaiUnavailableException(message, ChaiErrorCode.COMMUNICATION, false, false);
+                throw new ChaiUnavailableException(message, ChaiError.COMMUNICATION, false, false);
             }
             throw ChaiUnavailableException.forErrorMessage(message);
         }
@@ -546,7 +546,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
             searchHelper = (SearchHelper) searchHelper.clone();
         } catch (CloneNotSupportedException e) {
             LOGGER.fatal("unexpected clone of SearchHelper failed during chai search", e);
-            throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiErrorCode.UNKNOWN);
+            throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiError.UNKNOWN);
         }
 
         // replace a null dn with an empty string

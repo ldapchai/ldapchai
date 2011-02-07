@@ -20,7 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiConstant;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -106,7 +106,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     logMsg.append("; ").append(rootCause.getMessage());
                 }
                 logMsg.append(")");
-                throw new ChaiUnavailableException(logMsg.toString(), ChaiErrorCode.COMMUNICATION, false, true);
+                throw new ChaiUnavailableException(logMsg.toString(), ChaiError.COMMUNICATION, false, true);
             } else {
                 logMsg.append(e.getMessage());
 
@@ -889,7 +889,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             searchHelper = (SearchHelper) searchHelper.clone();
         } catch (CloneNotSupportedException e) {
             LOGGER.fatal("unexpected clone of SearchHelper failed during chai search", e);
-            throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiErrorCode.UNKNOWN);
+            throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiError.UNKNOWN);
         }
 
         // replace a null dn with an empty string
@@ -984,7 +984,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiOperationException, ChaiUnavailableException
     {
         if (errorIsRetryable(e)) {
-            throw new ChaiUnavailableException(e.getMessage(), ChaiErrorCode.COMMUNICATION, false, false);
+            throw new ChaiUnavailableException(e.getMessage(), ChaiError.COMMUNICATION, false, false);
         }
 
         throw ChaiOperationException.forErrorMessage(e.getMessage());

@@ -20,7 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
@@ -190,7 +190,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
                 return !((ChaiOperationException)e).isPermenant();
             } else {
                 final String errorMsg = e.getMessage();
-                return !new ChaiOperationException(errorMsg, ChaiErrorCode.UNKNOWN).isPermenant();
+                return !new ChaiOperationException(errorMsg, ChaiError.UNKNOWN).isPermenant();
             }
         }
 
@@ -547,7 +547,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         final boolean cacheFailures = "true".equalsIgnoreCase(this.getChaiConfiguration().getSetting(ChaiSetting.EXTENDED_OPERATION_FAILURE_CACHE));
         if (cacheFailures) {
             final ChaiOperationException opExcep = ChaiOperationException.forErrorMessage(e.getMessage());
-            if (opExcep.getErrorCode() == ChaiErrorCode.UNSUPPORTED_OPERATION) {
+            if (opExcep.getErrorCode() == ChaiError.UNSUPPORTED_OPERATION) {
                 final Map<String, Object> providerProps = this.getProviderProperties();
                 final Map<String, Exception> cacheFailureMap = (Map<String,Exception>)providerProps.get(EXTENDED_FAILURE_CACHE_KEY);
                 final String requestID = request.getID();

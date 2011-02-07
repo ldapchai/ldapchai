@@ -26,7 +26,7 @@ package com.novell.ldapchai.exception;
  * ldap server or underlying API such as JNDI.
  *
  * @author Jason D. Rivard
- * @see com.novell.ldapchai.exception.ChaiErrorCode
+ * @see ChaiError
  */
 public class ChaiUnavailableException extends ChaiException {
 // ------------------------------ FIELDS ------------------------------
@@ -36,9 +36,9 @@ public class ChaiUnavailableException extends ChaiException {
 
     /**
      * Generate a new {@code ChaiUnavailableException} based on the supplied
-     * error message.  The message is scanned for known {@link com.novell.ldapchai.exception.ChaiErrorCode}
+     * error message.  The message is scanned for known {@link ChaiError}
      * error codes.  If found, the correct {@code ChaiErrorCode} will be used. Otherwise,
-     * {@link ChaiErrorCode#UNKNOWN} will be used.
+     * {@link ChaiError#UNKNOWN} will be used.
      *
      * @param errorMessage string containing an error description/code
      * @return valid error code for the string
@@ -50,12 +50,12 @@ public class ChaiUnavailableException extends ChaiException {
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    public ChaiUnavailableException(final String message, final ChaiErrorCode errorCode)
+    public ChaiUnavailableException(final String message, final ChaiError errorCode)
     {
         super(message, errorCode);
     }
 
-    public ChaiUnavailableException(final String message, final ChaiErrorCode errorCode, final boolean permenant, final boolean authentication)
+    public ChaiUnavailableException(final String message, final ChaiError errorCode, final boolean permenant, final boolean authentication)
     {
         super(message, errorCode, permenant, authentication);
     }

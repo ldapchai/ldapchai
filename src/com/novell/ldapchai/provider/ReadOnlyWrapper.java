@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.util.ChaiLogger;
 
@@ -81,7 +81,7 @@ class ReadOnlyWrapper implements InvocationHandler {
 
         if (isModify) {
             throw new ChaiOperationException("attempt to make ldap modifaction, but Chai is configured for read-only",
-                    ChaiErrorCode.READ_ONLY_VIOLATION,
+                    ChaiError.READ_ONLY_VIOLATION,
                     true,
                     false);
         }

@@ -23,10 +23,7 @@ import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiErrorCode;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.exception.*;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
@@ -80,7 +77,8 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             final int responseCode = setResponse.getNmasRetCode();
             if (responseCode != 0) {
                 LOGGER.debug("nmas response code returned from server while testing nmas password: " + responseCode);
-                throw ChaiPasswordPolicyException.forErrorCode(responseCode);
+                final String errorString = "nmas error " + responseCode;
+                throw new ChaiPasswordPolicyException(errorString, ChaiErrors.getErrorForMessage(errorString));
             }
         }
         return true;
@@ -127,13 +125,13 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             final int responseCode = getResponse.getNmasRetCode();
             if (responseCode != 0) {
                 LOGGER.debug("error testing nmas password: " + responseCode);
-                throw new ChaiOperationException("error reading nmas password: error " + responseCode, ChaiErrorCode.UNKNOWN);
+                throw new ChaiOperationException("error reading nmas password: error " + responseCode, ChaiError.UNKNOWN);
             }
             return getResponse.getPwdStr();
         }
 
         LOGGER.debug("unknown error retreiving password (null response)");
-        throw new ChaiOperationException("unknown error retreiving password (null response)", ChaiErrorCode.UNKNOWN);
+        throw new ChaiOperationException("unknown error retreiving password (null response)", ChaiError.UNKNOWN);
     }
 
     public void setPassword(final String newPassword)
@@ -144,7 +142,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             try {
                 writeStringAttribute(ATTR_PASSWORD, newPassword);
             } catch (ChaiOperationException e) {
-                throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
             }
         } else {
             final SetPwdRequest request = new SetPwdRequest();
@@ -154,14 +152,15 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             try {
                 response = getChaiProvider().extendedOperation(request);
             } catch (ChaiOperationException e) {
-                throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
             }
             if (response != null) {
                 final SetPwdResponse setResponse = (SetPwdResponse) response;
                 final int responseCode = setResponse.getNmasRetCode();
                 if (responseCode != 0) {
                     LOGGER.debug("error setting nmas password: " + responseCode);
-                    throw ChaiPasswordPolicyException.forErrorCode(responseCode);
+                    final String errorString = "nmas error " + responseCode;
+                    throw new ChaiPasswordPolicyException(errorString, ChaiErrors.getErrorForMessage(errorString));
                 }
             }
         }
@@ -215,7 +214,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             try {
                 replaceAttribute(ATTR_PASSWORD, oldPassword, newPassword);
             } catch (ChaiOperationException e) {
-                throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
             }
         } else {
             final ChangePwdRequest request = new ChangePwdRequest();
@@ -226,14 +225,15 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             try {
                 response = getChaiProvider().extendedOperation(request);
             } catch (ChaiOperationException e) {
-                throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
             }
             if (response != null) {
                 final ChangePwdResponse changeResponse = (ChangePwdResponse) response;
                 final int responseCode = changeResponse.getNmasRetCode();
                 if (responseCode != 0) {
                     LOGGER.debug("error changing nmas password: " + responseCode);
-                    throw ChaiPasswordPolicyException.forErrorCode(responseCode);
+                    final String errorString = "nmas error " + responseCode;
+                    throw new ChaiPasswordPolicyException(errorString, ChaiErrors.getErrorForMessage(errorString));
                 }
             }
         }

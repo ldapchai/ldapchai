@@ -20,6 +20,7 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
@@ -101,20 +102,23 @@ abstract class AbstractResponseSet implements ResponseSet {
             final String responseText = crMap.get(loopChallenge);
 
             if (loopChallenge.getChallengeText() == null || loopChallenge.getChallengeText().length() < 1) {
-                throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.MISSING_REQUIRED_CHALLENGE_TEXT);
+                throw new ChaiValidationException("challenge text missing for challenge", ChaiError.CR_MISSING_REQUIRED_CHALLENGE_TEXT);
             }
 
             if (state.isReadableResponses()) {
                 if (responseText == null || responseText.length() < 1) {
-                    throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.MISSING_REQUIRED_RESPONSE_TEXT, loopChallenge.getChallengeText());
+                    final String errorString = "response text missing for challenge '" + loopChallenge.getChallengeText() + "'";
+                    throw new ChaiValidationException(errorString, ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT,loopChallenge.getChallengeText());
                 }
 
                 if (responseText.length() < loopChallenge.getMinLength()) {
-                    throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.RESPONSE_TOO_SHORT, loopChallenge.getChallengeText());
+                    final String errorString = "response text is too short for challenge '" + loopChallenge.getChallengeText() + "'";
+                    throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_SHORT,loopChallenge.getChallengeText());
                 }
 
                 if (responseText.length() > loopChallenge.getMaxLength()) {
-                    throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.RESPONSE_TOO_LONG, loopChallenge.getChallengeText());
+                    final String errorString = "response text is too long for challenge '" + loopChallenge.getChallengeText() + "'";
+                    throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_LONG,loopChallenge.getChallengeText());
                 }
             }
         }
@@ -126,7 +130,7 @@ abstract class AbstractResponseSet implements ResponseSet {
                 final String responseText = crMap.get(loopChallenge);
                 if (responseText != null && responseText.length() > 1) {
                     if (seenResponses.contains(responseText.toLowerCase())) {
-                        throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.DUPLICATE_RESPONSES, loopChallenge.getChallengeText());
+                        throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_DUPLICATE_RESPONSES, loopChallenge.getChallengeText());
                     }
                     seenResponses.add(responseText);
                 }
@@ -170,21 +174,21 @@ abstract class AbstractResponseSet implements ResponseSet {
                 final List<String> challengeTexts = this.getChallengeSet().getChallengeTexts();
 
                 if (!challengeTexts.contains(loopChallengeText)) {
-                    throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.MISSING_REQUIRED_RESPONSE_TEXT, loopChallengeText);
+                    throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT, loopChallengeText);
                 }
             }
         }
 
         if (this.getChallengeSet().getRequiredChallenges().size() < challengeSet.getRequiredChallenges().size()) {
-            throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.TOO_FEW_CHALLENGES);
+            throw new ChaiValidationException("too few challenges are required", ChaiError.CR_TOO_FEW_CHALLENGES);
         }
 
         if (this.getChallengeSet().getMinRandomRequired() < this.getChallengeSet().getMinRandomRequired()) {
-            throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.TOO_FEW_RANDOM_RESPONSES);
+            throw new ChaiValidationException("number of responses does not meet minimum random requirement", ChaiError.CR_TOO_FEW_RANDOM_RESPONSES);
         }
 
         if (this.getChallengeSet().getRandomChallenges().size() < challengeSet.getMinRandomRequired()) {
-            throw new ChaiValidationException(ChaiValidationException.VALIDATION_ERROR.TOO_FEW_RANDOM_RESPONSES);
+            throw new ChaiValidationException("number of responses does not meet minimum random requirement", ChaiError.CR_TOO_FEW_RANDOM_RESPONSES);
         }
 
         return true;

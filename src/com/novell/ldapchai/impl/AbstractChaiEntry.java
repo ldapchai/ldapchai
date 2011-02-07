@@ -22,7 +22,7 @@ package com.novell.ldapchai.impl;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiFactory;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
@@ -246,10 +246,10 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         }
 
         if (results.isEmpty()) {
-            throw new ChaiOperationException("search for canonical DN resulted in no results", ChaiErrorCode.UNKNOWN);
+            throw new ChaiOperationException("search for canonical DN resulted in no results", ChaiError.UNKNOWN);
         }
 
-        throw new ChaiOperationException("search for canonical DN resulted in multiple results", ChaiErrorCode.UNKNOWN);
+        throw new ChaiOperationException("search for canonical DN resulted in multiple results", ChaiError.UNKNOWN);
     }
 
     public final int readIntAttribute(final String attributeName)

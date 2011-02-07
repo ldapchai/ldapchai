@@ -25,7 +25,7 @@ package com.novell.ldapchai.exception;
  * ChaiOperationException and ChaiUnavailableException.
  *
  * @author Jason D. Rivard
- * @see com.novell.ldapchai.exception.ChaiErrorCode
+ * @see ChaiError
  */
 public class ChaiException extends Exception {
 // ------------------------------ FIELDS ------------------------------
@@ -33,13 +33,13 @@ public class ChaiException extends Exception {
     private boolean permenant = true;
     private boolean authentication = false;
 
-    private ChaiErrorCode errorCode;
+    private ChaiError errorCode;
 
 // -------------------------- STATIC METHODS --------------------------
 
     static ChaiException createChaiException(final String message)
     {
-        final ChaiErrorCode detectedCode = ChaiErrors.getErrorForMessage(message);
+        final ChaiError detectedCode = ChaiErrors.getErrorForMessage(message);
 
         if (ChaiErrors.isPermanent(message)) {
             return new ChaiUnavailableException(message, detectedCode);
@@ -50,12 +50,12 @@ public class ChaiException extends Exception {
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    protected ChaiException(final String message, final ChaiErrorCode errorCode)
+    protected ChaiException(final String message, final ChaiError errorCode)
     {
         this(message, errorCode, ChaiErrors.isPermanent(message), ChaiErrors.isAuthenticationRelated(message));
     }
 
-    public ChaiException(final String message, final ChaiErrorCode errorCode, final boolean permenant, final boolean authentication)
+    public ChaiException(final String message, final ChaiError errorCode, final boolean permenant, final boolean authentication)
     {
         super(message);
         this.permenant = permenant;
@@ -65,7 +65,7 @@ public class ChaiException extends Exception {
 
     // --------------------- GETTER / SETTER METHODS ---------------------
 
-    public ChaiErrorCode getErrorCode()
+    public ChaiError getErrorCode()
     {
         return errorCode;
     }

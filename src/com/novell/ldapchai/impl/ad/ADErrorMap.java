@@ -17,11 +17,24 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.exception;
+package com.novell.ldapchai.impl.ad;
 
-class ADErrorMap implements ErrorMap {
+import com.novell.ldapchai.exception.ChaiError;
+import com.novell.ldapchai.exception.ChaiErrors;
+import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.provider.ChaiProvider;
 
-    public ChaiErrorCode errorForMessage(final String message)
+public class ADErrorMap implements ErrorMap {
+
+    static {
+        ChaiErrors.addErrorMap(new ADErrorMap());
+    }
+
+    public ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor() {
+        return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
+    }
+
+    public ChaiError errorForMessage(final String message)
     {
         return forMessage(message).chaiErrorCode;
     }
@@ -55,29 +68,23 @@ class ADErrorMap implements ErrorMap {
     }
 
     enum ADError {
-        UNKNOWN                                        ("-999", ChaiErrorCode.UNKNOWN,                       true, false),
-        NO_SUCH_OBJECT                                 ("0x20", ChaiErrorCode.NO_SUCH_OBJECT,                true, false),
-        NO_SUCH_ATTRIBUTE                              ("0x10", ChaiErrorCode.NO_SUCH_ATTRIBUTE,             true, false),
-        FAILED_AUTHENTICATION                          ("80090308", ChaiErrorCode.FAILED_AUTHENTICATION,         true, true),
-//      DUPLICATE_PASSWORD                             ("",     ChaiErrorCode.DUPLICATE_PASSWORD,            true, false),
-//      PASSWORD_TOO_SHORT                             ("",     ChaiErrorCode.PASSWORD_TOO_SHORT,            true, false),
-//      BAD_PASSWORD                                   ("",     ChaiErrorCode.BAD_PASSWORD,                  true, true),
-//      PASSWORD_EXPIRED                               ("",     ChaiErrorCode.PASSWORD_EXPIRED,              true, true),
-//      NO_SUCH_ENTRY                                  ("",     ChaiErrorCode.NO_SUCH_ENTRY,                 true, false),
-//      NO_SUCH_VALUE                                  ("",     ChaiErrorCode.NO_SUCH_VALUE,                 true, false),
-//      NO_ACCESS                                      ("",     ChaiErrorCode.NO_ACCESS,                     true, false),
+        UNKNOWN                 ("-999", ChaiError.UNKNOWN,                       true, false),
+        NO_SUCH_OBJECT          ("0x20", ChaiError.NO_SUCH_ENTRY,                 true, false),
+        NO_SUCH_ATTRIBUTE       ("0x10", ChaiError.NO_SUCH_ATTRIBUTE,             true, false),
+        FAILED_AUTHENTICATION   ("80090308", ChaiError.FAILED_AUTHENTICATION,     true, true),
+        BAD_PASSWORD            ("19",     ChaiError.PASSWORD_BADPASSWORD,        true, true),
 
         ;
 
         private String errorCodeString;
-        private ChaiErrorCode chaiErrorCode;
+        private ChaiError chaiErrorCode;
         private boolean permenant;
         private boolean authentication;
         private String[] errorStrings;
 
         ADError(
                 final String errorCodeString,
-                final ChaiErrorCode chaiErrorCode,
+                final ChaiError chaiErrorCode,
                 final boolean permenant,
                 final boolean authentication,
                 final String... errorStrings
@@ -105,7 +112,7 @@ class ADErrorMap implements ErrorMap {
             return authentication;
         }
 
-        public ChaiErrorCode getChaiErrorCode()
+        public ChaiError getChaiErrorCode()
         {
             return chaiErrorCode;
         }

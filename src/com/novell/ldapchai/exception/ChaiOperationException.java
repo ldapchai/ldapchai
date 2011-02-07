@@ -26,7 +26,7 @@ package com.novell.ldapchai.exception;
  * ldap server or underlying API such as JNDI.
  *
  * @author Jason D. Rivard
- * @see com.novell.ldapchai.exception.ChaiErrorCode
+ * @see ChaiError
  */
 public class ChaiOperationException extends ChaiException {
 // ------------------------------ FIELDS ------------------------------
@@ -41,12 +41,12 @@ public class ChaiOperationException extends ChaiException {
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    public ChaiOperationException(final String message, final ChaiErrorCode errorCode)
+    public ChaiOperationException(final String message, final ChaiError errorCode)
     {
         super(message, errorCode);
     }
 
-    public ChaiOperationException(final String message, final ChaiErrorCode errorCode, final boolean permenant, final boolean authentication)
+    public ChaiOperationException(final String message, final ChaiError errorCode, final boolean permenant, final boolean authentication)
     {
         super(message, errorCode, permenant, authentication);
     }

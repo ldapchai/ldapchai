@@ -29,24 +29,25 @@ public final class ChaiErrors {
 
     private static final List<ErrorMap> errorMaps = new ArrayList<ErrorMap>();
 
-    static {
-        errorMaps.add(new EdirErrorMap());
-        errorMaps.add(new ADErrorMap());
+    public static void addErrorMap(final ErrorMap errorMap) {
+        if (errorMap != null) {
+            errorMaps.add(errorMap);
+        }
     }
 
     private ChaiErrors() {
     }
 
-    public static ChaiErrorCode getErrorForMessage(final String message)
+    public static ChaiError getErrorForMessage(final String message)
     {
         for (final ErrorMap errorMap : errorMaps) {
-            final ChaiErrorCode errorCode = errorMap.errorForMessage(message);
-            if (errorCode != null && errorCode != ChaiErrorCode.UNKNOWN) {
+            final ChaiError errorCode = errorMap.errorForMessage(message);
+            if (errorCode != null && errorCode != ChaiError.UNKNOWN) {
                 return errorCode;
             }
         }
 
-        return ChaiErrorCode.UNKNOWN;
+        return ChaiError.UNKNOWN;
     }
 
     /**

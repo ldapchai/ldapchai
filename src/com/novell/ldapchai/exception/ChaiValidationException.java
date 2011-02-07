@@ -26,74 +26,18 @@ package com.novell.ldapchai.exception;
  * @author Jason D. Rivard
  */
 public class ChaiValidationException extends ChaiException {
-// ----------------------------- CONSTANTS ----------------------------
+    private String fieldName;
 
-
-// -------------------------- ENUMERATIONS --------------------------
-
-    /**
-     * Enumeration of validation errors
-     */
-    public enum VALIDATION_ERROR {
-        NOT_ENOUGH_RANDOM_RESPONSES("NotEnoughRandom", "number of required responses greater then count of supplied random challenges"),
-        TOO_FEW_RANDOM_RESPONSES("TooFewRandom", "number of responses does not meet minimum random requirement"),
-        MISSING_REQUIRED_CHALLENGE_TEXT("MissingRequiredChallenge", "challenge text missing for challenge"),
-        MISSING_REQUIRED_RESPONSE_TEXT("MissingRequiredResponse", "response text missing for challenge"),
-        RESPONSE_TOO_SHORT("ResponseTooShort", "response text is too short for challenge"),
-        RESPONSE_TOO_LONG("ResponseTooLong", "response text is too long for challenge"),
-        TOO_FEW_CHALLENGES("TooFewChallenges", "too few challenges are required"),
-        DUPLICATE_RESPONSES("DuplicateResponses", "multiple responses have the same value"),
-        ;
-
-        private String errorKey;
-        private String debugDescription;
-
-        private VALIDATION_ERROR(final String errorKey, final String debugDescription)
-        {
-            this.errorKey = errorKey;
-            this.debugDescription = debugDescription;
-        }
-
-        public String getDebugDescription()
-        {
-            return debugDescription;
-        }
-
-        public String getErrorKey()
-        {
-            return errorKey;
-        }
+    public ChaiValidationException(final String message, final ChaiError errorCode) {
+        this(message, errorCode, null);
     }
 
-// ------------------------------ FIELDS ------------------------------
-
-    private ChaiValidationException.VALIDATION_ERROR validationError;
-    private String validationField;
-
-// --------------------------- CONSTRUCTORS ---------------------------
-
-    public ChaiValidationException(final ChaiValidationException.VALIDATION_ERROR validationError, final String validationField)
-    {
-        super(validationError.getErrorKey(), ChaiErrorCode.UNKNOWN);
-        this.validationError = validationError;
-        this.validationField = validationField;
+    public ChaiValidationException(final String message, final ChaiError errorCode, final String fieldName) {
+        super(message, errorCode);
+        this.fieldName = fieldName;
     }
 
-    public ChaiValidationException(final ChaiValidationException.VALIDATION_ERROR validationError)
-    {
-        this(validationError, null);
-
-    }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
-
-    public ChaiValidationException.VALIDATION_ERROR getValidationError()
-    {
-        return validationError;
-    }
-
-    public String getValidationField()
-    {
-        return validationField;
+    public String getFieldName() {
+        return fieldName;
     }
 }

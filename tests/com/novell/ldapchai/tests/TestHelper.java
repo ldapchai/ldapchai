@@ -22,7 +22,7 @@ package com.novell.ldapchai.tests;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiErrorCode;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -89,7 +89,7 @@ public class TestHelper {
                 object.getChaiProvider().deleteEntry(object.getEntryDN());
             }
         } catch (ChaiOperationException e) {
-            if (e.getErrorCode() != ChaiErrorCode.NO_SUCH_OBJECT) {
+            if (e.getErrorCode() != ChaiError.NO_SUCH_ENTRY) {
                 throw e;
             }
         }

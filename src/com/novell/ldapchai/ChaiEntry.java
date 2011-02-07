@@ -56,7 +56,7 @@ public interface ChaiEntry {
      * supplied value will be set.
      * <p/>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiErrorCode#DUPLICATE_PASSWORD}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError#DUPLICATE_PASSWORD}.
      *
      * @param attributeName  A valid attribute for the entry
      * @param attributeValue A string value to be added to the ldap entry
@@ -73,7 +73,7 @@ public interface ChaiEntry {
      * supplied value will be set.
      * <p/>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiErrorCode#DUPLICATE_PASSWORD}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError#DUPLICATE_PASSWORD}.
      *
      * @param attributeName   A valid attribute for the entry
      * @param attributeValues A set of string values to be added to the ldap entry
@@ -90,7 +90,7 @@ public interface ChaiEntry {
      * supplied value will be set.
      * <p/>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiErrorCode#DUPLICATE_PASSWORD}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError#DUPLICATE_PASSWORD}.
      *
      * @param attributeName   A valid attribute for the entry
      * @param attributeValues A set of string values to be added to the ldap entry
