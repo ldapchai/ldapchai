@@ -42,7 +42,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-class ChaiResponseSet extends AbstractResponseSet {
+public class ChaiResponseSet extends AbstractResponseSet {
 // ----------------------------- CONSTANTS ----------------------------
 
 
@@ -53,7 +53,7 @@ class ChaiResponseSet extends AbstractResponseSet {
         SHA1("SHA1"),
         SHA1_SALT("SHA1_SALT");
 
-        private String format;
+        private final String format;
 
         private FormatType(final String format)
         {
@@ -112,8 +112,8 @@ class ChaiResponseSet extends AbstractResponseSet {
 
     private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
-    private FormatType formatType;
-    private boolean caseInsensitive;
+    private final FormatType formatType;
+    private final boolean caseInsensitive;
 
     static {
         DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("Zulu"));
@@ -158,7 +158,7 @@ class ChaiResponseSet extends AbstractResponseSet {
         return null;
     }
 
-    private static ChaiResponseSet parseChaiResponseSetXML(final String input, final ChaiUser user)
+    public static ChaiResponseSet parseChaiResponseSetXML(final String input, final ChaiUser user)
             throws ChaiValidationException
     {
         if (input == null || input.length() < 1) {
@@ -197,7 +197,7 @@ class ChaiResponseSet extends AbstractResponseSet {
             {
                 final Attribute timeAttr = rootElement.getAttribute(XML_ATTRIBUTE_TIMESTAMP);
                 if (timeAttr != null) {
-                    String timeStr = timeAttr.getValue();
+                    final String timeStr = timeAttr.getValue();
                     try {
                         timestamp = DATE_FORMATTER.parse(timeStr);
                     } catch (ParseException e) {

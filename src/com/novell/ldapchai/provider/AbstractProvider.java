@@ -21,6 +21,7 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.exception.ChaiError;
+import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
@@ -181,18 +182,16 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
 // -------------------------- INNER CLASSES --------------------------
 
-        public boolean errorIsRetryable(final Exception e)
-        {
-
-            if (e instanceof ChaiUnavailableException) {
-                return !((ChaiUnavailableException)e).isPermenant();
-            } else if (e instanceof ChaiOperationException) {
-                return !((ChaiOperationException)e).isPermenant();
-            } else {
-                final String errorMsg = e.getMessage();
-                return !new ChaiOperationException(errorMsg, ChaiError.UNKNOWN).isPermenant();
-            }
+    public boolean errorIsRetryable(final Exception e)
+    {
+        if (e instanceof IOException) {
+            return true;
+        } else if (e instanceof ChaiException) {
+            return !(((ChaiException) e).isPermenant());
         }
+
+        return false;
+    }
 
     protected static class PromiscuousSSLSocketFactory extends SSLSocketFactory {
         static SSLSocketFactory wrappedSSLSocketFactory = null;

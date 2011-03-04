@@ -86,7 +86,7 @@ public enum ChaiError {
 
 // ------------------------------ FIELDS ------------------------------
 
-    private int errorCode;
+    private final int errorCode;
     private String errorKey;
 
 // -------------------------- STATIC METHODS --------------------------

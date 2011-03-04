@@ -67,26 +67,26 @@ public final class ChaiErrors {
     }
 
     /**
-     * Indicates if the error is deemed permement or temporary.
+     * Indicates if the error is deemed permanent or temporary.
      * <p/>
-     * Permenant errors are those that, if retried, the error would most likely
+     * Permanent errors are those that, if retried, the error would most likely
      * occur indefinitely.  This would generally include any error that if repeated against
      * a different server, the error returned would be the same.
      * <p/>
-     * Failover mechanisms use this indication to decide if an operation that
+     * Fail-over mechanisms use this indication to decide if an operation that
      * generated an error should be retried.
      *
-     * @return true if the error is defined as permanant
+     * @return true if the error is defined as permanent
      */
     static boolean isPermanent(final String message)
     {
         for (final ErrorMap errorMap : errorMaps) {
-            if (errorMap.isPermenant(message)) {
-                return true;
+            if (!errorMap.isPermenant(message)) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
 }
