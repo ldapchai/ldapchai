@@ -143,7 +143,7 @@ public interface ChaiProvider {
      * Create a new entry in the directory
      *
      * @param entryDN          A valid entryDN
-     * @param baseObjectClass  The base class of the object (objectClass)
+     * @param baseObjectClass  The base class of the entry (objectClass)
      * @param stringAttributes a Properties object containing
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
@@ -152,6 +152,21 @@ public interface ChaiProvider {
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
     public void createEntry(String entryDN, String baseObjectClass, Properties stringAttributes)
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
+
+    /**
+     * Create a new entry in the directory
+     *
+     * @param entryDN          A valid entryDN
+     * @param baseObjectClasses The base classes of the entry (objectClass)
+     * @param stringAttributes a Properties object containing
+     * @throws ChaiOperationException   If an error is encountered during the operation
+     * @throws ChaiUnavailableException If no directory servers are reachable
+     * @throws IllegalStateException    If the underlying connection is not in an available state
+     */
+    @ChaiProviderImplementor.LdapOperation
+    @ChaiProviderImplementor.ModifyOperation
+    public void createEntry(String entryDN, Set<String> baseObjectClasses, Properties stringAttributes)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**

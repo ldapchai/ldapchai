@@ -19,6 +19,11 @@
 
 package com.novell.ldapchai.impl.ad.entry;
 
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.util.internal.Base64Util;
+
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -70,4 +75,19 @@ public class ADEntries {
 
         return new Date(timestampAsJavaMs);
     }
+
+    static Date readDateAttribute(final ChaiEntry chaiEntry, final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
+        final String attrValue = chaiEntry.readStringAttribute(attributeName);
+        return attrValue == null ? null : ADEntries.convertWinEpochToDate(attrValue);
+    }
+
+    static String readGUID(final ChaiEntry chaiEntry) throws ChaiOperationException, ChaiUnavailableException {
+        final byte[][] guidValues = chaiEntry.readMultiByteAttribute("objectGUID");
+        if (guidValues == null || guidValues.length < 1) {
+            return null;
+        }
+        final byte[] guidValue = guidValues[0];
+        return Base64Util.encodeBytes(guidValue);
+    }
+
 }

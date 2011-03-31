@@ -29,6 +29,7 @@ import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
+import com.novell.ldapchai.util.internal.Base64Util;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -219,7 +220,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
                 return true;
             }
         } catch (Exception e) {
-            LOGGER.trace("unexpected error during isValid check: " + e.getMessage(),e);
+            LOGGER.trace("unexpected error during isValid check: " + e.getMessage());
         }
 
         return false;
@@ -407,5 +408,14 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
             return EdirEntries.convertZuluToDate(lastLoginTimeStr);
         }
         return null;
+    }
+
+    public String readGUID() throws ChaiOperationException, ChaiUnavailableException {
+        final byte[][] guidValues = this.readMultiByteAttribute("guid");
+        if (guidValues == null || guidValues.length < 1) {
+            return null;
+        }
+        final byte[] guidValue = guidValues[0];
+        return Base64Util.encodeBytes(guidValue);
     }
 }

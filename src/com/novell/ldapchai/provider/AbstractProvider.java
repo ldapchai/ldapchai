@@ -68,17 +68,19 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         final StringBuilder debugStr = new StringBuilder();
         debugStr.append(theMethod.getName());
         debugStr.append('(');
-        for (Iterator iter = Arrays.asList(parameters).iterator(); iter.hasNext();) {
-            final Object nextValue = iter.next();
-            if (nextValue == null) {
-                debugStr.append("null");
-            } else if (nextValue.getClass() == (new Object[0]).getClass()) {
-                debugStr.append("array");
-            } else {
-                debugStr.append(nextValue.toString());
-            }
-            if (iter.hasNext()) {
-                debugStr.append(',');
+        if (parameters != null) {
+            for (Iterator iter = Arrays.asList(parameters).iterator(); iter.hasNext();) {
+                final Object nextValue = iter.next();
+                if (nextValue == null) {
+                    debugStr.append("null");
+                } else if (nextValue.getClass().isArray()) {
+                    debugStr.append(Arrays.asList((Object[])nextValue).toString());
+                } else {
+                    debugStr.append(nextValue.toString());
+                }
+                if (iter.hasNext()) {
+                    debugStr.append(',');
+                }
             }
         }
         debugStr.append(')');
@@ -320,6 +322,21 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        public final void createEntry(final String entryDN, final Set<String> baseObjectClasses, final Properties stringAttributes)
+        {
+            if (baseObjectClasses == null) {
+                throw new NullPointerException("baseObjectClass must not be null");
+            }
+
+            if (baseObjectClasses.isEmpty()) {
+                throw new NullPointerException("baseObjectClass must not be empty");
+            }
+
+            if (entryDN == null) {
+                throw new NullPointerException("entryDN must not be null");
+            }
+        }
+
         public final void deleteEntry(final String entryDN)
         {
             if (entryDN == null) {
@@ -501,10 +518,10 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
 
         public void replaceBinaryAttribute(
-                String entryDN,
-                String attributeName,
-                byte[] oldValue,
-                byte[] newValue
+                final String entryDN,
+                final String attributeName,
+                final byte[] oldValue,
+                final byte[] newValue
         )
                 throws ChaiUnavailableException, ChaiOperationException
         {

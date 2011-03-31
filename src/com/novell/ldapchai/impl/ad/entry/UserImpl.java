@@ -100,7 +100,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         try {
             littleEndianEncodedPwd = quotedPwd.getBytes("UTF-16LE");
         } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("unexpected error, missing 'UTF-16KE' character encoder",e);
+            throw new IllegalStateException("unexpected error, missing 'UTF-16LE' character encoder",e);
         }
         final byte[][] multiBA = new byte[][] { littleEndianEncodedPwd };
 
@@ -231,11 +231,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             }
         }
 
-        long pwdExpirateTimeMs = pwdLastSetMs + maxPwdAgeMs;
+        final long pwdExpirateTimeMs = pwdLastSetMs + maxPwdAgeMs;
         return new Date(pwdExpirateTimeMs);
     }
 
-    private String readDomainValue(String attribute) throws ChaiUnavailableException, ChaiOperationException {
+    private String readDomainValue(final String attribute) throws ChaiUnavailableException, ChaiOperationException {
         ChaiEntry parentEntry = this.getParentEntry();
         int recursionCount  = 0; // should never need this, but provided for sanity
         while (parentEntry != null && recursionCount < 50) {
@@ -247,4 +247,15 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         }
         return null;
     }
+
+    @Override
+    public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
+        return ADEntries.readDateAttribute(this, attributeName);
+    }
+
+    @Override
+    public String readGUID() throws ChaiOperationException, ChaiUnavailableException {
+        return ADEntries.readGUID(this);
+    }
+
 }

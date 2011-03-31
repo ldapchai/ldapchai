@@ -33,9 +33,4 @@ class TopImpl extends AbstractChaiEntry implements ChaiEntry {
         super(entryDN, chaiProvider);
     }
 
-    public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
-        final String attrValue = readStringAttribute(attributeName);
-        return attrValue == null ? null : ADEntries.convertWinEpochToDate(attrValue);
-    }
-
 }

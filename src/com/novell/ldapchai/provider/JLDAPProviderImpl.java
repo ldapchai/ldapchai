@@ -142,11 +142,20 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
     public void createEntry(final String entryDN, final String baseObjectClass, final Properties stringAttributes)
             throws ChaiOperationException
     {
-        activityPreCheck();
         INPUT_VALIDATOR.createEntry(entryDN, baseObjectClass, stringAttributes);
+        this.createEntry(entryDN, Collections.singleton(baseObjectClass),stringAttributes);
+    }
+
+    @ChaiProviderImplementor.LdapOperation
+    @ChaiProviderImplementor.ModifyOperation
+    public void createEntry(final String entryDN, final Set<String> baseObjectClasses, final Properties stringAttributes)
+            throws ChaiOperationException
+    {
+        activityPreCheck();
+        INPUT_VALIDATOR.createEntry(entryDN, baseObjectClasses, stringAttributes);
 
         final LDAPAttributeSet ldapAttributeSet = new LDAPAttributeSet();
-        ldapAttributeSet.add(new LDAPAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS, baseObjectClass));
+        ldapAttributeSet.add(new LDAPAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS, baseObjectClasses.toArray(new String[baseObjectClasses.size()])));
         if (stringAttributes != null) {
             for (final Object key : stringAttributes.keySet()) {
                 ldapAttributeSet.add(new LDAPAttribute((String) key, stringAttributes.getProperty((String) key)));

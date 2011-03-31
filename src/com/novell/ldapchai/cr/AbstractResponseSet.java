@@ -123,7 +123,10 @@ abstract class AbstractResponseSet implements ResponseSet {
             }
         }
 
-        final boolean allowduplicates = StringHelper.convertStrToBoolean(user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.ALLOW_DUPLICATE_RESPONSES));
+        boolean allowduplicates = StringHelper.convertStrToBoolean(CrSetting.ALLOW_DUPLICATE_RESPONSES.getDefaultValue());
+        if (user != null) {
+            allowduplicates = StringHelper.convertStrToBoolean(user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.ALLOW_DUPLICATE_RESPONSES));
+        }
         if (!allowduplicates) {
             final Set<String> seenResponses = new HashSet<String>();
             for (final Challenge loopChallenge : crMap.keySet()) {
@@ -198,7 +201,10 @@ abstract class AbstractResponseSet implements ResponseSet {
             throws ChaiUnavailableException, ChaiOperationException
     {
         if (crMode == null) {
-            final String strDefault = user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.DEFAULT_WRITE_MODE);
+            String strDefault = CrSetting.DEFAULT_WRITE_MODE.getDefaultValue();
+            if (user != null) {
+                strDefault = user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.DEFAULT_WRITE_MODE);
+            }
             crMode = CrMode.forString(strDefault);
         }
 

@@ -20,11 +20,25 @@
 package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
+import java.util.Date;
+
 class GroupImpl extends AbstractChaiGroup implements Group, ChaiGroup {
-    public GroupImpl(String groupDN, ChaiProvider chaiProvider) {
+    public GroupImpl(final String groupDN, final ChaiProvider chaiProvider) {
         super(groupDN, chaiProvider);
     }
+    @Override
+    public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
+        return ADEntries.readDateAttribute(this, attributeName);
+    }
+
+    @Override
+    public String readGUID() throws ChaiOperationException, ChaiUnavailableException {
+        return ADEntries.readGUID(this);
+    }
+
 }

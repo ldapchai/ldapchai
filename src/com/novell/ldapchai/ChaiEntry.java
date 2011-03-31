@@ -445,5 +445,21 @@ public interface ChaiEntry {
     void replaceBinaryAttribute(final String attributeName, final byte[] oldValue, final byte[] newValue)
             throws ChaiOperationException, ChaiUnavailableException;
 
+    /**
+     * Read a GUID (Globally Unique Identifier) from the entry.  Chai will attempt to use vendor-specific
+     * attributes for the entry.  Many vendor implementations store GUID values as binary, or octet-length
+     * syntax so this method will automatically convert to a string format of some type, typically BASE64.
+     *
+     * Thus, the value returned by this method can be assumed to be unique per entry and reliably read across
+     * time, however the value may not be easily reversable to the original vendor format.
+     *
+     * @return Value of the entry's vendor-specific GUID format in some type of string format, or null if not available
+     *
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     * @throws UnsupportedOperationException If the vendor implementation does not have a GUID
+     */
+    String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException;
 }
 

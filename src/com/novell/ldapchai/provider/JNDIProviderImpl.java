@@ -238,11 +238,20 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @LdapOperation
     @ModifyOperation
-    public final void createEntry(final String entryDN, final String baseObjectClass, Properties stringAttributes)
+    public final void createEntry(final String entryDN, final String baseObjectClass, final Properties stringAttributes)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        INPUT_VALIDATOR.createEntry(entryDN, baseObjectClass, stringAttributes);
+        this.createEntry(entryDN, Collections.singleton(baseObjectClass),stringAttributes);
+    }
+
+    @LdapOperation
+    @ModifyOperation
+    public final void createEntry(final String entryDN, final Set<String> baseObjectClasses, Properties stringAttributes)
             throws ChaiOperationException, ChaiUnavailableException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.createEntry(entryDN, baseObjectClass, stringAttributes);
+        INPUT_VALIDATOR.createEntry(entryDN, baseObjectClasses, stringAttributes);
 
         if (stringAttributes == null) {
             stringAttributes = new Properties();
@@ -251,7 +260,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         final Attributes attrs = new BasicAttributes();
 
         //Put in the base object class an attribute
-        attrs.put(ChaiConstant.ATTR_LDAP_OBJECTCLASS, baseObjectClass);
+        final BasicAttribute objectClassAttr = new BasicAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS);
+        for (final String loopClass : baseObjectClasses) {
+            objectClassAttr.add(loopClass);
+        }
+        attrs.put(objectClassAttr);
 
         //Add each of the attributes required.
         for (final Object o : stringAttributes.keySet()) {
