@@ -198,7 +198,6 @@ public interface ChaiEntry {
     String readCanonicalDN()
             throws ChaiOperationException, ChaiUnavailableException;
 
-    /*
    /**
     * Read an attribute with timestamp value.  Automatically converts the timestamp to a {@code Date} object.
     * If there are any problems with the conversion, null is returned.
@@ -397,6 +396,16 @@ public interface ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
+     * Write an attribute with timestamp value.  Automatically converts the {@code Date} object to a timestamp.
+     *
+     * @param attributeName Name of the attribute to read.  Date must be in Zulu string format.
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     */
+    public void writeDateAttribute(final String attributeName, final Date date)
+            throws ChaiOperationException, ChaiUnavailableException;
+
+    /**
      * Removes all existing values, if any, and sets the new value.
      *
      * @param attributeValueProps  Name of the attributes and values to set on the entry.  Any existing values will
@@ -448,7 +457,7 @@ public interface ChaiEntry {
     /**
      * Read a GUID (Globally Unique Identifier) from the entry.  Chai will attempt to use vendor-specific
      * attributes for the entry.  Many vendor implementations store GUID values as binary, or octet-length
-     * syntax so this method will automatically convert to a string format of some type, typically BASE64.
+     * syntax so this method will automatically convert to a string format of some type, typically a hex or base64 string.
      *
      * Thus, the value returned by this method can be assumed to be unique per entry and reliably read across
      * time, however the value may not be easily reversable to the original vendor format.

@@ -87,13 +87,25 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public final void unlock()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER, "FALSE");
-        this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS, "0");
-        this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, "19700101010101Z");
+        String writeAttribute = "";
+        try {
+            writeAttribute = ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER;
+            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER, "FALSE");
+            writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS;
+            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS, "0");
+            writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME;
+            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, "19700101010101Z");
 
-        final String limit = this.readStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT);
-        if (limit != null) {
-            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING, limit);
+            final String limit = this.readStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT);
+            if (limit != null) {
+                writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING;
+                this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING, limit);
+            }
+        } catch (ChaiOperationException e) {
+            final String errorMsg = "error writing to " + writeAttribute + ": " + e.getMessage();
+            final ChaiOperationException newException = new ChaiOperationException(errorMsg,e.getErrorCode());
+            newException.initCause(e);
+            throw newException;
         }
     }
 
@@ -259,5 +271,12 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             }
         }
         return returnDate;
+    }
+
+    @Override
+    public String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return EdirEntries.readGuid(this);
     }
 }

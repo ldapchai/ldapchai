@@ -19,19 +19,21 @@
 
 package com.novell.ldapchai.exception;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.novell.ldapchai.provider.ChaiProvider;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Static methods useful for error handling.
  */
 public final class ChaiErrors {
 
-    private static final List<ErrorMap> errorMaps = new ArrayList<ErrorMap>();
+    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ErrorMap> errorMaps = new HashMap<ChaiProvider.DIRECTORY_VENDOR,ErrorMap>();
 
-    public static void addErrorMap(final ErrorMap errorMap) {
-        if (errorMap != null) {
-            errorMaps.add(errorMap);
+    static {
+        for (final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values()) {
+            errorMaps.put(vendor,vendor.getErrorMap());
         }
     }
 
@@ -40,7 +42,7 @@ public final class ChaiErrors {
 
     public static ChaiError getErrorForMessage(final String message)
     {
-        for (final ErrorMap errorMap : errorMaps) {
+        for (final ErrorMap errorMap : errorMaps.values()) {
             final ChaiError errorCode = errorMap.errorForMessage(message);
             if (errorCode != null && errorCode != ChaiError.UNKNOWN) {
                 return errorCode;
@@ -57,7 +59,7 @@ public final class ChaiErrors {
      */
     static boolean isAuthenticationRelated(final String message)
     {
-        for (final ErrorMap errorMap : errorMaps) {
+        for (final ErrorMap errorMap : errorMaps.values()) {
             if (errorMap.isAuthenticationRelated(message)) {
                 return true;
             }
@@ -80,7 +82,7 @@ public final class ChaiErrors {
      */
     static boolean isPermanent(final String message)
     {
-        for (final ErrorMap errorMap : errorMaps) {
+        for (final ErrorMap errorMap : errorMaps.values()) {
             if (!errorMap.isPermenant(message)) {
                 return false;
             }

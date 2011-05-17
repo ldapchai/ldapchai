@@ -38,6 +38,7 @@ public enum ChaiError {
     NO_SUCH_VALUE               ("NoSuchValue",                 4),
     NO_SUCH_ATTRIBUTE           ("NoSuchAttribute",             5),
     FAILED_AUTHENTICATION       ("FailedAuthentication",        7),
+    INTRUDER_LOCKOUT            ("IntruderLockout",             8),
     PASSWORD_EXPIRED            ("PasswordExpired",             10),
     UNSUPPORTED_OPERATION       ("UnsupportedOperation",        11),
     NO_ACCESS                   ("NoAccess",                    12),

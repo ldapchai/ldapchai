@@ -26,10 +26,6 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 public class ADErrorMap implements ErrorMap {
 
-    static {
-        ChaiErrors.addErrorMap(new ADErrorMap());
-    }
-
     public ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor() {
         return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
     }
@@ -54,14 +50,25 @@ public class ADErrorMap implements ErrorMap {
 
         for (final ADError error : ADError.values()) {
             if (message.contains(error.getErrorCodeString())) {
-                return error;
-            }
 
-            for (final String errorString : error.getErrorStrings()) {
-                if (message.contains(String.valueOf(errorString))) {
+                final String[] additionalStrings = error.getErrorStrings();
+                if (additionalStrings == null || additionalStrings.length == 0) {
                     return error;
                 }
+
+                boolean matchesAll = true;
+                for (final String additionalString : additionalStrings) {
+                    if (!message.contains(additionalString)) {
+                        matchesAll = false;
+                    }
+                }
+
+                if (matchesAll) {
+                    return error;
+                }
+
             }
+
         }
 
         return ADError.UNKNOWN;
@@ -71,9 +78,9 @@ public class ADErrorMap implements ErrorMap {
         UNKNOWN                 ("-999", ChaiError.UNKNOWN,                       true, false),
         NO_SUCH_OBJECT          ("0x20", ChaiError.NO_SUCH_ENTRY,                 true, false),
         NO_SUCH_ATTRIBUTE       ("0x10", ChaiError.NO_SUCH_ATTRIBUTE,             true, false),
+        INTRUDER_LOCKOUT        ("80090308", ChaiError.INTRUDER_LOCKOUT,          true, true, "775"),
         FAILED_AUTHENTICATION   ("80090308", ChaiError.FAILED_AUTHENTICATION,     true, true),
         BAD_PASSWORD            ("19",     ChaiError.PASSWORD_BADPASSWORD,        true, true),
-
         ;
 
         private String errorCodeString;

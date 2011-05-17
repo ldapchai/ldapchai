@@ -67,4 +67,11 @@ class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames {
     {
         EdirEntries.removeGroupMembership(theUser, this);
     }
+
+    @Override
+    public String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return EdirEntries.readGuid(this);
+    }
 }

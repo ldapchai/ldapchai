@@ -403,11 +403,20 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     public Date readDateAttribute(final String attributeName)
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String lastLoginTimeStr = this.readStringAttribute(attributeName);
-        if (lastLoginTimeStr != null) {
-            return EdirEntries.convertZuluToDate(lastLoginTimeStr);
+        final String value = this.readStringAttribute(attributeName);
+        if (value != null) {
+            return EdirEntries.convertZuluToDate(value);
         }
         return null;
+    }
+
+    public void writeDateAttribute(final String attributeName, final Date date)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        if (date == null) {
+            throw new NullPointerException("date cannot be null");
+        }
+        writeStringAttribute(attributeName, EdirEntries.convertDateToZulu(date));
     }
 
     public String readGUID() throws ChaiOperationException, ChaiUnavailableException {

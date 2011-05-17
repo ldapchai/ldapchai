@@ -20,16 +20,11 @@
 package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.exception.ChaiError;
-import com.novell.ldapchai.exception.ChaiErrors;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.security.nmas.NMASConstants;
 
 public class EdirErrorMap implements ErrorMap {
-
-    static {
-        ChaiErrors.addErrorMap(new EdirErrorMap());
-    }
 
     public ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor() {
         return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
@@ -156,7 +151,7 @@ public class EdirErrorMap implements ErrorMap {
         CREDIT_LIMIT_EXCEEDED                          (-194, ChaiError.UNKNOWN,                       true, false),
         TOO_MANY_HOLDS                                 (-195, ChaiError.UNKNOWN,                       true, false),
         ACCOUNTING_DISABLED                            (-196, ChaiError.UNKNOWN,                       true, false),
-        LOGIN_LOCKOUT                                  (-197, ChaiError.UNKNOWN,                       true, true),
+        LOGIN_LOCKOUT                                  (-197, ChaiError.INTRUDER_LOCKOUT,               true, true),
         NO_CONSOLE_RIGHTS                              (-198, ChaiError.UNKNOWN,                       true, false),
         Q_IO_FAILURE                                   (-208, ChaiError.UNKNOWN,                       true, false),
         NO_QUEUE                                       (-209, ChaiError.UNKNOWN,                       true, false),
@@ -518,7 +513,7 @@ public class EdirErrorMap implements ErrorMap {
         ERR_POSITIONING_IN_FILE                        (-798, ChaiError.UNKNOWN,                       true, false),
         ERR_GETTING_FILE_SIZE                          (-799, ChaiError.UNKNOWN,                       true, false),
 
-        UNSUPPORTED_OPERATION                          (0,   ChaiError.UNSUPPORTED_OPERATION, true, false, "Unrecognized extended operation"),
+        UNSUPPORTED_OPERATION                          (Integer.MAX_VALUE,   ChaiError.UNSUPPORTED_OPERATION, true, false, "Unrecognized extended operation"),
 
 
         ;

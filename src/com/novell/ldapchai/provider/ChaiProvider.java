@@ -21,6 +21,9 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.ad.ADErrorMap;
+import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.ldap.ExtendedRequest;
@@ -105,11 +108,22 @@ public interface ChaiProvider {
     }
 
     public static enum DIRECTORY_VENDOR {
-        GENERIC,
-        NOVELL_EDIRECTORY,
-        MICROSOFT_ACTIVE_DIRECTORY,
-        OPEN_LDAP,
-        DIRECTORY_SERVER_389
+        GENERIC(new EdirErrorMap()),
+        NOVELL_EDIRECTORY(new EdirErrorMap()),
+        MICROSOFT_ACTIVE_DIRECTORY(new ADErrorMap()),
+        OPEN_LDAP(new EdirErrorMap()),
+        DIRECTORY_SERVER_389(new EdirErrorMap())
+        ;
+
+        private final ErrorMap errorMap;
+
+        DIRECTORY_VENDOR(final ErrorMap errorMap) {
+            this.errorMap = errorMap;
+        }
+
+        public ErrorMap getErrorMap() {
+            return errorMap;
+        }
     }
 
 // -------------------------- OTHER METHODS --------------------------

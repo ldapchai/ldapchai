@@ -34,6 +34,7 @@ import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoRequest;
 import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoResponse;
 
 import javax.naming.ldap.ExtendedResponse;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -667,6 +668,14 @@ public class EdirEntries {
 
             return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicyByRule(policyMap);
         }
+    }
+
+    static String readGuid(final ChaiEntry entry)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        final byte[] st = entry.getChaiProvider().readMultiByteAttribute(entry.getEntryDN(),"guid")[0];
+        final BigInteger bigInt = new BigInteger(1,st);
+        return bigInt.toString(16);
     }
 
 }

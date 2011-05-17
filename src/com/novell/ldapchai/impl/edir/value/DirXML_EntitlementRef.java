@@ -40,7 +40,7 @@ import java.util.StringTokenizer;
  *
  * @author Jason D. Rivard
  */
-class DirXML_EntitlementRef implements Serializable {
+public class DirXML_EntitlementRef implements Serializable {
 // ----------------------------- CONSTANTS ----------------------------
 
     //@todo make this class public
@@ -49,7 +49,7 @@ class DirXML_EntitlementRef implements Serializable {
 // -------------------------- ENUMERATIONS --------------------------
 
     public enum State {
-        REVOKED(0),  //@todo verify
+        REVOKED(0),
         GRANTED(1);
 
         private int numValue;
@@ -78,8 +78,8 @@ class DirXML_EntitlementRef implements Serializable {
 // ------------------------------ FIELDS ------------------------------
 
     private String entitlementDN;
-    private State state;
-    private Document payload;
+    private int state;
+    private String payload;
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
@@ -93,9 +93,9 @@ class DirXML_EntitlementRef implements Serializable {
         this.entitlementDN = st.nextToken();
         final String stateString = st.nextToken();
         final int stateNumber = Integer.valueOf(stateString);
-        this.state = State.forNumValue(stateNumber);
+        this.state = stateNumber;
         if (st.hasMoreTokens()) {
-            this.payload = convertStrToDoc(st.nextToken());
+            this.payload = st.nextToken();
         } else {
             this.payload = null;
         }
@@ -123,8 +123,20 @@ class DirXML_EntitlementRef implements Serializable {
         return entitlementDN;
     }
 
-    public State getState()
+    public State getStateType()
     {
+        return State.forNumValue(getState());
+    }
+
+    public int getState() {
         return state;
+    }
+
+    public String getPayload() {
+        return payload;
+    }
+
+    public Document getPayloadDocument() {
+        return convertStrToDoc(getPayload());
     }
 }
