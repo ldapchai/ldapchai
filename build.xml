@@ -103,6 +103,7 @@
             <zipfileset dir="${destination}/javadoc-public" prefix="javadoc-public"/>
             <zipfileset dir="${destination}/javadoc-private" prefix="javadoc-private"/>
             <zipfileset dir="${src.root}/lib" prefix="lib" excludes="CVS"/>
+            <zipfileset dir="${src.root}/build-lib" prefix="build-lib" excludes="CVS"/>
             <zipfileset dir="${src.root}/src" prefix="src" includes="**/*.java"/>
             <zipfileset dir="${src.root}/examples" prefix="examples" includes="**/*.java"/>
             <zipfileset dir="${src.root}/tests" prefix="tests" includes="**/*.java"/>
