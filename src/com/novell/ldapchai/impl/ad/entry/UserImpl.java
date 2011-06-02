@@ -192,11 +192,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     {
         final String[] attrsToRead = new String[] {"pwdLastSet", "userAccountControl" };
 
-        final Properties readAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
+        final Map<String,String> readAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
 
-        final String uacStrValue = readAttrs.getProperty("userAccountControl","");
+        final String uacStrValue = readAttrs.get("userAccountControl");
 
-        if (uacStrValue.length() > 0) {
+        if (uacStrValue != null && uacStrValue.length() > 0) {
             final int intValue = StringHelper.convertStrToInt(uacStrValue,0);
             if ((ADS_UF_DONT_EXPIRE_PASSWD & intValue) == ADS_UF_DONT_EXPIRE_PASSWD) {
                 //user password does not expire
@@ -222,8 +222,8 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
         long pwdLastSetMs = 0;
         {
-            final String maxPwdAgeString = readAttrs.getProperty("pwdLastSet","");
-            if (maxPwdAgeString.length() > 0) {
+            final String maxPwdAgeString = readAttrs.get("pwdLastSet");
+            if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
                 long v = Long.parseLong(maxPwdAgeString);
                 v = Math.abs(v); // why is it stored as a negative value?  who knows.
                 v = v / 10000; // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak into the default 30 minute window a few nanoseconds early.  Thanks again MS.

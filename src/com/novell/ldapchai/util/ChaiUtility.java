@@ -72,7 +72,7 @@ public class ChaiUtility {
         entryDN.append(parentDN);
 
         //First create the base group.
-        provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, new Properties());
+        provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap());
 
         //Now build an ldapentry object to add attributes to it
         final ChaiEntry theObject = ChaiFactory.createChaiEntry(entryDN.toString(), provider);
@@ -136,7 +136,7 @@ public class ChaiUtility {
             }
             filter.append("(").append(ChaiConstant.ATTR_LDAP_COMMON_NAME).append("=").append(uniqueCN).append(")");
 
-            final Map<String, Properties> results = provider.search(containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE);
+            final Map<String, Map<String,String>> results = provider.search(containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE);
             if (results.size() == 0) {
                 // No object found!
                 break;
@@ -164,9 +164,9 @@ public class ChaiUtility {
     public static ChaiUser createUser(final String userDN, final String sn, final ChaiProvider provider)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Properties createAttributes = new Properties();
+        final Map<String,String> createAttributes = new HashMap<String, String>();
 
-        createAttributes.setProperty(ChaiConstant.ATTR_LDAP_SURNAME, sn);
+        createAttributes.put(ChaiConstant.ATTR_LDAP_SURNAME, sn);
 
         provider.createEntry(userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes);
 

@@ -31,10 +31,7 @@ import com.novell.ldapchai.util.StringHelper;
 import com.novell.security.nmas.jndi.ldap.ext.*;
 
 import javax.naming.ldap.ExtendedResponse;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Properties;
+import java.util.*;
 
 class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser {
     public String getLdapObjectClassName()
@@ -187,11 +184,11 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
                 ATTR_PASSWORD_EXPIRE_TIME
         };
 
-        final Properties userAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
+        final Map<String,String> userAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
 
         //check the limits and see if they are different, if they are different, then we're expired for sure.
-        final int limit = StringHelper.convertStrToInt(userAttrs.getProperty(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT),0);
-        final int current = StringHelper.convertStrToInt(userAttrs.getProperty(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING),0);
+        final int limit = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT),0);
+        final int current = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING),0);
         final int remaining = limit - current;
         if (current != limit) {
             LOGGER.debug("user " + this.getEntryDN() + " has " + remaining + " grace logins remaining, marking as expired");
@@ -199,8 +196,8 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         }
 
         //check the limits and see if they are different, if they are different, then we're expired for sure.
-        final String petExpireString = userAttrs.getProperty(ATTR_PASSWORD_EXPIRE_TIME,"");
-        if (petExpireString.length() > 0) {
+        final String petExpireString = userAttrs.get(ATTR_PASSWORD_EXPIRE_TIME);
+        if (petExpireString != null && petExpireString.length() > 0) {
             final Date expireDate = EdirEntries.convertZuluToDate(petExpireString);
             final long diff = expireDate.getTime() - System.currentTimeMillis();
             if (diff <= 0) {

@@ -35,10 +35,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 
-import java.util.HashSet;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 public class TestHelper {
 // ----------------------------- CONSTANTS ----------------------------
@@ -100,12 +97,12 @@ public class TestHelper {
     {
         final String createDN = "cn=testUser," + testContainer.getEntryDN();
         final String createClass = "inetOrgPerson";
-        final Properties createAttributes = new Properties();
+        final Map<String,String> createAttributes = new HashMap<String, String>();
 
-        createAttributes.setProperty("givenName", "Test");
-        createAttributes.setProperty("sn", "User");
-        createAttributes.setProperty("title", "TestUser");
-        createAttributes.setProperty("mail", "test@test.test");
+        createAttributes.put("givenName", "Test");
+        createAttributes.put("sn", "User");
+        createAttributes.put("title", "TestUser");
+        createAttributes.put("mail", "test@test.test");
 
         // perform the create operation in eDirectory
         try {

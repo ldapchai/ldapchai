@@ -252,10 +252,10 @@ public final class CrFactory {
         final List<Challenge> challenges = new ArrayList<Challenge>();
         final ChaiEntry csSetEntry = ChaiFactory.createChaiEntry(challengeSetDN, provider);
 
-        final Properties allValues = csSetEntry.readStringAttributes(null);
+        final Map<String,String> allValues = csSetEntry.readStringAttributes(Collections.<String>emptySet());
 
-        final String requiredQuestions = allValues.getProperty("nsimRequiredQuestions", "");
-        final String randomQuestions = allValues.getProperty("nsimRandomQuestions", "");
+        final String requiredQuestions = allValues.get("nsimRequiredQuestions");
+        final String randomQuestions = allValues.get("nsimRandomQuestions");
 
         try {
             if (requiredQuestions != null && requiredQuestions.length() > 0) {
@@ -270,7 +270,7 @@ public final class CrFactory {
             LOGGER.debug(e);
         }
 
-        final int minRandQuestions = StringHelper.convertStrToInt(allValues.getProperty("nsimNumberRandomQuestions"), 0);
+        final int minRandQuestions = StringHelper.convertStrToInt(allValues.get("nsimNumberRandomQuestions"), 0);
 
         return new ChallengeSetImpl(challenges, minRandQuestions, locale, identifer);
     }

@@ -153,9 +153,9 @@ public class ChaiTester extends TestCase {
         final String userClass = "inetOrgPerson";
         for (int i = 0; i < TestHelper.testBulkIterations; i++) {
             final String dn = "cn=user" + i + "," + testContainer.getEntryDN();
-            final Properties props = new Properties();
-            props.setProperty("givenName", "first" + i);
-            props.setProperty("sn", "last" + i);
+            final Map<String,String> props = new HashMap<String, String>();
+            props.put("givenName", "first" + i);
+            props.put("sn", "last" + i);
             TestHelper.getProvider().createEntry(dn, userClass, props);
             System.out.println("Created " + dn);
         }
@@ -168,12 +168,12 @@ public class ChaiTester extends TestCase {
 
         final String createDN = "cn=sadams," + testContainer.getEntryDN();
         final String createClass = "inetOrgPerson";
-        final Properties createAttributes = new Properties();
+        final Map<String,String> createAttributes = new HashMap<String, String>();
 
-        createAttributes.setProperty("givenName", "Sam");
-        createAttributes.setProperty("sn", "Adams");
-        createAttributes.setProperty("title", "Revolutionary");
-        createAttributes.setProperty("mail", "mc@teaparty.org");
+        createAttributes.put("givenName", "Sam");
+        createAttributes.put("sn", "Adams");
+        createAttributes.put("title", "Revolutionary");
+        createAttributes.put("mail", "mc@teaparty.org");
 
         // perform the create operation in eDirectory
         TestHelper.getProvider().createEntry(createDN, createClass, createAttributes);
@@ -195,12 +195,12 @@ public class ChaiTester extends TestCase {
 
         final String createDN = "cn=chaiCreateTestUser," + testContainer.getEntryDN();
         final String createClass = "inetOrgPerson";
-        final Properties createAttributes = new Properties();
+        final Map<String,String> createAttributes = new HashMap<String, String>();
 
-        createAttributes.setProperty("givenName", "GivenNameValue");
-        createAttributes.setProperty("sn", "SurnameValue");
-        createAttributes.setProperty("title", "test.Tester");
-        createAttributes.setProperty("mail", "test@test.test");
+        createAttributes.put("givenName", "GivenNameValue");
+        createAttributes.put("sn", "SurnameValue");
+        createAttributes.put("title", "test.Tester");
+        createAttributes.put("mail", "test@test.test");
 
         // perform the create operation in eDirectory
         TestHelper.getProvider().createEntry(createDN, createClass, createAttributes);
@@ -214,12 +214,12 @@ public class ChaiTester extends TestCase {
 
         final String createDN = "cn=chaiPasswordExpiredTestUser," + testContainer.getEntryDN();
         final String createClass = "inetOrgPerson";
-        final Properties createAttributes = new Properties();
+        final Map<String,String> createAttributes = new HashMap<String,String>();
 
-        createAttributes.setProperty("givenName", "GivenNameValue");
-        createAttributes.setProperty("sn", "SurnameValue");
-        createAttributes.setProperty("title", "test.Tester");
-        createAttributes.setProperty("mail", "est@test.test");
+        createAttributes.put("givenName", "GivenNameValue");
+        createAttributes.put("sn", "SurnameValue");
+        createAttributes.put("title", "test.Tester");
+        createAttributes.put("mail", "est@test.test");
 
         // perform the create operation in eDirectory
         TestHelper.getProvider().createEntry(createDN, createClass, createAttributes);

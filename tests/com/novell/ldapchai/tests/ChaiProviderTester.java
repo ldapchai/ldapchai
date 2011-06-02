@@ -26,6 +26,9 @@ import com.novell.ldapchai.provider.*;
 import junit.framework.Assert;
 import junit.framework.TestCase;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ChaiProviderTester extends TestCase {
@@ -51,7 +54,7 @@ public class ChaiProviderTester extends TestCase {
             System.out.println("Testing provider " + provider.toString());
 
             {   // test single value writes.
-                provider.writeStringAttribute(testUserDN, testAttribute, new String[]{"value1", "value2"}, false);
+                provider.writeStringAttribute(testUserDN, testAttribute, new HashSet<String>(Arrays.asList("value1", "value2")), false);
                 final Set<String> results = provider.readMultiStringAttribute(testUserDN, testAttribute);
                 Assert.assertTrue("setup values failed", results.size() == 2 && results.contains("value1") && results.contains("value2"));
             }
@@ -83,31 +86,31 @@ public class ChaiProviderTester extends TestCase {
             System.out.println("Testing provider " + provider.toString());
 
             {   // test single value writes.
-                provider.writeStringAttribute(testUserDN, testAttribute, new String[]{"value1"}, false);
+                provider.writeStringAttribute(testUserDN, testAttribute, Collections.singleton("value1"), false);
                 final Set<String> results = provider.readMultiStringAttribute(testUserDN, testAttribute);
                 Assert.assertTrue("single write failed", results.size() == 1 && results.contains("value1"));
             }
 
             {   // append single value writes.
-                provider.writeStringAttribute(testUserDN, testAttribute, new String[]{"value2"}, false);
+                provider.writeStringAttribute(testUserDN, testAttribute, Collections.singleton("value2"), false);
                 final Set<String> results = provider.readMultiStringAttribute(testUserDN, testAttribute);
                 Assert.assertTrue("single append failed", results.size() == 2 && results.contains("value1") && results.contains("value2"));
             }
 
             {   // overwrite single value writes.
-                provider.writeStringAttribute(testUserDN, testAttribute, new String[]{"value3"}, true);
+                provider.writeStringAttribute(testUserDN, testAttribute, Collections.singleton("value3"), true);
                 final Set<String> results = provider.readMultiStringAttribute(testUserDN, testAttribute);
                 Assert.assertTrue("single overwrite failed", results.size() == 1 && results.contains("value3"));
             }
 
             {   // append multi value writes.
-                provider.writeStringAttribute(testUserDN, testAttribute, new String[]{"value4", "value5"}, false);
+                provider.writeStringAttribute(testUserDN, testAttribute, new HashSet<String>(Arrays.asList("value4", "value5")), false);
                 final Set<String> results = provider.readMultiStringAttribute(testUserDN, testAttribute);
                 Assert.assertTrue("multi append failed", results.size() == 3 && results.contains("value3") && results.contains("value4") && results.contains("value5"));
             }
 
             {   // overwrite multi value writes.
-                provider.writeStringAttribute(testUserDN, testAttribute, new String[]{"value6", "value7"}, true);
+                provider.writeStringAttribute(testUserDN, testAttribute, new HashSet<String>(Arrays.asList("value6", "value7")), true);
                 final Set<String> results = provider.readMultiStringAttribute(testUserDN, testAttribute);
                 Assert.assertTrue("multi overwrite failed", results.size() == 2 && results.contains("value6") && results.contains("value7"));
             }

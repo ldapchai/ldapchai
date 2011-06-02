@@ -24,8 +24,7 @@ import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiException;
 
-import java.util.Enumeration;
-import java.util.Properties;
+import java.util.Map;
 
 /**
  * LDAP Chai API
@@ -47,14 +46,13 @@ public class ReadUserData {
             ChaiUser user = ChaiFactory.quickProvider(ldapURL,ldapBindDN,ldapBindPW);
 
             // read the value of the bindDN's cn attribute, and print it to stdout.
-            Properties allUserAttributes = user.readStringAttributes(null);
+            Map<String,String> allUserAttributes = user.readStringAttributes(null);
 
             System.out.println("UserDN: " + user.getEntryDN());
 
             // Output each of the user's attributes, and one value for each attriubte:
-            for (Enumeration propEnum = allUserAttributes.propertyNames(); propEnum.hasMoreElements();) {
-                String key = (String)propEnum.nextElement();
-                String value = allUserAttributes.getProperty(key);
+            for (String key : allUserAttributes.keySet()) {
+                String value = allUserAttributes.get(key);
                 System.out.println(key + ": " + value);
             }
 

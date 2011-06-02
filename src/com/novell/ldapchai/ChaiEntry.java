@@ -56,13 +56,13 @@ public interface ChaiEntry {
      * supplied value will be set.
      * <p/>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError#DUPLICATE_PASSWORD}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
      * @param attributeName  A valid attribute for the entry
      * @param attributeValue A string value to be added to the ldap entry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void addAttribute(String attributeName, String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -73,13 +73,13 @@ public interface ChaiEntry {
      * supplied value will be set.
      * <p/>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError#DUPLICATE_PASSWORD}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
      * @param attributeName   A valid attribute for the entry
      * @param attributeValues A set of string values to be added to the ldap entry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void addAttribute(String attributeName, Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -90,13 +90,13 @@ public interface ChaiEntry {
      * supplied value will be set.
      * <p/>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError#DUPLICATE_PASSWORD}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
      * @param attributeName   A valid attribute for the entry
      * @param attributeValues A set of string values to be added to the ldap entry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void addAttribute(String attributeName, String... attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -299,13 +299,13 @@ public interface ChaiEntry {
      * Callers of this method are encouraged to use the values specified in {@link ChaiConstant} when possible for attribute names.
      *
      * @param attributes Valid  attributes on the object.
-     * @return A Properties containing the result of the read
+     * @return A map containing the result of the read
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see #readStringAttribute(String)
-     * @see com.novell.ldapchai.provider.ChaiProvider#readStringAttributes(String,String[])
+     * @see com.novell.ldapchai.provider.ChaiProvider#readStringAttributes(String, java.util.Set)
      */
-    Properties readStringAttributes(Set<String> attributes)
+    Map<String,String> readStringAttributes(Set<String> attributes)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -331,8 +331,8 @@ public interface ChaiEntry {
      * @return Set<ChaiEntry>           ChaiEntry objects that mean the search criteria
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#search(String, String, String[], com.novell.ldapchai.provider.ChaiProvider.SEARCH_SCOPE)
-     * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, String, String[], com.novell.ldapchai.provider.ChaiProvider.SEARCH_SCOPE)
+     * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
+     * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
     Set<ChaiEntry> search(String filter)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -349,8 +349,8 @@ public interface ChaiEntry {
      * @return Set<ChaiEntry>           ChaiEntry objects that mean the search criteria
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#search(String, String, String[], com.novell.ldapchai.provider.ChaiProvider.SEARCH_SCOPE)
-     * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, String, String[], com.novell.ldapchai.provider.ChaiProvider.SEARCH_SCOPE)
+     * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
+     * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
     Set<ChaiEntry> search(SearchHelper searchHelper)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -365,8 +365,8 @@ public interface ChaiEntry {
      * @return Set<ChaiEntry>           ChaiEntry objects that mean the search criteria
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#search(String, String, String[], com.novell.ldapchai.provider.ChaiProvider.SEARCH_SCOPE)
-     * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, String, String[], com.novell.ldapchai.provider.ChaiProvider.SEARCH_SCOPE)
+     * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
+     * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
     Set<ChaiEntry> search(String filter, ChaiProvider.SEARCH_SCOPE searchScope)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -378,7 +378,7 @@ public interface ChaiEntry {
      * @param attributeValue New value for the attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void writeStringAttribute(String attributeName, String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -390,7 +390,7 @@ public interface ChaiEntry {
      * @param attributeValues New values for the attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, String[], boolean)
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void writeStringAttribute(String attributeName, Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -412,9 +412,9 @@ public interface ChaiEntry {
      * be replaced.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttributes(String, java.util.Properties, boolean)
+     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttributes(String, java.util.Map, boolean)
      */
-    void writeStringAttributes(Properties attributeValueProps)
+    void writeStringAttributes(Map<String,String> attributeValueProps)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**

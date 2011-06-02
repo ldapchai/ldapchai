@@ -25,9 +25,11 @@ import com.novell.ldapchai.cr.CrFactory;
 import com.novell.ldapchai.cr.ResponseSet;
 import com.novell.ldapchai.exception.*;
 import com.novell.ldapchai.provider.ChaiProvider;
-import com.novell.ldapchai.provider.ChaiSetting;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiUser} interface.
@@ -106,13 +108,6 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         } catch (ChaiOperationException e) {
             throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
         }
-    }
-
-    public Properties readStandardIdentityAttributes()
-            throws ChaiOperationException, ChaiUnavailableException
-    {
-        final String[] standardIdentityAttrs = this.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.STANDARD_IDENTITY_ATTRS).split(",");
-        return this.readStringAttributes(new HashSet<String>(Arrays.asList(standardIdentityAttrs)));
     }
 
     public final String readSurname()

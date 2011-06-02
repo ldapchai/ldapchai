@@ -311,7 +311,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return false;
         }
 
-        public final void createEntry(final String entryDN, final String baseObjectClass, final Properties stringAttributes)
+        public final void createEntry(final String entryDN, final String baseObjectClass, final Map<String,String> stringAttributes)
         {
             if (baseObjectClass == null) {
                 throw new NullPointerException("baseObjectClass must not be null");
@@ -322,7 +322,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
-        public final void createEntry(final String entryDN, final Set<String> baseObjectClasses, final Properties stringAttributes)
+        public final void createEntry(final String entryDN, final Set<String> baseObjectClasses, final Map<String,String> stringAttributes)
         {
             if (baseObjectClasses == null) {
                 throw new NullPointerException("baseObjectClass must not be null");
@@ -409,7 +409,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
-        public final Properties readStringAttributes(final String entryDN, final String[] attributes)
+        public final Map<String,String> readStringAttributes(final String entryDN, final Set<String> attributes)
         {
             if (entryDN == null) {
                 throw new NullPointerException("entryDN must not be null");
@@ -434,38 +434,53 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
-        public final Map<String, Properties> search(final String baseDN, final String filter)
-                throws ChaiUnavailableException, ChaiOperationException
+        public final Map<String, Map<String,String>> search(final String baseDN, final SearchHelper searchHelper)
         {
             if (baseDN == null) {
-                throw new NullPointerException("entryDN must not be null");
+                throw new NullPointerException("baseDN must not be null");
             }
-
+            if (searchHelper == null) {
+                throw new NullPointerException("searchHelper must not be null");
+            }
             return null;
         }
 
-        public final Map<String, Properties> search(final String baseDN, final SearchHelper searchHelper)
+        public final Map<String, Map<String,String>> search(final String baseDN, final String filter, final Set<String> attributes, final ChaiProvider.SEARCH_SCOPE searchScope)
         {
-            return null;
-        }
-
-        public final Map<String, Properties> search(final String baseDN, final String filter, final String[] attributes)
-        {
-            return null;
-        }
-
-        public final Map<String, Properties> search(final String baseDN, final String filter, final String[] attributes, final ChaiProvider.SEARCH_SCOPE searchScope)
-        {
-            return null;
-        }
-
-        public final Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final String filter, final String[] attributes, final ChaiProvider.SEARCH_SCOPE searchScope)
-        {
+            if (baseDN == null) {
+                throw new NullPointerException("baseDN must not be null");
+            }
+            if (filter == null) {
+                throw new NullPointerException("filter must not be null");
+            }
+            if (searchScope == null) {
+                throw new NullPointerException("searchScope must not be null");
+            }
             return null;
         }
 
         public final Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final SearchHelper searchHelper)
         {
+            if (baseDN == null) {
+                throw new NullPointerException("baseDN must not be null");
+            }
+            if (searchHelper == null) {
+                throw new NullPointerException("attributeName must not be null");
+            }
+            return null;
+        }
+
+        public final Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final String filter, final Set<String> attributes, final ChaiProvider.SEARCH_SCOPE searchScope)
+        {
+            if (baseDN == null) {
+                throw new NullPointerException("baseDN must not be null");
+            }
+            if (filter == null) {
+                throw new NullPointerException("filter must not be null");
+            }
+            if (searchScope == null) {
+                throw new NullPointerException("searchScope must not be null");
+            }
             return null;
         }
 
@@ -487,7 +502,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
-        public final void writeStringAttribute(final String entryDN, final String attributeName, final String[] values, final boolean overwrite)
+        public final void writeStringAttribute(final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite)
         {
             if (entryDN == null) {
                 throw new NullPointerException("entryDN must not be null");
@@ -500,16 +515,16 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
-        public final void writeStringAttributes(final String entryDN, final Properties attributeValueProps, final boolean overwrite)
+        public final void writeStringAttributes(final String entryDN, final Map<String,String> attributeValues, final boolean overwrite)
         {
             if (entryDN == null) {
                 throw new NullPointerException("entryDN must not be null");
             }
-            if (attributeValueProps == null) {
-                throw new NullPointerException("attributeValueProps must not be null");
+            if (attributeValues == null) {
+                throw new NullPointerException("attributeValues must not be null");
             }
-            if (attributeValueProps.isEmpty()) {
-                throw new NullPointerException("attributeValueProps must not be empty");
+            if (attributeValues.isEmpty()) {
+                throw new NullPointerException("attributeValues must not be empty");
             }
         }
 

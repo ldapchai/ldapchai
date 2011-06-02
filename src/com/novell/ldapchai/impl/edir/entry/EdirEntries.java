@@ -155,7 +155,7 @@ public class EdirEntries {
         entryDN.append(parentDN);
 
         //First create the base group.
-        provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, new Properties());
+        provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap());
 
         //Now build an ldapentry object to add attributes to it
         final ChaiEntry theObject = ChaiFactory.createChaiEntry(entryDN.toString(), provider);
@@ -219,7 +219,7 @@ public class EdirEntries {
             }
             filter.append("(").append(ChaiConstant.ATTR_LDAP_COMMON_NAME).append("=").append(uniqueCN).append(")");
 
-            final Map<String, Properties> results = provider.search(containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE);
+            final Map<String, Map<String,String>> results = provider.search(containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE);
             if (results.size() == 0) {
                 // No object found!
                 break;
@@ -247,9 +247,9 @@ public class EdirEntries {
     public static ChaiUser createUser(final String userDN, final String sn, final ChaiProvider provider)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Properties createAttributes = new Properties();
+        final Map<String,String> createAttributes = new HashMap<String, String>();
 
-        createAttributes.setProperty(ChaiConstant.ATTR_LDAP_SURNAME, sn);
+        createAttributes.put(ChaiConstant.ATTR_LDAP_SURNAME, sn);
 
         provider.createEntry(userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes);
 
@@ -549,6 +549,8 @@ public class EdirEntries {
                         // we've got a policy, and rules are enabled, now read the policy.
                         LOGGER.trace("using active universal password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN());
                         usedUniversalPolicy = true;
+                    } else {
+                        LOGGER.debug("ignoring unenabled nspm password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN());
                     }
                 }
             } catch (ChaiOperationException e) {
@@ -560,6 +562,7 @@ public class EdirEntries {
             if (!usedUniversalPolicy) {
                 try {
                     pwordPolicy = readTraditionalPasswordRules(theUser);
+                    LOGGER.trace("read traditional (non-nmas) password attributes from user entry " + theUser.getEntryDN());
                 } catch (ChaiOperationException e) {
                     LOGGER.error("ldap error reading traditional password policy: " + e.getMessage());
                 }
@@ -649,11 +652,11 @@ public class EdirEntries {
         private static ChaiPasswordPolicy readTraditionalPasswordRules(final ChaiUser theUser)
                 throws ChaiUnavailableException, ChaiOperationException
         {
-            final Properties values = theUser.readStringAttributes(TRADITIONAL_PASSWORD_ATTRIBUTES);
+            final Map<String,String> values = theUser.readStringAttributes(TRADITIONAL_PASSWORD_ATTRIBUTES);
 
-            final int minLength = convertStrToInt(values.getProperty("passwordMinimumLength"), 0);
-            final int expireInterval = convertStrToInt(values.getProperty("passwordExpirationInterval"), 0);
-            final boolean uniqueRequired = convertStrToBoolean(values.getProperty("passwordUniqueRequired"));
+            final int minLength = convertStrToInt(values.get("passwordMinimumLength"), 0);
+            final int expireInterval = convertStrToInt(values.get("passwordExpirationInterval"), 0);
+            final boolean uniqueRequired = convertStrToBoolean(values.get("passwordUniqueRequired"));
 
             final Map<ChaiPasswordRule, String> policyMap = new HashMap<ChaiPasswordRule, String>();
             policyMap.put(ChaiPasswordRule.MaximumLength, String.valueOf(16));  // default for legacy passwords;

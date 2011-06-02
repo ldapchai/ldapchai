@@ -158,21 +158,19 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     public final void addAttribute(final String attributeName, final String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        chaiProvider.writeStringAttribute(entryDN, attributeName, new String[]{attributeValue}, false);
+        chaiProvider.writeStringAttribute(entryDN, attributeName, Collections.singleton(attributeValue), false);
     }
 
     public final void addAttribute(final String attributeName, final Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        //Convert the set to an array.
-        final String[] valueArray = attributeValues.toArray(new String[attributeValues.size()]);
-        chaiProvider.writeStringAttribute(entryDN, attributeName, valueArray, false);
+        chaiProvider.writeStringAttribute(entryDN, attributeName, attributeValues, false);
     }
 
     public final void addAttribute(final String attributeName, final String... attributeValues)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        chaiProvider.writeStringAttribute(entryDN, attributeName, attributeValues, false);
+        chaiProvider.writeStringAttribute(entryDN, attributeName, new HashSet<String>(Arrays.asList(attributeValues)), false);
     }
 
     public final boolean compareStringAttribute(final String attributeName, final String attributeValue)
@@ -192,7 +190,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     {
         final Set<ChaiEntry> returnSet = new HashSet<ChaiEntry>();
         final String filter = "(" + ChaiConstant.ATTR_LDAP_OBJECTCLASS + "=*)";
-        final Map<String, Properties> results = this.getChaiProvider().search(this.getEntryDN(), filter, null, ChaiProvider.SEARCH_SCOPE.ONE);
+        final Map<String, Map<String,String>> results = this.getChaiProvider().search(this.getEntryDN(), filter, Collections.<String>emptySet(), ChaiProvider.SEARCH_SCOPE.ONE);
         for (final String dn : results.keySet()) {
             returnSet.add(ChaiFactory.createChaiEntry(dn, this.getChaiProvider()));
         }
@@ -241,7 +239,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
         searchHelper.setFilter(SearchHelper.DEFAULT_FILTER);
 
-        final Map<String, Properties> results = this.getChaiProvider().search(this.getEntryDN(), searchHelper);
+        final Map<String, Map<String,String>> results = this.getChaiProvider().search(this.getEntryDN(), searchHelper);
         if (results.size() == 1) {
             return results.keySet().iterator().next();
         }
@@ -319,14 +317,10 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         return chaiProvider.readStringAttribute(entryDN, attributeName);
     }
 
-    public final Properties readStringAttributes(final Set<String> attributes)
+    public final Map<String,String> readStringAttributes(final Set<String> attributes)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        String[] attrAsArray = null;
-        if (attributes != null) {
-            attrAsArray = attributes.toArray(new String[attributes.size()]);
-        }
-        return chaiProvider.readStringAttributes(this.entryDN, attrAsArray);
+        return chaiProvider.readStringAttributes(this.entryDN, attributes);
     }
 
     public final void replaceAttribute(final String attributeName, final String oldValue, final String newValue)
@@ -345,7 +339,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException
     {
         final Set<ChaiEntry> resultSet = new HashSet<ChaiEntry>();
-        final Map<String, Properties> results = chaiProvider.search(this.getEntryDN(), searchHelper.getFilter(), new String[0], searchHelper.getSearchScope());
+        final Map<String, Map<String,String>> results = chaiProvider.search(this.getEntryDN(), searchHelper.getFilter(), searchHelper.getAttributes(), searchHelper.getSearchScope());
         for (final String dn : results.keySet()) {
             resultSet.add(ChaiFactory.createChaiEntry(dn, this.getChaiProvider()));
         }
@@ -361,10 +355,10 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     public final void writeStringAttribute(final String attributeName, final String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        chaiProvider.writeStringAttribute(this.entryDN, attributeName, new String[]{attributeValue}, true);
+        chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValue == null ? null : Collections.<String>singleton(attributeValue), true);
     }
 
-    public final void writeStringAttributes(final Properties attributeValueProps)
+    public final void writeStringAttributes(final Map<String,String> attributeValueProps)
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttributes(this.entryDN, attributeValueProps, true);
@@ -373,18 +367,15 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     public final void writeStringAttribute(final String attributeName, final Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        //Convert the set to an array.
-        final String[] valueArray = attributeValues.toArray(new String[attributeValues.size()]);
-
         // Using the LDAP Helper, set the attributes.
-        chaiProvider.writeStringAttribute(this.entryDN, attributeName, valueArray, true);
+        chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValues, true);
     }
 
     public void writeStringAttribute(final String attributeName, final String... attributeValues)
             throws ChaiOperationException, ChaiUnavailableException
     {
         // Using the LDAP Helper, set the attributes.
-        chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValues, true);
+        chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValues == null ? null : new HashSet<String>(Arrays.asList(attributeValues)), true);
     }
 
     public void writeBinaryAttribute(final String attributeName, final byte[]... attributeValues)

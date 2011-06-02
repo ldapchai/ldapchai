@@ -23,7 +23,8 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
 
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * LDAP Chai API
@@ -54,11 +55,11 @@ public class CreateUser {
         String createClass = "inetOrgPerson";
 
         // create a Properties to set the initial attribute values for the new user.
-        Properties createAttributes = new Properties();
-        createAttributes.setProperty("givenName","George");
-        createAttributes.setProperty("sn","Washingon");
-        createAttributes.setProperty("title","President");
-        createAttributes.setProperty("mail","president@whitehouse.gov");
+        Map<String,String> createAttributes = new HashMap<String, String>();
+        createAttributes.put("givenName","George");
+        createAttributes.put("sn","Washingon");
+        createAttributes.put("title","President");
+        createAttributes.put("mail","president@whitehouse.gov");
 
         try {
             // perform the create operation

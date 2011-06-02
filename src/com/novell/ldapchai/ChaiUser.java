@@ -26,7 +26,6 @@ import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 
 import java.util.Date;
-import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -333,18 +332,6 @@ public interface ChaiUser extends ChaiEntry {
      */
     ResponseSet readResponseSet()
             throws ChaiUnavailableException, ChaiOperationException;
-
-    /**
-     * Convienence method to read several of this ChaiUser instance's general identity attributes, such
-     * as name, phone number and email address.  The attributes to be read are specified by {@link com.novell.ldapchai.provider.ChaiSetting#STANDARD_IDENTITY_ATTRS}.
-     * <p/>
-     *
-     * @return A Properties containing the attribute names as keys, and the ldap value as the value.
-     * @throws ChaiOperationException   If there is an error during the operation
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     */
-    Properties readStandardIdentityAttributes()
-            throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Convienence method to read this ChaiUser instance's {@link #ATTR_SURNAME} attribute.

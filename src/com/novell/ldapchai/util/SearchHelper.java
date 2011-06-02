@@ -34,7 +34,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
     public static final String DEFAULT_FILTER = "(objectClass=*)";
     public static final ChaiProvider.SEARCH_SCOPE DEFAULT_SCOPE = ChaiProvider.SEARCH_SCOPE.SUBTREE;
-    public static final String[] DEFAULT_ATTRIBUTES = null;
+    public static final Set<String> DEFAULT_ATTRIBUTES = Collections.emptySet();
     public static final int DEFAULT_TIMEOUT = 0;
     public static final int DEFAULT_MAX_RESULTS = 0;
 
@@ -42,7 +42,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
     private String filter = DEFAULT_FILTER;
     private ChaiProvider.SEARCH_SCOPE searchScope = DEFAULT_SCOPE;
-    private String[] attributes = DEFAULT_ATTRIBUTES;
+    private Set<String> attributes = DEFAULT_ATTRIBUTES;
     private int maxResults = DEFAULT_MAX_RESULTS;
     private int timeLimit = DEFAULT_TIMEOUT;
 
@@ -116,7 +116,7 @@ public class SearchHelper implements Serializable, Cloneable {
      */
     public void setAttributes(final Collection<String> attributes)
     {
-        this.attributes = attributes.toArray(new String[attributes.size()]);
+        this.attributes = attributes == null ? null : Collections.unmodifiableSet(new HashSet<String>(attributes));
     }
 
     /**
@@ -178,7 +178,7 @@ public class SearchHelper implements Serializable, Cloneable {
      */
     public void setAttributes(final String attributes)
     {
-        this.attributes = attributes.split(",| ");
+        setAttributes(attributes.split(",| "));
     }
 
     /**
@@ -261,9 +261,9 @@ public class SearchHelper implements Serializable, Cloneable {
      *
      * @return A list of valid attribute names
      */
-    public String[] getAttributes()
+    public Set<String> getAttributes()
     {
-        return attributes;
+        return attributes == null ? null : Collections.unmodifiableSet(attributes);
     }
 
     /**
@@ -273,7 +273,7 @@ public class SearchHelper implements Serializable, Cloneable {
      */
     public void setAttributes(final String... attributes)
     {
-        this.attributes = attributes;
+        this.attributes = attributes == null ? null : new HashSet<String>(Arrays.asList(attributes));
     }
 
     /**
@@ -334,8 +334,8 @@ public class SearchHelper implements Serializable, Cloneable {
         return super.clone();
     }
 
-    public boolean equals(final Object o)
-    {
+    @Override
+    public boolean equals(final Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -343,17 +343,18 @@ public class SearchHelper implements Serializable, Cloneable {
 
         if (maxResults != that.maxResults) return false;
         if (timeLimit != that.timeLimit) return false;
-        if (!Arrays.equals(attributes, that.attributes)) return false;
+        if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null) return false;
         if (filter != null ? !filter.equals(that.filter) : that.filter != null) return false;
-        return searchScope == that.searchScope;
+        if (searchScope != that.searchScope) return false;
+
+        return true;
     }
 
-    public int hashCode()
-    {
-        int result;
-        result = (filter != null ? filter.hashCode() : 0);
+    @Override
+    public int hashCode() {
+        int result = filter != null ? filter.hashCode() : 0;
         result = 31 * result + (searchScope != null ? searchScope.hashCode() : 0);
-        result = 31 * result + (attributes != null ? Arrays.hashCode(attributes) : 0);
+        result = 31 * result + (attributes != null ? attributes.hashCode() : 0);
         result = 31 * result + maxResults;
         result = 31 * result + timeLimit;
         return result;
@@ -371,7 +372,7 @@ public class SearchHelper implements Serializable, Cloneable {
         sb.append("SearchHelper: ");
         sb.append("filter: ").append(filter).append(", ");
         sb.append("scope: ").append(this.getSearchScope()).append(", ");
-        sb.append("attributes: ").append(Arrays.toString(attributes));
+        sb.append("attributes: ").append(Arrays.toString(attributes.toArray(new String[attributes.size()])));
 
         return sb.toString();
     }

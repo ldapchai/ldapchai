@@ -19,8 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.ChaiConstant;
-
 import java.io.Serializable;
 import java.net.URI;
 
@@ -128,8 +126,8 @@ public enum ChaiSetting {
      * against memory leaks.
      * <p/>
      * Only read operations are cached.  Performing any operation which may cause a modify (such as
-     * {@link ChaiProvider#createEntry(String, String, java.util.Properties)} or
-     * {@link ChaiProvider#writeStringAttribute(String, String, String[], boolean)} ) will cause
+     * {@link ChaiProvider#createEntry(String, String, java.util.Map)} or
+     * {@link ChaiProvider#writeStringAttribute(String, String, java.util.Set, boolean)} ) will cause
      * the cache to be cleared.
      * <p/>
      * There are many ways for this behavior to cause problems.  Enabling this setting should be done
@@ -367,43 +365,6 @@ public enum ChaiSetting {
      * </table>
      */
     READONLY("chai.provider.readonly", "false", true, Validator.BOOLEAN_VALIDATOR),
-
-    /**
-     * A comma separated list of attribute names to be used by {@link com.novell.ldapchai.ChaiUser#readStandardIdentityAttributes()}.
-     * <p/> 
-     * By default, this list includes:
-     * <ul>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_COMMON_NAME}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_UID}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_GIVEN_NAME}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_INITIAL}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_SURNAME}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_EMAIL}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_TELEPHONE_NUMBER}</li>
-     * <li>{@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_WORFORCE_ID}</li>
-     * </ul>
-     * <p/>
-     * <table border="0">
-     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.default.identityAttributes</td></tr>
-     * <tr><td style="text-align: right"><i>Default: </i></td><td>cn,uid,givenName,initials,sn,mail,telephoneNumber,workforceID</td></tr>
-     * </table>
-     */
-    STANDARD_IDENTITY_ATTRS("chai.default.identityAttributes",
-            ChaiConstant.ATTR_LDAP_COMMON_NAME
-                    + ',' + ChaiConstant.ATTR_LDAP_UID
-                    + ',' + ChaiConstant.ATTR_LDAP_GIVEN_NAME
-                    + ',' + ChaiConstant.ATTR_LDAP_INITIAL
-                    + ',' + ChaiConstant.ATTR_LDAP_SURNAME
-                    + ',' + ChaiConstant.ATTR_LDAP_EMAIL
-                    + ',' + ChaiConstant.ATTR_LDAP_TELEPHONE_NUMBER
-                    + ',' + ChaiConstant.ATTR_LDAP_WORFORCE_ID,
-            true, new Validator() {
-                public void validate(final String value) {
-                    if (value == null) {
-                        throw new IllegalArgumentException("value may not be null");
-                    }
-                }
-            }),
 
     /**
      * Specify a default directory vendor.  If not empty, {@link ChaiProvider} implementations <b>should</b> always
