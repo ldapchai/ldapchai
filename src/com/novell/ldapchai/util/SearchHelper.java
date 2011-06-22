@@ -34,7 +34,6 @@ public class SearchHelper implements Serializable, Cloneable {
 
     public static final String DEFAULT_FILTER = "(objectClass=*)";
     public static final ChaiProvider.SEARCH_SCOPE DEFAULT_SCOPE = ChaiProvider.SEARCH_SCOPE.SUBTREE;
-    public static final Set<String> DEFAULT_ATTRIBUTES = Collections.emptySet();
     public static final int DEFAULT_TIMEOUT = 0;
     public static final int DEFAULT_MAX_RESULTS = 0;
 
@@ -42,7 +41,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
     private String filter = DEFAULT_FILTER;
     private ChaiProvider.SEARCH_SCOPE searchScope = DEFAULT_SCOPE;
-    private Set<String> attributes = DEFAULT_ATTRIBUTES;
+    private Set<String> attributes = null;
     private int maxResults = DEFAULT_MAX_RESULTS;
     private int timeLimit = DEFAULT_TIMEOUT;
 
@@ -379,12 +378,14 @@ public class SearchHelper implements Serializable, Cloneable {
 
 // -------------------------- OTHER METHODS --------------------------
 
-    /**
-     * Set the filter to {@link #DEFAULT_ATTRIBUTES}
-     */
-    public void clearAttributes()
+    public void returnNoAttributes()
     {
-        attributes = DEFAULT_ATTRIBUTES;
+        attributes = Collections.emptySet();
+    }
+
+    public void returnAllAttributes()
+    {
+        attributes = null;
     }
 
     /**

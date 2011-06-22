@@ -235,7 +235,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException
     {
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.clearAttributes();
+        searchHelper.returnNoAttributes();
         searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
         searchHelper.setFilter(SearchHelper.DEFAULT_FILTER);
 
