@@ -186,12 +186,11 @@ abstract class AbstractResponseSet implements ResponseSet {
             throw new ChaiValidationException("too few challenges are required", ChaiError.CR_TOO_FEW_CHALLENGES);
         }
 
-        if (this.getChallengeSet().getMinRandomRequired() < this.getChallengeSet().getMinRandomRequired()) {
-            throw new ChaiValidationException("number of responses does not meet minimum random requirement", ChaiError.CR_TOO_FEW_RANDOM_RESPONSES);
-        }
-
         if (this.getChallengeSet().getRandomChallenges().size() < challengeSet.getMinRandomRequired()) {
-            throw new ChaiValidationException("number of responses does not meet minimum random requirement", ChaiError.CR_TOO_FEW_RANDOM_RESPONSES);
+            final StringBuilder errorMsg = new StringBuilder();
+            errorMsg.append("minimum number of ramdom responses in response set (").append(this.getChallengeSet().getRandomChallenges().size()).append(")");
+            errorMsg.append(" is less than minimum number of random responses required in challenge set (").append(challengeSet.getMinRandomRequired()).append(")");
+            throw new ChaiValidationException(errorMsg.toString(), ChaiError.CR_TOO_FEW_RANDOM_RESPONSES);
         }
 
         return true;

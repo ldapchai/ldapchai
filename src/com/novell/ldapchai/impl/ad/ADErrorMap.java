@@ -20,7 +20,6 @@
 package com.novell.ldapchai.impl.ad;
 
 import com.novell.ldapchai.exception.ChaiError;
-import com.novell.ldapchai.exception.ChaiErrors;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 

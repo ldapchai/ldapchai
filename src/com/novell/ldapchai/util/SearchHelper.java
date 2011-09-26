@@ -371,7 +371,9 @@ public class SearchHelper implements Serializable, Cloneable {
         sb.append("SearchHelper: ");
         sb.append("filter: ").append(filter).append(", ");
         sb.append("scope: ").append(this.getSearchScope()).append(", ");
-        sb.append("attributes: ").append(Arrays.toString(attributes.toArray(new String[attributes.size()])));
+        if (attributes != null) {
+            sb.append("attributes: ").append(Arrays.toString(attributes.toArray(new String[attributes.size()])));
+        }
 
         return sb.toString();
     }

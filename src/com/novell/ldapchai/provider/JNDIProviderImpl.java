@@ -825,11 +825,16 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         env.put(Context.SECURITY_CREDENTIALS, chaiConfig.getBindPassword());
 
         // set the JNDI pooler up
-        env.put("com.sun.jndi.ldap.connect.pool", "true");
+        final boolean jndiConnectionPoolEnable = Boolean.valueOf(chaiConfig.getSetting(ChaiSetting.JNDI_ENABLE_POOL));
+        if (jndiConnectionPoolEnable) {
+            env.put("com.sun.jndi.ldap.connect.pool", "true");
+            env.put("com.sun.jndi.ldap.connect.pool.initsize", String.valueOf(DEFAULT_INITIAL_POOL_SIZE));
+            env.put("com.sun.jndi.ldap.connect.pool.maxsize", String.valueOf(DEFAULT_MAXIMUM_POOL_SIZE));
+            env.put("com.sun.jndi.ldap.connect.pool.prefsize", String.valueOf(DEFAULT_PREFERRED_POOL_SIZE));
+        }
+
+        // connect using plaintext or plaintext/ssl
         env.put("com.sun.jndi.ldap.connect.pool.protocol", "plain ssl");
-        env.put("com.sun.jndi.ldap.connect.pool.initsize", String.valueOf(DEFAULT_INITIAL_POOL_SIZE));
-        env.put("com.sun.jndi.ldap.connect.pool.maxsize", String.valueOf(DEFAULT_MAXIMUM_POOL_SIZE));
-        env.put("com.sun.jndi.ldap.connect.pool.prefsize", String.valueOf(DEFAULT_PREFERRED_POOL_SIZE));
 
         // Set the ldap timeout time.
         env.put("com.sun.jndi.ldap.connect.timeout", chaiConfig.getSetting(ChaiSetting.LDAP_CONNECT_TIMEOUT));

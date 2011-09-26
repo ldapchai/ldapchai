@@ -397,13 +397,15 @@ public enum ChaiSetting {
     }
     ),
 
+    JNDI_ENABLE_POOL("chai.provider.jndi.enablePool", "true", true, Validator.BOOLEAN_VALIDATOR),
+
     ;
 
 // ------------------------------ FIELDS ------------------------------
 
     private final String key;
     private final String defaultValue;
-    private final boolean visable;
+    private final boolean visible;
     private final Validator validator;
 
 // -------------------------- STATIC METHODS --------------------------
@@ -428,12 +430,12 @@ public enum ChaiSetting {
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    ChaiSetting(final String key, final String defaultValue, final boolean visable, final Validator validator)
+    ChaiSetting(final String key, final String defaultValue, final boolean visible, final Validator validator)
     {
         this.key = key;
         this.defaultValue = defaultValue;
         this.validator = validator;
-        this.visable = visable;
+        this.visible = visible;
     }
 
 // --------------------- GETTER / SETTER METHODS ---------------------
@@ -459,9 +461,9 @@ public enum ChaiSetting {
         return key;
     }
 
-    boolean isVisable()
+    boolean isVisible()
     {
-        return this.visable;
+        return this.visible;
     }
 
 // -------------------------- OTHER METHODS --------------------------

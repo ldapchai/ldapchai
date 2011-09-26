@@ -103,7 +103,7 @@ class WireTraceWrapper extends AbstractWrapper {
         } catch (InvocationTargetException e) {
             throw e.getTargetException();
         } catch (Exception e) {
-            throw new RuntimeException("unexpected invocation exception: " + e.getMessage());
+            throw new RuntimeException("unexpected invocation exception: " + e.getMessage(),e);
         }
     }
 

@@ -254,7 +254,7 @@ public class ChaiConfiguration implements Cloneable, Serializable {
         for (final ChaiSetting s : ChaiSetting.values()) {
             sb.append(s.getKey());
             sb.append("=");
-            if (s.isVisable()) {
+            if (s.isVisible()) {
                 sb.append(getSetting(s));
             } else {
                 sb.append("**stripped**");
