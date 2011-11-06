@@ -24,7 +24,7 @@ import java.io.Serializable;
 /**
  *
  */
-class ChallengeImpl implements Challenge, Serializable {
+public class ChaiChallenge implements Challenge, Serializable {
 // ------------------------------ FIELDS ------------------------------
 
     private boolean adminDefined;
@@ -38,7 +38,7 @@ class ChallengeImpl implements Challenge, Serializable {
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    public ChallengeImpl(
+    public ChaiChallenge(
             final boolean required,
             final String challengeText,
             final int minLength,
@@ -119,7 +119,7 @@ class ChallengeImpl implements Challenge, Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        final ChallengeImpl challenge = (ChallengeImpl) o;
+        final ChaiChallenge challenge = (ChaiChallenge) o;
 
         if (adminDefined != challenge.adminDefined) return false;
         if (maxLength != challenge.maxLength) return false;

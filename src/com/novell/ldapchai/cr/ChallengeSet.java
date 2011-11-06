@@ -25,7 +25,7 @@ import java.util.Locale;
 
 /**
  * An instance of a challenge set to be used for challenge/response.   Instances of {@code ChallengeSet} can be
- * created or read using {@link com.novell.ldapchai.cr.CrFactory}.
+ * created or read using {@link ChaiCrFactory}.
  *
  * @author Jason D. Rivard
  */

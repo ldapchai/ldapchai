@@ -254,6 +254,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     }
 
     @Override
+    public void writeDateAttribute(final String attributeName, final Date date) throws ChaiUnavailableException, ChaiOperationException {
+        ADEntries.writeDateAttribute(this, attributeName, date);
+    }
+
+    @Override
     public String readGUID() throws ChaiOperationException, ChaiUnavailableException {
         return ADEntries.readGUID(this);
     }

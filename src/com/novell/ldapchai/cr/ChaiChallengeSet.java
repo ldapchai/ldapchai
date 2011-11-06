@@ -25,7 +25,7 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import java.io.Serializable;
 import java.util.*;
 
-class ChallengeSetImpl implements ChallengeSet, Serializable {
+public class ChaiChallengeSet implements ChallengeSet, Serializable {
 // ------------------------------ FIELDS ------------------------------
 
     private List<Challenge> challenges;
@@ -35,7 +35,7 @@ class ChallengeSetImpl implements ChallengeSet, Serializable {
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    protected ChallengeSetImpl(
+    public ChaiChallengeSet(
             final Collection<Challenge> challenges,
             final int minRandomRequired,
             final Locale locale,

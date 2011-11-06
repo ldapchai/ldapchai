@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.provider;
 
+import com.novell.ldapchai.cr.ChaiResponseSet;
+
 import java.io.Serializable;
 import java.net.URI;
 
@@ -399,6 +401,44 @@ public enum ChaiSetting {
 
     JNDI_ENABLE_POOL("chai.provider.jndi.enablePool", "true", true, Validator.BOOLEAN_VALIDATOR),
 
+    /**
+     * Case insensitive flag.  If true, the case of the responses will be ignored when tested.  Default is true.
+     */
+    CR_CASE_INSENSITIVE("chai.crsetting.caseInsensitive", "true",true, Validator.BOOLEAN_VALIDATOR),
+
+    /**
+     * Allow duplicate response values to be used.  Default is false.
+     */
+    CR_ALLOW_DUPLICATE_RESPONSES("chai.crsetting.allowDuplicateResponses", "false", true, Validator.BOOLEAN_VALIDATOR),
+
+    /**
+     * Default Chai CR Format Type.  Must be a valid string value of {@link ChaiResponseSet.FormatType}
+     */
+    CR_DEFAULT_FORMAT_TYPE("chai.crsetting.defaultFormatType", ChaiResponseSet.FormatType.SHA1_SALT.toString(), true, Validator.BOOLEAN_VALIDATOR),
+
+    /**
+     * Setting key to control the ldap attribute name used when reading/writing Chai Challenge/Response formats.
+     * <p/>
+     * <i>Default: </i><b>carLicense</b>
+     *
+     * @see com.novell.ldapchai.cr.ChaiResponseSet
+     * @see com.novell.ldapchai.util.ConfigObjectRecord
+     */
+    CR_CHAI_STORAGE_ATTRIBUTE("chai.cr.chai.attributeName", "carLicense", true, null),
+
+    /**
+     * Setting key to control the {@link com.novell.ldapchai.util.ConfigObjectRecord COR}
+     * RecordType used when reading/writing Chai Challenge/Response formats.
+     * <p/>
+     * <i>Default: </i><b>0002</b>
+     *
+     * @see com.novell.ldapchai.cr.ChaiResponseSet
+     * @see com.novell.ldapchai.util.ConfigObjectRecord
+     */
+    CR_CHAI_STORAGE_RECORD_ID("chai.cr.chai.recordId", "0002", true, null),
+
+
+
     ;
 
 // ------------------------------ FIELDS ------------------------------
@@ -504,6 +544,18 @@ public enum ChaiSetting {
             {
                 try {
                     Boolean.parseBoolean(value);
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(e.getMessage());
+                }
+            }
+        };
+
+        static final Validator CR_FORMAT_VALIDATOR = new Validator() {
+            public void validate(final String value) {
+                try {
+                    if (ChaiResponseSet.FormatType.valueOf(value) == null) {
+                        throw new IllegalArgumentException("unknown ChaiResponseSet.FormatType");
+                    }
                 } catch (Exception e) {
                     throw new IllegalArgumentException(e.getMessage());
                 }

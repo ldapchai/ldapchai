@@ -56,9 +56,9 @@ public class ADEntries {
             throw new NullPointerException("date must be non-null");
         }
 
-        long inputAsMs = date.getTime();
-        long inputAsADMs = inputAsMs - AD_EPOCH_OFFSET_MS;
-        long inputAsADNs = inputAsADMs * 10000;
+        final long inputAsMs = date.getTime();
+        final long inputAsADMs = inputAsMs - AD_EPOCH_OFFSET_MS;
+        final long inputAsADNs = inputAsADMs * 10000;
 
         return String.valueOf(inputAsADNs);
     }
@@ -80,6 +80,12 @@ public class ADEntries {
         final String attrValue = chaiEntry.readStringAttribute(attributeName);
         return attrValue == null ? null : ADEntries.convertWinEpochToDate(attrValue);
     }
+
+    static void writeDateAttribute(final ChaiEntry chaiEntry, final String attributeName, final Date date) throws ChaiUnavailableException, ChaiOperationException {
+        final String attrValue = convertDateToWinEpoch(date);
+        chaiEntry.writeStringAttribute(attributeName, attrValue);
+    }
+
 
     static String readGUID(final ChaiEntry entry) throws ChaiOperationException, ChaiUnavailableException {
         final byte[] st = entry.getChaiProvider().readMultiByteAttribute(entry.getEntryDN(),"objectGUID")[0];

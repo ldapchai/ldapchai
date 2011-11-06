@@ -39,7 +39,7 @@
  * are used: {@link com.novell.ldapchai.provider.ChaiConfiguration#getCrReadMode()} and {@link
  * com.novell.ldapchai.provider.ChaiConfiguration#getCrWriteMode()}.
  * These settings control which format will be used for reading and writing (they may be different). Multiple
- * methods (which are defined in {@link com.novell.ldapchai.cr.CrMode}) can be set for writing, in which case all of
+ * methods (which are defined in {@link ChaiResponseStorageMode}) can be set for writing, in which case all of
  * the specified formats will be written to during a call to {@link com.novell.ldapchai.cr.ResponseSet#write()}.
  *
  * <h4>Chai Format Detail</h4>

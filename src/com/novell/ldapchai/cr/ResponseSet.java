@@ -38,7 +38,7 @@ import java.util.Map;
  * creation, or there may be directory communication required for operation of methods on this
  * interface.
  * <p/>
- * Instances of {@code ResponseSet} can be created or read using {@link com.novell.ldapchai.cr.CrFactory}.
+ * Instances of {@code ResponseSet} can be created or read using {@link ChaiCrFactory}.
  *
  * @author Jason D. Rivard
  */
@@ -61,6 +61,9 @@ public interface ResponseSet {
      * @return Get the ChallengeSet embedded in this ResponseSet.
      */
     ChallengeSet getChallengeSet()
+            throws ChaiValidationException;
+
+    ChallengeSet getPresentableChallengeSet()
             throws ChaiValidationException;
 
     /**
@@ -101,29 +104,6 @@ public interface ResponseSet {
      */
     boolean test(Map<Challenge, String> responseTest)
             throws ChaiUnavailableException;
-
-    /**
-     * Write the response values to ldap directory using the default write mode set in the provider.
-     *
-     * @return true if successfully written
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @throws ChaiOperationException   If there is an error during the write operation
-     * @throws IllegalStateException    if this response set is not suitable for writing, for example, if it has already been written, or was obtained by reading from ldap
-     */
-    boolean write()
-            throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
-
-    /**
-     * Write the response values to ldap directory.
-     *
-     * @param writeMode Which type of mode to use for the write.
-     * @return true if successfully written
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @throws ChaiOperationException   If there is an error during the write operation
-     * @throws IllegalStateException    if this response set is not suitable for writing, for example, if it has already been written, or was obtained by reading from ldap
-     */
-    boolean write(CrMode writeMode)
-            throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
 
     /**
      * Get the locale of the response set.  A response set is always stored with a single

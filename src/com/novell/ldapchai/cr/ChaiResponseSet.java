@@ -25,6 +25,7 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
 import com.novell.ldapchai.util.internal.Base64Util;
@@ -63,21 +64,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
         public String toString()
         {
             return format;
-        }
-
-        public static FormatType forCrMode(final CrMode crMode)
-        {
-            switch (crMode) {
-                case CHAI_SHA1_SALT:
-                    return SHA1_SALT;
-                case CHAI_SHA1:
-                    return SHA1;
-                case CHAI_TEXT:
-                    return TEXT;
-
-                default:
-                    return null;
-            }
         }
     }
 
@@ -122,40 +108,35 @@ public class ChaiResponseSet extends AbstractResponseSet {
 // -------------------------- STATIC METHODS --------------------------
 
     static ChaiResponseSet readUserResponseSet(final ChaiUser theUser)
-            throws ChaiUnavailableException, ChaiValidationException
+            throws ChaiUnavailableException, ChaiValidationException, ChaiOperationException
     {
-        final String corRecordIdentifer = theUser.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.CHAI_RECORD_ID);
-        final String corAttribute = theUser.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.CHAI_ATTRIBUTE_NAME);
+        final String corRecordIdentifer = theUser.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.CR_CHAI_STORAGE_RECORD_ID);
+        final String corAttribute = theUser.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.CR_CHAI_STORAGE_ATTRIBUTE);
 
-        try {
-            final ChaiResponseSet returnVal;
-            final List<ConfigObjectRecord> corList = ConfigObjectRecord.readRecordFromLDAP(theUser, corAttribute, corRecordIdentifer, null, null);
-            String payload = "";
-            if (!corList.isEmpty()) {
-                final ConfigObjectRecord theCor = corList.get(0);
-                payload = theCor.getPayload();
-            }
-            returnVal = parseChaiResponseSetXML(payload, theUser);
-
-            if (returnVal == null) {
-                return null;
-            }
-
-            // strip out any randoms beyond the minimum required.
-            if (returnVal.getChallengeSet().getMinRandomRequired() > 0) {
-                while (returnVal.getChallengeSet().getRandomChallenges().size() > returnVal.getChallengeSet().getMinRandomRequired()) {
-                    final List<Challenge> randChallenges = returnVal.getChallengeSet().getRandomChallenges();
-                    returnVal.crMap.remove(randChallenges.get(new SecureRandom().nextInt(randChallenges.size())));
-                }
-            }
-
-            returnVal.isValid();
-
-            return returnVal;
-        } catch (ChaiOperationException e) {
-            LOGGER.debug("ldap error reading response set: " + e.getMessage());
+        final ChaiResponseSet returnVal;
+        final List<ConfigObjectRecord> corList = ConfigObjectRecord.readRecordFromLDAP(theUser, corAttribute, corRecordIdentifer, null, null);
+        String payload = "";
+        if (!corList.isEmpty()) {
+            final ConfigObjectRecord theCor = corList.get(0);
+            payload = theCor.getPayload();
         }
-        return null;
+        returnVal = parseChaiResponseSetXML(payload, theUser);
+
+        if (returnVal == null) {
+            return null;
+        }
+
+        // strip out any randoms beyond the minimum required.
+        if (returnVal.getChallengeSet().getMinRandomRequired() > 0) {
+            while (returnVal.getChallengeSet().getRandomChallenges().size() > returnVal.getChallengeSet().getMinRandomRequired()) {
+                final List<Challenge> randChallenges = returnVal.getChallengeSet().getRandomChallenges();
+                returnVal.crMap.remove(randChallenges.get(new SecureRandom().nextInt(randChallenges.size())));
+            }
+        }
+
+        returnVal.isValid();
+
+        return returnVal;
     }
 
     public static ChaiResponseSet parseChaiResponseSetXML(final String input, final ChaiUser user)
@@ -206,8 +187,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
                 }
             }
 
-
-
             for (final Object o : rootElement.getChildren()) {
                 final Element loopElement = (Element) o;
 
@@ -228,7 +207,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
                     answer = salt + SALT_SEPERATOR + answer;
                 }
 
-                final Challenge newChallenge = CrFactory.newChallenge(required, challengeText, minLength, maxLength, adminDefined);
+                final Challenge newChallenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
                 crMap.put(newChallenge, answer);
             }
         } catch (JDOMException e) {
@@ -244,7 +223,15 @@ public class ChaiResponseSet extends AbstractResponseSet {
             challengeLocale = new Locale(localeAttr.getValue());
         }
 
-        return new ChaiResponseSet(crMap, challengeLocale, minRandRequired, STATE.READ, user, respFormat, caseInsensitive, csIdentifier, timestamp);
+        return new ChaiResponseSet(
+                crMap,
+                challengeLocale,
+                minRandRequired,
+                STATE.READ,
+                respFormat,
+                caseInsensitive,
+                csIdentifier,
+                timestamp);
     }
 
 // --------------------------- CONSTRUCTORS ---------------------------
@@ -254,7 +241,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
-            final ChaiUser user,
             final FormatType formatType,
             final boolean caseInsensitive,
             final String csIdentifer,
@@ -262,8 +248,8 @@ public class ChaiResponseSet extends AbstractResponseSet {
     )
             throws ChaiValidationException
     {
-        super(crMap, locale, minimumRandomRequired, state, user, csIdentifer);
-        this.formatType = formatType == null ? FormatType.SHA1 : formatType;
+        super(crMap, locale, minimumRandomRequired, state, csIdentifer);
+        this.formatType = formatType == null ? FormatType.SHA1_SALT : formatType;
         this.caseInsensitive = caseInsensitive;
         this.timestamp = timestamp;
     }
@@ -317,11 +303,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
 
         int correctRandoms = 0;
         for (final Challenge loopChallenge : this.crMap.keySet()) {
-            String proposedResponse = testResponses.get(loopChallenge);
-
-            if (caseInsensitive) {
-                proposedResponse = proposedResponse.toLowerCase();
-            }
+            final String proposedResponse = testResponses.get(loopChallenge);
 
             final boolean correct = testRepsonse(crMap.get(loopChallenge), proposedResponse);
 
@@ -341,12 +323,20 @@ public class ChaiResponseSet extends AbstractResponseSet {
 
     private boolean testRepsonse(String actualResponse, String testResponse)
     {
+        if (testResponse == null) {
+            return false;
+        }
+
+        if (caseInsensitive) {
+            testResponse = testResponse.toLowerCase();
+        }
+
         switch (formatType) {
             case SHA1_SALT:
                 // move the salt from the actual password (put there temporarily when read from XML)
                 // to the test response
 
-                if (actualResponse.indexOf(SALT_SEPERATOR) > -1) {
+                if (actualResponse.contains(SALT_SEPERATOR)) {
                     final String salt = actualResponse.split(SALT_SEPERATOR)[0];
                     actualResponse = actualResponse.split(SALT_SEPERATOR)[1];
                     testResponse = salt + testResponse;
@@ -382,32 +372,27 @@ public class ChaiResponseSet extends AbstractResponseSet {
         return Base64Util.encodeBytes(hashedAnswer);
     }
 
-    public boolean writeImplementation()
+    boolean write(final ChaiUser user)
             throws ChaiUnavailableException, ChaiOperationException
     {
         if (this.state != STATE.NEW) {
             throw new IllegalStateException("ResponseSet not suitable for writing (not in NEW state)");
         }
 
-        final String corRecordIdentifer = user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.CHAI_RECORD_ID);
-        final String corAttribute = user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.CHAI_ATTRIBUTE_NAME);
 
-        if (corAttribute == null || corAttribute.length() < 1) {
-            final String error = "can't write user responseSet, " + CrSetting.CHAI_ATTRIBUTE_NAME + " not configured";
-            LOGGER.warn(error);
-            throw new IllegalDataException(error);
-        }
+        final String corAttribute = user.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.CR_CHAI_STORAGE_ATTRIBUTE);
+        final String corRecordIdentifier = user.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.CR_CHAI_STORAGE_RECORD_ID);
 
         try {
             final ConfigObjectRecord theCor;
-            final List<ConfigObjectRecord> corList = ConfigObjectRecord.readRecordFromLDAP(user, corAttribute, corRecordIdentifer, null, null);
+            final List<ConfigObjectRecord> corList = ConfigObjectRecord.readRecordFromLDAP(user, corAttribute, corRecordIdentifier, null, null);
             if (!corList.isEmpty()) {
                 theCor = corList.get(0);
             } else {
-                theCor = ConfigObjectRecord.createNew(user, corAttribute, corRecordIdentifer, null, null);
+                theCor = ConfigObjectRecord.createNew(user, corAttribute, corRecordIdentifier, null, null);
             }
 
-            final String attributePaylod = rsToChaiXML(this); 
+            final String attributePaylod = rsToChaiXML(this);
 
             theCor.updatePayload(attributePaylod);
         } catch (ChaiOperationException e) {

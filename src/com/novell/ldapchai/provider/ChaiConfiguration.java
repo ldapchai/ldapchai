@@ -19,7 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.cr.CrSetting;
 import com.novell.ldapchai.util.StringHelper;
 
 import java.io.Serializable;
@@ -49,23 +48,16 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     public static final String LDAP_URL_SEPERATOR_REGEX_PATTERN = ",| "; // comma <or> space (regex)
 
     private final static Properties DEFAULT_SETTINGS = new Properties();
-    private final static Properties DEFAULT_CR_SETTINGS = new Properties();
 
     private Serializable implementationConfiguration;
     private volatile transient boolean locked;
     private Properties settings = new Properties(DEFAULT_SETTINGS);
-
-    private Properties crSettings = new Properties(DEFAULT_CR_SETTINGS);
 
 // -------------------------- STATIC METHODS --------------------------
 
     static {
         for (final ChaiSetting s : ChaiSetting.values()) {
             DEFAULT_SETTINGS.put(s.getKey(), s.getDefaultValue());
-        }
-
-        for (final CrSetting s : CrSetting.values()) {
-            DEFAULT_CR_SETTINGS.put(s.getKey(), s.getDefaultValue());
         }
     }
 
@@ -78,18 +70,6 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     {
         final Properties propCopy = new Properties();
         propCopy.putAll(DEFAULT_SETTINGS);
-        return propCopy;
-    }
-
-    /**
-     * Get a properties containing the default CR settings used by a newly constructed {@code ChaiConfiguration}.
-     *
-     * @return The default settings.
-     */
-    public static Properties getDefaultCrSettings()
-    {
-        final Properties propCopy = new Properties();
-        propCopy.putAll(DEFAULT_CR_SETTINGS);
         return propCopy;
     }
 
@@ -141,22 +121,6 @@ public class ChaiConfiguration implements Cloneable, Serializable {
         return this;
     }
 
-    /**
-     * Set a single CR setting.  Each setting is avalable in the {@link CrSetting} enumeration.
-     *
-     * @param setting the setting to set
-     * @param value   the value to set
-     * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
-     * @throws IllegalArgumentException if the value is not syntactically correct
-     * @see ChaiSetting#validateValue(String)
-     */
-    public ChaiConfiguration setCrSetting(final CrSetting setting, final String value)
-    {
-        checkLock();
-        setting.validateValue(value);
-        this.crSettings.setProperty(setting.getKey(), value == null ? setting.getDefaultValue() : value);
-        return this;
-    }
 
     private void checkLock()
     {
@@ -224,13 +188,6 @@ public class ChaiConfiguration implements Cloneable, Serializable {
         }
         newInstance.settings = newSettings;
 
-        final Properties newCrSettings = new Properties();
-        for (Enumeration keyEnum = crSettings.propertyNames(); keyEnum.hasMoreElements();) {
-            final String keyName = (String) keyEnum.nextElement();
-            newCrSettings.setProperty(keyName, crSettings.getProperty(keyName));
-        }
-        newInstance.crSettings = newCrSettings;
-
         newInstance.implementationConfiguration = implementationConfiguration;
         newInstance.locked = false;
 
@@ -293,16 +250,6 @@ public class ChaiConfiguration implements Cloneable, Serializable {
         return StringHelper.convertStrToBoolean(settingValue);
     }
 
-    /**
-     * Get an individual setting value
-     *
-     * @param setting the setting to return
-     * @return the value or the default value if no value exists.
-     */
-    public String getCrSetting(final CrSetting setting)
-    {
-        return crSettings.getProperty(setting.getKey());
-    }
 
 // -------------------------- OTHER METHODS --------------------------
 
@@ -343,19 +290,6 @@ public class ChaiConfiguration implements Cloneable, Serializable {
         // make a defensive copy
         final Properties propCopy = new Properties();
         propCopy.putAll(settings);
-        return propCopy;
-    }
-
-    /**
-     * Get the current CR settings of the {@code ChaiProvider}.
-     *
-     * @return a copy of the settings for this ChaiConfiguration
-     */
-    public Properties getCrSettings()
-    {
-        // make a defensive copy
-        final Properties propCopy = new Properties();
-        propCopy.putAll(crSettings);
         return propCopy;
     }
 

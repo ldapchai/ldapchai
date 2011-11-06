@@ -24,6 +24,8 @@ import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.*;
 import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.impl.edir.NmasCrFactory;
+import com.novell.ldapchai.impl.edir.NmasResponseSet;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiProvider;
@@ -50,8 +52,8 @@ public class ChaiTester extends TestCase {
     {
         final ChaiEntry testContainer = TestHelper.createTestContainer();
         final ChaiUser testUser;
+        final ChaiConfiguration chaiConfig = new ChaiConfiguration("ldaps://ldaphost:636", "cn=admin,ou=ou,o=o", "novell");
         {    // create provider and test user.
-            final ChaiConfiguration chaiConfig = new ChaiConfiguration("ldaps://ldaphost:636", "cn=admin,ou=ou,o=o", "novell");
             chaiConfig.setSetting(ChaiSetting.PROMISCUOUS_SSL, "true");
             final ChaiProvider provider = ChaiProviderFactory.createProvider(chaiConfig);
 
@@ -62,48 +64,53 @@ public class ChaiTester extends TestCase {
         final Map<Challenge, String> crMap;
         {
             final Map<Challenge, String> tempMap = new HashMap<Challenge, String>();
-            tempMap.put(CrFactory.newChallenge(true, "c1", 5, 200, true), "response1");
-            tempMap.put(CrFactory.newChallenge(true, "c2", 5, 200, true), "response2");
-            tempMap.put(CrFactory.newChallenge(false, "c3", 5, 200, true), "response3");
-            tempMap.put(CrFactory.newChallenge(false, "c4", 5, 200, true), "response4");
+            tempMap.put(new ChaiChallenge(true, "c1", 5, 200, true), "response1");
+            tempMap.put(new ChaiChallenge(true, "c2", 5, 200, true), "response2");
+            tempMap.put(new ChaiChallenge(false, "c3", 5, 200, true), "response3");
+            tempMap.put(new ChaiChallenge(false, "c4", 5, 200, true), "response4");
             crMap = Collections.unmodifiableMap(tempMap);
         }
 
         // write responses to user entry
-        CrFactory.newResponseSet(crMap, null, 0, testUser, null).write(null);
+        {
+            final ChaiResponseSet responseSet = ChaiCrFactory.newChaiResponseSet(crMap, null, 0, chaiConfig, null);
+            ChaiCrFactory.writeChaiResponseSet(responseSet, testUser);
+        }
+
 
         // read responses from user entry
-        final ResponseSet retreivedSet = testUser.readResponseSet();
+        final ResponseSet retreivedSet = ChaiCrFactory.readChaiResponseSet(testUser);
 
         Assert.assertTrue("error testing chai responses", retreivedSet.test(crMap));
 
         {
             final Map<Challenge, String> testMap = new HashMap<Challenge, String>(crMap);
-            testMap.put(CrFactory.newChallenge(true, "c2", 5, 200, true), "response3");
+            testMap.put(new ChaiChallenge(true, "c2", 5, 200, true), "response3");
             Assert.assertFalse("error testing chai responses, false positive", retreivedSet.test(testMap));
         }
 
         {
             final Map<Challenge, String> testMap = new HashMap<Challenge, String>(crMap);
-            testMap.put(CrFactory.newChallenge(true, "c2", 50, 200, true), "response2");
+            testMap.put(new ChaiChallenge(true, "c2", 50, 200, true), "response2");
             try {
-                CrFactory.newResponseSet(testMap, null, 0, testUser, null).write(null);
+                final ChaiResponseSet responseSet = ChaiCrFactory.newChaiResponseSet(testMap, null, 0, chaiConfig, null);
+                ChaiCrFactory.writeChaiResponseSet(responseSet, testUser);
                 Assert.fail("did not throw expected IllegalArgumentException due to response length being to short");
             } catch (ChaiValidationException e) { /* test should throw exception */ }
         }
 
         {
-            final ResponseSet testRs = CrFactory.newResponseSet(crMap, null, 1, testUser, null);
-            final ChallengeSet testCs = CrFactory.newChallengeSet(crMap.keySet(), null, 1, null);
+            final ResponseSet testRs = ChaiCrFactory.newChaiResponseSet(crMap, null, 1, chaiConfig, null);
+            final ChallengeSet testCs = new ChaiChallengeSet(crMap.keySet(), 1, null, null);
             Assert.assertTrue("meetsChallengeSetRequirements failed positive test", testRs.meetsChallengeSetRequirements(testCs));
         }
 
         {
             final Map<Challenge, String> testMap = new HashMap<Challenge, String>();
-            testMap.put(CrFactory.newChallenge(true, "c1", 5, 200, true), "response1");
-            testMap.put(CrFactory.newChallenge(true, "c2", 5, 200, true), "response2");
-            final ResponseSet testRs = CrFactory.newResponseSet(testMap, null, 1, testUser, null);
-            final ChallengeSet testCs = CrFactory.newChallengeSet(crMap.keySet(), null, 2, null);
+            testMap.put(new ChaiChallenge(true, "c1", 5, 200, true), "response1");
+            testMap.put(new ChaiChallenge(true, "c2", 5, 200, true), "response2");
+            final ResponseSet testRs = ChaiCrFactory.newChaiResponseSet(testMap, null, 1, chaiConfig, null);
+            final ChallengeSet testCs = new ChaiChallengeSet(crMap.keySet(), 2, null, null);
 
             try {
                 testRs.meetsChallengeSetRequirements(testCs);
@@ -180,11 +187,11 @@ public class ChaiTester extends TestCase {
         final ChaiUser theUser = ChaiFactory.createChaiUser(createDN, TestHelper.getProvider());
 
         final Map<Challenge, String> crMap = new HashMap<Challenge, String>();
-        crMap.put(CrFactory.newChallenge(true, "Got Milk?", 2, 255, true), "yep");
-        crMap.put(CrFactory.newChallenge(true, "Zoinks?", 2, 255, true), "Zoinks!");
+        crMap.put(new ChaiChallenge(true, "Got Milk?", 2, 255, true), "yep");
+        crMap.put(new ChaiChallenge(true, "Zoinks?", 2, 255, true), "Zoinks!");
 
-        final ResponseSet rs = CrFactory.newResponseSet(crMap, null, 2, theUser, null);
-        Assert.assertTrue("NMAS Response Writing Test failed", rs.write(CrMode.NMAS));
+        final NmasResponseSet rs = NmasCrFactory.newNmasResponseSet(crMap, null, 2, theUser, null);
+        Assert.assertTrue("NMAS Response Writing Test failed", NmasCrFactory.writeResponseSet(rs));
     }
 
     public void testCreateUser()

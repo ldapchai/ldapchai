@@ -19,17 +19,14 @@
 
 package com.novell.ldapchai.cr;
 
-import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiError;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.util.ChaiLogger;
-import com.novell.ldapchai.util.StringHelper;
 
+import java.security.SecureRandom;
 import java.util.*;
 
-abstract class AbstractResponseSet implements ResponseSet {
+public abstract class AbstractResponseSet implements ResponseSet {
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ResponseSet.class.getName());
 // ----------------------------- CONSTANTS ----------------------------
@@ -37,7 +34,7 @@ abstract class AbstractResponseSet implements ResponseSet {
 
 // -------------------------- ENUMERATIONS --------------------------
 
-    enum STATE {
+    public enum STATE {
         NEW(true),
         WRITTEN(true),
         READ(false);
@@ -58,14 +55,14 @@ abstract class AbstractResponseSet implements ResponseSet {
 // ------------------------------ FIELDS ------------------------------
 
     protected Map<Challenge, String> crMap = Collections.emptyMap();
+    protected ChallengeSet allChallengeSet;
+    protected ChallengeSet presentableChallengeSet;
     protected Locale locale;
     protected int minimumRandomRequired;
-    protected String csIdentifier;
     protected Date timestamp;
+    protected String csIdentifier;
 
     protected STATE state;
-
-    protected ChaiUser user;
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
@@ -74,7 +71,6 @@ abstract class AbstractResponseSet implements ResponseSet {
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
-            final ChaiUser user,
             final String csIdentifier
     )
             throws ChaiValidationException
@@ -83,19 +79,29 @@ abstract class AbstractResponseSet implements ResponseSet {
         this.locale = locale;
         this.minimumRandomRequired = minimumRandomRequired;
         this.crMap = crMap;
-        this.user = user;
         this.csIdentifier = csIdentifier;
 
         this.timestamp = new Date();
 
         this.isValid();
 
+        allChallengeSet = new ChaiChallengeSet(crMap.keySet(), minimumRandomRequired, locale, csIdentifier);
+        presentableChallengeSet = reduceCsToMinRandoms(allChallengeSet);
+
         if (state == STATE.READ) {
-            this.getChallengeSet().lock();
+            this.allChallengeSet.lock();
+            this.presentableChallengeSet.lock();
         }
+
     }
 
     protected void isValid()
+            throws ChaiValidationException
+    {
+        isValid(false);
+    }
+
+    protected void isValid(boolean allowDuplicates)
             throws ChaiValidationException
     {
         for (final Challenge loopChallenge : crMap.keySet()) {
@@ -123,11 +129,7 @@ abstract class AbstractResponseSet implements ResponseSet {
             }
         }
 
-        boolean allowduplicates = StringHelper.convertStrToBoolean(CrSetting.ALLOW_DUPLICATE_RESPONSES.getDefaultValue());
-        if (user != null) {
-            allowduplicates = StringHelper.convertStrToBoolean(user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.ALLOW_DUPLICATE_RESPONSES));
-        }
-        if (!allowduplicates) {
+        if (!allowDuplicates) {
             final Set<String> seenResponses = new HashSet<String>();
             for (final Challenge loopChallenge : crMap.keySet()) {
                 final String responseText = crMap.get(loopChallenge);
@@ -165,7 +167,7 @@ abstract class AbstractResponseSet implements ResponseSet {
 
     public final ChallengeSet getChallengeSet() throws ChaiValidationException
     {
-        return CrFactory.newChallengeSet(crMap.keySet(), locale, minimumRandomRequired, csIdentifier);
+        return allChallengeSet;
     }
 
     public boolean meetsChallengeSetRequirements(final ChallengeSet challengeSet)
@@ -196,57 +198,6 @@ abstract class AbstractResponseSet implements ResponseSet {
         return true;
     }
 
-    public boolean write(CrMode crMode)
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        if (crMode == null) {
-            String strDefault = CrSetting.DEFAULT_WRITE_MODE.getDefaultValue();
-            if (user != null) {
-                strDefault = user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.DEFAULT_WRITE_MODE);
-            }
-            crMode = CrMode.forString(strDefault);
-        }
-
-        if (this.state != STATE.NEW) {
-            throw new IllegalStateException("RepsonseSet not suitable for writing (not in NEW state)");
-        }
-
-        final AbstractResponseSet loopResponseSet;
-        try {
-            switch (crMode) {
-                case NMAS:
-                    loopResponseSet = new NmasResponseSet(this.crMap, this.locale, this.minimumRandomRequired, STATE.NEW, user, csIdentifier);
-                    break;
-                case CHAI_SHA1:
-                case CHAI_SHA1_SALT:
-                case CHAI_TEXT:
-                    final boolean caseInsensitive = Boolean.parseBoolean(user.getChaiProvider().getChaiConfiguration().getCrSetting(CrSetting.CHAI_CASE_INSENSITIVE));
-                    loopResponseSet = new ChaiResponseSet(this.crMap, this.locale, this.minimumRandomRequired, STATE.NEW, user, ChaiResponseSet.FormatType.forCrMode(crMode), caseInsensitive, csIdentifier, new Date());
-                    break;
-                default:
-                    throw new IllegalStateException("unknwon CR Mode");
-            }
-        } catch (ChaiValidationException e) {
-            throw new RuntimeException("unexpected Chai API runtime error", e);
-        }
-
-        loopResponseSet.writeImplementation();
-
-       try {
-           this.getChallengeSet().lock();
-       } catch (ChaiValidationException e) {
-           LOGGER.warn("unexpected validation error",e);
-       }
-
-        return true;
-    }
-
-    public boolean write()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        return write(null);
-    }
-
     public Locale getLocale()
     {
         return locale;
@@ -256,8 +207,31 @@ abstract class AbstractResponseSet implements ResponseSet {
         return timestamp;
     }
 
+    public ChallengeSet getPresentableChallengeSet() throws ChaiValidationException {
+        return presentableChallengeSet;
+    }
+
     // -------------------------- OTHER METHODS --------------------------
 
-    abstract boolean writeImplementation()
-            throws ChaiUnavailableException, ChaiOperationException;
+    private static ChallengeSet reduceCsToMinRandoms(final ChallengeSet allChallengeSet)
+            throws ChaiValidationException
+    {
+        if (allChallengeSet.getRandomChallenges().size() <= allChallengeSet.getMinRandomRequired()) {
+            return allChallengeSet;
+        }
+
+        final SecureRandom random = new SecureRandom();
+        final List<Challenge> newChallenges = new ArrayList<Challenge>();
+        final List<Challenge> allRandoms = new ArrayList<Challenge>(allChallengeSet.getRandomChallenges());
+        while (newChallenges.size() < allChallengeSet.getMinRandomRequired()) {
+            newChallenges.add(allRandoms.remove(random.nextInt(allRandoms.size())));
+        }
+        newChallenges.addAll(allChallengeSet.getRequiredChallenges());
+        return new ChaiChallengeSet(
+                newChallenges,
+                allChallengeSet.getMinRandomRequired(),
+                allChallengeSet.getLocale(),
+                allChallengeSet.getIdentifier()
+                );
+    }
 }

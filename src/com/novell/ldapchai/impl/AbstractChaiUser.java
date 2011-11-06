@@ -20,10 +20,10 @@
 package com.novell.ldapchai.impl;
 
 import com.novell.ldapchai.*;
-import com.novell.ldapchai.cr.ChallengeSet;
-import com.novell.ldapchai.cr.CrFactory;
-import com.novell.ldapchai.cr.ResponseSet;
-import com.novell.ldapchai.exception.*;
+import com.novell.ldapchai.exception.ChaiErrors;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Collections;
@@ -169,17 +169,6 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return false;
     }
 
-    public ChallengeSet readAssignedChallengeSet()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        try {
-            return CrFactory.readAssignedChallengeSet(this);
-        } catch (ChaiValidationException e) {
-            LOGGER.info("validation error reading assigned challenge sets " + e.getMessage());
-            return null;
-        }
-    }
-
     public Date readLastLoginTime() throws ChaiOperationException, ChaiUnavailableException {
         return null;
     }
@@ -190,17 +179,6 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
 
     public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
         return null;
-    }
-
-    public ResponseSet readResponseSet()
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        try {
-            return CrFactory.readResponseSet(this);
-        } catch (ChaiValidationException e) {
-            LOGGER.info("validation error reading chai response set " + e.getMessage());
-            return null;
-        }
     }
 
     public boolean testPasswordPolicy(final String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {

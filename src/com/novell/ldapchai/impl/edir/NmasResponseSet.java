@@ -17,9 +17,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.cr;
+package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.cr.*;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
@@ -30,6 +31,8 @@ import com.novell.security.nmas.mgmt.NMASChallengeResponse;
 import org.jdom.*;
 import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.io.IOException;
@@ -38,13 +41,15 @@ import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
-class NmasResponseSet extends AbstractResponseSet {
+public class NmasResponseSet extends AbstractResponseSet {
 // ----------------------------- CONSTANTS ----------------------------
 
 
 // ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(NmasResponseSet.class.getName());
+
+    private ChaiUser user;
 
 // -------------------------- STATIC METHODS --------------------------
 
@@ -65,7 +70,7 @@ class NmasResponseSet extends AbstractResponseSet {
 
             final String challengeText = readDisplayString(loopQ, locale);
 
-            final Challenge challenge = new ChallengeImpl(required, challengeText, minLength, maxLength, true);
+            final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, true);
             returnList.add(challenge);
         }
 
@@ -73,7 +78,7 @@ class NmasResponseSet extends AbstractResponseSet {
             final Element loopQ = (Element) iter.next();
             final int maxLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MaxLength"), 255);
             final int minLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MinLength"), 1);
-            final Challenge challenge = new ChallengeImpl(required, null, minLength, maxLength, false);
+            final Challenge challenge = new ChaiChallenge(required, null, minLength, maxLength, false);
             returnList.add(challenge);
         }
 
@@ -117,7 +122,7 @@ class NmasResponseSet extends AbstractResponseSet {
         return questionElement.getText();
     }
 
-    public static ResponseSet readNmasUserResponseSet(
+    static NmasResponseSet readNmasUserResponseSet(
             final ChaiUser theUser
     )
             throws ChaiUnavailableException, ChaiValidationException
@@ -178,16 +183,16 @@ class NmasResponseSet extends AbstractResponseSet {
             final boolean required = typeStrValue.equalsIgnoreCase("Required");
             final String challengeText = loopQ.getText();
 
-            final Challenge challenge = new ChallengeImpl(required, challengeText, minLength, maxLength, adminDefined);
+            final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
             returnList.add(challenge);
         }
 
-        return new ChallengeSetImpl(returnList, minRandom, null, guidValue);
+        return new ChaiChallengeSet(returnList, minRandom, null, guidValue);
     }
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    public NmasResponseSet(
+    NmasResponseSet(
             final Map<Challenge, String> crMap,
             final Locale locale,
             final int minimumRandomRequired,
@@ -197,7 +202,8 @@ class NmasResponseSet extends AbstractResponseSet {
     )
             throws ChaiValidationException
     {
-        super(crMap, locale, minimumRandomRequired, state, user, csIdentifier);
+        super(crMap, locale, minimumRandomRequired, state, csIdentifier);
+        this.user = user;
     }
 
 // ------------------------ INTERFACE METHODS ------------------------
@@ -219,7 +225,7 @@ class NmasResponseSet extends AbstractResponseSet {
 
 // -------------------------- OTHER METHODS --------------------------
 
-    public boolean writeImplementation()
+    boolean write()
             throws ChaiUnavailableException, ChaiOperationException
     {
         if (this.state != STATE.NEW) {
@@ -230,7 +236,7 @@ class NmasResponseSet extends AbstractResponseSet {
         try {
             final PutLoginConfigRequest request = new PutLoginConfigRequest();
             request.setObjectDN(user.getEntryDN());
-            final byte[] data = CrHelper.csToNmasXML(getChallengeSet(), this.csIdentifier).getBytes("UTF8");
+            final byte[] data = csToNmasXML(getChallengeSet(), this.csIdentifier).getBytes("UTF8");
             request.setData(data);
             request.setDataLen(data.length);
             request.setTag("ChallengeResponseQuestions");
@@ -346,5 +352,56 @@ class NmasResponseSet extends AbstractResponseSet {
         final String variant = st.nextToken("");
         return new Locale(language, country, variant);
     }
+
+    private static final String NMAS_XML_ROOTNODE = "Challenges";
+    private static final String NMAS_XML_ATTR_RANDOM_COUNT = "RandomQuestions";
+    private static final String NMAS_XML_NODE_CHALLENGE = "Challenge";
+    private static final String NMAS_XML_ATTR_TYPE = "Type";
+    private static final String NMAS_XML_ATTR_DEFINE = "Define";
+    private static final String NMAS_XML_ATTR_MIN_LENGTH = "MinLength";
+    private static final String NMAS_XML_ATTR_MAX_LENGTH = "MaxLength";
+
+// -------------------------- STATIC METHODS --------------------------
+
+    static String csToNmasXML(final ChallengeSet cs, final String guidValue)
+    {
+        final Element rootElement = new Element(NMAS_XML_ROOTNODE);
+        rootElement.setAttribute(NMAS_XML_ATTR_RANDOM_COUNT, String.valueOf(cs.getMinRandomRequired()));
+        if (guidValue != null) {
+            rootElement.setAttribute("GUID", guidValue);
+        } else {
+            rootElement.setAttribute("GUID", "0");
+        }
+
+        for (final Challenge challenge : cs.getChallenges()) {
+            final Element loopElement = new Element(NMAS_XML_NODE_CHALLENGE);
+            if (challenge.getChallengeText() != null) {
+                loopElement.setText(challenge.getChallengeText());
+            }
+
+            if (challenge.isAdminDefined()) {
+                loopElement.setAttribute(NMAS_XML_ATTR_DEFINE, "Admin");
+            } else {
+                loopElement.setAttribute(NMAS_XML_ATTR_DEFINE, "User");
+            }
+
+            if (challenge.isRequired()) {
+                loopElement.setAttribute(NMAS_XML_ATTR_TYPE, "Required");
+            } else {
+                loopElement.setAttribute(NMAS_XML_ATTR_TYPE, "Random");
+            }
+
+            loopElement.setAttribute(NMAS_XML_ATTR_MIN_LENGTH, String.valueOf(challenge.getMinLength()));
+            loopElement.setAttribute(NMAS_XML_ATTR_MAX_LENGTH, String.valueOf(challenge.getMaxLength()));
+
+            rootElement.addContent(loopElement);
+        }
+
+        final XMLOutputter outputter = new XMLOutputter();
+        outputter.setFormat(Format.getCompactFormat());
+
+        return outputter.outputString(rootElement);
+    }
+
 }
 

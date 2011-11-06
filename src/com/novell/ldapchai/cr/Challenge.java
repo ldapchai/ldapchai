@@ -24,7 +24,7 @@ import java.io.Serializable;
 /**
  * Challenge data object, containing all the properties defined by a challenge.
  * <p/>
- * Instances of {@code Challenge} can be generated using {@link com.novell.ldapchai.cr.CrFactory}.
+ * Instances of {@code Challenge} can be generated using {@link ChaiCrFactory}.
  * <p/>
  * {@code Challenge}s are mutable until they are locked.  Once locked, setters will throw an illegal state exception.
  *

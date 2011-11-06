@@ -20,7 +20,6 @@
 
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.cr.CrSetting;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiConfiguration;
@@ -53,7 +52,7 @@ public class AdvancedConnection {
         ChaiConfiguration chaiConfig = new ChaiConfiguration(ldapURL, ldapBindDN, ldapBindPW);
 
         // set the chai challenge/response engine to use the 'title' attribute to store its data.
-        chaiConfig.setCrSetting(CrSetting.CHAI_ATTRIBUTE_NAME,"title");
+        chaiConfig.setSetting(ChaiSetting.CR_CHAI_STORAGE_ATTRIBUTE,"title");
 
         // disable ldap server fail-over
         chaiConfig.setSetting(ChaiSetting.WATCHDOG_ENABLE,"false");

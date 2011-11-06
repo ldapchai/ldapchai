@@ -19,8 +19,6 @@
 
 package com.novell.ldapchai;
 
-import com.novell.ldapchai.cr.ChallengeSet;
-import com.novell.ldapchai.cr.ResponseSet;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -248,24 +246,6 @@ public interface ChaiUser extends ChaiEntry {
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * Return the user's assigned challenge set.  The implementation will use
-     * various methods to discover an assigned policy, including evaluting the user's
-     * universal password policy assignments according to the setting of the values for the
-     * underlying provider's {@link com.novell.ldapchai.cr.CrSetting#DEFAULT_READ_MODE} settings.
-     * <p/>
-     * In the unlikely event a {@link com.novell.ldapchai.exception.ChaiValidationException} is thrown
-     * during the read operation, the exception will be written to the debug logger, but null will be returned.  If
-     * the caller needs to receive a validation exception use {@link com.novell.ldapchai.cr.CrFactory#readAssignedChallengeSet(ChaiUser)} instead.
-     *
-     * @return The user's assigned {@code ChallengeSet}, or null if no such assignment can be determined.
-     * @throws ChaiOperationException   If there is an error during the operation
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.cr.CrFactory#readAssignedChallengeSet(ChaiUser) )
-     */
-    ChallengeSet readAssignedChallengeSet()
-            throws ChaiUnavailableException, ChaiOperationException;
-
-    /**
      * Convienence method to read this ChaiUser instance's {@link #ATTR_GIVEN_NAME} attribute.
      *
      * @return The value of the attribute, or null if no value
@@ -314,23 +294,6 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiUnavailableException      If the directory server(s) are unavailable
      */
     Date readPasswordExpirationDate()
-            throws ChaiUnavailableException, ChaiOperationException;
-
-    /**
-     * Return the user's response set.  The implementation will use
-     * various methods to discover a user's configured response set according to the setting of the values for the
-     * underlying {@code ChaiProvider}'s {@link com.novell.ldapchai.cr.CrSetting#DEFAULT_READ_MODE} setting.
-     * <p/>
-     * In the unlikely event a {@link com.novell.ldapchai.exception.ChaiValidationException} is thrown
-     * during the read operation due to a structural problem with the data read from ldap, the exception will be written to the debug logger, but null will be returned.  If
-     * the caller needs to receive a validation exception use {@link com.novell.ldapchai.cr.CrFactory#readResponseSet(ChaiUser)} instead.
-     *
-     * @return The user's assigned {@code ResponseSet}, or null if none can be loaded.
-     * @throws ChaiOperationException   If there is an error during the operation
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.cr.CrFactory#readResponseSet(ChaiUser)
-     */
-    ResponseSet readResponseSet()
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**

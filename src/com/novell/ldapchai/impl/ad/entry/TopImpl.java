@@ -33,4 +33,13 @@ class TopImpl extends AbstractChaiEntry implements ChaiEntry {
         super(entryDN, chaiProvider);
     }
 
+    @Override
+    public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
+        return ADEntries.readDateAttribute(this, attributeName);
+    }
+
+    @Override
+    public void writeDateAttribute(final String attributeName, final Date date) throws ChaiUnavailableException, ChaiOperationException {
+        ADEntries.writeDateAttribute(this, attributeName, date);
+    }
 }
