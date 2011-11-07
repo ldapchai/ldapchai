@@ -72,7 +72,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiResponseSet.class.getName());
 
     private static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final String SALT_SEPERATOR = "___";
+    private static final String SALT_SEPARATOR = "___";
 
     private final static String XML_NODE_ROOT = "ResponseSet";
     private final static String XML_ATTRIBUTE_MIN_RANDOM_REQUIRED = "minRandomRequired";
@@ -196,7 +196,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
                 String answer = loopElement.getChild(XML_NODE_ANSWER_VALUE).getText();
                 if (respFormat == FormatType.SHA1_SALT) {
                     final String salt = loopElement.getChild(XML_NODE_ANSWER_VALUE).getAttribute(XML_ATTRIBUTE_SALT).getValue();
-                    answer = salt + SALT_SEPERATOR + answer;
+                    answer = salt + SALT_SEPARATOR + answer;
                 }
 
                 final Challenge newChallenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
@@ -328,9 +328,9 @@ public class ChaiResponseSet extends AbstractResponseSet {
                 // move the salt from the actual password (put there temporarily when read from XML)
                 // to the test response
 
-                if (actualResponse.contains(SALT_SEPERATOR)) {
-                    final String salt = actualResponse.split(SALT_SEPERATOR)[0];
-                    actualResponse = actualResponse.split(SALT_SEPERATOR)[1];
+                if (actualResponse.contains(SALT_SEPARATOR)) {
+                    final String salt = actualResponse.split(SALT_SEPARATOR)[0];
+                    actualResponse = actualResponse.split(SALT_SEPARATOR)[1];
                     testResponse = salt + testResponse;
                 }
 
