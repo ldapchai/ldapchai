@@ -126,14 +126,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
             return null;
         }
 
-        // strip out any randoms beyond the minimum required.
-        if (returnVal.getChallengeSet().getMinRandomRequired() > 0) {
-            while (returnVal.getChallengeSet().getRandomChallenges().size() > returnVal.getChallengeSet().getMinRandomRequired()) {
-                final List<Challenge> randChallenges = returnVal.getChallengeSet().getRandomChallenges();
-                returnVal.crMap.remove(randChallenges.get(new SecureRandom().nextInt(randChallenges.size())));
-            }
-        }
-
         returnVal.isValid();
 
         return returnVal;
