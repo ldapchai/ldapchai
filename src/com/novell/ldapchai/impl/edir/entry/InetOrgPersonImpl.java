@@ -276,4 +276,8 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     {
         return EdirEntries.readGuid(this);
     }
+
+    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
+        return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
+    }
 }

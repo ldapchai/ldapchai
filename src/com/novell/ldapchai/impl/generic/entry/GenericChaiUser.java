@@ -19,20 +19,19 @@
 
 package com.novell.ldapchai.impl.generic.entry;
 
-import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.cr.ChallengeSet;
-import com.novell.ldapchai.cr.ResponseSet;
 import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
-
-import java.util.Date;
 
 class GenericChaiUser extends AbstractChaiUser implements ChaiUser {
     public GenericChaiUser(final String userDN, final ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
     }
+
+    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
+        return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
+    }
+
 }

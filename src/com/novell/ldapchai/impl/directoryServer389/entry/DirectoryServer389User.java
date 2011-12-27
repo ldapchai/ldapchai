@@ -70,4 +70,8 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
 
         return expireDate.before(new Date());
     }
+
+    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
+        return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
+    }
 }

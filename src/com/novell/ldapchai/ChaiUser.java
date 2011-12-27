@@ -388,6 +388,8 @@ public interface ChaiUser extends ChaiEntry {
     boolean testPasswordPolicy(String testPassword)
             throws ChaiUnavailableException, ChaiPasswordPolicyException;
 
+    boolean isAccountEnabled()
+            throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Unlocks a user from many conditions that would prevent the user from logging in.

@@ -35,9 +35,10 @@ import java.util.regex.Pattern;
 
 class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
-    private static int COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT = 0x0010;
-    private static int COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED = 0x800000;
-    private static int ADS_UF_DONT_EXPIRE_PASSWD = 0x10000;
+    private static final int COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE = 0x0002;
+    private static final int COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT = 0x0010;
+    private static final int COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED = 0x800000;
+    private static final int ADS_UF_DONT_EXPIRE_PASSWD = 0x10000;
 
     UserImpl(final String userDN, final ChaiProvider chaiProvider)
     {
@@ -263,4 +264,13 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         return ADEntries.readGUID(this);
     }
 
+    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
+        final String computedBit = readStringAttribute("msDS-User-Account-Control-Computed");
+        if (computedBit != null && computedBit.length() > 0) {
+            final int intValue = Integer.parseInt(computedBit);
+            return ((intValue & COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE) == COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE);
+        }
+
+        return false;
+    }
 }
