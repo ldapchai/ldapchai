@@ -71,12 +71,10 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         if (parameters != null) {
             for (Iterator iter = Arrays.asList(parameters).iterator(); iter.hasNext();) {
                 final Object nextValue = iter.next();
-                if (nextValue == null) {
-                    debugStr.append("null");
-                } else if (nextValue.getClass().isArray()) {
-                    debugStr.append(Arrays.asList((Object[])nextValue).toString());
-                } else {
-                    debugStr.append(nextValue.toString());
+                try {
+                    debugStr.append(parameterToString(nextValue));
+                } catch (Throwable e) {
+                    debugStr.append("<binary>");
                 }
                 if (iter.hasNext()) {
                     debugStr.append(',');
@@ -86,6 +84,23 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         debugStr.append(')');
 
         return debugStr.toString();
+    }
+
+    private static String parameterToString(final Object nextValue) {
+        if (nextValue == null) {
+            return "null";
+        } else if (nextValue.getClass().isArray()) {
+            final StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (final Object loopValue : Arrays.asList((Object[])nextValue)) {
+                sb.append(parameterToString(loopValue));
+                sb.append(",");
+            }
+            sb.append("]");
+            return sb.toString();
+        } else {
+            return String.valueOf(nextValue);
+        }
     }
 
     public Map<String, Object> getProviderProperties()

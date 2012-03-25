@@ -24,9 +24,10 @@ import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.AbstractResponseSet;
+import com.novell.ldapchai.cr.ChaiChallengeSet;
 import com.novell.ldapchai.cr.Challenge;
 import com.novell.ldapchai.cr.ChallengeSet;
-import com.novell.ldapchai.cr.ChaiChallengeSet;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
@@ -34,6 +35,9 @@ import com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.StringHelper;
+import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigRequest;
+import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigResponse;
+import com.novell.security.nmas.mgmt.NMASChallengeResponse;
 import org.jdom.JDOMException;
 
 import java.io.IOException;
@@ -172,6 +176,25 @@ public class NmasCrFactory {
             throws ChaiUnavailableException, ChaiOperationException {
         return responseSet.write();
     }
+
+    public static void clearResponseSet(final ChaiUser theUser)
+            throws ChaiUnavailableException, ChaiOperationException {
+        final ChaiProvider provider = theUser.getChaiProvider();
+
+        final DeleteLoginConfigRequest request = new DeleteLoginConfigRequest();
+        request.setObjectDN(theUser.getEntryDN());
+        request.setTag("ChallengeResponseQuestions");
+        request.setMethodID(NMASChallengeResponse.METHOD_ID);
+        request.setMethodIDLen(NMASChallengeResponse.METHOD_ID.length * 4);
+
+        final DeleteLoginConfigResponse response = (DeleteLoginConfigResponse)provider.extendedOperation(request);
+        if (response != null && response.getNmasRetCode() != 0) {
+            final String errorMsg = "nmas error clearing loginResponseConfig: " + response.getNmasRetCode();
+            LOGGER.debug(errorMsg);
+            throw new ChaiOperationException(errorMsg, ChaiError.UNKNOWN);
+        }
+    }
+
 
     public static NmasResponseSet readNmasResponseSet(final ChaiUser user)
             throws ChaiUnavailableException, ChaiValidationException
