@@ -74,12 +74,13 @@ public class ADErrorMap implements ErrorMap {
     }
 
     enum ADError {
-        UNKNOWN                 ("-999", ChaiError.UNKNOWN,                       true, false),
-        NO_SUCH_OBJECT          ("0x20", ChaiError.NO_SUCH_ENTRY,                 true, false),
-        NO_SUCH_ATTRIBUTE       ("0x10", ChaiError.NO_SUCH_ATTRIBUTE,             true, false),
-        INTRUDER_LOCKOUT        ("80090308", ChaiError.INTRUDER_LOCKOUT,          true, true, "775"),
-        FAILED_AUTHENTICATION   ("80090308", ChaiError.FAILED_AUTHENTICATION,     true, true),
-        BAD_PASSWORD            ("19",     ChaiError.PASSWORD_BADPASSWORD,        true, true),
+        UNKNOWN                 ("-999",                ChaiError.UNKNOWN,                      true, false),
+        NO_SUCH_OBJECT          ("0x20",                ChaiError.NO_SUCH_ENTRY,                true, false),
+        NO_SUCH_ATTRIBUTE       ("0x10",                ChaiError.NO_SUCH_ATTRIBUTE,            true, false),
+        INTRUDER_LOCKOUT        ("80090308",            ChaiError.INTRUDER_LOCKOUT,             true, true, "775"),
+        FAILED_AUTHENTICATION   ("80090308",            ChaiError.FAILED_AUTHENTICATION,        true, true, "52e"),
+        TOO_SOON                ("1005",                ChaiError.PASSWORD_TOO_SOON,            true, true, "9005a"),
+        BAD_PASSWORD            ("error code 19",       ChaiError.PASSWORD_BADPASSWORD,         true, true),
         ;
 
         private String errorCodeString;

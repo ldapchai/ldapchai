@@ -192,4 +192,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return false;
     }
 
+    public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
+        return null;
+    }
 }

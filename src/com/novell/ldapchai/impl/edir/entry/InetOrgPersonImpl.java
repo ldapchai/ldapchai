@@ -280,4 +280,9 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
         return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
     }
+
+    public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
+        return this.readDateAttribute("pwdChangedTime");
+    }
+
 }

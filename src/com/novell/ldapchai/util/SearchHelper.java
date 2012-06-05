@@ -669,7 +669,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
         public String toString()
         {
-            return attr + matchingRule.getMatchCode() + value;
+            return "(" + attr + matchingRule.getMatchCode() + value + ")";
         }
     }
 }

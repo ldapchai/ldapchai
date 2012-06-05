@@ -424,7 +424,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
             String loopResponseText = rs.caseInsensitive ? rs.crMap.get(loopChallenge).toLowerCase() : rs.crMap.get(loopChallenge);
 
             final Element loopElement = new Element(XML_NODE_RESPONSE);
-            loopElement.addContent(new Element(XML_NODE_CHALLENGE).addContent(new CDATA(loopChallenge.getChallengeText())));
+            loopElement.addContent(new Element(XML_NODE_CHALLENGE).addContent(new Text(loopChallenge.getChallengeText())));
 
             {
                 final Element contentElement = new Element(XML_NODE_ANSWER_VALUE);
@@ -446,7 +446,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
                             final MessageDigest md = MessageDigest.getInstance("SHA1");
                             final byte[] hashedAnswer = md.digest((loopResponseText).getBytes());
                             final String encodedAnswer = Base64Util.encodeBytes(hashedAnswer);
-                            contentElement.addContent(new CDATA(encodedAnswer));
+                            contentElement.addContent(new Text(encodedAnswer));
                         } catch (NoSuchAlgorithmException e) {
                             LOGGER.warn("error while hashing Chai SHA1 response: " + e.getMessage());
                         }
@@ -465,8 +465,10 @@ public class ChaiResponseSet extends AbstractResponseSet {
 
         final Document doc = new Document(rootElement);
         final XMLOutputter outputter = new XMLOutputter();
-        outputter.setFormat(Format.getCompactFormat().setTextMode(Format.TextMode.NORMALIZE));
-
+        final Format format = Format.getCompactFormat();
+        format.setTextMode(Format.TextMode.NORMALIZE);
+        format.setLineSeparator("");
+        outputter.setFormat(format);
         return outputter.outputString(doc);
     }
 

@@ -20,6 +20,7 @@
 package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.*;
+import com.novell.ldapchai.exception.ChaiErrors;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -147,7 +148,13 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         } catch (UnsupportedEncodingException e) {
             throw new IllegalStateException("unexpected error, missing 'UTF-16LE' character encoder",e);
         }
-        replaceBinaryAttribute("unicodePwd", littleEndianEncodedOldPwd, littleEndianEncodedNewPwd);
+
+        try {
+            replaceBinaryAttribute("unicodePwd", littleEndianEncodedOldPwd, littleEndianEncodedNewPwd);
+        } catch (ChaiOperationException e) {
+            throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+        }
+
     }
 
     public void expirePassword()
@@ -182,10 +189,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
                 recursionCount++;
             }
 
-            Date futureUnlockTime = new Date(lockoutTime.getTime() + lockoutDurationMs);
+            final Date futureUnlockTime = new Date(lockoutTime.getTime() + lockoutDurationMs);
             return System.currentTimeMillis() <= futureUnlockTime.getTime();
         }
         return false;
+    }
+
+    public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
+        return this.readDateAttribute("pwdLastSet");
     }
 
     public Date readPasswordExpirationDate()
