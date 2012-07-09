@@ -172,7 +172,7 @@ class FailOverWrapper implements InvocationHandler {
             try {
                 return AbstractWrapper.invoker(currentProvider, m, args);
             } catch (Exception e) {
-                if (settings.errorIsRetryable(e)) {
+                if (settings.errorIsRetryable(e) && !closed) {
                     rotationMachine.reportBrokenProvider(currentProvider);
                 } else {
                     if (e instanceof ChaiOperationException) {

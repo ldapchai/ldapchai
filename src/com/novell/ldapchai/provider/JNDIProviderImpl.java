@@ -472,7 +472,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         NamingEnumeration attrEnumeration = null;
 
         try {
-            if (attributes.isEmpty()) {
+            if (attributes == null || attributes.isEmpty()) {
                 returnedAttribs = ldapConnection.getAttributes(entryDN, null);
                 attrEnumeration = returnedAttribs.getAll();
                 while (attrEnumeration.hasMoreElements()) {

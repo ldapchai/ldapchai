@@ -19,6 +19,9 @@
 
 package com.novell.ldapchai.provider;
 
+import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -132,6 +135,36 @@ class WatchdogWrapper implements InvocationHandler {
         setting_idleTimeout = Integer.parseInt(originalProviderConfig.getSetting(ChaiSetting.WATCHDOG_IDLE_TIMEOUT));
 
         watchdogManager.registerInstance(this);
+
+        checkForPwExpiration();
+    }
+
+    private void checkForPwExpiration()
+
+    {
+        final boolean doPwExpCheck = realProvider.getChaiConfiguration().getBooleanSetting(ChaiSetting.WATCHDOG_DISABLE_IF_PW_EXPIRED);
+        if (!doPwExpCheck) {
+            return;
+        }
+
+        LOGGER.trace("checking for user password expiration to adjust watchdog timeout");
+
+        final boolean userPwExpired;
+        try {
+            final String bindUserDN = realProvider.getChaiConfiguration().getSetting(ChaiSetting.BIND_DN);
+            final ChaiUser bindUser = ChaiFactory.createChaiUser(bindUserDN, realProvider);
+            userPwExpired = bindUser.isPasswordExpired();
+        } catch (ChaiException e) {
+            LOGGER.error("unexpected error attempting to read user password expiration value during watchdog initialization: " + e.getMessage(),e);
+            return;
+        }
+
+        if (userPwExpired) {
+            LOGGER.info("connection user account password is currently expired.  Disabling watchdog timeout.");
+            setting_idleTimeout = Integer.MAX_VALUE;
+        } else {
+            setting_idleTimeout = realProvider.getChaiConfiguration().getIntSetting(ChaiSetting.WATCHDOG_IDLE_TIMEOUT);
+        }
     }
 
 // ------------------------ CANONICAL METHODS ------------------------
@@ -166,6 +199,7 @@ class WatchdogWrapper implements InvocationHandler {
             return AbstractWrapper.invoker(originalProvider, method, args);
         }
 
+        final Object returnObject;
         try {
             outstandingOperations++;
             lastBeginTimestamp = System.currentTimeMillis();
@@ -175,7 +209,7 @@ class WatchdogWrapper implements InvocationHandler {
                 lastBeginTimestamp = System.currentTimeMillis();
             }
 
-            return AbstractWrapper.invoker(realProvider, method, args);
+            returnObject = AbstractWrapper.invoker(realProvider, method, args);
         } catch (Exception e) {
             if (e instanceof ChaiOperationException) {
                 throw (ChaiOperationException) e;
@@ -189,6 +223,13 @@ class WatchdogWrapper implements InvocationHandler {
             outstandingOperations--;
             lastFinishTimestamp = System.currentTimeMillis();
         }
+
+
+        if ("setPassword".equals(method.getName()) || "setPassword".equals(method.getName())) {
+            checkForPwExpiration();
+        }
+
+        return returnObject;
     }
 
 // -------------------------- OTHER METHODS --------------------------
