@@ -304,6 +304,10 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         {
         }
 
+        public boolean isConnected() {
+            return false;
+        }
+
         public ProviderStatistics getProviderStatistics()
         {
             return null;

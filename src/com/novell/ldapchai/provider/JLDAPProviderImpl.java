@@ -592,4 +592,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         return Collections.unmodifiableMap(returnMap);
     }
+
+    public boolean isConnected() {
+        return ldapConnection != null && ldapConnection.isConnected();
+    }
 }

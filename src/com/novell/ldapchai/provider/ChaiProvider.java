@@ -482,6 +482,11 @@ public interface ChaiProvider {
     @ChaiProviderImplementor.ModifyOperation
     void replaceBinaryAttribute(String entryDN, String attributeName, byte[] oldValue, byte[] newValue)
             throws ChaiUnavailableException, ChaiOperationException;
-    
+
+    /**
+     * Indicates if the provider has a current, active connection to the ldap directory.
+     * @return true if the connection has a valid, active connection to the ldap directory.
+     */
+    boolean isConnected();
 }
 

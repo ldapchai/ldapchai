@@ -988,4 +988,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         return super.errorIsRetryable(e);
     }
+
+    public boolean isConnected() {
+        return jndiConnection != null;
+    }
 }

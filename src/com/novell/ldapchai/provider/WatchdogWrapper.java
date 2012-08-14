@@ -193,6 +193,13 @@ class WatchdogWrapper implements InvocationHandler {
             return Void.TYPE;
         }
 
+        if (method.getName().equals("isConnected")) {
+            if (wdStatus != STATUS.ACTIVE) {
+                return false;
+            }
+        }
+
+
         final boolean isLdap = method.getAnnotation(ChaiProviderImplementor.LdapOperation.class) != null;
 
         if (wdStatus == STATUS.CLOSED || !isLdap) {
