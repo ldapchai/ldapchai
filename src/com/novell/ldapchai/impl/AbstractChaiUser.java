@@ -195,4 +195,8 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
         return null;
     }
+
+    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
+        return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
+    }
 }

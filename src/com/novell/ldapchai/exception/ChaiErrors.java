@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.exception;
 
+import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public final class ChaiErrors {
 
     static {
         for (final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values()) {
-            errorMaps.put(vendor,vendor.getErrorMap());
+            errorMaps.put(vendor, ChaiFactory.getErrorMap(vendor));
         }
     }
 

@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.directoryServer389.entry;
+package com.novell.ldapchai.impl.openldap.entry;
 
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
@@ -26,48 +26,36 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-import java.util.Date;
+class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
+{
 
-class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
-    public DirectoryServer389User(final String userDN, final ChaiProvider chaiProvider) {
+    public OpenLDAPUser(String userDN, ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
     }
 
-    @Override
     public void setPassword(final String newPassword)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
+            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword));
+        } catch (javax.naming.NamingException e) {
+            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         } catch (ChaiOperationException e) {
             throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         }
     }
 
-    @Override
-    public void changePassword(final String oldPassword, final String newPassword) throws
-            ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
+    public void changePassword(final String oldPassword, final String newPassword)
+            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
+            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword));
+        } catch (javax.naming.NamingException e) {
+            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         } catch (ChaiOperationException e) {
             throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         }
     }
 
-    @Override
-    public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
-        return readDateAttribute(ATTR_PASSWORD_EXPIRE_TIME);
-    }
 
-    @Override
-    public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
-        final Date expireDate = readPasswordExpirationDate();
-
-        if (expireDate == null) {
-            return false;
-        }
-
-        return expireDate.before(new Date());
-    }
 }

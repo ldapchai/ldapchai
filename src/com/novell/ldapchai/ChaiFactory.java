@@ -20,10 +20,12 @@
 package com.novell.ldapchai;
 
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.ad.entry.ADEntryFactory;
 import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389EntryFactory;
 import com.novell.ldapchai.impl.edir.entry.EdirEntryFactory;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
+import com.novell.ldapchai.impl.openldap.entry.OpenLDAPEntryFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -57,6 +59,7 @@ public final class ChaiFactory {
         ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY, new ADEntryFactory());
         ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389, new DirectoryServer389EntryFactory());
         ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.GENERIC, new GenericEntryFactory());
+        ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP, new OpenLDAPEntryFactory());
     }
 // -------------------------- STATIC METHODS --------------------------
 
@@ -106,6 +109,33 @@ public final class ChaiFactory {
     }
 
     /**
+     * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
+     *
+     * @param provider A valid and functioning {@code ChaiProvider}.  The {@code ChaiProvider}'s ldap
+     *                 connection will be used by the {@code ChaiGroup}.
+     * @return A valid {@code ChaiUser}
+     */
+    public static ErrorMap getErrorMap(final ChaiProvider provider)
+            throws ChaiUnavailableException
+    {
+        final ChaiEntryFactory entryFactory = getChaiEntryFactory(provider.getDirectoryVendor());
+        return entryFactory.getErrorMap();
+    }
+
+    /**
+     * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
+     *
+     * @param vendor A valid and functioning {@code ChaiProvider}.  The {@code ChaiProvider}'s ldap
+     *                 connection will be used by the {@code ChaiGroup}.
+     * @return A valid {@code ChaiUser}
+     */
+    public static ErrorMap getErrorMap(final ChaiProvider.DIRECTORY_VENDOR vendor)
+    {
+        final ChaiEntryFactory entryFactory = getChaiEntryFactory(vendor);
+        return entryFactory.getErrorMap();
+    }
+
+    /**
      * Convenience method for {@link com.novell.ldapchai.provider.ChaiProviderFactory#quickProvider(String,String,String)}.
      * <p/>
      * Get a ChaiUser using a standard JNDI ChaiProvider with default settings.
@@ -145,6 +175,8 @@ public final class ChaiFactory {
         ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider);
 
         ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor();
+
+        ErrorMap getErrorMap();
     }
 }
 

@@ -21,6 +21,8 @@ package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 /**
@@ -31,6 +33,8 @@ import com.novell.ldapchai.provider.ChaiProvider;
  * be used directly.  Instead, use {@link ChaiFactory}.
  */
 public class EdirEntryFactory implements ChaiFactory.ChaiEntryFactory {
+
+    private static ErrorMap errorMap;
 
     public InetOrgPerson createChaiUser(final String userDN, final ChaiProvider chaiProvider) {
         return new InetOrgPersonImpl(userDN, chaiProvider);
@@ -46,5 +50,12 @@ public class EdirEntryFactory implements ChaiFactory.ChaiEntryFactory {
 
     public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
         return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
+    }
+
+    public ErrorMap getErrorMap() {
+        if (errorMap == null) {
+            errorMap = new EdirErrorMap();
+        }
+        return errorMap;
     }
 }

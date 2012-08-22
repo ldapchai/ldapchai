@@ -107,22 +107,11 @@ public interface ChaiProvider {
     }
 
     public static enum DIRECTORY_VENDOR {
-        GENERIC(new EdirErrorMap()),
-        NOVELL_EDIRECTORY(new EdirErrorMap()),
-        MICROSOFT_ACTIVE_DIRECTORY(new ADErrorMap()),
-        OPEN_LDAP(new EdirErrorMap()),
-        DIRECTORY_SERVER_389(new EdirErrorMap())
-        ;
-
-        private final ErrorMap errorMap;
-
-        DIRECTORY_VENDOR(final ErrorMap errorMap) {
-            this.errorMap = errorMap;
-        }
-
-        public ErrorMap getErrorMap() {
-            return errorMap;
-        }
+        GENERIC,
+        NOVELL_EDIRECTORY,
+        MICROSOFT_ACTIVE_DIRECTORY,
+        OPEN_LDAP,
+        DIRECTORY_SERVER_389,
     }
 
 // -------------------------- OTHER METHODS --------------------------

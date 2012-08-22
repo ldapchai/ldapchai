@@ -17,38 +17,39 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.ad.entry;
+package com.novell.ldapchai.impl.openldap.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.impl.ad.ADErrorMap;
+import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class ADEntryFactory implements ChaiFactory.ChaiEntryFactory {
+public class OpenLDAPEntryFactory implements ChaiFactory.ChaiEntryFactory {
 
     private static ErrorMap errorMap;
 
-    public User createChaiUser(final String userDN, final ChaiProvider chaiProvider) {
-        return new UserImpl(userDN, chaiProvider);
+    public ChaiUser createChaiUser(final String entryDN, final ChaiProvider provider) {
+        return new OpenLDAPUser(entryDN, provider);
     }
 
     public ChaiGroup createChaiGroup(final String entryDN, final ChaiProvider provider) {
-        return new GroupImpl(entryDN, provider);
+        return new OpenLDAPGroup(entryDN, provider);
     }
 
     public ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider) {
-        return new TopImpl(entryDN, provider);
+        return new OpenLDAPEntry(entryDN, provider);
     }
 
     public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
-        return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
+        return ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP;
     }
 
     public ErrorMap getErrorMap() {
         if (errorMap == null) {
-            errorMap = new ADErrorMap();
+            errorMap = new EdirErrorMap();
         }
         return errorMap;
     }

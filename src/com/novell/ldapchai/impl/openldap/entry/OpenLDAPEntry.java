@@ -17,16 +17,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.generic.entry;
+package com.novell.ldapchai.impl.openldap.entry;
 
-import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.impl.AbstractChaiUser;
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-class GenericChaiUser extends AbstractChaiUser implements ChaiUser {
-    public GenericChaiUser(final String userDN, final ChaiProvider chaiProvider) {
-        super(userDN, chaiProvider);
+class OpenLDAPEntry extends AbstractChaiEntry implements ChaiEntry {
+    public OpenLDAPEntry(String entryDN, ChaiProvider chaiProvider) {
+        super(entryDN, chaiProvider);
     }
 }
