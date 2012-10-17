@@ -440,9 +440,7 @@ public class SearchHelper implements Serializable, Cloneable {
             sb.append("(");
             sb.append(operator);
             for (final FilterSequence sequence : filterSequences) {
-                sb.append("(");
                 sb.append(sequence.toString());
-                sb.append(")");
             }
             sb.append(")");
         } else {
