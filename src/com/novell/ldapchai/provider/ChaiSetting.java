@@ -451,6 +451,16 @@ public enum ChaiSetting {
      */
     CR_CHAI_STORAGE_RECORD_ID("chai.cr.chai.recordId", "0002", true, null),
 
+    /**
+     * Setting key to control the number of iterations to perform the CR Salt when the
+     * format type is set to {@link com.novell.ldapchai.cr.ChaiResponseSet.FormatType#SHA1_SALT}
+     * <p/>
+     * <i>Default: </i><b>1000</b>
+     *
+     * @see com.novell.ldapchai.cr.ChaiResponseSet
+     * @see com.novell.ldapchai.util.ConfigObjectRecord
+     */
+    CR_CHAI_SALT_COUNT("chai.cr.chai.saltCount", "1000", true, Validator.INTEGER_VALIDATOR),
 
 
     ;

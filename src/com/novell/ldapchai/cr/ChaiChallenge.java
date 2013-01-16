@@ -101,7 +101,7 @@ public class ChaiChallenge implements Challenge, Serializable {
 // ------------------------ CANONICAL METHODS ------------------------
 
     /**
-     * Tests for equality of Challenges.  Challenges are equal when the following elements of a chellenge are equal:
+     * Tests for equality of Challenges.  Challenges are equal when the following elements of a challenge are equal:
      * <ul>
      *   <li>admin defined</li>
      *   <li>maximum length</li>

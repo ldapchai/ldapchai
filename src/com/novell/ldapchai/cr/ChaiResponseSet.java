@@ -28,7 +28,6 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
-import com.novell.ldapchai.util.internal.Base64Util;
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -36,9 +35,6 @@ import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -50,55 +46,43 @@ public class ChaiResponseSet extends AbstractResponseSet {
 // -------------------------- ENUMERATIONS --------------------------
 
     public static enum FormatType {
-        TEXT("TEXT"),
-        SHA1("SHA1"),
-        SHA1_SALT("SHA1_SALT");
-
-        private final String format;
-
-        private FormatType(final String format)
-        {
-            this.format = format;
-        }
-
-        public String toString()
-        {
-            return format;
-        }
+        TEXT,
+        SHA1,
+        SHA1_SALT,
+        ;
     }
 
 // ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiResponseSet.class.getName());
 
-    private static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final String SALT_SEPARATOR = "___";
+    static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    private final static String XML_NODE_ROOT = "ResponseSet";
-    private final static String XML_ATTRIBUTE_MIN_RANDOM_REQUIRED = "minRandomRequired";
-    private final static String XML_ATTRIBUTE_LOCALE = "locale";
+    final static String XML_NODE_ROOT = "ResponseSet";
+    final static String XML_ATTRIBUTE_MIN_RANDOM_REQUIRED = "minRandomRequired";
+    final static String XML_ATTRIBUTE_LOCALE = "locale";
 
-    private final static String XML_NODE_RESPONSE = "response";
-    private final static String XML_NODE_CHALLENGE = "challenge";
-    private final static String XML_NODE_ANSWER_VALUE = "answer";
+    final static String XML_NODE_RESPONSE = "response";
+    final static String XML_NODE_CHALLENGE = "challenge";
+    final static String XML_NODE_ANSWER_VALUE = "answer";
 
-    private final static String XML_ATTRIBUTE_VERSION = "version";
-    private final static String XML_ATTRIBUTE_CHAI_VERSION = "chaiVersion";
-    private final static String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
-    private final static String XML_ATTRIBUTE_REQUIRED = "required";
-    private final static String XNL_ATTRIBUTE_CONTENT_FORMAT = "format";
-    private final static String XML_ATTRIBUTE_SALT = "salt";
-    private final static String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
-    private final static String XNL_ATTRIBUTE_MAX_LENGTH = "maxLength";
-    private final static String XML_ATTRIBUTE_CASE_INSENSITIVE = "caseInsensitive";
-    private final static String XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER = "challengeSetID"; // identifier from challenge set.
-    private final static String XML_ATTRIBUTE_TIMESTAMP = "time";
+    final static String XML_ATTRIBUTE_VERSION = "version";
+    final static String XML_ATTRIBUTE_CHAI_VERSION = "chaiVersion";
+    final static String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
+    final static String XML_ATTRIBUTE_REQUIRED = "required";
+    final static String XML_ATTRIBUTE_SALT_COUNT = "saltcount";
+    final static String XNL_ATTRIBUTE_CONTENT_FORMAT = "format";
+    final static String XML_ATTRIBUTE_SALT = "salt";
+    final static String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
+    final static String XNL_ATTRIBUTE_MAX_LENGTH = "maxLength";
+    final static String XML_ATTRIBUTE_CASE_INSENSITIVE = "caseInsensitive";
+    final static String XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER = "challengeSetID"; // identifier from challenge set.
+    final static String XML_ATTRIBUTE_TIMESTAMP = "time";
 
-    private final static String VALUE_VERSION = "2";
+    final static String VALUE_VERSION = "2";
 
-    private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
-    private final FormatType formatType;
     private final boolean caseInsensitive;
 
     static {
@@ -126,8 +110,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
             return null;
         }
 
-        returnVal.isValid();
-
         return returnVal;
     }
 
@@ -138,10 +120,9 @@ public class ChaiResponseSet extends AbstractResponseSet {
             return null;
         }
 
-        final Map<Challenge, String> crMap = new LinkedHashMap<Challenge, String>();
+        final Map<Challenge, Answer> crMap = new LinkedHashMap<Challenge, Answer>();
         int minRandRequired = 0;
         Attribute localeAttr = null;
-        ChaiResponseSet.FormatType respFormat = ChaiResponseSet.FormatType.TEXT;
         boolean caseInsensitive = false;
         String csIdentifier = null;
         Date timestamp = null;
@@ -180,25 +161,31 @@ public class ChaiResponseSet extends AbstractResponseSet {
             }
 
             for (final Object o : rootElement.getChildren()) {
-                final Element loopElement = (Element) o;
+                final Element loopResponseElement = (Element) o;
 
-                final boolean required = loopElement.getAttribute(XML_ATTRIBUTE_REQUIRED).getBooleanValue();
-                final boolean adminDefined = loopElement.getAttribute(XML_ATTRIBUTE_ADMIN_DEFINED).getBooleanValue();
+                final boolean required = loopResponseElement.getAttribute(XML_ATTRIBUTE_REQUIRED).getBooleanValue();
+                final boolean adminDefined = loopResponseElement.getAttribute(XML_ATTRIBUTE_ADMIN_DEFINED).getBooleanValue();
 
-                final String challengeText = loopElement.getChild(XML_NODE_CHALLENGE).getText();
-                final int minLength = loopElement.getAttribute(XNL_ATTRIBUTE_MIN_LENGTH).getIntValue();
-                final int maxLength = loopElement.getAttribute(XNL_ATTRIBUTE_MAX_LENGTH).getIntValue();
+                final String challengeText = loopResponseElement.getChild(XML_NODE_CHALLENGE).getText();
+                final int minLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MIN_LENGTH).getIntValue();
+                final int maxLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MAX_LENGTH).getIntValue();
 
+                final Element answerElement = loopResponseElement.getChild(XML_NODE_ANSWER_VALUE);
+                final String formatStr = answerElement.getAttribute(XNL_ATTRIBUTE_CONTENT_FORMAT).getValue();
+                final FormatType respFormat = ChaiResponseSet.FormatType.valueOf(formatStr);
+                final Answer answer;
+                switch (respFormat) {
+                    case SHA1_SALT:
+                    case SHA1:
+                        answer = Sha1SaltAnswer.fromXml(answerElement,caseInsensitive);
+                        break;
+                    case TEXT:
+                        answer = TextAnswer.fromXml(answerElement,caseInsensitive);
+                        break;
+                    default:
+                        answer = null;
 
-                final String format = loopElement.getChild(XML_NODE_ANSWER_VALUE).getAttribute(XNL_ATTRIBUTE_CONTENT_FORMAT).getValue();
-                respFormat = ChaiResponseSet.FormatType.valueOf(format);
-
-                String answer = loopElement.getChild(XML_NODE_ANSWER_VALUE).getText();
-                if (respFormat == FormatType.SHA1_SALT) {
-                    final String salt = loopElement.getChild(XML_NODE_ANSWER_VALUE).getAttribute(XML_ATTRIBUTE_SALT).getValue();
-                    answer = salt + SALT_SEPARATOR + answer;
                 }
-
                 final Challenge newChallenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
                 crMap.put(newChallenge, answer);
             }
@@ -220,7 +207,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
                 challengeLocale,
                 minRandRequired,
                 STATE.READ,
-                respFormat,
                 caseInsensitive,
                 csIdentifier,
                 timestamp);
@@ -229,11 +215,10 @@ public class ChaiResponseSet extends AbstractResponseSet {
 // --------------------------- CONSTRUCTORS ---------------------------
 
     ChaiResponseSet(
-            final Map<Challenge, String> crMap,
+            final Map<Challenge, Answer> crMap,
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
-            final FormatType formatType,
             final boolean caseInsensitive,
             final String csIdentifer,
             final Date timestamp
@@ -241,7 +226,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
             throws ChaiValidationException
     {
         super(crMap, locale, minimumRandomRequired, state, csIdentifer);
-        this.formatType = formatType == null ? FormatType.SHA1_SALT : formatType;
         this.caseInsensitive = caseInsensitive;
         this.timestamp = timestamp;
     }
@@ -252,7 +236,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
     {
         final StringBuilder sb = new StringBuilder(super.toString());
         sb.append(", format(");
-        sb.append(this.formatType);
         sb.append(")");
         return sb.toString();
     }
@@ -297,7 +280,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
         for (final Challenge loopChallenge : this.crMap.keySet()) {
             final String proposedResponse = testResponses.get(loopChallenge);
 
-            final boolean correct = testRepsonse(crMap.get(loopChallenge), proposedResponse);
+            final boolean correct = crMap.get(loopChallenge).testAnswer(proposedResponse);
 
             if (correct && !loopChallenge.isRequired()) {
                 correctRandoms++;
@@ -313,56 +296,6 @@ public class ChaiResponseSet extends AbstractResponseSet {
 
 // -------------------------- OTHER METHODS --------------------------
 
-    private boolean testRepsonse(String actualResponse, String testResponse)
-    {
-        if (testResponse == null) {
-            return false;
-        }
-
-        if (caseInsensitive) {
-            testResponse = testResponse.toLowerCase();
-        }
-
-        switch (formatType) {
-            case SHA1_SALT:
-                // move the salt from the actual password (put there temporarily when read from XML)
-                // to the test response
-
-                if (actualResponse.contains(SALT_SEPARATOR)) {
-                    final String salt = actualResponse.split(SALT_SEPARATOR)[0];
-                    actualResponse = actualResponse.split(SALT_SEPARATOR)[1];
-                    testResponse = salt + testResponse;
-                }
-
-                // continue on with sha1 method
-
-            case SHA1:
-                try {
-                    final String encryptedTestResponse = hashValue(testResponse);
-                    if (actualResponse.equals(encryptedTestResponse)) {
-                        return true;
-                    }
-                } catch (NoSuchAlgorithmException e) {
-                    LOGGER.warn("error encoding hash for answer: \"" + e.getMessage() + "\"");
-                }
-                break;
-
-            case TEXT:
-                if (actualResponse.equals(testResponse)) {
-                    return true;
-                }
-                break;
-        }
-        return false;
-    }
-
-    private static String hashValue(final String rawResponse)
-            throws NoSuchAlgorithmException
-    {
-        final MessageDigest md = MessageDigest.getInstance("SHA1");
-        final byte[] hashedAnswer = md.digest(rawResponse.getBytes());
-        return Base64Util.encodeBytes(hashedAnswer);
-    }
 
     boolean write(final ChaiUser user)
             throws ChaiUnavailableException, ChaiOperationException
@@ -421,46 +354,15 @@ public class ChaiResponseSet extends AbstractResponseSet {
         }
 
         for (final Challenge loopChallenge : rs.crMap.keySet()) {
-            String loopResponseText = rs.caseInsensitive ? rs.crMap.get(loopChallenge).toLowerCase() : rs.crMap.get(loopChallenge);
-
-            final Element loopElement = new Element(XML_NODE_RESPONSE);
-            loopElement.addContent(new Element(XML_NODE_CHALLENGE).addContent(new Text(loopChallenge.getChallengeText())));
-
-            {
-                final Element contentElement = new Element(XML_NODE_ANSWER_VALUE);
-                contentElement.setAttribute(XNL_ATTRIBUTE_CONTENT_FORMAT, rs.formatType.toString());
-                switch (rs.formatType) {
-                    case TEXT:
-                        contentElement.addContent(new CDATA(loopResponseText));
-                        break;
-
-                    case SHA1_SALT:
-                        // generate salt, prepend the salt to the answer, and store the salt as an attr in the xml
-                        final String salt = generateSalt(32);
-                        loopResponseText = salt + loopResponseText;
-                        contentElement.setAttribute(XML_ATTRIBUTE_SALT, salt);
-                        // continue on to SHA1 storage.
-
-                    case SHA1:
-                        try {
-                            final MessageDigest md = MessageDigest.getInstance("SHA1");
-                            final byte[] hashedAnswer = md.digest((loopResponseText).getBytes());
-                            final String encodedAnswer = Base64Util.encodeBytes(hashedAnswer);
-                            contentElement.addContent(new Text(encodedAnswer));
-                        } catch (NoSuchAlgorithmException e) {
-                            LOGGER.warn("error while hashing Chai SHA1 response: " + e.getMessage());
-                        }
-                }
-
-                loopElement.addContent(contentElement);
-            }
-
-            loopElement.setAttribute(XML_ATTRIBUTE_ADMIN_DEFINED, String.valueOf(loopChallenge.isAdminDefined()));
-            loopElement.setAttribute(XML_ATTRIBUTE_REQUIRED, String.valueOf(loopChallenge.isRequired()));
-            loopElement.setAttribute(XNL_ATTRIBUTE_MIN_LENGTH, String.valueOf(loopChallenge.getMinLength()));
-            loopElement.setAttribute(XNL_ATTRIBUTE_MAX_LENGTH, String.valueOf(loopChallenge.getMaxLength()));
-
-            rootElement.addContent(loopElement);
+            final Element responseElement = new Element(XML_NODE_RESPONSE);
+            responseElement.addContent(new Element(XML_NODE_CHALLENGE).addContent(new Text(loopChallenge.getChallengeText())));
+            final Element answerElement = rs.crMap.get(loopChallenge).toXml();
+            responseElement.addContent(answerElement);
+            responseElement.setAttribute(XML_ATTRIBUTE_ADMIN_DEFINED, String.valueOf(loopChallenge.isAdminDefined()));
+            responseElement.setAttribute(XML_ATTRIBUTE_REQUIRED, String.valueOf(loopChallenge.isRequired()));
+            responseElement.setAttribute(XNL_ATTRIBUTE_MIN_LENGTH, String.valueOf(loopChallenge.getMinLength()));
+            responseElement.setAttribute(XNL_ATTRIBUTE_MAX_LENGTH, String.valueOf(loopChallenge.getMaxLength()));
+            rootElement.addContent(responseElement);
         }
 
         final Document doc = new Document(rootElement);
@@ -470,15 +372,5 @@ public class ChaiResponseSet extends AbstractResponseSet {
         format.setLineSeparator("");
         outputter.setFormat(format);
         return outputter.outputString(doc);
-    }
-
-    private static String generateSalt(final int length)
-    {
-        final SecureRandom random = new SecureRandom();
-        final StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            sb.append(SALT_CHARS.charAt(random.nextInt(SALT_CHARS.length())));
-        }
-        return sb.toString();
     }
 }

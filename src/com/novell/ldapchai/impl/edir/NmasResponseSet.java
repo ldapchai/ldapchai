@@ -202,7 +202,7 @@ public class NmasResponseSet extends AbstractResponseSet {
     )
             throws ChaiValidationException
     {
-        super(crMap, locale, minimumRandomRequired, state, csIdentifier);
+        super(convertAnswerTextMap(crMap), locale, minimumRandomRequired, state, csIdentifier);
         this.user = user;
     }
 
@@ -264,7 +264,7 @@ public class NmasResponseSet extends AbstractResponseSet {
         //write responses
         for (final Challenge loopChallenge : crMap.keySet()) {
             try {
-                final byte[] data = crMap.get(loopChallenge).getBytes("UTF8");
+                final byte[] data = ((NmasAnswer)crMap.get(loopChallenge)).getAnswerText().getBytes("UTF8");
                 final PutLoginSecretRequest request = new PutLoginSecretRequest();
                 request.setObjectDN(user.getEntryDN());
                 request.setData(data);
@@ -403,5 +403,34 @@ public class NmasResponseSet extends AbstractResponseSet {
         return outputter.outputString(rootElement);
     }
 
+    private static Map<Challenge,Answer> convertAnswerTextMap(final Map<Challenge,String> crMap) {
+        final Map<Challenge,Answer> returnMap = new LinkedHashMap<Challenge,Answer>();
+        for (final Challenge challenge : crMap.keySet()) {
+            final String answerText = crMap.get(challenge);
+            returnMap.put(challenge,new NmasAnswer(answerText));
+        }
+        return returnMap;
+    }
+
+    private static class NmasAnswer implements Answer {
+        private String answerText;
+
+        private NmasAnswer(String answerText) {
+            this.answerText = answerText;
+        }
+
+        public String getAnswerText() {
+            return answerText;
+        }
+
+        public boolean testAnswer(String answer) {
+            //@todo TODO
+            throw new UnsupportedOperationException("NMAS Response testing not yet implemented");
+        }
+
+        public Element toXml() {
+            return null;
+        }
+    }
 }
 

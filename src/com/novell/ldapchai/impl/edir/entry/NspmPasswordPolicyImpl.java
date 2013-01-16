@@ -57,6 +57,17 @@ import java.util.*;
  */
 class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
 
+    static final Collection<String> LDAP_PASSWORD_ATTRIBUTES;
+
+    static {
+        final ArrayList<String> ldapPasswordAttributes = new ArrayList<String>();
+        for (final Attribute attribute : Attribute.values()) {
+            ldapPasswordAttributes.add(attribute.getLdapAttribute());
+        }
+        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableCollection(ldapPasswordAttributes);
+    }
+
+
     private final Map<String, String> ruleMap = new HashMap<String, String>();
     private final Map<String, List<String>> allEntryValues = new HashMap<String, List<String>>();
 
@@ -69,6 +80,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setFilter(SearchHelper.DEFAULT_FILTER);
         searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
+        searchHelper.setAttributes(LDAP_PASSWORD_ATTRIBUTES);
 
         final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues(getEntryDN(), searchHelper);
         final Map<String, List<String>> results = bigResults.get(this.getEntryDN());

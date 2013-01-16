@@ -20,6 +20,7 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
@@ -70,8 +71,9 @@ public final class ChaiCrFactory {
             throws ChaiValidationException
     {
         final boolean caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
-        final ChaiResponseSet.FormatType formatType = ChaiResponseSet.FormatType.valueOf(chaiConfiguration.getSetting(ChaiSetting.CR_DEFAULT_FORMAT_TYPE));
-        return new ChaiResponseSet(challengeResponseMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, formatType, caseInsensitive, csIdentifier, new Date());
+        validateAnswers(challengeResponseMap,chaiConfiguration);
+        final Map<Challenge,Answer> answerMap = makeAnswerMap(challengeResponseMap, chaiConfiguration);
+        return new ChaiResponseSet(answerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date());
     }
 
     public static boolean writeChaiResponseSet(
@@ -83,9 +85,68 @@ public final class ChaiCrFactory {
         return chaiResponseSet.write(chaiUser);
     }
 
+    private static Map<Challenge,Answer> makeAnswerMap(final Map<Challenge, String> crMap, final ChaiConfiguration chaiConfiguration) {
+        final ChaiResponseSet.FormatType formatType = ChaiResponseSet.FormatType.valueOf(chaiConfiguration.getSetting(ChaiSetting.CR_DEFAULT_FORMAT_TYPE));
+        final boolean caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
+        final Map<Challenge,Answer> answerMap = new LinkedHashMap<Challenge, Answer>();
+        for (final Challenge challenge : crMap.keySet()) {
+            final String answerText = crMap.get(challenge);
+            final Answer answer;
+            switch (formatType) {
+                case SHA1_SALT:
+                case SHA1:
+                    final int saltCount = Integer.parseInt(chaiConfiguration.getSetting(ChaiSetting.CR_CHAI_SALT_COUNT));
+                    answer = Sha1SaltAnswer.newResponse(answerText,saltCount,caseInsensitive);
+                    break;
+                case TEXT:
+                default:
+                    answer = TextAnswer.newResponse(answerText,caseInsensitive);
+            }
+            answerMap.put(challenge,answer);
+        }
+        return answerMap;
+    }
 
+    private static void validateAnswers(final Map<Challenge, String> crMap, final ChaiConfiguration chaiConfiguration)
+            throws ChaiValidationException
+    {
+        final boolean allowDuplicates = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_ALLOW_DUPLICATE_RESPONSES);
+        for (final Challenge loopChallenge : crMap.keySet()) {
+            final String answerText = crMap.get(loopChallenge);
 
+            if (loopChallenge.getChallengeText() == null || loopChallenge.getChallengeText().length() < 1) {
+                throw new ChaiValidationException("challenge text missing for challenge", ChaiError.CR_MISSING_REQUIRED_CHALLENGE_TEXT);
+            }
 
+            if (answerText == null || answerText.length() < 1) {
+                final String errorString = "response text missing for challenge '" + loopChallenge.getChallengeText() + "'";
+                throw new ChaiValidationException(errorString, ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT,loopChallenge.getChallengeText());
+            }
+
+            if (answerText.length() < loopChallenge.getMinLength()) {
+                final String errorString = "response text is too short for challenge '" + loopChallenge.getChallengeText() + "'";
+                throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_SHORT,loopChallenge.getChallengeText());
+            }
+
+            if (answerText.length() > loopChallenge.getMaxLength()) {
+                final String errorString = "response text is too long for challenge '" + loopChallenge.getChallengeText() + "'";
+                throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_LONG,loopChallenge.getChallengeText());
+            }
+        }
+
+        if (!allowDuplicates) {
+            final Set<String> seenResponses = new HashSet<String>();
+            for (final Challenge loopChallenge : crMap.keySet()) {
+                final String responseText = crMap.get(loopChallenge);
+                if (responseText != null && responseText.length() > 1) {
+                    if (seenResponses.contains(responseText.toLowerCase())) {
+                        throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_DUPLICATE_RESPONSES, loopChallenge.getChallengeText());
+                    }
+                    seenResponses.add(responseText);
+                }
+            }
+        }
+    }
 
 
 

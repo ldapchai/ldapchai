@@ -54,7 +54,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
 // ------------------------------ FIELDS ------------------------------
 
-    protected Map<Challenge, String> crMap = Collections.emptyMap();
+    protected Map<Challenge, Answer> crMap = Collections.emptyMap();
     protected ChallengeSet allChallengeSet;
     protected ChallengeSet presentableChallengeSet;
     protected Locale locale;
@@ -67,7 +67,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
 // --------------------------- CONSTRUCTORS ---------------------------
 
     protected AbstractResponseSet(
-            final Map<Challenge, String> crMap,
+            final Map<Challenge, Answer> crMap,
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
@@ -83,8 +83,6 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
         this.timestamp = new Date();
 
-        this.isValid();
-
         allChallengeSet = new ChaiChallengeSet(crMap.keySet(), minimumRandomRequired, locale, csIdentifier);
         presentableChallengeSet = reduceCsToMinRandoms(allChallengeSet);
 
@@ -95,53 +93,6 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
     }
 
-    protected void isValid()
-            throws ChaiValidationException
-    {
-        isValid(false);
-    }
-
-    protected void isValid(boolean allowDuplicates)
-            throws ChaiValidationException
-    {
-        for (final Challenge loopChallenge : crMap.keySet()) {
-            final String responseText = crMap.get(loopChallenge);
-
-            if (loopChallenge.getChallengeText() == null || loopChallenge.getChallengeText().length() < 1) {
-                throw new ChaiValidationException("challenge text missing for challenge", ChaiError.CR_MISSING_REQUIRED_CHALLENGE_TEXT);
-            }
-
-            if (state.isReadableResponses()) {
-                if (responseText == null || responseText.length() < 1) {
-                    final String errorString = "response text missing for challenge '" + loopChallenge.getChallengeText() + "'";
-                    throw new ChaiValidationException(errorString, ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT,loopChallenge.getChallengeText());
-                }
-
-                if (responseText.length() < loopChallenge.getMinLength()) {
-                    final String errorString = "response text is too short for challenge '" + loopChallenge.getChallengeText() + "'";
-                    throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_SHORT,loopChallenge.getChallengeText());
-                }
-
-                if (responseText.length() > loopChallenge.getMaxLength()) {
-                    final String errorString = "response text is too long for challenge '" + loopChallenge.getChallengeText() + "'";
-                    throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_LONG,loopChallenge.getChallengeText());
-                }
-            }
-        }
-
-        if (!allowDuplicates) {
-            final Set<String> seenResponses = new HashSet<String>();
-            for (final Challenge loopChallenge : crMap.keySet()) {
-                final String responseText = crMap.get(loopChallenge);
-                if (responseText != null && responseText.length() > 1) {
-                    if (seenResponses.contains(responseText.toLowerCase())) {
-                        throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_DUPLICATE_RESPONSES, loopChallenge.getChallengeText());
-                    }
-                    seenResponses.add(responseText);
-                }
-            }
-        }
-    }
 
 // ------------------------ CANONICAL METHODS ------------------------
 

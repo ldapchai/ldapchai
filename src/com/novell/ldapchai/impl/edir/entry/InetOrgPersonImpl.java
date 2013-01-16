@@ -195,7 +195,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             return true;
         }
 
-        //check the limits and see if they are different, if they are different, then we're expired for sure.
+        //check the time
         final String petExpireString = userAttrs.get(ATTR_PASSWORD_EXPIRE_TIME);
         if (petExpireString != null && petExpireString.length() > 0) {
             final Date expireDate = EdirEntries.convertZuluToDate(petExpireString);
@@ -284,5 +284,4 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
         return this.readDateAttribute("pwdChangedTime");
     }
-
 }
