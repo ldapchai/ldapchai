@@ -60,7 +60,7 @@
                  description="public documentation">
             <doctitle>LDAP Chai API</doctitle>
             <header>LDAP Chai API</header>
-            <link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+            <link href="http://docs.oracle.com/javase/6/docs/api/"/>
             <classpath>
                 <fileset dir="${src.root}/lib" includes="*.jar"/>
             </classpath>
@@ -79,7 +79,7 @@
                  overview="overview.html"
                  destdir="${destination}/javadoc-private"
                  access="private">
-            <link href="http://download.oracle.com/javase/1.5.0/docs/api/"/>
+            <link href="http://docs.oracle.com/javase/6/docs/api/"/>
             <doctitle>LDAP Chai API</doctitle>
             <header>LDAP Chai API</header>
             <classpath>

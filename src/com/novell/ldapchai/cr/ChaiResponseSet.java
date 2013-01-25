@@ -70,7 +70,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
     final static String XML_ATTRIBUTE_CHAI_VERSION = "chaiVersion";
     final static String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
     final static String XML_ATTRIBUTE_REQUIRED = "required";
-    final static String XML_ATTRIBUTE_SALT_COUNT = "saltcount";
+    final static String XML_ATTRIBUTE_HASH_COUNT = "hashcount";
     final static String XNL_ATTRIBUTE_CONTENT_FORMAT = "format";
     final static String XML_ATTRIBUTE_SALT = "salt";
     final static String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
@@ -160,7 +160,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
                 }
             }
 
-            for (final Object o : rootElement.getChildren()) {
+            for (final Object o : rootElement.getChildren("response")) {
                 final Element loopResponseElement = (Element) o;
 
                 final boolean required = loopResponseElement.getAttribute(XML_ATTRIBUTE_REQUIRED).getBooleanValue();
@@ -246,15 +246,14 @@ public class ChaiResponseSet extends AbstractResponseSet {
 // --------------------- Interface ResponseSet ---------------------
 
     public String stringValue()
-            throws UnsupportedOperationException
-    {
+            throws UnsupportedOperationException, ChaiOperationException {
         try {
             String stringResult = rsToChaiXML(this);
             stringResult = stringResult.replace("\r", "");
             stringResult = stringResult.replace("\n", "");
             return stringResult;
         } catch (ChaiValidationException e) {
-            LOGGER.warn("error writing XML response set",e);
+            LOGGER.warn("error writing XML response set", e);
             throw new UnsupportedOperationException(e);
         }
     }
@@ -334,7 +333,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
         return true;
     }
 
-    static String rsToChaiXML(final ChaiResponseSet rs) throws ChaiValidationException {
+    static String rsToChaiXML(final ChaiResponseSet rs) throws ChaiValidationException, ChaiOperationException {
         final Element rootElement = new Element(XML_NODE_ROOT);
         rootElement.setAttribute(XML_ATTRIBUTE_MIN_RANDOM_REQUIRED, String.valueOf(rs.getChallengeSet().getMinRandomRequired()));
         rootElement.setAttribute(XML_ATTRIBUTE_LOCALE, rs.getChallengeSet().getLocale().toString());

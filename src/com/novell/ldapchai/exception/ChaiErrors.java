@@ -84,7 +84,7 @@ public final class ChaiErrors {
     static boolean isPermanent(final String message)
     {
         for (final ErrorMap errorMap : errorMaps.values()) {
-            if (!errorMap.isPermenant(message)) {
+            if (!errorMap.isPermanent(message)) {
                 return false;
             }
         }

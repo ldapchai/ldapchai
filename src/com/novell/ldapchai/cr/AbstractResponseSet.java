@@ -28,7 +28,8 @@ import java.util.*;
 
 public abstract class AbstractResponseSet implements ResponseSet {
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ResponseSet.class.getName());
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractResponseSet.class.getName());
+
 // ----------------------------- CONSTANTS ----------------------------
 
 
@@ -61,6 +62,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
     protected int minimumRandomRequired;
     protected Date timestamp;
     protected String csIdentifier;
+    protected Map<Challenge, HelpdeskAnswer> helpdeskCrMap = Collections.emptyMap();
 
     protected STATE state;
 

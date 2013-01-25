@@ -842,6 +842,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         //set alias dereferencing
         env.put("java.naming.ldap.derefAliases", chaiConfig.getSetting(ChaiSetting.LDAP_DEREFENCE_ALIAS));
 
+        //set referrals
+        if (chaiConfig.getBooleanSetting(ChaiSetting.LDAP_FOLLOW_REFERRALS)) {
+            env.put(Context.REFERRAL,"follow");
+        }
+
         final boolean isSecureLdapURL = (URI.create(ldapURL)).getScheme().equalsIgnoreCase("ldaps");
 
         //setup blind SSL socket factory
@@ -851,8 +856,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
 
         // mix in default environment settings
-        if (chaiConfig.getImplementationConfiguration() != null && chaiConfig.getImplementationConfiguration() instanceof Hashtable) {
-            final Hashtable defaultEnvironment = (Hashtable) chaiConfig.getImplementationConfiguration();
+        if (chaiConfig.getImplementationConfiguration() != null && chaiConfig.getImplementationConfiguration() instanceof Map) {
+            final Map defaultEnvironment = (Map) chaiConfig.getImplementationConfiguration();
             for (final Object key : defaultEnvironment.keySet()) {
                 if (key instanceof String && defaultEnvironment.get(key) instanceof String) {
                     env.put((String) key, (String) defaultEnvironment.get(key));

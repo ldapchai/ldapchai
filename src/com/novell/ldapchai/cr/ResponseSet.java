@@ -46,7 +46,7 @@ public interface ResponseSet {
 // ------------------------ CANONICAL METHODS ------------------------
 
     /**
-     * Get a debug-freindly representation of this {@code ResponseSet}.
+     * Get a debug-friendly representation of this {@code ResponseSet}.
      *
      * @return A string suitable for debug logging
      */
@@ -89,7 +89,7 @@ public interface ResponseSet {
      * @throws UnsupportedOperationException if the implementation does not support a string view of the response set.
      */
     String stringValue()
-            throws UnsupportedOperationException;
+            throws UnsupportedOperationException, ChaiOperationException;
 
     /**
      * Test the returned response set.
@@ -125,5 +125,4 @@ public interface ResponseSet {
      */
     Date getTimestamp()
             throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
-
 }

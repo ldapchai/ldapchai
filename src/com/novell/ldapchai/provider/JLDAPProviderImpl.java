@@ -85,7 +85,13 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
             } else {
                 ldapConnection = new LDAPConnection();
             }
+
             ldapConnection.connect(ldapURL.getHost(), ldapURL.getPort());
+            if (chaiConfig.getBooleanSetting(ChaiSetting.LDAP_FOLLOW_REFERRALS)) {
+                final LDAPConstraints ldapConstraints = new LDAPConstraints();
+                ldapConstraints.setReferralFollowing(true);
+                ldapConnection.setConstraints(ldapConstraints);
+            }
             final byte[] bindPassword = chaiConfig.getSetting(ChaiSetting.BIND_PASSWORD).getBytes();
             final String bindDN = chaiConfig.getSetting(ChaiSetting.BIND_DN);
             ldapConnection.bind(LDAPConnection.LDAP_V3, bindDN, bindPassword);

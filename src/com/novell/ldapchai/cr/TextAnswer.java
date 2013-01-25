@@ -22,7 +22,7 @@ package com.novell.ldapchai.cr;
 import com.novell.ldapchai.util.ChaiLogger;
 import org.jdom.Element;
 
-public class TextAnswer implements Answer {
+class TextAnswer implements Answer {
     private static ChaiLogger LOGGER = ChaiLogger.getLogger(TextAnswer.class);
 
     private String answer;

@@ -34,8 +34,8 @@ public class ADErrorMap implements ErrorMap {
         return forMessage(message).chaiErrorCode;
     }
 
-    public boolean isPermenant(final String message) {
-        return forMessage(message).isPermenant();
+    public boolean isPermanent(final String message) {
+        return forMessage(message).isPermanent();
     }
 
     public boolean isAuthenticationRelated(final String message) {
@@ -77,29 +77,31 @@ public class ADErrorMap implements ErrorMap {
         UNKNOWN                 ("-999",                ChaiError.UNKNOWN,                      true, false),
         NO_SUCH_OBJECT          ("0x20",                ChaiError.NO_SUCH_ENTRY,                true, false),
         NO_SUCH_ATTRIBUTE       ("0x10",                ChaiError.NO_SUCH_ATTRIBUTE,            true, false),
-        INTRUDER_LOCKOUT        ("80090308",            ChaiError.INTRUDER_LOCKOUT,             true, true, "775"),
-        FAILED_AUTHENTICATION   ("80090308",            ChaiError.FAILED_AUTHENTICATION,        true, true, "52e"),
+        INTRUDER_LOCKOUT        ("80090308",            ChaiError.INTRUDER_LOCKOUT,             true, true, "data 775"),
+        NEW_PASSWORD_REQUIRED   ("80090308",            ChaiError.NEW_PASSWORD_REQUIRED,        true, true, "data 773"),
+        FAILED_AUTHENTICATION   ("80090308",            ChaiError.FAILED_AUTHENTICATION,        true, true, "data 52e"),
+        USER_NOT_FOUND          ("80090308",            ChaiError.FAILED_AUTHENTICATION,        true, true, "data 525"),
         TOO_SOON                ("1005",                ChaiError.PASSWORD_TOO_SOON,            true, true, "9005a"),
         BAD_PASSWORD            ("error code 19",       ChaiError.PASSWORD_BADPASSWORD,         true, true),
         ;
 
         private String errorCodeString;
         private ChaiError chaiErrorCode;
-        private boolean permenant;
+        private boolean permanent;
         private boolean authentication;
         private String[] errorStrings;
 
         ADError(
                 final String errorCodeString,
                 final ChaiError chaiErrorCode,
-                final boolean permenant,
+                final boolean permanent,
                 final boolean authentication,
                 final String... errorStrings
         )
         {
             this.errorCodeString = errorCodeString;
             this.chaiErrorCode = chaiErrorCode;
-            this.permenant = permenant;
+            this.permanent = permanent;
             this.authentication = authentication;
             this.errorStrings = errorStrings;
         }
@@ -109,9 +111,9 @@ public class ADErrorMap implements ErrorMap {
             return errorCodeString;
         }
 
-        public boolean isPermenant()
+        public boolean isPermanent()
         {
-            return permenant;
+            return permanent;
         }
 
         public boolean isAuthentication()

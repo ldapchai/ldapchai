@@ -17,16 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.exception;
+package com.novell.ldapchai.cr;
 
-import com.novell.ldapchai.provider.ChaiProvider;
-
-public interface ErrorMap {
-    ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor();
-
-    ChaiError errorForMessage(String message);
-
-    boolean isPermanent(String message);
-
-    boolean isAuthenticationRelated(String message);
+public interface HelpdeskAnswer extends Answer {
+    public String answerText();
 }

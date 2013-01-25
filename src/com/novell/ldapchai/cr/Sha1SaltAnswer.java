@@ -27,13 +27,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-public class Sha1SaltAnswer implements Answer {
+class Sha1SaltAnswer implements Answer {
     private static ChaiLogger LOGGER = ChaiLogger.getLogger(Sha1SaltAnswer.class);
 
-    private String answerHash;
-    private String salt;
-    private int saltCount = 1;
-    private boolean caseInsensitive;
+    private final String answerHash;
+    private final String salt;
+    private final int hashCount;
+    private final boolean caseInsensitive;
 
     private Sha1SaltAnswer(final String answer, final String salt, final int saltCount, final boolean caseInsensitive) {
         if (answer == null || answer.length() < 1) {
@@ -42,7 +42,7 @@ public class Sha1SaltAnswer implements Answer {
 
         this.answerHash = answer;
         this.salt = salt;
-        this.saltCount = saltCount;
+        this.hashCount = saltCount;
         this.caseInsensitive = caseInsensitive;
     }
 
@@ -61,7 +61,7 @@ public class Sha1SaltAnswer implements Answer {
     public static Sha1SaltAnswer fromXml(final Element element, final boolean caseInsensitive) {
         final String answerValue = element.getText();
         final String salt = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT) == null ? "" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT).getValue();
-        final String saltCountStr = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT_COUNT) == null ? "1" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT_COUNT).getValue();
+        final String saltCountStr = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT) == null ? "1" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT).getValue();
         int saltCount = 1;
         try { saltCount = Integer.parseInt(saltCountStr); } catch (NumberFormatException e) { /* noop */ }
         return new Sha1SaltAnswer(answerValue,salt,saltCount,caseInsensitive);
@@ -72,8 +72,8 @@ public class Sha1SaltAnswer implements Answer {
         answerElement.setText(answerHash);
         answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT,salt);
         answerElement.setAttribute(ChaiResponseSet.XNL_ATTRIBUTE_CONTENT_FORMAT, ChaiResponseSet.FormatType.SHA1_SALT.toString());
-        if (saltCount >= 1) {
-            answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT_COUNT,String.valueOf(saltCount));
+        if (hashCount >= 1) {
+            answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT,String.valueOf(hashCount));
         }
         return answerElement;
     }
@@ -86,7 +86,7 @@ public class Sha1SaltAnswer implements Answer {
 
         final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
         final String saltedTest = salt + casedResponse;
-        final String hashedTest = hashValue(saltedTest,saltCount);
+        final String hashedTest = hashValue(saltedTest, hashCount);
         return answerHash.equalsIgnoreCase(hashedTest);
     }
 

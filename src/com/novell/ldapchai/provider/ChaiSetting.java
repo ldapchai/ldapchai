@@ -336,6 +336,16 @@ public enum ChaiSetting {
     LDAP_CONNECT_TIMEOUT("chai.ldap.ldapTimeout", "5000", true, Validator.INTEGER_VALIDATOR),
 
     /**
+     * Enable LDAP referral following.  Valid settings are "true" or "false".
+     * <p/>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.followReferrals</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
+     * </table>
+     */
+    LDAP_FOLLOW_REFERRALS("chai.ldap.followReferrals", "false", true, Validator.BOOLEAN_VALIDATOR),
+
+    /**
      * Set the fully qualified class name of the {@code ChaiProvider} class name to be used.  By default this is
      * the class name for the {@link JNDIProviderImpl} class.
      * <p/>

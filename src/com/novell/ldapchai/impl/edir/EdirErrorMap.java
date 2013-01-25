@@ -35,7 +35,7 @@ public class EdirErrorMap implements ErrorMap {
         return forMessage(message).chaiErrorCode;
     }
 
-    public boolean isPermenant(final String message) {
+    public boolean isPermanent(final String message) {
         return forMessage(message).isPermenant();
     }
 
