@@ -125,4 +125,13 @@ public interface ResponseSet {
      */
     Date getTimestamp()
             throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
+
+    /**
+     * Return the helpdesk challenge responses.  The helpdesk challenge response answers are stored in reversable format
+     * to be used by helpdesk administrators.  The answers can be used to help verify the identity of users when authenticating
+     * over the phone to a helpdesk or other 3rd party.
+     * @return
+     */
+
+    Map<Challenge, String> getHelpdeskResponses();
 }

@@ -70,6 +70,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
     protected AbstractResponseSet(
             final Map<Challenge, Answer> crMap,
+            final Map<Challenge, HelpdeskAnswer> helpdeskCrMap,
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
@@ -81,6 +82,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
         this.locale = locale;
         this.minimumRandomRequired = minimumRandomRequired;
         this.crMap = crMap;
+        this.helpdeskCrMap = helpdeskCrMap;
         this.csIdentifier = csIdentifier;
 
         this.timestamp = new Date();
@@ -162,6 +164,17 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
     public ChallengeSet getPresentableChallengeSet() throws ChaiValidationException {
         return presentableChallengeSet;
+    }
+
+    public Map<Challenge, String> getHelpdeskResponses() {
+        final Map<Challenge, String> returnMap = new LinkedHashMap<Challenge, String>();
+        if (this.helpdeskCrMap != null) {
+            for (final Challenge challenge : helpdeskCrMap.keySet()) {
+                final String answerText = helpdeskCrMap.get(challenge).answerText();
+                returnMap.put(challenge,answerText);
+            }
+        }
+        return returnMap;
     }
 
     // -------------------------- OTHER METHODS --------------------------

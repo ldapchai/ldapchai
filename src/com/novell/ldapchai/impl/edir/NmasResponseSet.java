@@ -202,7 +202,7 @@ public class NmasResponseSet extends AbstractResponseSet {
     )
             throws ChaiValidationException
     {
-        super(convertAnswerTextMap(crMap), locale, minimumRandomRequired, state, csIdentifier);
+        super(convertAnswerTextMap(crMap), Collections.<Challenge,HelpdeskAnswer>emptyMap(), locale, minimumRandomRequired, state, csIdentifier);
         this.user = user;
     }
 

@@ -50,10 +50,8 @@ public final class ChaiCrFactory {
 // -------------------------- STATIC METHODS --------------------------
 
     /**
-     * Create a new ResponseSet.  The generated ResponseSet will be suitable for writing to the directory
-     * by calling the ResponseSet's {@link ResponseSet#write(ChaiResponseStorageMode)} method.
+     * Create a new ResponseSet.  The generated ResponseSet will be suitable for writing to the directory.
      *
-     * @param user                  User to associate the response set with
      * @param challengeResponseMap  A map containing Challenges as the key, and string responses for values
      * @param locale                The locale the response set is stored in
      * @param minimumRandomRequired Minimum random responses required
@@ -70,10 +68,24 @@ public final class ChaiCrFactory {
     )
             throws ChaiValidationException
     {
+        return newChaiResponseSet(challengeResponseMap, Collections.<Challenge,String>emptyMap(), locale, minimumRandomRequired, chaiConfiguration, csIdentifier);
+    }
+
+    public static ChaiResponseSet newChaiResponseSet(
+            final Map<Challenge, String> challengeResponseMap,
+            final Map<Challenge, String> helpdeskMap,
+            final Locale locale,
+            final int minimumRandomRequired,
+            final ChaiConfiguration chaiConfiguration,
+            final String csIdentifier
+    )
+            throws ChaiValidationException
+    {
         final boolean caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
         validateAnswers(challengeResponseMap,chaiConfiguration);
         final Map<Challenge,Answer> answerMap = makeAnswerMap(challengeResponseMap, chaiConfiguration);
-        return new ChaiResponseSet(answerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date());
+        final Map<Challenge,HelpdeskAnswer> helpdeskAnswerMap = makeHelpdeskAnswerMap(helpdeskMap, chaiConfiguration);
+        return new ChaiResponseSet(answerMap, helpdeskAnswerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date());
     }
 
     public static boolean writeChaiResponseSet(
@@ -85,8 +97,35 @@ public final class ChaiCrFactory {
         return chaiResponseSet.write(chaiUser);
     }
 
-    private static Map<Challenge,Answer> makeAnswerMap(final Map<Challenge, String> crMap, final ChaiConfiguration chaiConfiguration) {
+    private static Map<Challenge,HelpdeskAnswer> makeHelpdeskAnswerMap(
+            final Map<Challenge, String> crMap,
+            final ChaiConfiguration chaiConfiguration
+    )
+    {
+        final Map<Challenge,Answer> tempMap = makeAnswerMap(crMap, ChaiResponseSet.FormatType.HELPDESK, chaiConfiguration);
+        final Map<Challenge,HelpdeskAnswer> returnMap = new LinkedHashMap<Challenge, HelpdeskAnswer>();
+        for (final Challenge challenge : tempMap.keySet()) {
+            returnMap.put(challenge, (HelpdeskAnswer)tempMap.get(challenge));
+        }
+        return returnMap;
+    }
+
+
+    private static Map<Challenge,Answer> makeAnswerMap(
+            final Map<Challenge, String> crMap,
+            final ChaiConfiguration chaiConfiguration
+    )
+    {
         final ChaiResponseSet.FormatType formatType = ChaiResponseSet.FormatType.valueOf(chaiConfiguration.getSetting(ChaiSetting.CR_DEFAULT_FORMAT_TYPE));
+        return makeAnswerMap(crMap, formatType, chaiConfiguration);
+    }
+
+    private static Map<Challenge,Answer> makeAnswerMap(
+            final Map<Challenge, String> crMap,
+            final ChaiResponseSet.FormatType formatType,
+            final ChaiConfiguration chaiConfiguration
+    )
+    {
         final boolean caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
         final Map<Challenge,Answer> answerMap = new LinkedHashMap<Challenge, Answer>();
         for (final Challenge challenge : crMap.keySet()) {
@@ -96,11 +135,13 @@ public final class ChaiCrFactory {
                 case SHA1_SALT:
                 case SHA1:
                     final int saltCount = Integer.parseInt(chaiConfiguration.getSetting(ChaiSetting.CR_CHAI_SALT_COUNT));
-                    answer = Sha1SaltAnswer.newResponse(answerText,saltCount,caseInsensitive);
+                    answer = Sha1SaltAnswer.newAnswer(answerText, saltCount, caseInsensitive);
                     break;
-                case TEXT:
+                case HELPDESK:
+                    answer = ChaiHelpdeskAnswer.newAnswer(answerText, challenge.getChallengeText());
+                    break;
                 default:
-                    answer = TextAnswer.newResponse(answerText,caseInsensitive);
+                    answer = TextAnswer.newAnswer(answerText, caseInsensitive);
             }
             answerMap.put(challenge,answer);
         }
@@ -175,5 +216,10 @@ public final class ChaiCrFactory {
         return ChaiResponseSet.readUserResponseSet(user);
     }
 
+    public static ResponseSet parseChaiResponseSetXML(final String inputXmlString)
+            throws ChaiValidationException, ChaiOperationException
+    {
+        return ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML(inputXmlString);
+    }
 
 }

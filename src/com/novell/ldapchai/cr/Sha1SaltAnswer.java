@@ -46,7 +46,7 @@ class Sha1SaltAnswer implements Answer {
         this.caseInsensitive = caseInsensitive;
     }
 
-    public static Sha1SaltAnswer newResponse(final String answer, final int saltCount, final boolean caseInsensitive) {
+    public static Sha1SaltAnswer newAnswer(final String answer, final int saltCount, final boolean caseInsensitive) {
         if (answer == null || answer.length() < 1) {
             throw new IllegalArgumentException("missing answerHash text");
         }

@@ -37,7 +37,7 @@ class TextAnswer implements Answer {
         this.caseInsensitive = caseInsensitive;
     }
 
-    public static TextAnswer newResponse(final String answer, final boolean caseInsensitive) {
+    public static TextAnswer newAnswer(final String answer, final boolean caseInsensitive) {
         return new TextAnswer(answer,caseInsensitive);
     }
 

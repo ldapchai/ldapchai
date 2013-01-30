@@ -47,7 +47,7 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
         this.challengeText = challengeText;
     }
 
-    public static ChaiHelpdeskAnswer newResponse(final String answer, final String challengeText) {
+    public static ChaiHelpdeskAnswer newAnswer(final String answer, final String challengeText) {
         return new ChaiHelpdeskAnswer(answer, challengeText);
     }
 
@@ -66,7 +66,7 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
     public Element toXml() throws ChaiOperationException {
         final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
         answerElement.setText(encryptValue(answer, challengeText));
-        answerElement.setAttribute(ChaiResponseSet.XNL_ATTRIBUTE_CONTENT_FORMAT, "HELPDESK");
+        answerElement.setAttribute(ChaiResponseSet.XNL_ATTRIBUTE_CONTENT_FORMAT, ChaiResponseSet.FormatType.HELPDESK.toString());
         return answerElement;
     }
 

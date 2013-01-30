@@ -34,12 +34,13 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class ChaiResponseSet extends AbstractResponseSet {
+public class ChaiResponseSet extends AbstractResponseSet implements Serializable {
 // ----------------------------- CONSTANTS ----------------------------
 
 
@@ -49,6 +50,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
         TEXT,
         SHA1,
         SHA1_SALT,
+        HELPDESK
         ;
     }
 
@@ -63,6 +65,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
     final static String XML_ATTRIBUTE_LOCALE = "locale";
 
     final static String XML_NODE_RESPONSE = "response";
+    final static String XML_NODE_HELPDESK_RESPONSE = "helpdesk-response";
     final static String XML_NODE_CHALLENGE = "challenge";
     final static String XML_NODE_ANSWER_VALUE = "answer";
 
@@ -104,7 +107,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
             final ConfigObjectRecord theCor = corList.get(0);
             payload = theCor.getPayload();
         }
-        returnVal = parseChaiResponseSetXML(payload, theUser);
+        returnVal = ChaiResponseXmlParser.parseChaiResponseSetXML(payload);
 
         if (returnVal == null) {
             return null;
@@ -113,109 +116,12 @@ public class ChaiResponseSet extends AbstractResponseSet {
         return returnVal;
     }
 
-    public static ChaiResponseSet parseChaiResponseSetXML(final String input, final ChaiUser user)
-            throws ChaiValidationException
-    {
-        if (input == null || input.length() < 1) {
-            return null;
-        }
-
-        final Map<Challenge, Answer> crMap = new LinkedHashMap<Challenge, Answer>();
-        int minRandRequired = 0;
-        Attribute localeAttr = null;
-        boolean caseInsensitive = false;
-        String csIdentifier = null;
-        Date timestamp = null;
-
-        try {
-            final SAXBuilder builder = new SAXBuilder();
-            final Document doc = builder.build(new StringReader(input));
-            final Element rootElement = doc.getRootElement();
-            minRandRequired = rootElement.getAttribute(XML_ATTRIBUTE_MIN_RANDOM_REQUIRED).getIntValue();
-            localeAttr = rootElement.getAttribute(XML_ATTRIBUTE_LOCALE);
-
-            {
-                final Attribute caseAttr = rootElement.getAttribute(XML_ATTRIBUTE_CASE_INSENSITIVE);
-                if (caseAttr != null && caseAttr.getBooleanValue()) {
-                    caseInsensitive = true;
-                }
-            }
-
-            {
-                final Attribute csIdentiferAttr = rootElement.getAttribute(XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER);
-                if (csIdentiferAttr != null) {
-                    csIdentifier = csIdentiferAttr.getValue();
-                }
-            }
-
-            {
-                final Attribute timeAttr = rootElement.getAttribute(XML_ATTRIBUTE_TIMESTAMP);
-                if (timeAttr != null) {
-                    final String timeStr = timeAttr.getValue();
-                    try {
-                        timestamp = DATE_FORMATTER.parse(timeStr);
-                    } catch (ParseException e) {
-                        LOGGER.error("unexpected error attempting to parse timestamp: " + e.getMessage());
-                    }
-                }
-            }
-
-            for (final Object o : rootElement.getChildren("response")) {
-                final Element loopResponseElement = (Element) o;
-
-                final boolean required = loopResponseElement.getAttribute(XML_ATTRIBUTE_REQUIRED).getBooleanValue();
-                final boolean adminDefined = loopResponseElement.getAttribute(XML_ATTRIBUTE_ADMIN_DEFINED).getBooleanValue();
-
-                final String challengeText = loopResponseElement.getChild(XML_NODE_CHALLENGE).getText();
-                final int minLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MIN_LENGTH).getIntValue();
-                final int maxLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MAX_LENGTH).getIntValue();
-
-                final Element answerElement = loopResponseElement.getChild(XML_NODE_ANSWER_VALUE);
-                final String formatStr = answerElement.getAttribute(XNL_ATTRIBUTE_CONTENT_FORMAT).getValue();
-                final FormatType respFormat = ChaiResponseSet.FormatType.valueOf(formatStr);
-                final Answer answer;
-                switch (respFormat) {
-                    case SHA1_SALT:
-                    case SHA1:
-                        answer = Sha1SaltAnswer.fromXml(answerElement,caseInsensitive);
-                        break;
-                    case TEXT:
-                        answer = TextAnswer.fromXml(answerElement,caseInsensitive);
-                        break;
-                    default:
-                        answer = null;
-
-                }
-                final Challenge newChallenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
-                crMap.put(newChallenge, answer);
-            }
-        } catch (JDOMException e) {
-            LOGGER.debug("error parsing stored response record: " + e.getMessage());
-        } catch (IOException e) {
-            LOGGER.debug("error parsing stored response record: " + e.getMessage());
-        } catch (NullPointerException e) {
-            LOGGER.debug("error parsing stored response record: " + e.getMessage());
-        }
-
-        Locale challengeLocale = Locale.getDefault();
-        if (localeAttr != null) {
-            challengeLocale = new Locale(localeAttr.getValue());
-        }
-
-        return new ChaiResponseSet(
-                crMap,
-                challengeLocale,
-                minRandRequired,
-                STATE.READ,
-                caseInsensitive,
-                csIdentifier,
-                timestamp);
-    }
 
 // --------------------------- CONSTRUCTORS ---------------------------
 
     ChaiResponseSet(
             final Map<Challenge, Answer> crMap,
+            final Map<Challenge, HelpdeskAnswer> helpdeskCrMap,
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
@@ -225,7 +131,7 @@ public class ChaiResponseSet extends AbstractResponseSet {
     )
             throws ChaiValidationException
     {
-        super(crMap, locale, minimumRandomRequired, state, csIdentifer);
+        super(crMap, helpdeskCrMap, locale, minimumRandomRequired, state, csIdentifer);
         this.caseInsensitive = caseInsensitive;
         this.timestamp = timestamp;
     }
@@ -333,7 +239,9 @@ public class ChaiResponseSet extends AbstractResponseSet {
         return true;
     }
 
-    static String rsToChaiXML(final ChaiResponseSet rs) throws ChaiValidationException, ChaiOperationException {
+    static String rsToChaiXML(final ChaiResponseSet rs)
+            throws ChaiValidationException, ChaiOperationException
+    {
         final Element rootElement = new Element(XML_NODE_ROOT);
         rootElement.setAttribute(XML_ATTRIBUTE_MIN_RANDOM_REQUIRED, String.valueOf(rs.getChallengeSet().getMinRandomRequired()));
         rootElement.setAttribute(XML_ATTRIBUTE_LOCALE, rs.getChallengeSet().getLocale().toString());
@@ -352,17 +260,22 @@ public class ChaiResponseSet extends AbstractResponseSet {
             rootElement.setAttribute(XML_ATTRIBUTE_TIMESTAMP, DATE_FORMATTER.format(rs.timestamp));
         }
 
-        for (final Challenge loopChallenge : rs.crMap.keySet()) {
-            final Element responseElement = new Element(XML_NODE_RESPONSE);
-            responseElement.addContent(new Element(XML_NODE_CHALLENGE).addContent(new Text(loopChallenge.getChallengeText())));
-            final Element answerElement = rs.crMap.get(loopChallenge).toXml();
-            responseElement.addContent(answerElement);
-            responseElement.setAttribute(XML_ATTRIBUTE_ADMIN_DEFINED, String.valueOf(loopChallenge.isAdminDefined()));
-            responseElement.setAttribute(XML_ATTRIBUTE_REQUIRED, String.valueOf(loopChallenge.isRequired()));
-            responseElement.setAttribute(XNL_ATTRIBUTE_MIN_LENGTH, String.valueOf(loopChallenge.getMinLength()));
-            responseElement.setAttribute(XNL_ATTRIBUTE_MAX_LENGTH, String.valueOf(loopChallenge.getMaxLength()));
-            rootElement.addContent(responseElement);
+        if (rs.crMap != null) {
+            for (final Challenge loopChallenge : rs.crMap.keySet()) {
+                final Answer answer = rs.crMap.get(loopChallenge);
+                final Element responseElement = challengeToXml(loopChallenge, answer, XML_NODE_RESPONSE);
+                rootElement.addContent(responseElement);
+            }
         }
+
+        if (rs.helpdeskCrMap != null) {
+            for (final Challenge loopChallenge : rs.helpdeskCrMap.keySet()) {
+                final Answer answer = rs.helpdeskCrMap.get(loopChallenge);
+                final Element responseElement = challengeToXml(loopChallenge, answer, XML_NODE_HELPDESK_RESPONSE);
+                rootElement.addContent(responseElement);
+            }
+        }
+
 
         final Document doc = new Document(rootElement);
         final XMLOutputter outputter = new XMLOutputter();
@@ -371,5 +284,169 @@ public class ChaiResponseSet extends AbstractResponseSet {
         format.setLineSeparator("");
         outputter.setFormat(format);
         return outputter.outputString(doc);
+    }
+
+    private static Element challengeToXml(final Challenge loopChallenge, final Answer answer, final String elementName)
+            throws ChaiOperationException
+    {
+        final Element responseElement = new Element(elementName);
+        responseElement.addContent(new Element(XML_NODE_CHALLENGE).addContent(new Text(loopChallenge.getChallengeText())));
+        final Element answerElement = answer.toXml();
+        responseElement.addContent(answerElement);
+        responseElement.setAttribute(XML_ATTRIBUTE_ADMIN_DEFINED, String.valueOf(loopChallenge.isAdminDefined()));
+        responseElement.setAttribute(XML_ATTRIBUTE_REQUIRED, String.valueOf(loopChallenge.isRequired()));
+        responseElement.setAttribute(XNL_ATTRIBUTE_MIN_LENGTH, String.valueOf(loopChallenge.getMinLength()));
+        responseElement.setAttribute(XNL_ATTRIBUTE_MAX_LENGTH, String.valueOf(loopChallenge.getMaxLength()));
+        return responseElement;
+    }
+
+    static class ChaiResponseXmlParser {
+        static ChaiResponseSet parseChaiResponseSetXML(final String input)
+                throws ChaiValidationException, ChaiOperationException {
+            if (input == null || input.length() < 1) {
+                return null;
+            }
+
+            final Map<Challenge, Answer> crMap = new LinkedHashMap<Challenge, Answer>();
+            final Map<Challenge, HelpdeskAnswer> helpdeskCrMap = new LinkedHashMap<Challenge,HelpdeskAnswer>();
+            int minRandRequired = 0;
+            Attribute localeAttr = null;
+            boolean caseInsensitive = false;
+            String csIdentifier = null;
+            Date timestamp = null;
+
+            try {
+                final SAXBuilder builder = new SAXBuilder();
+                final Document doc = builder.build(new StringReader(input));
+                final Element rootElement = doc.getRootElement();
+                minRandRequired = rootElement.getAttribute(XML_ATTRIBUTE_MIN_RANDOM_REQUIRED).getIntValue();
+                localeAttr = rootElement.getAttribute(XML_ATTRIBUTE_LOCALE);
+
+                {
+                    final Attribute caseAttr = rootElement.getAttribute(XML_ATTRIBUTE_CASE_INSENSITIVE);
+                    if (caseAttr != null && caseAttr.getBooleanValue()) {
+                        caseInsensitive = true;
+                    }
+                }
+
+                {
+                    final Attribute csIdentiferAttr = rootElement.getAttribute(XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER);
+                    if (csIdentiferAttr != null) {
+                        csIdentifier = csIdentiferAttr.getValue();
+                    }
+                }
+
+                {
+                    final Attribute timeAttr = rootElement.getAttribute(XML_ATTRIBUTE_TIMESTAMP);
+                    if (timeAttr != null) {
+                        final String timeStr = timeAttr.getValue();
+                        try {
+                            timestamp = DATE_FORMATTER.parse(timeStr);
+                        } catch (ParseException e) {
+                            LOGGER.error("unexpected error attempting to parse timestamp: " + e.getMessage());
+                        }
+                    }
+                }
+
+                for (final Object o : rootElement.getChildren(XML_NODE_RESPONSE)) {
+                    final Element loopResponseElement = (Element) o;
+                    final Challenge newChallenge = parseResponseElement(loopResponseElement);
+                    final Answer answer = parseAnswerElement(loopResponseElement.getChild(XML_NODE_ANSWER_VALUE),caseInsensitive,newChallenge.getChallengeText());
+                    crMap.put(newChallenge, answer);
+                }
+                for (final Object o : rootElement.getChildren(XML_NODE_HELPDESK_RESPONSE)) {
+                    final Element loopResponseElement = (Element) o;
+                    final Challenge newChallenge = parseResponseElement(loopResponseElement);
+                    final HelpdeskAnswer answer = (HelpdeskAnswer)parseAnswerElement(loopResponseElement.getChild(XML_NODE_ANSWER_VALUE),caseInsensitive,newChallenge.getChallengeText());
+                    helpdeskCrMap.put(newChallenge, answer);
+                }
+            } catch (JDOMException e) {
+                LOGGER.debug("error parsing stored response record: " + e.getMessage());
+            } catch (IOException e) {
+                LOGGER.debug("error parsing stored response record: " + e.getMessage());
+            } catch (NullPointerException e) {
+                LOGGER.debug("error parsing stored response record: " + e.getMessage());
+            }
+
+            Locale challengeLocale = Locale.getDefault();
+            if (localeAttr != null) {
+                challengeLocale = new Locale(localeAttr.getValue());
+            }
+
+            return new ChaiResponseSet(
+                    crMap,
+                    helpdeskCrMap,
+                    challengeLocale,
+                    minRandRequired,
+                    STATE.READ,
+                    caseInsensitive,
+                    csIdentifier,
+                    timestamp);
+        }
+
+        private static Challenge parseResponseElement(final Element loopResponseElement)
+                throws DataConversionException
+        {
+            final boolean required = loopResponseElement.getAttribute(XML_ATTRIBUTE_REQUIRED).getBooleanValue();
+            final boolean adminDefined = loopResponseElement.getAttribute(XML_ATTRIBUTE_ADMIN_DEFINED).getBooleanValue();
+
+            final String challengeText = loopResponseElement.getChild(XML_NODE_CHALLENGE).getText();
+            final int minLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MIN_LENGTH).getIntValue();
+            final int maxLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MAX_LENGTH).getIntValue();
+
+            return new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
+        }
+
+        private static Answer parseAnswerElement(
+                final Element answerElement,
+                final boolean caseInsensitive,
+                final String challengeText
+        ) throws ChaiOperationException
+        {
+            final String formatStr = answerElement.getAttribute(XNL_ATTRIBUTE_CONTENT_FORMAT).getValue();
+            final FormatType respFormat;
+            if (formatStr != null && formatStr.length() > 0) {
+                respFormat = FormatType.valueOf(formatStr);
+            } else {
+                respFormat = FormatType.TEXT;
+            }
+            final Answer answer;
+            switch (respFormat) {
+                case SHA1_SALT:
+                case SHA1:
+                    answer = Sha1SaltAnswer.fromXml(answerElement,caseInsensitive);
+                    break;
+                case TEXT:
+                    answer = TextAnswer.fromXml(answerElement,caseInsensitive);
+                    break;
+                case HELPDESK:
+                    answer = ChaiHelpdeskAnswer.fromXml(answerElement, challengeText);
+                    break;
+                default:
+                    answer = null;
+
+            }
+            return answer;
+        }
+    }
+
+    /**
+     *
+     * @param inputXmlString
+     * @param theUser
+     * @deprecated {@link ChaiCrFactory#parseChaiResponseSetXML(String)}
+     * @see  {@link ChaiCrFactory#parseChaiResponseSetXML(String)}
+     * @return
+     * @throws ChaiValidationException
+     */
+    @Deprecated
+    public static ResponseSet parseChaiResponseSetXML(final String inputXmlString, final ChaiUser theUser)
+            throws ChaiValidationException
+    {
+        try {
+            return ChaiResponseXmlParser.parseChaiResponseSetXML(inputXmlString);
+        } catch (ChaiOperationException e) {
+            throw new ChaiValidationException(e.getMessage(),e.getErrorCode());
+        }
     }
 }
