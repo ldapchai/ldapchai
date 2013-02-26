@@ -200,4 +200,13 @@ public abstract class AbstractResponseSet implements ResponseSet {
                 allChallengeSet.getIdentifier()
                 );
     }
+
+    public Map<Challenge,Answer> getChallengeAnswers() {
+
+        return crMap == null ? Collections.<Challenge,Answer>emptyMap() : Collections.unmodifiableMap(crMap);
+    }
+
+    public Map<Challenge,HelpdeskAnswer> getHelpdeskAnswers() {
+        return helpdeskCrMap == null ? Collections.<Challenge,HelpdeskAnswer>emptyMap() : Collections.unmodifiableMap(helpdeskCrMap);
+    }
 }

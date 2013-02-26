@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -125,5 +126,12 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
         final byte[] key = new byte[16];
         System.arraycopy(md.digest(), 0, key, 0, 16);
         return new SecretKeySpec(key, "AES");
+    }
+
+    public AnswerBean asAnswerBean() {
+        final AnswerBean answerBean = new AnswerBean();
+        answerBean.setType(ChaiResponseSet.FormatType.HELPDESK);
+        answerBean.setAnswerText(answer);
+        return answerBean;
     }
 }

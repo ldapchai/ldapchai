@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.util.ChaiLogger;
 import org.jdom.Element;
 
@@ -61,4 +62,13 @@ class TextAnswer implements Answer {
         final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
         return answer.equalsIgnoreCase(casedResponse);
     }
+
+    public AnswerBean asAnswerBean() {
+        final AnswerBean answerBean = new AnswerBean();
+        answerBean.setType(ChaiResponseSet.FormatType.TEXT);
+        answerBean.setAnswerText(answer);
+        answerBean.setCaseInsensitive(caseInsensitive);
+        return answerBean;
+    }
+
 }

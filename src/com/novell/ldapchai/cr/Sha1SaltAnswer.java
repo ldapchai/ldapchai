@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.internal.Base64Util;
 import org.jdom.Element;
@@ -116,4 +117,13 @@ class Sha1SaltAnswer implements Answer {
         return sb.toString();
     }
 
+    public AnswerBean asAnswerBean() {
+        final AnswerBean answerBean = new AnswerBean();
+        answerBean.setType(ChaiResponseSet.FormatType.SHA1_SALT);
+        answerBean.setAnswerHash(answerHash);
+        answerBean.setCaseInsensitive(caseInsensitive);
+        answerBean.setHashCount(hashCount);
+        answerBean.setSalt(salt);
+        return answerBean;
+    }
 }

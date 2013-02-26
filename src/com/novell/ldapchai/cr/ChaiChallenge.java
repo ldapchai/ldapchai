@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.ChallengeBean;
+
 import java.io.Serializable;
 
 /**
@@ -173,5 +175,15 @@ public class ChaiChallenge implements Challenge, Serializable {
     public void lock()
     {
         locked = true;
+    }
+
+    public ChallengeBean asChallengeBean() {
+        final ChallengeBean challengeBean = new ChallengeBean();
+        challengeBean.setAdminDefined(adminDefined);
+        challengeBean.setRequired(required);
+        challengeBean.setChallengeText(challengeText);
+        challengeBean.setMaxLength(maxLength);
+        challengeBean.setMinLength(minLength);
+        return challengeBean;
     }
 }

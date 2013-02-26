@@ -81,7 +81,8 @@ public class ADErrorMap implements ErrorMap {
         NEW_PASSWORD_REQUIRED   ("80090308",            ChaiError.NEW_PASSWORD_REQUIRED,        true, true, "data 773"),
         FAILED_AUTHENTICATION   ("80090308",            ChaiError.FAILED_AUTHENTICATION,        true, true, "data 52e"),
         USER_NOT_FOUND          ("80090308",            ChaiError.FAILED_AUTHENTICATION,        true, true, "data 525"),
-        TOO_SOON                ("1005",                ChaiError.PASSWORD_TOO_SOON,            true, true, "9005a"),
+        PASSWORD_EXPIRED        ("80090308",            ChaiError.PASSWORD_EXPIRED,             true, true, "data 532"),
+        //TOO_SOON                ("1005",                ChaiError.PASSWORD_TOO_SOON,            true, true, "9005a"),
         BAD_PASSWORD            ("error code 19",       ChaiError.PASSWORD_BADPASSWORD,         true, true),
         ;
 

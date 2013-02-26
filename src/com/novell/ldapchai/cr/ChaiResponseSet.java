@@ -21,6 +21,8 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.cr.bean.AnswerBean;
+import com.novell.ldapchai.cr.bean.ChallengeBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -449,4 +451,32 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
             throw new ChaiValidationException(e.getMessage(),e.getErrorCode());
         }
     }
+
+    public List<ChallengeBean> asChallengeBeans(boolean includeAnswers) {
+        return asBeans(crMap,includeAnswers);
+    }
+
+    public List<ChallengeBean> asHelpdeskChallengeBeans(boolean includeAnswers) {
+        return asBeans(helpdeskCrMap,includeAnswers);
+    }
+
+    public static List<ChallengeBean> asBeans(final Map inputMap, boolean includeAnswers) {
+        if (inputMap == null) {
+            return Collections.emptyList();
+        }
+
+        final List<ChallengeBean> returnList = new ArrayList<ChallengeBean>();
+        for (final Object loopChallengeObj : inputMap.keySet()) {
+            final Challenge loopChallenge = (Challenge)loopChallengeObj;
+            final ChallengeBean challengeBean = loopChallenge.asChallengeBean();
+            if (includeAnswers) {
+                final Answer loopAnswer = (Answer)inputMap.get(loopChallenge);
+                final AnswerBean answerBean = loopAnswer.asAnswerBean();
+                challengeBean.setAnswer(answerBean);
+            }
+            returnList.add(challengeBean);
+        }
+        return returnList;
+    }
+
 }

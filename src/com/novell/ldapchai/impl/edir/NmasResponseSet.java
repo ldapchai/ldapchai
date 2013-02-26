@@ -21,6 +21,8 @@ package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.*;
+import com.novell.ldapchai.cr.bean.AnswerBean;
+import com.novell.ldapchai.cr.bean.ChallengeBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
@@ -431,6 +433,31 @@ public class NmasResponseSet extends AbstractResponseSet {
         public Element toXml() {
             return null;
         }
+
+        public AnswerBean asAnswerBean() {
+            throw new UnsupportedOperationException("NMAS stored responses do not support retrieval of answers");
+        }
+    }
+
+    public List<ChallengeBean> asChallengeBeans(boolean includeAnswers) {
+        if (includeAnswers) {
+            throw new UnsupportedOperationException("NMAS stored responses do not support retrieval of answers");
+        }
+
+        if (crMap == null) {
+            return Collections.emptyList();
+        }
+
+        final List<ChallengeBean> returnList = new ArrayList<ChallengeBean>();
+        for (final Challenge challenge : this.crMap.keySet()) {
+            returnList.add(challenge.asChallengeBean());
+        }
+        return returnList;
+    }
+
+    public List<ChallengeBean> asHelpdeskChallengeBeans(boolean includeAnswers) {
+        //@todo TODO
+        throw new UnsupportedOperationException("NMAS stored responses do not support Helpdesk Challenges");
     }
 }
 

@@ -89,10 +89,13 @@
     </target>
 
     <target name="makeJAR" depends="init,compileCode">
-        <jar zipfile="${destination}/ldapChai.jar" filesonly="true" manifest="${src.root}/MANIFEST.MF" compress="true">
+        <jar zipfile="${destination}/ldapChai.jar" filesonly="true" compress="true">
             <zipfileset dir="${destination}/bin" includes="**/*.class"/>
             <zipfileset dir="${src.root}/src" includes="**/*.properties"/>
             <zipfileset dir="${src.root}/src" prefix="src"/>
+            <manifest>
+                <attribute name="Main-Class" value="com.novell.ldapchai.util.MainHandler"/>
+            </manifest>
         </jar>
     </target>
 

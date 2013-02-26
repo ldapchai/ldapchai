@@ -19,11 +19,13 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.ChallengeBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -134,4 +136,8 @@ public interface ResponseSet {
      */
 
     Map<Challenge, String> getHelpdeskResponses();
+
+    List<ChallengeBean> asChallengeBeans(boolean includeAnswers);
+
+    List<ChallengeBean> asHelpdeskChallengeBeans(boolean includeAnswers);
 }
