@@ -60,7 +60,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         policyMap.put(ChaiPasswordRule.CaseSensitive, String.valueOf(true));
 
         //read minimum password length from domain
-        final Matcher domainMatcher = Pattern.compile("(dc=[a-z0-9]+[,]*)+", Pattern.CASE_INSENSITIVE).matcher(this.getEntryDN());
+        final Matcher domainMatcher = Pattern.compile("(dc=[a-z0-9-]+[,]*)+", Pattern.CASE_INSENSITIVE).matcher(this.getEntryDN());
         if (domainMatcher.find()) {
             final String domainDN = domainMatcher.group();
             final String minPwdLength = this.getChaiProvider().readStringAttribute(domainDN, "minPwdLength");
