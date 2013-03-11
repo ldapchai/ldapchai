@@ -70,4 +70,16 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
 
         return expireDate.before(new Date());
     }
+
+    @Override
+    public void unlock() throws ChaiOperationException, ChaiUnavailableException {
+        this.deleteAttribute("pwdAccountLockedTime",null);
+    }
+
+    @Override
+    public boolean isLocked()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readBooleanAttribute("pwdLockout");
+    }
 }
