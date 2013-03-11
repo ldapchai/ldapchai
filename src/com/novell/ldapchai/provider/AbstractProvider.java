@@ -31,6 +31,7 @@ import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
@@ -210,92 +211,46 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return false;
     }
 
-    protected static class PromiscuousSSLSocketFactory extends SSLSocketFactory {
-        static SSLSocketFactory wrappedSSLSocketFactory = null;
+    public static abstract class ThreadLocalSocketFactory
+            extends SocketFactory
+    {
 
-        static {
-            final TrustManager[] trustAllCerts = new TrustManager[]{
-                    new X509TrustManager() {
-                        public java.security.cert.X509Certificate[] getAcceptedIssuers()
-                        {
-                            return null;
-                        }
+        static ThreadLocal<SocketFactory> local = new ThreadLocal<SocketFactory>();
 
-                        public void checkClientTrusted(
-                                final java.security.cert.X509Certificate[] certs, final String authType)
-                        {
-                        }
-
-                        public void checkServerTrusted(
-                                final java.security.cert.X509Certificate[] certs, final String authType)
-                        {
-                        }
-                    }
-            };
-
-            try {
-                final SSLContext sc = SSLContext.getInstance("SSL");
-                sc.init(null, trustAllCerts, new java.security.SecureRandom());
-                wrappedSSLSocketFactory = sc.getSocketFactory();
-            } catch (Exception e) {
-                // nothing to do
-            }
+        public static SocketFactory getDefault()
+        {
+            SocketFactory result = local.get();
+            if ( result == null )
+                throw new IllegalStateException();
+            return result;
         }
 
-        public PromiscuousSSLSocketFactory()
+        public static void set( SocketFactory factory )
         {
-            super();
+            local.set( factory );
         }
 
-        public Socket createSocket()
-                throws IOException
+        public static void remove()
         {
-            return wrappedSSLSocketFactory.createSocket();
+            local.remove();
         }
 
-        public String[] getDefaultCipherSuites()
+    }
+
+    static class PromiscuousTrustManager implements X509TrustManager {
+        public java.security.cert.X509Certificate[] getAcceptedIssuers()
         {
-            return wrappedSSLSocketFactory.getDefaultCipherSuites();
+            return null;
         }
 
-        public String[] getSupportedCipherSuites()
+        public void checkClientTrusted(
+                final java.security.cert.X509Certificate[] certs, final String authType)
         {
-            return wrappedSSLSocketFactory.getSupportedCipherSuites();
         }
 
-        public Socket createSocket(final Socket socket, final String string, final int i, final boolean b)
-                throws IOException
+        public void checkServerTrusted(
+                final java.security.cert.X509Certificate[] certs, final String authType)
         {
-            return wrappedSSLSocketFactory.createSocket(socket, string, i, b);
-        }
-
-        public Socket createSocket(final String string, final int i)
-                throws IOException
-        {
-            return wrappedSSLSocketFactory.createSocket(string, i);
-        }
-
-        public Socket createSocket(final String string, final int i, final InetAddress inetAddress, final int i1)
-                throws IOException
-        {
-            return wrappedSSLSocketFactory.createSocket(string, i, inetAddress, i1);
-        }
-
-        public Socket createSocket(final InetAddress inetAddress, final int i)
-                throws IOException
-        {
-            return wrappedSSLSocketFactory.createSocket(inetAddress, i);
-        }
-
-        public Socket createSocket(final InetAddress inetAddress, final int i, final InetAddress inetAddress1, final int i1)
-                throws IOException
-        {
-            return wrappedSSLSocketFactory.createSocket(inetAddress, i, inetAddress1, i1);
-        }
-
-        public static javax.net.SocketFactory getDefault()
-        {
-            return new PromiscuousSSLSocketFactory();
         }
     }
 

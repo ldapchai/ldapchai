@@ -32,6 +32,8 @@ import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
 import javax.naming.ldap.InitialLdapContext;
 import javax.naming.ldap.LdapContext;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
@@ -813,7 +815,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
 // -------------------------- OTHER METHODS --------------------------
 
-    private Hashtable generateJndiEnvironment(final String ldapURL)
+    private synchronized Hashtable generateJndiEnvironment(final String ldapURL)
     {
         // Populate the hashtable with the attributes to connect to eDirectory.
         final Hashtable<String, String> env = new Hashtable<String, String>();
@@ -851,8 +853,27 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         //setup blind SSL socket factory
         final boolean promiscuousMode = Boolean.valueOf(chaiConfig.getSetting(ChaiSetting.PROMISCUOUS_SSL));
-        if (promiscuousMode && isSecureLdapURL) {
-            env.put("java.naming.ldap.factory.socket", AbstractProvider.PromiscuousSSLSocketFactory.class.getName());
+        if (isSecureLdapURL) {
+            if (promiscuousMode) {
+                try {
+                    final SSLContext sc = SSLContext.getInstance("SSL");
+                    sc.init(null, new X509TrustManager[]{new PromiscuousTrustManager()}, new java.security.SecureRandom());
+                    ThreadLocalSocketFactory.set(sc.getSocketFactory());
+                    env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
+                } catch (Exception e) {
+                    LOGGER.error("error configuring promiscuous socket factory");
+                }
+
+            } else if (chaiConfig.getTrustManager() != null) {
+                try {
+                    final SSLContext sc = SSLContext.getInstance("SSL");
+                    sc.init(null, chaiConfig.getTrustManager(), new java.security.SecureRandom());
+                    ThreadLocalSocketFactory.set(sc.getSocketFactory());
+                    env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
+                } catch (Exception e) {
+                    LOGGER.error("error configuring promiscuous socket factory");
+                }
+            }
         }
 
         // mix in default environment settings

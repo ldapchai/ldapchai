@@ -30,6 +30,8 @@ import com.novell.ldapchai.util.SearchHelper;
 import javax.naming.NamingException;
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.X509TrustManager;
 import java.net.URI;
 import java.util.*;
 
@@ -78,7 +80,21 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
             if (ldapURL.getScheme().equalsIgnoreCase("ldaps")) {
                 final boolean usePromiscuousSSL = Boolean.parseBoolean(chaiConfig.getSetting(ChaiSetting.PROMISCUOUS_SSL));
                 if (usePromiscuousSSL) {
-                    ldapConnection = new LDAPConnection(new LDAPJSSESecureSocketFactory(new PromiscuousSSLSocketFactory()));
+                    try {
+                        final SSLContext sc = SSLContext.getInstance("SSL");
+                        sc.init(null, new X509TrustManager[]{new PromiscuousTrustManager()}, new java.security.SecureRandom());
+                        ldapConnection = new LDAPConnection(new LDAPJSSESecureSocketFactory(sc.getSocketFactory()));
+                    } catch (Exception e) {
+                        LOGGER.error("error creating promiscuous ssl ldap socket factory: " + e.getMessage());
+                    }
+                } else if (chaiConfig.getTrustManager() != null) {
+                    try {
+                        final SSLContext sc = SSLContext.getInstance("SSL");
+                        sc.init(null, chaiConfig.getTrustManager(), new java.security.SecureRandom());
+                        ldapConnection = new LDAPConnection(new LDAPJSSESecureSocketFactory(sc.getSocketFactory()));
+                    } catch (Exception e) {
+                        LOGGER.error("error creating configured ssl ldap socket factory: " + e.getMessage());
+                    }
                 } else {
                     ldapConnection = new LDAPConnection(new LDAPJSSESecureSocketFactory());
                 }

@@ -21,6 +21,8 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.util.StringHelper;
 
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import java.io.Serializable;
 import java.util.*;
 
@@ -52,6 +54,7 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     private Serializable implementationConfiguration;
     private volatile transient boolean locked;
     private Properties settings = new Properties(DEFAULT_SETTINGS);
+    private X509TrustManager[] trustManager = null;
 
 // -------------------------- STATIC METHODS --------------------------
 
@@ -187,6 +190,7 @@ public class ChaiConfiguration implements Cloneable, Serializable {
             newSettings.setProperty(keyName, settings.getProperty(keyName));
         }
         newInstance.settings = newSettings;
+        newInstance.trustManager = trustManager;
 
         newInstance.implementationConfiguration = implementationConfiguration;
         newInstance.locked = false;
@@ -294,6 +298,17 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     }
 
     /**
+     * Get the current settings of the {@code ChaiProvider}.
+     *
+     * @return a copy of the settings for this ChaiConfiguration
+     */
+    public X509TrustManager[] getTrustManager()
+    {
+        // make a defensive copy
+        return trustManager;
+    }
+
+    /**
      * Lock this {@code ChaiConfiguration}.  Once locked, all of the setter methods will throw an {@link IllegalStateException}.
      * In order to be locked, both an implementation class and implementation configuration must be set.
      */
@@ -319,6 +334,19 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     {
         checkLock();
         this.implementationConfiguration = implementationConfiguration;
+        return this;
+    }
+
+    /**
+     * Add a TrustManager to be used when connecting to ssl ldap servers.
+     *
+     * @param trustManager A serializable trustmanager to be used for connecting to ldap servers.
+     * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
+     */
+    public ChaiConfiguration setTrustManager(final X509TrustManager[] trustManager)
+    {
+        checkLock();
+        this.trustManager = trustManager;
         return this;
     }
 
