@@ -72,7 +72,7 @@ class Sha1SaltAnswer implements Answer {
         final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
         answerElement.setText(answerHash);
         answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT,salt);
-        answerElement.setAttribute(ChaiResponseSet.XNL_ATTRIBUTE_CONTENT_FORMAT, ChaiResponseSet.FormatType.SHA1_SALT.toString());
+        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, Answer.FormatType.SHA1_SALT.toString());
         if (hashCount >= 1) {
             answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT,String.valueOf(hashCount));
         }
@@ -119,7 +119,7 @@ class Sha1SaltAnswer implements Answer {
 
     public AnswerBean asAnswerBean() {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(ChaiResponseSet.FormatType.SHA1_SALT);
+        answerBean.setType(Answer.FormatType.SHA1_SALT);
         answerBean.setAnswerHash(answerHash);
         answerBean.setCaseInsensitive(caseInsensitive);
         answerBean.setHashCount(hashCount);

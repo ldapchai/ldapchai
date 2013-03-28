@@ -67,7 +67,7 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
     public Element toXml() throws ChaiOperationException {
         final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
         answerElement.setText(encryptValue(answer, challengeText));
-        answerElement.setAttribute(ChaiResponseSet.XNL_ATTRIBUTE_CONTENT_FORMAT, ChaiResponseSet.FormatType.HELPDESK.toString());
+        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.HELPDESK.toString());
         return answerElement;
     }
 
@@ -130,7 +130,7 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
 
     public AnswerBean asAnswerBean() {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(ChaiResponseSet.FormatType.HELPDESK);
+        answerBean.setType(FormatType.HELPDESK);
         answerBean.setAnswerText(answer);
         return answerBean;
     }

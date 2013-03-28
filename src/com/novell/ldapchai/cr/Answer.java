@@ -10,4 +10,14 @@ public interface Answer {
     public Element toXml() throws ChaiOperationException;
 
     public AnswerBean asAnswerBean();
+
+    enum FormatType {
+        TEXT,
+        SHA1,
+        SHA1_SALT,
+        HELPDESK,
+        BCRYPT
+
+        ;
+    }
 }

@@ -19,23 +19,23 @@
 
 package com.novell.ldapchai.cr.bean;
 
-import com.novell.ldapchai.cr.ChaiResponseSet;
+import com.novell.ldapchai.cr.Answer;
 
 import java.io.Serializable;
 
 public class AnswerBean implements Serializable {
-    public ChaiResponseSet.FormatType type;
+    public Answer.FormatType type;
     public String answerText;
     public String answerHash;
     public String salt;
     public int hashCount;
     public boolean caseInsensitive;
 
-    public ChaiResponseSet.FormatType getType() {
+    public Answer.FormatType getType() {
         return type;
     }
 
-    public void setType(ChaiResponseSet.FormatType type) {
+    public void setType(Answer.FormatType type) {
         this.type = type;
     }
 

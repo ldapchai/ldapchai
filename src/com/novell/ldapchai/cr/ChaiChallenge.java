@@ -186,4 +186,16 @@ public class ChaiChallenge implements Challenge, Serializable {
         challengeBean.setMinLength(minLength);
         return challengeBean;
     }
+
+    public static Challenge fromChallengeBean(final ChallengeBean challengeBean) {
+        return new ChaiChallenge(
+                challengeBean.isRequired(),
+                challengeBean.getChallengeText(),
+                challengeBean.getMinLength(),
+                challengeBean.getMaxLength(),
+                challengeBean.isAdminDefined()
+        );
+    }
 }
+
+

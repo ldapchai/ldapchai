@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.cr.ChaiResponseSet;
+import com.novell.ldapchai.cr.Answer;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -436,9 +436,9 @@ public enum ChaiSetting {
     CR_ALLOW_DUPLICATE_RESPONSES("chai.crsetting.allowDuplicateResponses", "false", true, Validator.BOOLEAN_VALIDATOR),
 
     /**
-     * Default Chai CR Format Type.  Must be a valid string value of {@link ChaiResponseSet.FormatType}
+     * Default Chai CR Format Type.  Must be a valid string value of {@link com.novell.ldapchai.cr.Answer.FormatType}
      */
-    CR_DEFAULT_FORMAT_TYPE("chai.crsetting.defaultFormatType", ChaiResponseSet.FormatType.SHA1_SALT.toString(), true, Validator.BOOLEAN_VALIDATOR),
+    CR_DEFAULT_FORMAT_TYPE("chai.crsetting.defaultFormatType", Answer.FormatType.SHA1_SALT.toString(), true, Validator.BOOLEAN_VALIDATOR),
 
     /**
      * Setting key to control the ldap attribute name used when reading/writing Chai Challenge/Response formats.
@@ -463,7 +463,7 @@ public enum ChaiSetting {
 
     /**
      * Setting key to control the number of iterations to perform the CR Salt when the
-     * format type is set to {@link com.novell.ldapchai.cr.ChaiResponseSet.FormatType#SHA1_SALT}
+     * format type is set to {@link com.novell.ldapchai.cr.Answer.FormatType#SHA1_SALT}
      * <p/>
      * <i>Default: </i><b>1000</b>
      *
@@ -587,7 +587,7 @@ public enum ChaiSetting {
         static final Validator CR_FORMAT_VALIDATOR = new Validator() {
             public void validate(final String value) {
                 try {
-                    if (ChaiResponseSet.FormatType.valueOf(value) == null) {
+                    if (Answer.FormatType.valueOf(value) == null) {
                         throw new IllegalArgumentException("unknown ChaiResponseSet.FormatType");
                     }
                 } catch (Exception e) {

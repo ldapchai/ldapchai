@@ -102,7 +102,7 @@ public final class ChaiCrFactory {
             final ChaiConfiguration chaiConfiguration
     )
     {
-        final Map<Challenge,Answer> tempMap = makeAnswerMap(crMap, ChaiResponseSet.FormatType.HELPDESK, chaiConfiguration);
+        final Map<Challenge,Answer> tempMap = makeAnswerMap(crMap, Answer.FormatType.HELPDESK, chaiConfiguration);
         final Map<Challenge,HelpdeskAnswer> returnMap = new LinkedHashMap<Challenge, HelpdeskAnswer>();
         for (final Challenge challenge : tempMap.keySet()) {
             returnMap.put(challenge, (HelpdeskAnswer)tempMap.get(challenge));
@@ -116,13 +116,13 @@ public final class ChaiCrFactory {
             final ChaiConfiguration chaiConfiguration
     )
     {
-        final ChaiResponseSet.FormatType formatType = ChaiResponseSet.FormatType.valueOf(chaiConfiguration.getSetting(ChaiSetting.CR_DEFAULT_FORMAT_TYPE));
+        final Answer.FormatType formatType = Answer.FormatType.valueOf(chaiConfiguration.getSetting(ChaiSetting.CR_DEFAULT_FORMAT_TYPE));
         return makeAnswerMap(crMap, formatType, chaiConfiguration);
     }
 
     private static Map<Challenge,Answer> makeAnswerMap(
             final Map<Challenge, String> crMap,
-            final ChaiResponseSet.FormatType formatType,
+            final Answer.FormatType formatType,
             final ChaiConfiguration chaiConfiguration
     )
     {
@@ -139,6 +139,9 @@ public final class ChaiCrFactory {
                     break;
                 case HELPDESK:
                     answer = ChaiHelpdeskAnswer.newAnswer(answerText, challenge.getChallengeText());
+                    break;
+                case BCRYPT:
+                    answer = BCryptAnswer.newAnswer(answerText, caseInsensitive);
                     break;
                 default:
                     answer = TextAnswer.newAnswer(answerText, caseInsensitive);

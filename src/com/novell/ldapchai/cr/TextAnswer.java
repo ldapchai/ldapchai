@@ -50,7 +50,7 @@ class TextAnswer implements Answer {
     public Element toXml() {
         final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
         answerElement.setText(answer);
-        answerElement.setAttribute(ChaiResponseSet.XNL_ATTRIBUTE_CONTENT_FORMAT, ChaiResponseSet.FormatType.TEXT.toString());
+        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.TEXT.toString());
         return answerElement;
     }
 
@@ -65,7 +65,7 @@ class TextAnswer implements Answer {
 
     public AnswerBean asAnswerBean() {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(ChaiResponseSet.FormatType.TEXT);
+        answerBean.setType(FormatType.TEXT);
         answerBean.setAnswerText(answer);
         answerBean.setCaseInsensitive(caseInsensitive);
         return answerBean;

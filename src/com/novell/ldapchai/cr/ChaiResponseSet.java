@@ -46,17 +46,7 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 // ----------------------------- CONSTANTS ----------------------------
 
 
-// -------------------------- ENUMERATIONS --------------------------
-
-    public static enum FormatType {
-        TEXT,
-        SHA1,
-        SHA1_SALT,
-        HELPDESK
-        ;
-    }
-
-// ------------------------------ FIELDS ------------------------------
+    // ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiResponseSet.class.getName());
 
@@ -76,7 +66,7 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
     final static String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
     final static String XML_ATTRIBUTE_REQUIRED = "required";
     final static String XML_ATTRIBUTE_HASH_COUNT = "hashcount";
-    final static String XNL_ATTRIBUTE_CONTENT_FORMAT = "format";
+    final static String XML_ATTRIBUTE_CONTENT_FORMAT = "format";
     final static String XML_ATTRIBUTE_SALT = "salt";
     final static String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
     final static String XNL_ATTRIBUTE_MAX_LENGTH = "maxLength";
@@ -405,12 +395,12 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
                 final String challengeText
         ) throws ChaiOperationException
         {
-            final String formatStr = answerElement.getAttribute(XNL_ATTRIBUTE_CONTENT_FORMAT).getValue();
-            final FormatType respFormat;
+            final String formatStr = answerElement.getAttribute(XML_ATTRIBUTE_CONTENT_FORMAT).getValue();
+            final Answer.FormatType respFormat;
             if (formatStr != null && formatStr.length() > 0) {
-                respFormat = FormatType.valueOf(formatStr);
+                respFormat = Answer.FormatType.valueOf(formatStr);
             } else {
-                respFormat = FormatType.TEXT;
+                respFormat = Answer.FormatType.TEXT;
             }
             final Answer answer;
             switch (respFormat) {
@@ -423,6 +413,9 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
                     break;
                 case HELPDESK:
                     answer = ChaiHelpdeskAnswer.fromXml(answerElement, challengeText);
+                    break;
+                case BCRYPT:
+                    answer = BCryptAnswer.fromXml(answerElement, caseInsensitive);
                     break;
                 default:
                     answer = null;
