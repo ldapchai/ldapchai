@@ -20,6 +20,9 @@
 package com.novell.ldapchai.cr.bean;
 
 import com.novell.ldapchai.cr.Answer;
+import com.novell.ldapchai.cr.BCryptAnswer;
+import com.novell.ldapchai.cr.ChaiChallenge;
+import com.novell.ldapchai.cr.ChaiCrFactory;
 
 import java.io.Serializable;
 
@@ -77,5 +80,9 @@ public class AnswerBean implements Serializable {
 
     public void setCaseInsensitive(boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
+    }
+
+    public Answer asAnswer(final ChallengeBean associatedChallengeBean) {
+        return ChaiCrFactory.answerBeanToAnswer(this, ChaiChallenge.fromChallengeBean(associatedChallengeBean));
     }
 }

@@ -39,7 +39,7 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
     private final String challengeText;
     private final String answer;
 
-    private ChaiHelpdeskAnswer(final String answer, final String challengeText) {
+    ChaiHelpdeskAnswer(final String answer, final String challengeText) {
         if (answer == null || answer.length() < 1) {
             throw new IllegalArgumentException("missing answer text");
         }

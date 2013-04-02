@@ -36,12 +36,12 @@ class Sha1SaltAnswer implements Answer {
     private final int hashCount;
     private final boolean caseInsensitive;
 
-    private Sha1SaltAnswer(final String answer, final String salt, final int saltCount, final boolean caseInsensitive) {
-        if (answer == null || answer.length() < 1) {
+    Sha1SaltAnswer(final String answerHash, final String salt, final int saltCount, final boolean caseInsensitive) {
+        if (answerHash == null || answerHash.length() < 1) {
             throw new IllegalArgumentException("missing answer text");
         }
 
-        this.answerHash = answer;
+        this.answerHash = answerHash;
         this.salt = salt;
         this.hashCount = saltCount;
         this.caseInsensitive = caseInsensitive;

@@ -11,7 +11,7 @@ public class BCryptAnswer implements Answer {
     private final String answerHash;
     private final boolean caseInsensitive;
 
-    private BCryptAnswer(final String answerHash, final boolean caseInsensitive) {
+    BCryptAnswer(final String answerHash, final boolean caseInsensitive) {
         if (answerHash == null || answerHash.length() < 1) {
             throw new IllegalArgumentException("missing answer text");
         }

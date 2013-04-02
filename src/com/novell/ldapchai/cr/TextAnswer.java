@@ -29,7 +29,7 @@ class TextAnswer implements Answer {
     private String answer;
     private boolean caseInsensitive;
 
-    private TextAnswer(final String answer, final boolean caseInsensitive) {
+    TextAnswer(final String answer, final boolean caseInsensitive) {
         if (answer == null || answer.length() < 1) {
             throw new IllegalArgumentException("missing answer text");
         }
