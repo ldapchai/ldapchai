@@ -156,7 +156,11 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
         {
             final List<String> results = entryValues.get(Attribute.DISALLOWED_ATTRIBUTES.getLdapAttribute());
             if (results != null) {
-                final String normalizedValue = StringHelper.stringCollectionToString(results,"\n");
+                final List<String> cleanedResults = new ArrayList<String>();
+                for (ListIterator<String> iterator = results.listIterator(); iterator.hasNext(); ) {
+                    cleanedResults.add(iterator.next().replaceAll("[ :]", ""));
+                }
+                final String normalizedValue = StringHelper.stringCollectionToString(cleanedResults,"\n");
                 returnMap.put(ChaiPasswordRule.DisallowedAttributes.getKey(),normalizedValue);
             }
         }

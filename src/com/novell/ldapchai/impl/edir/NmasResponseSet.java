@@ -137,7 +137,15 @@ public class NmasResponseSet extends AbstractResponseSet {
         try {
             final ExtendedResponse response = theUser.getChaiProvider().extendedOperation(request);
             final byte[] responseValue = response.getEncodedValue();
+
+            if (responseValue == null) {
+                return null;
+            }
+
             String xmlString = new String(responseValue);
+            if (xmlString.length() <= 16) {
+                return null;
+            }
 
             xmlString = xmlString.substring(16); // first 16 bytes are non-xml header.
             final ChallengeSet cs = parseNmasUserResponseXML(xmlString);
