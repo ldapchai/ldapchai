@@ -52,12 +52,12 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
     public ChaiPasswordPolicy getPasswordPolicy() throws ChaiUnavailableException, ChaiOperationException {
 
-        final Map<ChaiPasswordRule, String> policyMap = new HashMap<ChaiPasswordRule, String>();
+        final Map<String, String> policyMap = new LinkedHashMap<String, String>();
 
         // defaults for ad policy
-        policyMap.put(ChaiPasswordRule.AllowNumeric, String.valueOf(true));
-        policyMap.put(ChaiPasswordRule.AllowSpecial, String.valueOf(true));
-        policyMap.put(ChaiPasswordRule.CaseSensitive, String.valueOf(true));
+        policyMap.put(ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf(true));
+        policyMap.put(ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf(true));
+        policyMap.put(ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf(true));
 
         //read minimum password length from domain
         final Matcher domainMatcher = Pattern.compile("(dc=[a-z0-9-]+[,]*)+", Pattern.CASE_INSENSITIVE).matcher(this.getEntryDN());
@@ -65,11 +65,20 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             final String domainDN = domainMatcher.group();
             final String minPwdLength = this.getChaiProvider().readStringAttribute(domainDN, "minPwdLength");
             if (minPwdLength != null && minPwdLength.length() > 0) {
-                policyMap.put(ChaiPasswordRule.MinimumLength, minPwdLength);
+                policyMap.put(ChaiPasswordRule.MinimumLength.getKey(), minPwdLength);
             }
         }
 
-        return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicyByRule(policyMap);
+        // Read PSO policy object.
+        final String psoObject = this.readStringAttribute(ChaiConstant.ATTR_AD_PASSWORD_POLICY_RESULTANT_PSO);
+        if (psoObject != null && psoObject.length() > 0) {
+            final MsDSPasswordSettingsImpl msDSPasswordSetting = new MsDSPasswordSettingsImpl(psoObject,this.getChaiProvider());
+            for (final String loopKey : msDSPasswordSetting.getKeys()) {
+                policyMap.put(loopKey, msDSPasswordSetting.getValue(loopKey));
+            }
+        }
+
+        return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicy(policyMap);
     }
 
     public String readPassword() throws ChaiUnavailableException, ChaiOperationException {

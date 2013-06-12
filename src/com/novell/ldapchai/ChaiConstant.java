@@ -282,6 +282,19 @@ public interface ChaiConstant {
     public static final String ATTR_EDIR_PASSWORD_POLICY_FORGOTTEN_LOGIN_CONFIG = "nsimForgottenLoginConfig";
     public static final String ATTR_EDIR_PASSWORD_POLICY_PASSWORD_LIFETIME = "nspmMinPasswordLifetime";
 
+    public static final String ATTR_AD_PASSWORD_POLICY_PRECEDENCE = "msDS-PasswordSettingsPrecedence";
+    public static final String ATTR_AD_PASSWORD_POLICY_REVERSIBLE_ENCRYPTION = "msDS-PasswordReversibleEncryptionEnabled";
+    public static final String ATTR_AD_PASSWORD_POLICY_HISTORY_LENGTH = "msDS-PasswordHistoryLength";
+    public static final String ATTR_AD_PASSWORD_POLICY_COMPLEXITY_ENABLED = "msDS-PasswordComplexityEnabled";
+    public static final String ATTR_AD_PASSWORD_POLICY_MIN_PASSWORD_LENGTH = "msDS-MinimumPasswordLength";
+    public static final String ATTR_AD_PASSWORD_POLICY_MIN_PASSWORD_AGE = "msDS-MinimumPasswordAge";
+    public static final String ATTR_AD_PASSWORD_POLICY_MAX_PASSWORD_AGE = "msDS-MaximumPasswordAge";
+    public static final String ATTR_AD_PASSWORD_POLICY_LOCKOUT_THRESHOLD = "msDS-LockoutThreshold";
+    public static final String ATTR_AD_PASSWORD_POLICY_LOCKOUT_WINDOW = "msDS-LockoutObservationWindow";
+    public static final String ATTR_AD_PASSWORD_POLICY_LOCKOUT_DURATION = "msDS-LockoutDuration";
+    public static final String ATTR_AD_PASSWORD_POLICY_APPLIES_TO = "msDS-PSOAppliesTo";
+    public static final String ATTR_AD_PASSWORD_POLICY_RESULTANT_PSO = "msDS-ResultantPSO";
+
     public static final String OBJECTCLASS_BASE_LDAP_USER = "inetOrgPerson";
     public static final String OBJECTCLASS_BASE_LDAP_GROUP = "groupOfNames";
     public static final String OBJECTCLASS_BASE_LDAP_ORGANIZATIONAL_UNIT = "organizationalUnit";
