@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.provider;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.novell.ldapchai.util.ChaiLogger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -115,17 +117,27 @@ class WireTraceWrapper extends AbstractWrapper {
             throws Throwable
     {
         final long opNumber = getNextCounter();
+        final String messageLabel = "id=" + realProvider.getIdentifier() + ",op#" + opNumber;
 
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("begin op#" + opNumber + " " + AbstractProvider.methodToDebugStr(method, args));
+            LOGGER.trace("begin " + messageLabel + " method " + AbstractProvider.methodToDebugStr(method, args));
         }
 
         final long startTime = System.currentTimeMillis();
         final Object result = method.invoke(realProvider, args);
         final long totalTime = System.currentTimeMillis() - startTime;
 
+        String debugResult = null;
+        if (result != null) {
+            try {
+                debugResult = (new GsonBuilder().disableHtmlEscaping().create()).toJson(result);
+            } catch (Exception e) {
+                debugResult = toString();
+            }
+        }
+
         if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("finish op#" + opNumber + " result: " + result + " (" + totalTime + "ms)");
+            LOGGER.trace("finish " + messageLabel + " result: " + (debugResult== null ? "null" : debugResult) + " (" + totalTime + "ms)");
         }
 
         return result;

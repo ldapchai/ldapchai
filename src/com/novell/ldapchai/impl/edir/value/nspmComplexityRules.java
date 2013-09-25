@@ -21,10 +21,10 @@ package com.novell.ldapchai.impl.edir.value;
 
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.util.ChaiLogger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -94,7 +94,7 @@ public class nspmComplexityRules {
                      final Map<Rule,String> returnRules = new HashMap<Rule,String>();
                      int violationsAllowed = 0;
 
-                     final org.jdom.Attribute violationsAttribute = loopRuleSet.getAttribute("ViolationsAllowed");
+                     final org.jdom2.Attribute violationsAttribute = loopRuleSet.getAttribute("ViolationsAllowed");
                      if (violationsAttribute != null && violationsAttribute.getValue().length() > 0) {
                          violationsAllowed = Integer.parseInt(violationsAttribute.getValue());
                      }
@@ -104,7 +104,7 @@ public class nspmComplexityRules {
 
                          final List ruleAttributes = loopRuleElement.getAttributes();
                          for (final Object attributeObject : ruleAttributes) {
-                             final org.jdom.Attribute loopAttribute = (org.jdom.Attribute)attributeObject;
+                             final org.jdom2.Attribute loopAttribute = (org.jdom2.Attribute)attributeObject;
 
                              final Rule rule = Rule.valueOf(loopAttribute.getName());
                              final String value = loopAttribute.getValue();

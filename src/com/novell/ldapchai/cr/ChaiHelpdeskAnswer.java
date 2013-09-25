@@ -22,9 +22,8 @@ package com.novell.ldapchai.cr;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.internal.Base64Util;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -33,9 +32,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
-    private static ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiHelpdeskAnswer.class);
-
+class ChaiHelpdeskAnswer implements HelpdeskAnswer {
     private final String challengeText;
     private final String answer;
 
@@ -46,18 +43,6 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
 
         this.answer = answer;
         this.challengeText = challengeText;
-    }
-
-    public static ChaiHelpdeskAnswer newAnswer(final String answer, final String challengeText) {
-        return new ChaiHelpdeskAnswer(answer, challengeText);
-    }
-
-    public static ChaiHelpdeskAnswer fromXml(final Element element, final String challengeText)
-            throws ChaiOperationException
-    {
-        final String hashedAnswer = element.getText();
-        final String answerValue = decryptValue(hashedAnswer, challengeText);
-        return new ChaiHelpdeskAnswer(answerValue,challengeText);
     }
 
     public String answerText() {
@@ -99,7 +84,6 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
     }
 
     private static String decryptValue(final String value, final String key)
-            throws ChaiOperationException
     {
         try {
             if (value == null || value.length() < 1) {
@@ -114,7 +98,7 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
             return new String(decrypted);
         } catch (Exception e) {
             final String errorMsg = "unexpected error performing helpdesk answer decrypt operation: " + e.getMessage();
-            throw new ChaiOperationException(errorMsg,ChaiError.CHAI_INTERNAL_ERROR);
+            throw new IllegalArgumentException(errorMsg);
         }
     }
 
@@ -133,5 +117,22 @@ public class ChaiHelpdeskAnswer implements HelpdeskAnswer {
         answerBean.setType(FormatType.HELPDESK);
         answerBean.setAnswerText(answer);
         return answerBean;
+    }
+
+    static class ChaiHelpdeskAnswerFactory implements ImplementationFactory {
+        public Answer newAnswer(AnswerFactory.AnswerConfiguration answerConfiguration, String answerText) {
+            return new ChaiHelpdeskAnswer(answerText, answerConfiguration.getChallengeText());
+        }
+
+        public Answer fromAnswerBean(AnswerBean input, String challengeText) {
+            return new ChaiHelpdeskAnswer(input.answerText, challengeText);
+        }
+
+        public ChaiHelpdeskAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+            final String hashedAnswer = element.getText();
+            final String answerValue = decryptValue(hashedAnswer, challengeText);
+            return new ChaiHelpdeskAnswer(answerValue,challengeText);
+        }
+
     }
 }

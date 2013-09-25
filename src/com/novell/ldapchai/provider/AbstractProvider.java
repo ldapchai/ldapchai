@@ -61,6 +61,8 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     protected Map<String,Object> providerProperties = new HashMap<String,Object>();
     private DIRECTORY_VENDOR cachedDirectoryVendor;
 
+    private static int idCounter = 0;
+    private int counter = idCounter++;
 
 // -------------------------- STATIC METHODS --------------------------
 
@@ -619,4 +621,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return cachedDirectoryVendor;
     }
 
+    public String getIdentifier() {
+        return String.valueOf(counter);
+    }
 }

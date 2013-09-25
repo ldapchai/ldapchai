@@ -30,10 +30,10 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
-import org.jdom.*;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.jdom2.*;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -343,13 +343,13 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
                 for (final Object o : rootElement.getChildren(XML_NODE_RESPONSE)) {
                     final Element loopResponseElement = (Element) o;
                     final Challenge newChallenge = parseResponseElement(loopResponseElement);
-                    final Answer answer = parseAnswerElement(loopResponseElement.getChild(XML_NODE_ANSWER_VALUE),caseInsensitive,newChallenge.getChallengeText());
+                    final Answer answer = AnswerFactory.fromXml(loopResponseElement.getChild(XML_NODE_ANSWER_VALUE),caseInsensitive,newChallenge.getChallengeText());
                     crMap.put(newChallenge, answer);
                 }
                 for (final Object o : rootElement.getChildren(XML_NODE_HELPDESK_RESPONSE)) {
                     final Element loopResponseElement = (Element) o;
                     final Challenge newChallenge = parseResponseElement(loopResponseElement);
-                    final HelpdeskAnswer answer = (HelpdeskAnswer)parseAnswerElement(loopResponseElement.getChild(XML_NODE_ANSWER_VALUE),caseInsensitive,newChallenge.getChallengeText());
+                    final HelpdeskAnswer answer = (HelpdeskAnswer)AnswerFactory.fromXml(loopResponseElement.getChild(XML_NODE_ANSWER_VALUE),caseInsensitive,newChallenge.getChallengeText());
                     helpdeskCrMap.put(newChallenge, answer);
                 }
             } catch (JDOMException e) {
@@ -387,41 +387,6 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
             final int maxLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MAX_LENGTH).getIntValue();
 
             return new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
-        }
-
-        private static Answer parseAnswerElement(
-                final Element answerElement,
-                final boolean caseInsensitive,
-                final String challengeText
-        ) throws ChaiOperationException
-        {
-            final String formatStr = answerElement.getAttribute(XML_ATTRIBUTE_CONTENT_FORMAT).getValue();
-            final Answer.FormatType respFormat;
-            if (formatStr != null && formatStr.length() > 0) {
-                respFormat = Answer.FormatType.valueOf(formatStr);
-            } else {
-                respFormat = Answer.FormatType.TEXT;
-            }
-            final Answer answer;
-            switch (respFormat) {
-                case SHA1_SALT:
-                case SHA1:
-                    answer = Sha1SaltAnswer.fromXml(answerElement,caseInsensitive);
-                    break;
-                case TEXT:
-                    answer = TextAnswer.fromXml(answerElement,caseInsensitive);
-                    break;
-                case HELPDESK:
-                    answer = ChaiHelpdeskAnswer.fromXml(answerElement, challengeText);
-                    break;
-                case BCRYPT:
-                    answer = BCryptAnswer.fromXml(answerElement, caseInsensitive);
-                    break;
-                default:
-                    answer = null;
-
-            }
-            return answer;
         }
     }
 

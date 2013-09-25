@@ -38,7 +38,7 @@ import com.novell.ldapchai.util.StringHelper;
 import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigRequest;
 import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigResponse;
 import com.novell.security.nmas.mgmt.NMASChallengeResponse;
-import org.jdom.JDOMException;
+import org.jdom2.JDOMException;
 
 import java.io.IOException;
 import java.util.*;

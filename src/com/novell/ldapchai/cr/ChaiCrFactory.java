@@ -104,7 +104,7 @@ public final class ChaiCrFactory {
         for (final ChallengeBean challengeBean : challengeResponses) {
             final AnswerBean answerBean = challengeBean.getAnswer();
             final Challenge challenge = ChaiChallenge.fromChallengeBean(challengeBean);
-            tempCrMap.put(challenge,answerBeanToAnswer(answerBean,challenge));
+            tempCrMap.put(challenge, AnswerFactory.fromAnswerBean(answerBean, challenge.getChallengeText()));
             if (answerBean.isCaseInsensitive() != caseInsensitive) {
                 throw new IllegalArgumentException("all answers must have the same caseInsensitive value");
             }
@@ -113,7 +113,7 @@ public final class ChaiCrFactory {
         for (final ChallengeBean challengeBean : helpdeskChallengeResponses) {
             final AnswerBean answerBean = challengeBean.getAnswer();
             final Challenge challenge = ChaiChallenge.fromChallengeBean(challengeBean);
-            tempHelpdeskCrMap.put(challenge,(HelpdeskAnswer)answerBeanToAnswer(answerBean,challenge));
+            tempHelpdeskCrMap.put(challenge,(HelpdeskAnswer) AnswerFactory.fromAnswerBean(answerBean, challenge.getChallengeText()));
         }
 
         return new ChaiResponseSet(tempCrMap, tempHelpdeskCrMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date());
@@ -157,26 +157,16 @@ public final class ChaiCrFactory {
             final ChaiConfiguration chaiConfiguration
     )
     {
-        final boolean caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
+
         final Map<Challenge,Answer> answerMap = new LinkedHashMap<Challenge, Answer>();
         for (final Challenge challenge : crMap.keySet()) {
+            final AnswerFactory.AnswerConfiguration answerConfiguration = new AnswerFactory.AnswerConfiguration();
+            answerConfiguration.caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
+            answerConfiguration.formatType = formatType;
+            answerConfiguration.hashCount = Integer.parseInt(chaiConfiguration.getSetting(ChaiSetting.CR_CHAI_SALT_COUNT));
+            answerConfiguration.challengeText = challenge.getChallengeText();  //needed for helpdesk challenges
             final String answerText = crMap.get(challenge);
-            final Answer answer;
-            switch (formatType) {
-                case SHA1_SALT:
-                case SHA1:
-                    final int saltCount = Integer.parseInt(chaiConfiguration.getSetting(ChaiSetting.CR_CHAI_SALT_COUNT));
-                    answer = Sha1SaltAnswer.newAnswer(answerText, saltCount, caseInsensitive);
-                    break;
-                case HELPDESK:
-                    answer = ChaiHelpdeskAnswer.newAnswer(answerText, challenge.getChallengeText());
-                    break;
-                case BCRYPT:
-                    answer = BCryptAnswer.newAnswer(answerText, caseInsensitive);
-                    break;
-                default:
-                    answer = TextAnswer.newAnswer(answerText, caseInsensitive);
-            }
+            final Answer answer = AnswerFactory.newAnswer(answerConfiguration, answerText);
             answerMap.put(challenge,answer);
         }
         return answerMap;
@@ -256,32 +246,4 @@ public final class ChaiCrFactory {
         return ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML(inputXmlString);
     }
 
-    public static Answer answerBeanToAnswer(final AnswerBean input, final Challenge challenge) {
-        if (input == null) {
-            throw new IllegalStateException("input cannot be null");
-        }
-        if (input.type == null) {
-            throw new IllegalStateException("format type cannot be null");
-        }
-        switch (input.type) {
-            case BCRYPT:
-                return new BCryptAnswer(input.getAnswerHash(),input.isCaseInsensitive());
-
-            case SHA1:
-            case SHA1_SALT:
-                return new Sha1SaltAnswer(input.getAnswerHash(),input.getSalt(),input.getHashCount(),input.isCaseInsensitive());
-
-            case TEXT:
-                return new TextAnswer(input.getAnswerText(), input.isCaseInsensitive());
-
-            case HELPDESK:
-                if (challenge == null) {
-                    throw new IllegalArgumentException("challenge cannot be null to convert helpdesk answers");
-                }
-                return new ChaiHelpdeskAnswer(input.getAnswerText(), challenge.getChallengeText());
-
-            default:
-                throw new UnsupportedOperationException("unknown type format for answer");
-        }
-    }
 }

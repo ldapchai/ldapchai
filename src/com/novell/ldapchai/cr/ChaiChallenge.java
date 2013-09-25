@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.cr;
 
+import com.google.gson.Gson;
 import com.novell.ldapchai.cr.bean.ChallengeBean;
 
 import java.io.Serializable;
@@ -50,7 +51,7 @@ public class ChaiChallenge implements Challenge, Serializable {
     {
         this.adminDefined = adminDefined;
         this.required = required;
-        this.challengeText = challengeText;
+        this.challengeText = challengeText == null ? null : challengeText.trim();
         this.minLength = minLength < 0 ? 2 : minLength;
         this.maxLength = maxLength < 0 ? 255 : maxLength;
     }
@@ -152,19 +153,7 @@ public class ChaiChallenge implements Challenge, Serializable {
 
     public String toString()
     {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("Challenge: ");
-        if (getChallengeText() != null && getChallengeText().length() > 0) {
-            sb.append('\"').append(getChallengeText()).append('\"');
-        } else {
-            sb.append("[undefined]");
-        }
-        sb.append(", required: ").append(String.valueOf(isRequired()));
-        sb.append(", adminDefined: ").append(String.valueOf(isAdminDefined()));
-        sb.append(", minLength: ").append(getMinLength());
-        sb.append(", maxLength: ").append(getMaxLength());
-
-        return sb.toString();
+        return "Challenge: " + new Gson().toJson(asChallengeBean());
     }
 
 // ------------------------ INTERFACE METHODS ------------------------

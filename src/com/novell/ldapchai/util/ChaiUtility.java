@@ -400,7 +400,7 @@ public class ChaiUtility {
 
                 { // try to detect Novell eDirectory
                     for (final String vendorVersionValue : vendorVersions) {
-                        if (vendorVersionValue.contains("Novell eDirectory")) {
+                        if (vendorVersionValue.contains("eDirectory")) {
                             return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
                         }
                     }

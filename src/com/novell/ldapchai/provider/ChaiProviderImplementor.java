@@ -114,4 +114,6 @@ public interface ChaiProviderImplementor extends ChaiProvider {
     @Retention(RetentionPolicy.RUNTIME)
             @interface SearchOperation {
     }
+
+    String getIdentifier();
 }

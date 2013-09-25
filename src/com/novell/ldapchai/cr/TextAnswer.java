@@ -21,11 +21,9 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.util.ChaiLogger;
-import org.jdom.Element;
+import org.jdom2.Element;
 
 class TextAnswer implements Answer {
-    private static ChaiLogger LOGGER = ChaiLogger.getLogger(TextAnswer.class);
-
     private String answer;
     private boolean caseInsensitive;
 
@@ -36,15 +34,6 @@ class TextAnswer implements Answer {
 
         this.answer = answer;
         this.caseInsensitive = caseInsensitive;
-    }
-
-    public static TextAnswer newAnswer(final String answer, final boolean caseInsensitive) {
-        return new TextAnswer(answer,caseInsensitive);
-    }
-
-    public static TextAnswer fromXml(final Element element, final boolean caseInsensitive) {
-        final String answerValue = element.getText();
-        return new TextAnswer(answerValue,caseInsensitive);
     }
 
     public Element toXml() {
@@ -71,4 +60,19 @@ class TextAnswer implements Answer {
         return answerBean;
     }
 
+    static class TextAnswerFactory implements ImplementationFactory {
+        public TextAnswer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
+            final boolean caseInsensitive = answerConfiguration.caseInsensitive;
+            return new TextAnswer(answer,caseInsensitive);
+        }
+
+        public Answer fromAnswerBean(AnswerBean input, String challengeText) {
+            return new TextAnswer(input.getAnswerText(), input.isCaseInsensitive());
+        }
+
+        public TextAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+            final String answerValue = element.getText();
+            return new TextAnswer(answerValue,caseInsensitive);
+        }
+    }
 }

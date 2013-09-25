@@ -2,39 +2,19 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.util.BCrypt;
-import com.novell.ldapchai.util.ChaiLogger;
-import org.jdom.Element;
+import org.jdom2.Element;
 
-public class BCryptAnswer implements Answer {
-    private static ChaiLogger LOGGER = ChaiLogger.getLogger(Sha1SaltAnswer.class);
-
+class BCryptAnswer implements Answer {
     private final String answerHash;
     private final boolean caseInsensitive;
 
-    BCryptAnswer(final String answerHash, final boolean caseInsensitive) {
+    private BCryptAnswer(final String answerHash, final boolean caseInsensitive) {
         if (answerHash == null || answerHash.length() < 1) {
             throw new IllegalArgumentException("missing answer text");
         }
 
         this.answerHash = answerHash;
         this.caseInsensitive = caseInsensitive;
-    }
-
-    public static BCryptAnswer newAnswer(final String answer, final boolean caseInsensitive) {
-        if (answer == null || answer.length() < 1) {
-            throw new IllegalArgumentException("missing answerHash text");
-        }
-
-
-        final String salt = BCrypt.gensalt();
-        final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
-        final String hashedAnswer = BCrypt.hashpw(casedAnswer, salt);
-        return new BCryptAnswer(hashedAnswer,caseInsensitive);
-    }
-
-    public static BCryptAnswer fromXml(final Element element, final boolean caseInsensitive) {
-        final String answerValue = element.getText();
-        return new BCryptAnswer(answerValue,caseInsensitive);
     }
 
     public Element toXml() {
@@ -63,4 +43,28 @@ public class BCryptAnswer implements Answer {
         return answerBean;
     }
 
+    static class BCryptAnswerFactory implements ImplementationFactory{
+        public BCryptAnswer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
+            if (answer == null || answer.length() < 1) {
+                throw new IllegalArgumentException("missing answerHash text");
+            }
+
+            final boolean caseInsensitive = answerConfiguration.isCaseInsensitive();
+            final String salt = BCrypt.gensalt();
+            final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
+            final String hashedAnswer = BCrypt.hashpw(casedAnswer, salt);
+            return new BCryptAnswer(hashedAnswer,caseInsensitive);
+        }
+
+        public BCryptAnswer fromAnswerBean(final AnswerBean answerBean, final String challengeText) {
+            return new BCryptAnswer(answerBean.getAnswerHash(), answerBean.isCaseInsensitive());
+        }
+
+        public BCryptAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+            final String answerValue = element.getText();
+            return new BCryptAnswer(answerValue,caseInsensitive);
+        }
+
+
+    }
 }

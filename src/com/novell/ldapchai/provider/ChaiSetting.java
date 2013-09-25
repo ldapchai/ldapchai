@@ -463,7 +463,7 @@ public enum ChaiSetting {
 
     /**
      * Setting key to control the number of iterations to perform the CR Salt when the
-     * format type is set to {@link com.novell.ldapchai.cr.Answer.FormatType#SHA1_SALT}
+     * format type is set to a hash type that allows for multiple iterations such as {@link com.novell.ldapchai.cr.Answer.FormatType#SHA1_SALT}
      * <p/>
      * <i>Default: </i><b>1000</b>
      *
