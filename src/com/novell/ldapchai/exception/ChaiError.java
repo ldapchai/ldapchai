@@ -44,6 +44,9 @@ public enum ChaiError {
     UNSUPPORTED_OPERATION       ("UnsupportedOperation",        11),
     NO_ACCESS                   ("NoAccess",                    12),
     READ_ONLY_VIOLATION         ("ReadOnlyViolation",           13),
+    ACCOUNT_DISABLED            ("AccountDisabled",             14),
+    ACCOUNT_EXPIRED             ("AccountExpired",              15),
+
 
     PASSWORD_PREVIOUSLYUSED     ("Password_PreviouslyUsed",     500),
     PASSWORD_BADOLDPASSWORD     ("Password_BadOldPassword",     501),

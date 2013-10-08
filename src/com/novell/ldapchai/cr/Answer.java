@@ -18,7 +18,9 @@ public interface Answer {
         SHA1_SALT(new HashSaltAnswer.HashSaltAnswerFactory()),
         SHA256_SALT(new HashSaltAnswer.HashSaltAnswerFactory()),
         SHA512_SALT(new HashSaltAnswer.HashSaltAnswerFactory()),
-        BCRYPT(new BCryptAnswer.BCryptAnswerFactory()),
+        BCRYPT(new PasswordCryptAnswer.PasswordCryptAnswerFactory()),
+        SCRYPT(new PasswordCryptAnswer.PasswordCryptAnswerFactory()),
+        PBKDF2(new PKDBF2Answer.PKDBF2AnswerFactory()),
         HELPDESK(new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory()),
         ;
 

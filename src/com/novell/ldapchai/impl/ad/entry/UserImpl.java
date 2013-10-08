@@ -27,6 +27,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
+import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
@@ -285,12 +286,16 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     }
 
     public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
-        final String computedBit = readStringAttribute("msDS-User-Account-Control-Computed");
-        if (computedBit != null && computedBit.length() > 0) {
-            final int intValue = Integer.parseInt(computedBit);
-            return ((intValue & COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE) == COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE);
+        final String disabledUserSearchFilter = "(useraccountcontrol:1.2.840.113556.1.4.803:=2)";
+        final SearchHelper searchHelper = new SearchHelper();
+        searchHelper.setFilter(disabledUserSearchFilter);
+        searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
+        final Map<String, Map<String, String>> results = this.getChaiProvider().search(this.getEntryDN(),searchHelper);
+        for (final String resultDN : results.keySet()) {
+            if (resultDN != null && resultDN.equals(this.getEntryDN())) {
+                return false;
+            }
         }
-
-        return false;
+        return true;
     }
 }
