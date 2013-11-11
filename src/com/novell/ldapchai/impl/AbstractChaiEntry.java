@@ -200,14 +200,30 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     public final ChaiEntry getParentEntry()
             throws ChaiUnavailableException
     {
-        final StringBuilder sb = new StringBuilder(this.getEntryDN());
-        final int firstCommaPos = this.getEntryDN().indexOf(",");
-        if (firstCommaPos == -1) {
+        final String parentDNString = getParentDNString(this.getEntryDN());
+        if (parentDNString == null) {
             return null;
         }
-        sb.delete(0, firstCommaPos + 1);
-        final String parentDN = sb.toString();
-        return ChaiFactory.createChaiEntry(parentDN,getChaiProvider());
+        return ChaiFactory.createChaiEntry(parentDNString,getChaiProvider());
+    }
+
+    private static String getParentDNString(final String inputDN) {
+        if (inputDN == null || inputDN.length() < 0) {
+            return null;
+        }
+        final String dnSeparatorRegex = "(?<!\\\\),";
+        final String[] dnSegments = inputDN.split(dnSeparatorRegex);
+        if (dnSegments.length < 2) {
+            return null;
+        }
+        final StringBuilder parentDN = new StringBuilder();
+        for (int i = 1; i < (dnSegments.length); i++) {
+            parentDN.append(dnSegments[i]);
+            if (i < (dnSegments.length - 1)) {
+                parentDN.append(",");
+            }
+        }
+        return parentDN.toString();
     }
 
     public final boolean isValid()

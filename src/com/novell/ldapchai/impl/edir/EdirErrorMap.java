@@ -88,7 +88,6 @@ public class EdirErrorMap implements ErrorMap {
         PASSWORD_SPECIAL_DISALLOWED   (NMASConstants.NMAS_E_PASSWORD_SPECIAL_DISALLOWED,   ChaiError.PASSWORD_SPECIAL_DISALLOWED,    true, false),
         PASSWORD_TOO_SOON             (NMASConstants.NMAS_E_PASSWORD_LIFE_MIN,             ChaiError.PASSWORD_TOO_SOON,              true, false),
 
-        UNKNOWN                                        (-1,   ChaiError.UNKNOWN,                       true, false),
         BUFFER_TOO_SMALL                               (-119, ChaiError.UNKNOWN,                       true, false),
         VOLUME_FLAG_NOT_SET                            (-120, ChaiError.UNKNOWN,                       true, false),
         NO_ITEMS_FOUND                                 (-121, ChaiError.UNKNOWN,                       true, false),
@@ -514,6 +513,7 @@ public class EdirErrorMap implements ErrorMap {
         ERR_GETTING_FILE_SIZE                          (-799, ChaiError.UNKNOWN,                       true, false),
 
         UNSUPPORTED_OPERATION                          (Integer.MAX_VALUE,   ChaiError.UNSUPPORTED_OPERATION, true, false, "Unrecognized extended operation"),
+        UNKNOWN                                        (-1,   ChaiError.UNKNOWN,                       true, false),
 
 
         ;

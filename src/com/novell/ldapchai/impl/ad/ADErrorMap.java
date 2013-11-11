@@ -74,7 +74,6 @@ public class ADErrorMap implements ErrorMap {
     }
 
     enum ADError {
-        UNKNOWN                 ("-999",                ChaiError.UNKNOWN,                      true, false),
         NO_SUCH_OBJECT          ("0x20",                ChaiError.NO_SUCH_ENTRY,                true, false),
         NO_SUCH_ATTRIBUTE       ("0x10",                ChaiError.NO_SUCH_ATTRIBUTE,            true, false),
         INTRUDER_LOCKOUT        ("80090308",            ChaiError.INTRUDER_LOCKOUT,             true, true, "data 775"),
@@ -90,6 +89,8 @@ public class ADErrorMap implements ErrorMap {
         ACCOUNT_DISABLED        ("80090308",            ChaiError.ACCOUNT_DISABLED,             true, true, "data 533"),
         ACCOUNT_EXPIRED         ("80090308",            ChaiError.ACCOUNT_EXPIRED,              true, true, "data 701"),
         BAD_PASSWORD            ("error code 19",       ChaiError.PASSWORD_BADPASSWORD,         true, true),
+
+        UNKNOWN                 ("-999",                ChaiError.UNKNOWN,                      true, false),
         ;
 
 

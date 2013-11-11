@@ -37,6 +37,7 @@ import javax.net.ssl.X509TrustManager;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Default {@code ChaiProvider} implementation; wraps the standard JNDI ldap API.  Runs in a standard Java SE 1.5 (or greater) environment.  Supports
@@ -223,7 +224,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         NamingEnumeration<SearchResult> answer = null;
         boolean result = false;
         try {
-            answer = ldapConnection.search(entryDN, "(" + attributeName + "={0})", new Object[]{ba}, ctls);
+            answer = ldapConnection.search(addJndiEscape(entryDN), "(" + attributeName + "={0})", new Object[]{ba}, ctls);
             result = answer.hasMore();
         } catch (NamingException e) {
             convertNamingException(e);
@@ -272,7 +273,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         // Create the object.
         final DirContext ldapConnection = getLdapConnection();
         try {
-            ldapConnection.createSubcontext(entryDN, attrs);
+            ldapConnection.createSubcontext(addJndiEscape(entryDN), attrs);
         } catch (NamingException e) {
             convertNamingException(e);
         }
@@ -288,7 +289,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         final LdapContext ldapConnection = getLdapConnection();
         try {
-            ldapConnection.destroySubcontext(entryDN);
+            ldapConnection.destroySubcontext(addJndiEscape(entryDN));
         } catch (NamingException e) {
             convertNamingException(e);
         }
@@ -314,7 +315,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         // Modify the Attributes.
         final LdapContext ldapConnection = getLdapConnection();
         try {
-            ldapConnection.modifyAttributes(entryDN, modificationItem);
+            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
         } catch (NamingException e) {
             convertNamingException(e);
         }
@@ -374,7 +375,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
 
             // Get the Enumeration of attribute values.
-            namingEnum = ldapConnection.getAttributes(entryDN, attributesArray).get(attributeName).getAll();
+            namingEnum = ldapConnection.getAttributes(addJndiEscape(entryDN), attributesArray).get(attributeName).getAll();
             while (namingEnum.hasMore()) {
                 final Object value = namingEnum.next();
 
@@ -423,7 +424,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             // Get the Enumeration of attribute values.
             final LdapContext ldapConnection = getLdapConnection();
 
-            namingEnum = ldapConnection.getAttributes(entryDN, attributesArray).get(attributeName).getAll();
+            namingEnum = ldapConnection.getAttributes(addJndiEscape(entryDN), attributesArray).get(attributeName).getAll();
             while (namingEnum.hasMore()) {
                 attributeValues.add(namingEnum.next().toString());
             }
@@ -475,7 +476,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         try {
             if (attributes == null || attributes.isEmpty()) {
-                returnedAttribs = ldapConnection.getAttributes(entryDN, null);
+                returnedAttribs = ldapConnection.getAttributes(addJndiEscape(entryDN), null);
                 attrEnumeration = returnedAttribs.getAll();
                 while (attrEnumeration.hasMoreElements()) {
                     final Attribute attribute = (Attribute) attrEnumeration.nextElement();
@@ -486,7 +487,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     }
                 }
             } else { // Loop through each requested attribute
-                returnedAttribs = ldapConnection.getAttributes(entryDN, attributes.toArray(new String[attributes.size()]));
+                returnedAttribs = ldapConnection.getAttributes(addJndiEscape(entryDN), attributes.toArray(new String[attributes.size()]));
                 for (final String loopAttr : attributes) {
                     // Ask JNDI for the attribute (which actually includes all the values)
                     final Attribute attribute = returnedAttribs.get(loopAttr);
@@ -534,7 +535,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // Modify the Attributes.
         try {
-            ldapConnection.modifyAttributes(entryDN, mods);
+            ldapConnection.modifyAttributes(addJndiEscape(entryDN), mods);
         } catch (NamingException e) {
             convertNamingException(e);
         }
@@ -635,7 +636,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // Modify the Attributes.
         try {
-            ldapConnection.modifyAttributes(entryDN, modificationItem);
+            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
             // inform jndi the attribute is binary.
             ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
         } catch (NamingException e) {
@@ -686,7 +687,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // Modify the Attributes.
         try {
-            ldapConnection.modifyAttributes(entryDN, modificationItem);
+            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
             // inform jndi the attribute is binary.
             ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
         } catch (NamingException e) {
@@ -731,7 +732,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // Modify the Attributes.
         try {
-            ldapConnection.modifyAttributes(entryDN, modificationItem);
+            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
         } catch (NamingException e) {
             convertNamingException(e);
         }
@@ -766,7 +767,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // Modify the Attributes.
         try {
-            ldapConnection.modifyAttributes(entryDN, modificationItemArray);
+            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItemArray);
         } catch (NamingException e) {
             convertNamingException(e);
         }
@@ -823,7 +824,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         // add in basic connection info
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.PROVIDER_URL, ldapURL);
-        env.put(Context.SECURITY_PRINCIPAL, chaiConfig.getSetting(ChaiSetting.BIND_DN));
+        env.put(Context.SECURITY_PRINCIPAL, addJndiEscape(chaiConfig.getSetting(ChaiSetting.BIND_DN)));
         env.put(Context.SECURITY_CREDENTIALS, chaiConfig.getBindPassword());
 
         // set the JNDI pooler up
@@ -926,11 +927,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         try {
             // Search in the tree.
             final LdapContext ldapConnection = getLdapConnection();
-            answer = ldapConnection.search(baseDN, searchHelper.getFilter(), ctls);
+            answer = ldapConnection.search(addJndiEscape(baseDN), searchHelper.getFilter(), ctls);
             while (answer.hasMore()) {
                 final SearchResult searchResult = answer.next();
                 final StringBuilder entryDN = new StringBuilder();
-                entryDN.append(searchResult.getName());
+                entryDN.append(removeJndiEscapes(searchResult.getName()));
                 if (baseDN != null && baseDN.length() > 0) {
                     if (entryDN.length() > 0) {
                         entryDN.append(',');
@@ -1017,5 +1018,25 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     public boolean isConnected() {
         return jndiConnection != null;
+    }
+
+    protected static String removeJndiEscapes(final String input) {
+        if (input == null) {
+            return null;
+        }
+
+        // remove surrounding quotes if the internal value contains a / charachter
+        final String slashEscapePattern = "^\".*/.*\"$";
+        if (input.matches(slashEscapePattern)) {
+            return input.replaceAll("^\"|\"$","");
+        }
+        return input;
+    }
+
+    protected static String addJndiEscape(final String input) {
+        if (input == null) {
+            return null;
+        }
+        return input.replaceAll("/", "\\\\2f");
     }
 }

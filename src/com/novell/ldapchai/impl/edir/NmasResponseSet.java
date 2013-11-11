@@ -408,8 +408,10 @@ public class NmasResponseSet extends AbstractResponseSet {
         }
 
         final XMLOutputter outputter = new XMLOutputter();
-        outputter.setFormat(Format.getCompactFormat());
-
+        final Format format = Format.getRawFormat();
+        format.setTextMode(Format.TextMode.PRESERVE);
+        format.setLineSeparator("");
+        outputter.setFormat(format);
         return outputter.outputString(rootElement);
     }
 

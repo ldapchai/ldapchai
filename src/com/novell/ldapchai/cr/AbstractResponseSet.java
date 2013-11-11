@@ -134,7 +134,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
                 final List<String> challengeTexts = this.getChallengeSet().getChallengeTexts();
 
                 if (!challengeTexts.contains(loopChallengeText)) {
-                    throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT, loopChallengeText);
+                    throw new ChaiValidationException("multiple challenges have the same value", ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT, loopChallengeText);
                 }
             }
         }

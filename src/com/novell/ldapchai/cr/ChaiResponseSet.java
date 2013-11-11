@@ -271,8 +271,8 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
         final Document doc = new Document(rootElement);
         final XMLOutputter outputter = new XMLOutputter();
-        final Format format = Format.getCompactFormat();
-        format.setTextMode(Format.TextMode.NORMALIZE);
+        final Format format = Format.getRawFormat();
+        format.setTextMode(Format.TextMode.PRESERVE);
         format.setLineSeparator("");
         outputter.setFormat(format);
         return outputter.outputString(doc);
