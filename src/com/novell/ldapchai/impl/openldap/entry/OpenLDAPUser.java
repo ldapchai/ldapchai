@@ -33,7 +33,7 @@ class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         super(userDN, chaiProvider);
     }
 
-    public void setPassword(final String newPassword)
+    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         try {

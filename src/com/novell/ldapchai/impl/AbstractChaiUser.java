@@ -141,6 +141,12 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     public void setPassword(final String newPassword)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
+        this.setPassword(newPassword, false);
+    }
+
+    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
+    {
         try {
             writeStringAttribute(ATTR_PASSWORD, newPassword);
         } catch (ChaiOperationException e) {

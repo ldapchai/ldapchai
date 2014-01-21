@@ -20,6 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
@@ -478,6 +479,25 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        public final void writeBinaryAttribute(
+                final String entryDN,
+                final String attributeName,
+                final byte[][] values,
+                final boolean overwrite,
+                final ChaiRequestControl[] controls
+        )
+        {
+            if (entryDN == null) {
+                throw new NullPointerException("entryDN must not be null");
+            }
+            if (attributeName == null) {
+                throw new NullPointerException("attributeName must not be null");
+            }
+            if (values == null) {
+                throw new NullPointerException("values must not be null");
+            }
+        }
+
         public final void writeStringAttribute(final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite)
         {
             if (entryDN == null) {
@@ -595,9 +615,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
                         currentURLsHavePath = true;
                     }
 
-                    if (i != splitUrls.length) {
-                        newUrlConfig.append(",");
-                    }
+                    newUrlConfig.append(",");
                 }
 
                 rootDSEChaiConfig.setSetting(ChaiSetting.BIND_URLS,newUrlConfig.toString());

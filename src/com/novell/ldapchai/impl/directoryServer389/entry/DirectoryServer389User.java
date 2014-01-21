@@ -34,7 +34,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
     }
 
     @Override
-    public void setPassword(final String newPassword)
+    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         try {

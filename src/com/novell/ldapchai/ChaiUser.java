@@ -333,7 +333,7 @@ public interface ChaiUser extends ChaiEntry {
      * If the old password is not correct, or the new password does not meet the server's requirements, a discriptive exception
      * will be thrown.
      * <p/>
-     * This method should only be used for administators setting a different user's password.  For self
+     * This method should only be used for administrators setting a different user's password.  For self
      * changes, use {@link #changePassword(String,String)}.
      * <p/>
      * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
@@ -345,10 +345,23 @@ public interface ChaiUser extends ChaiEntry {
      * <p/>
      *
      * @param newPassword A new password value that conforms to the users password policy
+     * @param enforcePasswordPolicy Indicates if the password policy should be enforced.  The ldap vendor may or may not
+     *                              support this.
      * @throws ChaiPasswordPolicyException If the new password does not meet the user's password policy
      * @throws ChaiUnavailableException    If the directory server(s) are unavailable
      * @throws com.novell.ldapchai.exception.ChaiOperationException If there is an error while setting the password
      * @see #changePassword(String,String)
+     */
+    void setPassword(String newPassword, boolean enforcePasswordPolicy)
+            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;
+
+
+    /**
+     * See {@link #setPassword(String, boolean)}. Sets enforcePasswordPolicy to false.
+     * @param newPassword
+     * @throws ChaiUnavailableException
+     * @throws ChaiPasswordPolicyException
+     * @throws ChaiOperationException
      */
     void setPassword(String newPassword)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;

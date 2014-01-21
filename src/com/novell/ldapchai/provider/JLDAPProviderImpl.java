@@ -21,6 +21,7 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldap.*;
 import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -420,6 +421,20 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
     public void writeBinaryAttribute(final String entryDN, final String attribute, final byte[][] values, final boolean overwrite)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
+        writeBinaryAttribute(entryDN, attribute, values, overwrite, null);
+    }
+
+    @ChaiProviderImplementor.LdapOperation
+    @ChaiProviderImplementor.ModifyOperation
+    public void writeBinaryAttribute(
+            final String entryDN,
+            final String attribute,
+            final byte[][] values,
+            final boolean overwrite,
+            final ChaiRequestControl[] controls
+    )
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
+    {
         activityPreCheck();
         INPUT_VALIDATOR.writeBinaryAttribute(entryDN, attribute, values, overwrite);
 
@@ -431,7 +446,13 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
 
         final LDAPModification mod = new LDAPModification(overwrite ? LDAPModification.REPLACE : LDAPModification.ADD, ldapAttr);
         try {
-            ldapConnection.modify(entryDN, mod);
+            if (controls != null && controls.length > 0) {
+                final LDAPConstraints constraints = new LDAPConstraints();
+                constraints.setControls(convertControls(controls));
+                ldapConnection.modify(entryDN, mod, constraints);
+            } else {
+                ldapConnection.modify(entryDN, mod);
+            }
         } catch (LDAPException e) {
             throw ChaiOperationException.forErrorMessage(e.getLDAPErrorMessage());
         }
@@ -617,5 +638,21 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
 
     public boolean isConnected() {
         return ldapConnection != null && ldapConnection.isConnected();
+    }
+
+    protected static LDAPControl[] convertControls(final ChaiRequestControl[] controls) {
+        if (controls == null) {
+            return null;
+        }
+
+        final LDAPControl[] newControls = new LDAPControl[controls.length];
+        for (int i = 0; i < controls.length; i++) {
+            newControls[i] = new LDAPControl(
+                    controls[i].getId(),
+                    controls[i].isCritical(),
+                    controls[i].getValue()
+            );
+        }
+        return newControls;
     }
 }

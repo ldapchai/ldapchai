@@ -20,6 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -28,16 +29,12 @@ import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.*;
 import javax.naming.directory.*;
-import javax.naming.ldap.ExtendedRequest;
-import javax.naming.ldap.ExtendedResponse;
-import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.*;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Default {@code ChaiProvider} implementation; wraps the standard JNDI ldap API.  Runs in a standard Java SE 1.5 (or greater) environment.  Supports
@@ -613,6 +610,18 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     )
             throws ChaiUnavailableException, ChaiOperationException
     {
+        writeBinaryAttribute(entryDN, attributeName, values, overwrite, null);
+    }
+
+    public final void writeBinaryAttribute(
+            final String entryDN,
+            final String attributeName,
+            final byte[][] values,
+            final boolean overwrite,
+            final ChaiRequestControl[] controls
+    )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         activityPreCheck();
         INPUT_VALIDATOR.writeBinaryAttribute(entryDN, attributeName, values, overwrite);
 
@@ -636,6 +645,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // Modify the Attributes.
         try {
+            if (controls != null && controls.length > 0) {
+                ldapConnection.setRequestControls(convertControls(controls));
+            }
+
             ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
             // inform jndi the attribute is binary.
             ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
@@ -741,6 +754,17 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     @LdapOperation
     @ModifyOperation
     public final void writeStringAttributes(final String entryDN, final Map<String,String> attributeValueProps, final boolean overwrite)
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        writeStringAttributes(entryDN, attributeValueProps, overwrite, null);
+    }
+
+    public final void writeStringAttributes(
+            final String entryDN,
+            final Map<String,String> attributeValueProps,
+            final boolean overwrite,
+            final BasicControl[] controls
+    )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
@@ -1038,5 +1062,21 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             return null;
         }
         return input.replaceAll("/", "\\\\2f");
+    }
+
+    protected static BasicControl[] convertControls(final ChaiRequestControl[] controls) {
+        if (controls == null) {
+            return null;
+        }
+
+        final BasicControl[] newControls = new BasicControl[controls.length];
+        for (int i = 0; i < controls.length; i++) {
+            newControls[i] = new BasicControl(
+                    controls[i].getId(),
+                    controls[i].isCritical(),
+                    controls[i].getValue()
+            );
+        }
+        return newControls;
     }
 }

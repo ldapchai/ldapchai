@@ -472,6 +472,14 @@ public enum ChaiSetting {
      */
     CR_CHAI_SALT_COUNT("chai.cr.chai.saltCount", "1000", true, Validator.INTEGER_VALIDATOR),
 
+    /**
+     * If true, then during the {@link com.novell.ldapchai.ChaiUser#setPassword(String),true} operation, the control for
+     * OID LDAP_SERVER_POLICY_HINTS_OID - 1.2.840.113556.1.4.2066 will be sent, causing AD to enforce password policy
+     * rules including history rule requirements on the operation.
+     * <p/>
+     * <i>Default: </i><b>false</b>
+     */
+    AD_SET_POLICY_HINTS_ON_PW_SET("chai.ad.setPolicyHintsOnPwSet", "false", true, Validator.BOOLEAN_VALIDATOR),
 
     ;
 

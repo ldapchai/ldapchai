@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
+import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ErrorMap;
@@ -409,6 +410,24 @@ public interface ChaiProvider {
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
     void writeBinaryAttribute(String entryDN, String attributeName, byte[][] values, boolean overwrite)
+            throws ChaiUnavailableException, ChaiOperationException;
+
+    /**
+     * Write the binary values to the specified object's specified attribute.
+     *
+     * @param entryDN       A valid entryDN
+     * @param attributeName A valid attribute of the entryDN
+     * @param values        An array of values to add
+     * @param overwrite     Overwrite existing values
+     * @param controls      additional request directives to the ldap server
+     * @throws ChaiOperationException   If an error is encountered during the operation
+     * @throws ChaiUnavailableException If no directory servers are reachable
+     * @throws IllegalStateException    If the underlying connection is not in an available state
+     * @see com.novell.ldapchai.ChaiEntry#writeStringAttribute(String, String)
+     */
+    @ChaiProviderImplementor.LdapOperation
+    @ChaiProviderImplementor.ModifyOperation
+    void writeBinaryAttribute(String entryDN, String attributeName, byte[][] values, boolean overwrite, ChaiRequestControl[] controls)
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**

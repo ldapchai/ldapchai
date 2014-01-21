@@ -143,7 +143,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         throw new ChaiOperationException("unknown error retreiving password (null response)", ChaiError.UNKNOWN);
     }
 
-    public void setPassword(final String newPassword)
+    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
         final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
