@@ -20,12 +20,10 @@
 package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.*;
-import com.novell.ldapchai.exception.ChaiErrors;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.exception.*;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
 import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
@@ -41,6 +39,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     private static final int COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT = 0x0010;
     private static final int COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED = 0x800000;
     private static final int ADS_UF_DONT_EXPIRE_PASSWD = 0x10000;
+    private static final String LDAP_SERVER_POLICY_HINTS_OID = "1.2.840.113556.1.4.2066";
 
     UserImpl(final String userDN, final ChaiProvider chaiProvider)
     {
@@ -104,11 +103,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         this.writeStringAttribute("lockoutTime","0");
     }
 
-    public void setPassword(final String newPassword)
+    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         final String quotedPwd = '"' + newPassword + '"';
-        final byte[]  littleEndianEncodedPwd;
+        final byte[] littleEndianEncodedPwd;
         try {
             littleEndianEncodedPwd = quotedPwd.getBytes("UTF-16LE");
         } catch (UnsupportedEncodingException e) {
@@ -116,7 +115,21 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         }
         final byte[][] multiBA = new byte[][] { littleEndianEncodedPwd };
 
-        writeBinaryAttribute("unicodePwd",multiBA);
+        try {
+            if (enforcePasswordPolicy && this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.AD_SET_POLICY_HINTS_ON_PW_SET)) {
+                final byte[] value = {48,(byte)132,0,0,0,3,2,1,1}; //0x1 berEncoded
+                final ChaiRequestControl[] controls = new ChaiRequestControl[] {new ChaiRequestControl(LDAP_SERVER_POLICY_HINTS_OID , true, value)};
+                chaiProvider.writeBinaryAttribute(this.getEntryDN(),"unicodePwd",multiBA,true,controls);
+            } else {
+                writeBinaryAttribute("unicodePwd",multiBA);
+            }
+        } catch (ChaiOperationException e) {
+            if (e.getErrorCode() == ChaiError.UNKNOWN) {
+                throw new ChaiOperationException(e.getMessage(),ChaiError.PASSWORD_BADPASSWORD);
+            } else {
+                throw e;
+            }
+        }
     }
 
     public boolean isPasswordExpired()
@@ -162,7 +175,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         try {
             replaceBinaryAttribute("unicodePwd", littleEndianEncodedOldPwd, littleEndianEncodedNewPwd);
         } catch (ChaiOperationException e) {
-            throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+            if (e.getErrorCode() == ChaiError.UNKNOWN) {
+                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiError.PASSWORD_BADPASSWORD);
+            } else {
+                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+            }
         }
 
     }
