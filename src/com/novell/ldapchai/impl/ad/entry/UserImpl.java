@@ -259,19 +259,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             return null;  // passwords never expire according to the domain policy.
         }
 
-        long pwdLastSetMs = 0;
-        {
-            final String maxPwdAgeString = readAttrs.get("pwdLastSet");
-            if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
-                long v = Long.parseLong(maxPwdAgeString);
-                v = Math.abs(v); // why is it stored as a negative value?  who knows.
-                v = v / 10000; // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak into the default 30 minute window a few nanoseconds early.  Thanks again MS.
-                pwdLastSetMs = v;
-            }
+        final String maxPwdAgeString = readAttrs.get("pwdLastSet");
+        if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
+            final Date pwdLastSet = ADEntries.convertWinEpochToDate(maxPwdAgeString);
+            final long pwExpireTimeMs = pwdLastSet.getTime() + maxPwdAgeMs;
+            return new Date(pwExpireTimeMs);
         }
 
-        final long pwdExpirateTimeMs = pwdLastSetMs + maxPwdAgeMs;
-        return new Date(pwdExpirateTimeMs);
+        return null;
     }
 
     private String readDomainValue(final String attribute) throws ChaiUnavailableException, ChaiOperationException {

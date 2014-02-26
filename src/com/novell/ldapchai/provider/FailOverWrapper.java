@@ -181,7 +181,7 @@ class FailOverWrapper implements InvocationHandler {
                         throw (ChaiUnavailableException)e;
                     } else {
                         LOGGER.warn("unexpected chai api error",e);
-                        throw new IllegalStateException(e.getMessage(),e);             
+                        throw new IllegalStateException(e.getMessage(),e);
                     }
                 }
             }
@@ -269,16 +269,10 @@ class FailOverWrapper implements InvocationHandler {
 
         private void configureInitialState(final ChaiConfiguration chaiConfig)
         {
-            try {
-                for (final String loopUrl : chaiConfig.bindURLsAsList()) {
-                    final ChaiConfiguration loopConfig = (ChaiConfiguration) chaiConfig.clone();
-                    loopConfig.setSetting(ChaiSetting.BIND_URLS, loopUrl);
-                    proividerSlots.add(new ProviderSlot(loopConfig, loopUrl));
-                }
-            } catch (CloneNotSupportedException e) {
-                final String errorMsg = "unexpected api error";
-                LOGGER.warn(errorMsg, e);
-                throw new IllegalStateException(errorMsg);
+            for (final String loopUrl : chaiConfig.bindURLsAsList()) {
+                final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfig);
+                loopConfig.setSetting(ChaiSetting.BIND_URLS, loopUrl);
+                proividerSlots.add(new ProviderSlot(loopConfig, loopUrl));
             }
 
             if (!LAST_KNOWN_GOOD_CACHE.isEmpty()) {

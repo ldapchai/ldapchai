@@ -424,7 +424,7 @@ public class EdirEntries {
         for (final String loopURL : ldapURLs) {
             ChaiProvider loopProvider = null;
             try {
-                final ChaiConfiguration loopConfig = (ChaiConfiguration) chaiConfiguration.clone();
+                final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfiguration);
                 loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
                 loopConfig.setSetting(ChaiSetting.FAILOVER_CONNECT_RETRIES, "1");
 
@@ -438,8 +438,6 @@ public class EdirEntries {
             } catch (ChaiUnavailableException e) {
                 //disregard
             } catch (ChaiOperationException e) {
-                //disregard
-            } catch (CloneNotSupportedException e) {
                 //disregard
             } finally {
                 try {

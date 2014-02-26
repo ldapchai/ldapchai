@@ -41,7 +41,7 @@ import java.util.*;
  * @author Jason D. Rivard
  * @see ChaiSetting
  */
-public class ChaiConfiguration implements Cloneable, Serializable {
+public class ChaiConfiguration implements Serializable {
 // ----------------------------- CONSTANTS ----------------------------
 
 
@@ -108,6 +108,25 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     }
 
     /**
+     * Construct a new configuration based on the input configuration settings, including the bind DN, password and ldap URLs.  The
+     * new instance will be unlocked, regardless of the lock status of the input configuratio.
+     */
+    public ChaiConfiguration(final ChaiConfiguration existingConfiguration)
+    {
+        final Properties newSettings = new Properties();
+        for (final Enumeration keyEnum = existingConfiguration.settings.propertyNames(); keyEnum.hasMoreElements();) {
+            final String keyName = (String) keyEnum.nextElement();
+            newSettings.setProperty(keyName, existingConfiguration.settings.getProperty(keyName));
+        }
+        settings = newSettings;
+
+        trustManager = existingConfiguration.trustManager;
+        implementationConfiguration = existingConfiguration.implementationConfiguration;
+        locked = false;
+    }
+
+
+    /**
      * Set a single settings.  Each setting is avalable in the {@link ChaiSetting} enumeration.
      *
      * @param setting the setting to set
@@ -169,34 +188,6 @@ public class ChaiConfiguration implements Cloneable, Serializable {
     }
 
 // ------------------------ CANONICAL METHODS ------------------------
-
-    /**
-     * Clone this configuration and all of its settings, including the bind DN, password and ldap URLs.  The
-     * returned clone will always be unlocked.
-     *
-     * @return An unlocked copy of the current configuration.
-     * @throws CloneNotSupportedException
-     */
-    public Object clone()
-            throws CloneNotSupportedException
-    {
-        super.clone();
-        
-        final ChaiConfiguration newInstance = new ChaiConfiguration();
-
-        final Properties newSettings = new Properties();
-        for (Enumeration keyEnum = settings.propertyNames(); keyEnum.hasMoreElements();) {
-            final String keyName = (String) keyEnum.nextElement();
-            newSettings.setProperty(keyName, settings.getProperty(keyName));
-        }
-        newInstance.settings = newSettings;
-        newInstance.trustManager = trustManager;
-
-        newInstance.implementationConfiguration = implementationConfiguration;
-        newInstance.locked = false;
-
-        return newInstance;
-    }
 
     /**
      * Returns a string value suitable for debugging.  Sensitive values such as passwords are

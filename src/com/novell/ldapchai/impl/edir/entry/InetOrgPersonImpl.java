@@ -188,9 +188,8 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
 
         //check the limits and see if they are different, if they are different, then we're expired for sure.
         final int limit = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT),0);
-        final int current = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING),0);
-        final int remaining = limit - current;
-        if (current != limit) {
+        final int remaining = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING),0);
+        if (remaining != limit) {
             LOGGER.debug("user " + this.getEntryDN() + " has " + remaining + " grace logins remaining, marking as expired");
             return true;
         }

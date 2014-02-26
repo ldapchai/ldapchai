@@ -66,10 +66,14 @@ public class ADEntries {
     public static Date convertWinEpochToDate(final String dateString)
     {
         if (dateString == null) {
-            throw new NullPointerException("dateString must be non-null");
+            return null;
         }
 
         final long timestampAsNs = Long.parseLong(dateString);
+        if (timestampAsNs <= 0) {
+            return null;
+        }
+
         final long timestampAsMs = timestampAsNs / 10000;
         final long timestampAsJavaMs = timestampAsMs + AD_EPOCH_OFFSET_MS;
 

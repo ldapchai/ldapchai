@@ -601,36 +601,9 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
 
             try {
-                final ChaiConfiguration rootDSEChaiConfig = (ChaiConfiguration)this.getChaiConfiguration().clone();
-                final String ldapUrls = rootDSEChaiConfig.getSetting(ChaiSetting.BIND_URLS);
-                final String[] splitUrls = ldapUrls.split(ChaiConfiguration.LDAP_URL_SEPERATOR_REGEX_PATTERN);
-                final StringBuilder newUrlConfig = new StringBuilder();
-                boolean currentURLsHavePath = false;
-
-                for (int i = 0; i < splitUrls.length; i++) {
-                    final URI uri = URI.create(splitUrls[i]);
-                    final String newURI = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
-                    newUrlConfig.append(newURI);
-                    if (uri.getPath() != null && uri.getPath().length() > 0) {
-                        currentURLsHavePath = true;
-                    }
-
-                    newUrlConfig.append(",");
-                }
-
-                rootDSEChaiConfig.setSetting(ChaiSetting.BIND_URLS,newUrlConfig.toString());
-                final ChaiProvider rootDseProvider = currentURLsHavePath ? ChaiProviderFactory.createProvider(rootDSEChaiConfig) : this;
-
-                // can not call the ChaiFactory here, because ChaiFactory in turn calls this method to get the
-                // directory vendor.  Instead, we will go directly to the Generic ChaiFactory
-
-                final GenericEntryFactory genericEntryFactory = new GenericEntryFactory();
-                final ChaiEntry rootDseEntry = genericEntryFactory.createChaiEntry("",rootDseProvider);
+                final ChaiEntry rootDseEntry = ChaiUtility.getRootDSE(this);
                 cachedDirectoryVendor = ChaiUtility.determineDirectoryVendor(rootDseEntry);
             } catch (ChaiOperationException e) {
-                LOGGER.warn("error while attempting to determine directory vendor: " + e.getMessage());
-                cachedDirectoryVendor = DIRECTORY_VENDOR.GENERIC;
-            } catch (CloneNotSupportedException e) {
                 LOGGER.warn("error while attempting to determine directory vendor: " + e.getMessage());
                 cachedDirectoryVendor = DIRECTORY_VENDOR.GENERIC;
             }

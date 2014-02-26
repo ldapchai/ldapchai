@@ -22,11 +22,13 @@ package com.novell.ldapchai.util;
 import com.novell.ldapchai.*;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.provider.ChaiSetting;
 
+import java.net.URI;
 import java.util.*;
 
 /**
@@ -290,15 +292,15 @@ public class ChaiUtility {
         int testCount = 0;
         int successCount = 0;
 
-        for (final String loopURL : ldapURLs) {
+        final Collection<ChaiConfiguration> perReplicaProviders = splitConfigurationPerReplica(
+                chaiEntry.getChaiProvider().getChaiConfiguration(),
+                Collections.singletonMap(ChaiSetting.FAILOVER_CONNECT_RETRIES, "1")
+        );
+
+        for (final ChaiConfiguration loopConfiguration : perReplicaProviders) {
             ChaiProvider loopProvider = null;
             try {
-                final ChaiConfiguration loopConfig = (ChaiConfiguration) chaiConfiguration.clone();
-                loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
-                loopConfig.setSetting(ChaiSetting.FAILOVER_CONNECT_RETRIES, "1");
-
-                loopProvider = ChaiProviderFactory.createProvider(loopConfig);
-
+                loopProvider = ChaiProviderFactory.createProvider(loopConfiguration);
                 if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, value)) {
                     successCount++;
                 }
@@ -308,11 +310,11 @@ public class ChaiUtility {
                 //disregard
             } catch (ChaiOperationException e) {
                 //disregard
-            } catch (CloneNotSupportedException e) {
-                //disregard
             } finally {
                 try {
-                    loopProvider.close();
+                    if (loopProvider != null) {
+                        loopProvider.close();
+                    }
                 } catch (Exception e) {
                     //already closed, whatever.
                 }
@@ -329,6 +331,29 @@ public class ChaiUtility {
         }
 
         return testCount > 0 && testCount == successCount;
+    }
+
+    public static Collection<ChaiConfiguration> splitConfigurationPerReplica(
+            final ChaiConfiguration chaiConfiguration,
+            final Map<ChaiSetting,String> additionalSettings
+    ) {
+        final Collection<ChaiConfiguration> returnProviders = new ArrayList<ChaiConfiguration>();
+
+        final List<String> ldapURLs = chaiConfiguration.bindURLsAsList();
+
+        for (final String loopURL : ldapURLs) {
+            final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfiguration);
+            loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
+            if (additionalSettings != null) {
+                for (final ChaiSetting setting : additionalSettings.keySet()) {
+                    final String value = additionalSettings.get(setting);
+                    loopConfig.setSetting(setting,value);
+                }
+            }
+            returnProviders.add(loopConfig);
+        }
+
+        return returnProviders;
     }
 
 
@@ -439,5 +464,34 @@ public class ChaiUtility {
         }
 
         return ChaiProvider.DIRECTORY_VENDOR.GENERIC;
+    }
+
+    public static ChaiEntry getRootDSE(final ChaiProvider provider)
+            throws ChaiUnavailableException
+    {
+        final ChaiConfiguration rootDSEChaiConfig = new ChaiConfiguration(provider.getChaiConfiguration());
+        final String ldapUrls = rootDSEChaiConfig.getSetting(ChaiSetting.BIND_URLS);
+        final String[] splitUrls = ldapUrls.split(ChaiConfiguration.LDAP_URL_SEPERATOR_REGEX_PATTERN);
+        final StringBuilder newUrlConfig = new StringBuilder();
+
+        boolean currentURLsHavePath = false;
+        for (final String splitUrl : splitUrls) {
+            final URI uri = URI.create(splitUrl);
+            final String newURI = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
+            newUrlConfig.append(newURI);
+            if (uri.getPath() != null && uri.getPath().length() > 0) {
+                currentURLsHavePath = true;
+            }
+
+            newUrlConfig.append(",");
+        }
+
+        rootDSEChaiConfig.setSetting(ChaiSetting.BIND_URLS,newUrlConfig.toString());
+        final ChaiProvider rootDseProvider = currentURLsHavePath ? ChaiProviderFactory.createProvider(rootDSEChaiConfig) : provider;
+
+        // can not call the ChaiFactory here, because ChaiFactory in turn calls this method to get the
+        // directory vendor.  Instead, we will go directly to the Generic ChaiFactory
+        final GenericEntryFactory genericEntryFactory = new GenericEntryFactory();
+        return genericEntryFactory.createChaiEntry("",rootDseProvider);
     }
 }
