@@ -156,7 +156,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     public final Date readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readDateAttribute(ATTR_LAST_LOGIN);
+        final Set<String> readAttributes = new HashSet<String>(Arrays.asList(new String[]{ATTR_LAST_LOGIN,ATTR_LAST_LOGIN_TIMESTAMP}));
+        final Map<String,String> readResults = this.readStringAttributes(readAttributes);
+        final Date lastLoginDate = readResults.containsKey(ATTR_LAST_LOGIN) ? ADEntries.convertWinEpochToDate(readResults.get(ATTR_LAST_LOGIN)) : null;
+        final Date lastLoginDateTimestamp = readResults.containsKey(ATTR_LAST_LOGIN_TIMESTAMP) ? ADEntries.convertWinEpochToDate(readResults.get(ATTR_LAST_LOGIN_TIMESTAMP)) : null;
+        if (lastLoginDate == null || lastLoginDateTimestamp == null) {
+            return lastLoginDate == null ? lastLoginDateTimestamp : lastLoginDate;
+        }
+        return lastLoginDate.after(lastLoginDateTimestamp) ? lastLoginDate : lastLoginDateTimestamp;
     }
 
     public final void changePassword(final String oldPassword, final String newPassword)
@@ -262,8 +269,10 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         final String maxPwdAgeString = readAttrs.get("pwdLastSet");
         if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
             final Date pwdLastSet = ADEntries.convertWinEpochToDate(maxPwdAgeString);
-            final long pwExpireTimeMs = pwdLastSet.getTime() + maxPwdAgeMs;
-            return new Date(pwExpireTimeMs);
+            if (pwdLastSet != null) {
+                final long pwExpireTimeMs = pwdLastSet.getTime() + maxPwdAgeMs;
+                return new Date(pwExpireTimeMs);
+            }
         }
 
         return null;

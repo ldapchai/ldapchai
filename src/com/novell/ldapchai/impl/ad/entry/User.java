@@ -27,4 +27,6 @@ interface User extends Organizational_Person, ChaiUser {
      */
     public static final String ATTR_LAST_LOGIN = "lastLogon";
 
+    public static final String ATTR_LAST_LOGIN_TIMESTAMP = "lastLogonTimestamp";
+
 }
