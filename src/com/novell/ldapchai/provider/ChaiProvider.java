@@ -110,9 +110,10 @@ public interface ChaiProvider {
     public static enum DIRECTORY_VENDOR {
         GENERIC,
         NOVELL_EDIRECTORY,
-        MICROSOFT_ACTIVE_DIRECTORY,
         OPEN_LDAP,
         DIRECTORY_SERVER_389,
+        ORACLE_DS,
+        MICROSOFT_ACTIVE_DIRECTORY,
     }
 
 // -------------------------- OTHER METHODS --------------------------

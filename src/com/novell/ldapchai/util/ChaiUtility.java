@@ -440,6 +440,15 @@ public class ChaiUtility {
                 }
 
 
+                { // try to detect oracle ds
+                    for (final String vendorVersion : vendorVersions) {
+                        if (vendorVersion.contains("Sun-Directory-Server") || vendorVersion.contains("Oracle-Directory-Server")) {
+                            return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
+                        }
+                    }
+                }
+
+
                 { // try to detect 389 Directory
                     for (final String vendorNamesValue : vendorNames) {
                         if (vendorNamesValue.contains("389 Project")) {

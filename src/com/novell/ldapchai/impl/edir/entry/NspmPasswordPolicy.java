@@ -248,7 +248,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 ChaiPasswordRule.AllowLastCharSpecial),
 
         /**
-         * If the password should be recongnized as case sensitive (true/false).
+         * If the password should be recognized as case sensitive (true/false).
          */
         CASE_SENSITIVE(
                 TYPE.BOOLEAN,
@@ -258,7 +258,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
 
         /**
          * If the password must be unique when compared to previously used passwords (true/false).  This rule
-         * is not directly enforcable by the Chai API.
+         * is not directly enforceable by the Chai API.
          */
         PASSWORD_UNIQUE_REQUIRED(
                 TYPE.BOOLEAN,

@@ -234,7 +234,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
                 return true;
             }
         } catch (Exception e) {
-            LOGGER.trace("unexpected error during isValid check: " + e.getMessage());
+            LOGGER.trace("error during isValid check of '" + this.getEntryDN() + "', error: " + e.getMessage());
         }
 
         return false;

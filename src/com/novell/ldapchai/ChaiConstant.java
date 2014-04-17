@@ -295,6 +295,12 @@ public interface ChaiConstant {
     public static final String ATTR_AD_PASSWORD_POLICY_APPLIES_TO = "msDS-PSOAppliesTo";
     public static final String ATTR_AD_PASSWORD_POLICY_RESULTANT_PSO = "msDS-ResultantPSO";
 
+    public static final String ATTR_ORACLEDS_PASSWORD_POLICY_MIN_LENGTH = "pwdMinLength";
+    public static final String ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT = "pwdInHistory";
+    public static final String ATTR_ORACLEDS_PASSWORD_POLICY_MAX_PASSWORD_AGE = "pwdMaxAge";
+    public static final String ATTR_ORACLEDS_PASSWORD_POLICY_MIN_PASSWORD_AGE = "pwdMinAge";
+    public static final String ATTR_ORACLEDS_PASSWORD_SUB_ENTRY = "passwordPolicySubentry";
+
     public static final String OBJECTCLASS_BASE_LDAP_USER = "inetOrgPerson";
     public static final String OBJECTCLASS_BASE_LDAP_GROUP = "groupOfNames";
     public static final String OBJECTCLASS_BASE_LDAP_ORGANIZATIONAL_UNIT = "organizationalUnit";

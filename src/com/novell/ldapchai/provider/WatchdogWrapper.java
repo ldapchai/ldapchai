@@ -149,14 +149,14 @@ class WatchdogWrapper implements InvocationHandler {
 
         LOGGER.trace("checking for user password expiration to adjust watchdog timeout");
 
-        final boolean userPwExpired;
+        boolean userPwExpired;
         try {
             final String bindUserDN = realProvider.getChaiConfiguration().getSetting(ChaiSetting.BIND_DN);
             final ChaiUser bindUser = ChaiFactory.createChaiUser(bindUserDN, realProvider);
             userPwExpired = bindUser.isPasswordExpired();
         } catch (ChaiException e) {
-            LOGGER.error("unexpected error attempting to read user password expiration value during watchdog initialization: " + e.getMessage(),e);
-            return;
+            LOGGER.error("unexpected error attempting to read user password expiration value during watchdog initialization, will assume expiration, error: " + e.getMessage());
+            userPwExpired = true;
         }
 
         if (userPwExpired) {

@@ -23,6 +23,7 @@ import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -30,7 +31,7 @@ import java.util.Map;
  */
 public final class ChaiErrors {
 
-    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ErrorMap> errorMaps = new HashMap<ChaiProvider.DIRECTORY_VENDOR,ErrorMap>();
+    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ErrorMap> errorMaps = new LinkedHashMap<ChaiProvider.DIRECTORY_VENDOR,ErrorMap>();
 
     static {
         for (final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values()) {

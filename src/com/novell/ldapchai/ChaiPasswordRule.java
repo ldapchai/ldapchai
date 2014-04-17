@@ -49,7 +49,7 @@ public enum ChaiPasswordRule {
     /** Minimum number of lower case characters.  Default is 0. */
     MinimumLowerCase("chai.pwrule.lower.min", RuleType.MIN, "0"),
 
-    /** If false, then no numeric characters are permited.  Default is false. */
+    /** If false, then no numeric characters are permitted.  Default is false. */
     AllowNumeric("chai.pwrule.numeric.allow", RuleType.BOOLEAN, "false"),
 
     MinimumNumeric("chai.pwrule.numeric.min", RuleType.MIN, "0"),

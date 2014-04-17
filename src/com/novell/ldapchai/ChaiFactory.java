@@ -26,6 +26,7 @@ import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389Entry
 import com.novell.ldapchai.impl.edir.entry.EdirEntryFactory;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.impl.openldap.entry.OpenLDAPEntryFactory;
+import com.novell.ldapchai.impl.oracleds.entry.OracleDSEntryFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.util.ChaiLogger;
@@ -60,6 +61,7 @@ public final class ChaiFactory {
         ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389, new DirectoryServer389EntryFactory());
         ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.GENERIC, new GenericEntryFactory());
         ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP, new OpenLDAPEntryFactory());
+        ENTRY_FACTORY_MAP.put(ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS, new OracleDSEntryFactory());
     }
 // -------------------------- STATIC METHODS --------------------------
 

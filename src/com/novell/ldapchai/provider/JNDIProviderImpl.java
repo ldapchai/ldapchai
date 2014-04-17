@@ -747,6 +747,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         try {
             ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
         } catch (NamingException e) {
+            LOGGER.trace("error during write of attribute '" + attributeName + "', error: " + e.getMessage());
             convertNamingException(e);
         }
     }
