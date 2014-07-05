@@ -362,7 +362,7 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
             Locale challengeLocale = Locale.getDefault();
             if (localeAttr != null) {
-                challengeLocale = new Locale(localeAttr.getValue());
+                challengeLocale = parseLocaleString(localeAttr.getValue());
             }
 
             return new ChaiResponseSet(
@@ -437,4 +437,28 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         return returnList;
     }
 
+    public static Locale parseLocaleString(final String localeString) {
+        if (localeString == null) {
+            return Locale.getDefault();
+        }
+
+        final StringTokenizer st = new StringTokenizer(localeString, "_");
+
+        if (!st.hasMoreTokens()) {
+            return Locale.getDefault();
+        }
+
+        final String language = st.nextToken();
+        if (!st.hasMoreTokens()) {
+            return new Locale(language);
+        }
+
+        final String country = st.nextToken();
+        if (!st.hasMoreTokens()) {
+            return new Locale(language, country);
+        }
+
+        final String variant = st.nextToken("");
+        return new Locale(language, country, variant);
+    }
 }
