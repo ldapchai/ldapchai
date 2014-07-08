@@ -22,6 +22,7 @@ public interface Answer {
         SCRYPT(new PasswordCryptAnswer.PasswordCryptAnswerFactory()),
         PBKDF2(new PKDBF2Answer.PKDBF2AnswerFactory()),
         HELPDESK(new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory()),
+        NMAS(null),
         ;
 
         private ImplementationFactory factory;
