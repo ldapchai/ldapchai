@@ -112,4 +112,11 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser {
     {
         return OracleDSEntries.readPasswordPolicy(this);
     }
+
+    @Override
+    public void expirePassword()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        this.writeStringAttribute("passwordExpirationTime", "19700101010101Z");
+    }
 }

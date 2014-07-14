@@ -74,6 +74,8 @@ public enum ChaiPasswordRule {
     UniqueRequired("chai.pwrule.uniqueRequired", RuleType.BOOLEAN, "false"),
     ADComplexity("chai.pwrule.ADComplexity", RuleType.BOOLEAN, "false"),
     NovellComplexityRules("chai.pwrule.novellComplexity", RuleType.TEXT, ""),
+    AllowUserChange("chai.pwrule.allowUserChange", RuleType.BOOLEAN, "true"),
+    AllowAdminChange("chai.pwrule.allowAdminChange", RuleType.BOOLEAN, "true"),
 
     /**
      * A list of disallowed values that may not appear in the password.

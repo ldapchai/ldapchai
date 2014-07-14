@@ -31,7 +31,10 @@ import com.novell.ldapchai.util.StringHelper;
 import com.novell.security.nmas.jndi.ldap.ext.*;
 
 import javax.naming.ldap.ExtendedResponse;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Map;
 
 class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser {
     public String getLdapObjectClassName()
@@ -250,7 +253,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, "19700101010101Z");
+        this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, "19700101010101Z");
     }
 
     public boolean isLocked()

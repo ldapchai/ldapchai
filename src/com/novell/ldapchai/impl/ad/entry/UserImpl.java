@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 
 class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
+    // @todo: replace with @UserAccountControl
     private static final int COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE = 0x0002;
     private static final int COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT = 0x0010;
     private static final int COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED = 0x800000;
@@ -194,7 +195,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, "19700101010101Z");
+        this.writeStringAttribute("pwdLastSet", "0");
     }
 
     public boolean isLocked()
