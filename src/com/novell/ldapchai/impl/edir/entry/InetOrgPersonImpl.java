@@ -84,7 +84,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return true;
     }
 
-    public final void unlock()
+    public final void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
         String writeAttribute = "";
@@ -256,7 +256,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, "19700101010101Z");
     }
 
-    public boolean isLocked()
+    public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return readBooleanAttribute("lockedByIntruder");

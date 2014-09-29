@@ -191,10 +191,10 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return true;
     }
 
-    public void unlock() throws ChaiOperationException, ChaiUnavailableException {
+    public void unlockPassword() throws ChaiOperationException, ChaiUnavailableException {
     }
 
-    public boolean isLocked() throws ChaiOperationException, ChaiUnavailableException {
+    public boolean isPasswordLocked() throws ChaiOperationException, ChaiUnavailableException {
         return false;
     }
 

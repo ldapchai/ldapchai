@@ -64,22 +64,30 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
     public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
         final Date expireDate = readPasswordExpirationDate();
 
-        if (expireDate == null) {
+        return expireDate == null ? false : expireDate.before(new Date());
+
+    }
+
+    @Override
+    public void unlockPassword() throws ChaiOperationException, ChaiUnavailableException {
+        this.writeStringAttribute("passwordRetryCount", "0");
+        this.deleteAttribute("accountUnlockTime", null);    }
+
+    @Override
+    public boolean isPasswordLocked()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final Date unlockDate = readDateAttribute("accountUnlockTime");
+        if (unlockDate == null) {
             return false;
         }
 
-        return expireDate.before(new Date());
-    }
+        return unlockDate.after(new Date());    }
 
-    @Override
-    public void unlock() throws ChaiOperationException, ChaiUnavailableException {
-        this.deleteAttribute("pwdAccountLockedTime",null);
-    }
-
-    @Override
-    public boolean isLocked()
+    public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return readBooleanAttribute("pwdLockout");
+        this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, "19700101010101Z");
     }
+
 }

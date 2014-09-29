@@ -411,7 +411,7 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void unlock()
+    void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -424,7 +424,7 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    boolean isLocked()
+    boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**

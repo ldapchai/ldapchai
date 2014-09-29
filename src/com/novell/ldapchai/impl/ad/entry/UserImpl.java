@@ -98,7 +98,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         return false;
     }
 
-    public void unlock()
+    public void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
         this.writeStringAttribute("lockoutTime","0");
@@ -198,7 +198,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         this.writeStringAttribute("pwdLastSet", "0");
     }
 
-    public boolean isLocked()
+    public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
         // modern versions of ad have a (somewhat) sane way of checking account lockout; heaven forbid a boolean attribute.
