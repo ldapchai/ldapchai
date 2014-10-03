@@ -204,10 +204,11 @@ public final class ChaiCrFactory {
             for (final Challenge loopChallenge : crMap.keySet()) {
                 final String responseText = crMap.get(loopChallenge);
                 if (responseText != null && responseText.length() > 1) {
-                    if (seenResponses.contains(responseText.toLowerCase())) {
+                    final String lowercaseResponseText = responseText.toLowerCase();
+                    if (seenResponses.contains(lowercaseResponseText)) {
                         throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_DUPLICATE_RESPONSES, loopChallenge.getChallengeText());
                     }
-                    seenResponses.add(responseText);
+                    seenResponses.add(lowercaseResponseText);
                 }
             }
         }

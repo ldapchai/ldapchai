@@ -205,4 +205,16 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
         return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
     }
+
+    public void unlock()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        this.unlockPassword();
+    }
+
+    public boolean isLocked()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return this.isPasswordLocked();
+    }
 }

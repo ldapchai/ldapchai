@@ -415,6 +415,16 @@ public interface ChaiUser extends ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
+     * Deprecated and replaced with {@link #unlockPassword()} due to the ambiguous name of the method.
+     *
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     */
+    @Deprecated
+    void unlock()
+            throws ChaiOperationException, ChaiUnavailableException;
+
+    /**
      * Checks if a user account is locked.
      * Primarily, this checks for states similar to intruder detection or account lock due to
      * incorrect login attempts.
@@ -425,6 +435,18 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     boolean isPasswordLocked()
+            throws ChaiOperationException, ChaiUnavailableException;
+
+    /**
+     * Deprecated and replaced with {@link #isPasswordExpired()} due to the ambiguous name of the method.
+     *
+     * @return true if the account is in a locked state
+     *
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     */
+    @Deprecated
+    boolean isLocked()
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
