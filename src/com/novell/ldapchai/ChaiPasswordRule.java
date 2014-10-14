@@ -73,6 +73,8 @@ public enum ChaiPasswordRule {
     ChallengeResponseEnabled("chai.pwrule.challengeResponseEnabled", RuleType.BOOLEAN, "false"),
     UniqueRequired("chai.pwrule.uniqueRequired", RuleType.BOOLEAN, "false"),
     ADComplexity("chai.pwrule.ADComplexity", RuleType.BOOLEAN, "false"),
+    ADComplexity2008("chai.pwrule.ADComplexity2008", RuleType.BOOLEAN, "false"),
+    ADComplexityMaxViolation("chai.pwrule.ADComplexityMaxViolation", RuleType.MAX, "false"),
     NovellComplexityRules("chai.pwrule.novellComplexity", RuleType.TEXT, ""),
     AllowUserChange("chai.pwrule.allowUserChange", RuleType.BOOLEAN, "true"),
     AllowAdminChange("chai.pwrule.allowAdminChange", RuleType.BOOLEAN, "true"),

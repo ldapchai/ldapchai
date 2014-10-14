@@ -383,14 +383,36 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 ChaiPasswordRule.DisallowedAttributes),
 
         /**
-         * Mininum lifetime of the user's password.  Once set, the user will not be able to modify
+         * Minimum lifetime of the user's password.  Once set, the user will not be able to modify
          * their password until this amount of time has passed.  Value is in seconds.
          */
         MIN_LIFETIME(
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_LIFETIME,
                 "0",
-                ChaiPasswordRule.MinimumLifetime);
+                ChaiPasswordRule.MinimumLifetime),
+
+
+        /**
+         * AD 2008 Complexity Policy
+         */
+        AD_2008_COMPLEXITY(
+                TYPE.BOOLEAN,
+                "nspmAD2K8Syntax",
+                "FALSE",
+                ChaiPasswordRule.ADComplexity2008),
+
+        /**
+         * AD 2008 Complexity Policy
+         */
+        AD_COMPLEXITY_MAX_VIOLATION(
+                TYPE.MAX,
+                "nspmAD2K8maxViolaton",
+                "2",
+                ChaiPasswordRule.ADComplexityMaxViolation),
+        ;
+
+
 
         private final TYPE type;
         private final String ldapAttr;
