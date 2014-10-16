@@ -291,6 +291,18 @@ public enum ChaiSetting {
 
 
     /**
+     * Indicates if the failover engine will use it's "last known good" mechanism.  When a new connection is made, if
+     * this setting is enabled, the provider will start with the last known good server instead of the first server in
+     * the connection url list.
+     * <p/>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.useLastKnownGoodHint</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
+     * </table>
+     */
+    FAILOVER_USE_LAST_KNOWN_GOOD_HINT("chai.failover.useLastKnownGoodHint", "true", true, Validator.BOOLEAN_VALIDATOR),
+
+    /**
      * Minimum time Chai will wait before retrying a server marked as down.  Time is in milliseconds.
      * <p/>
      * <table border="0">
@@ -334,6 +346,18 @@ public enum ChaiSetting {
      * </table>
      */
     LDAP_CONNECT_TIMEOUT("chai.ldap.ldapTimeout", "5000", true, Validator.INTEGER_VALIDATOR),
+
+    /**
+     * Ldap read timeout, if supported by the ChaiProvider implementation.  Time is in milliseconds.
+     * A value of zero will leave the default value of the implementation.
+     *.
+     * <p/>
+     * <table border="0">
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.ldapReadTimeout</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
+     * </table>
+     */
+    LDAP_READ_TIMEOUT("chai.ldap.ldapReadTimeout", "0", true, Validator.INTEGER_VALIDATOR),
 
     /**
      * Enable LDAP referral following.  Valid settings are "true" or "false".

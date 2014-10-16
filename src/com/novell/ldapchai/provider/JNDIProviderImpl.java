@@ -867,6 +867,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         // Set the ldap timeout time.
         env.put("com.sun.jndi.ldap.connect.timeout", chaiConfig.getSetting(ChaiSetting.LDAP_CONNECT_TIMEOUT));
 
+        // Set the ldap read timeout time.
+        if (chaiConfig.getIntSetting(ChaiSetting.LDAP_READ_TIMEOUT) > 0) {
+            env.put("com.sun.jndi.ldap.read.timeout", chaiConfig.getSetting(ChaiSetting.LDAP_READ_TIMEOUT));
+        }
+
         //set alias dereferencing
         env.put("java.naming.ldap.derefAliases", chaiConfig.getSetting(ChaiSetting.LDAP_DEREFENCE_ALIAS));
 

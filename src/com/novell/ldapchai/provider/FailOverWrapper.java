@@ -49,6 +49,7 @@ class FailOverWrapper implements InvocationHandler {
 
     private volatile RotationMachine rotationMachine;
     private final ChaiProvider originalProvider;
+    private final ChaiConfiguration originalConfiguration;
 
     private final FailOverSettings settings;
     private volatile boolean closed = false;
@@ -93,6 +94,7 @@ class FailOverWrapper implements InvocationHandler {
     {
         final int settingMaxRetries = Integer.parseInt(chaiConfig.getSetting(ChaiSetting.FAILOVER_CONNECT_RETRIES));
         final int settingMinFailbackTime = Integer.parseInt(chaiConfig.getSetting(ChaiSetting.FAILOVER_MINIMUM_FAILBACK_TIME));
+        this.originalConfiguration = chaiConfig;
 
         final ChaiProviderImplementor failOverHelper;
         try {
@@ -124,6 +126,10 @@ class FailOverWrapper implements InvocationHandler {
         if (m.getName().equals("close")) {
             closeThis();
             return Void.TYPE;
+        }
+
+        if (m.getName().equals("getChaiConfiguration")) {
+            return originalConfiguration;
         }
 
         final boolean isLdap = m.getAnnotation(ChaiProviderImplementor.LdapOperation.class) != null;
@@ -173,7 +179,7 @@ class FailOverWrapper implements InvocationHandler {
                 return AbstractWrapper.invoker(currentProvider, m, args);
             } catch (Exception e) {
                 if (settings.errorIsRetryable(e) && !closed) {
-                    rotationMachine.reportBrokenProvider(currentProvider);
+                    rotationMachine.reportBrokenProvider(currentProvider,e);
                 } else {
                     if (e instanceof ChaiOperationException) {
                         throw (ChaiOperationException) e;
@@ -234,6 +240,7 @@ class FailOverWrapper implements InvocationHandler {
         private final List<ProviderSlot> proividerSlots = new ArrayList<ProviderSlot>();
         private volatile int activeSlot = 0;
         private final FailOverSettings settings;
+        private final ChaiConfiguration originalConfiguration;
 
         private final int urlListHashCode;
 
@@ -250,6 +257,7 @@ class FailOverWrapper implements InvocationHandler {
         {
             urlListHashCode = chaiConfig.bindURLsAsList().hashCode();
             this.settings = settings;
+            this.originalConfiguration = chaiConfig;
             configureInitialState(chaiConfig);
         }
 
@@ -257,12 +265,15 @@ class FailOverWrapper implements InvocationHandler {
             this.activeSlot = activeSlot;
 
             if (activeSlot != 0) {
-                LAST_KNOWN_GOOD_CACHE.put(urlListHashCode, activeSlot);
-                lngLastPopulateTime = System.currentTimeMillis();
+                if (originalConfiguration.getBooleanSetting(ChaiSetting.FAILOVER_USE_LAST_KNOWN_GOOD_HINT)) {
+                    LAST_KNOWN_GOOD_CACHE.put(urlListHashCode, activeSlot);
+                    lngLastPopulateTime = System.currentTimeMillis();
 
-                while (LAST_KNOWN_GOOD_CACHE.size() > MAX_SIZE_LNG_CACHE) {
-                    LAST_KNOWN_GOOD_CACHE.keySet().iterator().remove();
-                    LOGGER.warn("RotationMachine maximum Last Known Good cache size (" + MAX_SIZE_LNG_CACHE + ") exceeded, reducing cached entries " );
+
+                    while (LAST_KNOWN_GOOD_CACHE.size() > MAX_SIZE_LNG_CACHE) {
+                        LAST_KNOWN_GOOD_CACHE.keySet().iterator().remove();
+                        LOGGER.warn("RotationMachine maximum Last Known Good cache size (" + MAX_SIZE_LNG_CACHE + ") exceeded, reducing cached entries " );
+                    }
                 }
             }
         }
@@ -275,15 +286,18 @@ class FailOverWrapper implements InvocationHandler {
                 proividerSlots.add(new ProviderSlot(loopConfig, loopUrl));
             }
 
-            if (!LAST_KNOWN_GOOD_CACHE.isEmpty()) {
-                if ((System.currentTimeMillis() - lngLastPopulateTime) > settings.getMinFailBackTime()) {
-                    LAST_KNOWN_GOOD_CACHE.clear();
+            if (originalConfiguration.getBooleanSetting(ChaiSetting.FAILOVER_USE_LAST_KNOWN_GOOD_HINT)) {
+                if (!LAST_KNOWN_GOOD_CACHE.isEmpty()) {
+                    if ((System.currentTimeMillis() - lngLastPopulateTime) > settings.getMinFailBackTime()) {
+                        LAST_KNOWN_GOOD_CACHE.clear();
+                    }
                 }
-            }
 
-            if (LAST_KNOWN_GOOD_CACHE.containsKey(urlListHashCode)) {
-                activeSlot = LAST_KNOWN_GOOD_CACHE.get(urlListHashCode);
-                LOGGER.debug("using slot #" + activeSlot + " (" + proividerSlots.get(activeSlot).getUrl() + ") as initial bind URL due to Last Known Good cache");
+                if (LAST_KNOWN_GOOD_CACHE.containsKey(urlListHashCode)) {
+                    activeSlot = LAST_KNOWN_GOOD_CACHE.get(urlListHashCode);
+                    LOGGER.debug("using slot #" + activeSlot + " (" + proividerSlots.get(
+                            activeSlot).getUrl() + ") as initial bind URL due to Last Known Good cache");
+                }
             }
         }
 
@@ -292,11 +306,13 @@ class FailOverWrapper implements InvocationHandler {
         {
             failbackCheck();
 
+            ChaiUnavailableException lastException = null;
             if (failState == FAILSTATE.NEW) {
                 try {
                     makeNewProvider(activeSlot);
                     failState = FAILSTATE.OKAY;
                 } catch (ChaiUnavailableException e) {
+                    lastException = e;
                     if (settings.errorIsRetryable(e)) {
                         failState = FAILSTATE.FAILED;
                     } else {
@@ -310,7 +326,7 @@ class FailOverWrapper implements InvocationHandler {
             }
 
             if (failState == FAILSTATE.FAILED) {
-                currentServerIsBroken();
+                currentServerIsBroken(lastException);
 
                 if (failState == FAILSTATE.OKAY) {
                     return proividerSlots.get(activeSlot).getProvider();
@@ -326,7 +342,7 @@ class FailOverWrapper implements InvocationHandler {
             throw new ChaiUnavailableException(errorMsg.toString(), ChaiError.COMMUNICATION);
         }
 
-        public synchronized void reportBrokenProvider(final ChaiProvider provider)
+        public synchronized void reportBrokenProvider(final ChaiProvider provider, final Exception e)
         {
             //no point doing anything if state is already reported as broken.
             if (failState != FAILSTATE.OKAY) {
@@ -336,7 +352,7 @@ class FailOverWrapper implements InvocationHandler {
             //make sure the reported provider is the one thats actually currently active, otherwise ignore the report
             final ChaiProvider presumedCurrentProvider = proividerSlots.get(activeSlot).getProvider();
             if (presumedCurrentProvider != null && presumedCurrentProvider.equals(provider)) {
-                currentServerIsBroken();
+                currentServerIsBroken(e);
             }
         }
 
@@ -351,12 +367,15 @@ class FailOverWrapper implements InvocationHandler {
             }
         }
 
-        private synchronized void currentServerIsBroken()
+        private synchronized void currentServerIsBroken(final Exception errorCause)
         {
             if (proividerSlots.size() > 1) {
-                LOGGER.warn("current server " + proividerSlots.get(activeSlot).getUrl() + " has failed, failing over to next server in list");
+                LOGGER.warn("current server " + proividerSlots.get(activeSlot).getUrl()
+                        + " has failed, failing over to next server in list"
+                        + ((errorCause != null) ? ", last error: " + errorCause.getMessage() : ""));
             } else {
-                LOGGER.warn("unable to reach ldap server " + proividerSlots.get(activeSlot).getUrl());
+                LOGGER.warn("unable to reach ldap server " + proividerSlots.get(activeSlot).getUrl()
+                        + ((errorCause != null) ? ", last error: " + errorCause.getMessage() : ""));
             }
             lastFailureTime = System.currentTimeMillis();
             boolean success = false;
