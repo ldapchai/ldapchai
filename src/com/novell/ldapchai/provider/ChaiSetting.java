@@ -447,7 +447,7 @@ public enum ChaiSetting {
     }
     ),
 
-    JNDI_ENABLE_POOL("chai.provider.jndi.enablePool", "true", true, Validator.BOOLEAN_VALIDATOR),
+    JNDI_ENABLE_POOL("chai.provider.jndi.enablePool", "false", true, Validator.BOOLEAN_VALIDATOR),
 
     /**
      * Case insensitive flag.  If true, the case of the responses will be ignored when tested.  Default is true.
