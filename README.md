@@ -8,10 +8,10 @@ LDAP Chai is well suited for business applications and general purpose LDAP deve
 
 Features:
 
-Full use of Java 1.5 language enhancements including generics, enums and annotations
-LDAP multi-server failover support
-LDAP connection watch dog, for managing high volume ldap connections.
-Support for NMAS and non-NMAS (PWM) style challenge/response settings
-Simple methods for the most common operations, such as reading an int or Date.
-Pluggable connection implementation; included implementations wrap the standard Java JNDI ldap interface or JLDAP API.
-Pluggable vendor implementation; included implementations wrap Microsoft Active Directory and Novell eDirectory
+* Full use of Java 1.5 language enhancements including generics, enums and annotations
+* LDAP multi-server failover support
+* LDAP connection watch dog, for managing high volume ldap connections.
+* Support for NMAS and non-NMAS (PWM) style challenge/response settings
+* Simple methods for the most common operations, such as reading an int or Date.
+* Pluggable connection implementation; included implementations wrap the standard Java JNDI ldap interface or JLDAP API.
+* Pluggable vendor implementation; included implementations wrap Microsoft Active Directory and Novell eDirectory
