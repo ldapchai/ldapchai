@@ -1,0 +1,343 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+
+	<groupId>com.github.ldapchai</groupId>
+	<version>0.6.5-SNAPSHOT</version>
+	<artifactId>ldapchai</artifactId>
+	<packaging>jar</packaging>
+
+	<name>LDAP Chai</name>
+	<description>The LDAP Chai API, easy to use LDAP for Java developers.
+
+LDAP Chai is a wrapper library that makes using ldap services as simple and easy as it can be.
+LDAP Chai has methods for commonly used functions, and relieves developers of the need to write code that has been written many times before.
+</description>
+
+	<properties>
+		<maven.compiler.source>1.5</maven.compiler.source>
+		<maven.compiler.target>1.5</maven.compiler.target>
+		<skipTests>true</skipTests>  <!-- missing test configuration from source? -->
+		<outputDirectory.private>${project.build.directory}/private</outputDirectory.private>
+	</properties>
+
+	<!-- Not usable when deploying to Central
+	<repositories>
+		<repository>
+			<id>nsl.nexus</id>
+			<url>http://nexus.novell.com:8080/nexus/content/groups/netiq</url>
+			<releases>
+				<checksumPolicy>fail</checksumPolicy>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	-->
+			
+	<dependencies>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>saxpath</artifactId>
+			<version>1.0-FCS</version>
+		</dependency>
+		<dependency>
+			<groupId>jaxen</groupId>
+			<artifactId>jaxen</artifactId>
+			<version>1.0-FCS</version>
+			<!-- newer 1.1.1 exists, doesn't match captured -->
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.12</version>
+			<!-- newer available 1.2.17 -->
+		</dependency>
+
+		<!-- Directory Access -->
+		<dependency>
+			<groupId>com.novell.ldap</groupId>
+			<artifactId>jldap</artifactId>
+			<version>2009-10-07</version>
+		</dependency>
+		<dependency>
+			<groupId>com.Novell.edirectory</groupId>
+			<artifactId>NMASToolkit</artifactId>
+			<version>0.0.1</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/lib/NMASToolkit.jar</systemPath>
+		</dependency>
+		<!-- Need to be made available
+			<dependency>
+			<groupId>com.Novell.edirectory</groupId>
+			<artifactId>NMASToolkit</artifactId>
+			<version>8.8.8-0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+			<groupId>com.Novell.edirectory</groupId>
+			<artifactId>NMASClient</artifactId>
+			<version>8.8.8-0-SNAPSHOT</version>
+			<scope>test</scope>
+			</dependency> -->
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>tests</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.16</version>
+				<configuration>
+					<!-- <parallel>classes</parallel> -->
+					<includes>
+						<include>**/*Tester.java</include>
+					</includes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<!-- include the examples in the test build -->
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>examples</source>
+							</sources>
+						</configuration>
+					</execution>
+					<!-- Capture secondary private javadoc -->
+					<execution>
+						<id>add-private-javadoc</id>
+						<phase>package</phase>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<file>${outputDirectory.private}/${finalName}-</file>
+									<type>extension of your file </type>
+									<classifier>optional</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.2</version>
+				<executions>
+					<execution>
+						<id>default-jar</id>
+						<configuration>
+							<archive>
+								<manifest>
+									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+									<mainClass>com.novell.ldapchai.util.MainHandler</mainClass>
+								</manifest>
+								<manifestEntries>
+									<Implementation-Description>${project.description}</Implementation-Description>
+								</manifestEntries>
+							</archive>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<doctitle>LDAP Chai API</doctitle>
+					<windowtitle>LDAP Chai API</windowtitle>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs-private</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<show>private</show>
+							<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
+							<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
+							<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
+						</configuration>
+					</execution>
+					<execution>
+						<id>attach-javadocs-public</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<show>public</show>
+							<excludePackageNames>com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+								default -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+			</plugin>
+		</plugins>
+	</reporting>
+
+  <profiles>
+	<profile>
+      <id>sonatype-oss-release</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.1</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+	
+    <profile>
+      <id>maven-3</id>
+      <activation>
+        <file>
+          <exists>${basedir}</exists><!-- This employs that the basedir expression is only recognized by Maven 3.x (see MNG-2363) -->
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>attach-descriptor</id>
+                <goals>
+                  <goal>attach-descriptor</goal>
+                </goals>
+                <configuration>
+                  <!-- deploying using github site -->
+                  <skipDeploy>true</skipDeploy>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+      <!-- https://github.com/github/maven-plugins -->
+          <plugin> <!-- Requires maven 3 -->
+            <groupId>com.github.github</groupId>
+            <artifactId>site-maven-plugin</artifactId>
+            <version>0.8</version>
+            <configuration>
+              <message>Creating site for ${project.version}</message>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>site</goal>
+                </goals>
+                <phase>site</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+  
+</project>
