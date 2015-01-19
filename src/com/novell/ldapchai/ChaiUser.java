@@ -460,5 +460,28 @@ public interface ChaiUser extends ChaiEntry {
      */
     Date readPasswordModificationDate()
         throws ChaiOperationException, ChaiUnavailableException;
+
+    /**
+     * Read the user's account expiration date.  The implementation will attempt to read the user's defined or calculated
+     * account expiration date, if supported
+     * <ol>
+     *
+     * @return the date at which the password is expired, or the current time if the password is expired but a date cannot be determined
+     * @throws UnsupportedOperationException If the configuration of the provider is not suitable for retreiving passwords.
+     * @throws ChaiOperationException        If there is an error during the operation
+     * @throws ChaiUnavailableException      If the directory server(s) are unavailable
+     */
+    Date readAccountExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException;
+
+    /**
+     * Checks if a user account is expired.
+     * @return true if the account is in a locked state
+     *
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     */
+    boolean isAccountExpired()
+            throws ChaiOperationException, ChaiUnavailableException;
 }
 

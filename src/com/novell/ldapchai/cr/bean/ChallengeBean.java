@@ -27,6 +27,9 @@ public class ChallengeBean implements Serializable {
     public int maxLength;
     public boolean adminDefined;
     public boolean required;
+    public int maxQuestionCharsInAnswer;
+    public boolean enforceWordlist;
+    
     public AnswerBean answer;
 
     public String getChallengeText() {
@@ -67,6 +70,22 @@ public class ChallengeBean implements Serializable {
 
     public void setRequired(boolean required) {
         this.required = required;
+    }
+
+    public int getMaxQuestionCharsInAnswer() {
+        return maxQuestionCharsInAnswer;
+    }
+
+    public void setMaxQuestionCharsInAnswer(int maxQuestionCharsInAnswer) {
+        this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer;
+    }
+
+    public boolean isEnforceWordlist() {
+        return enforceWordlist;
+    }
+
+    public void setEnforceWordlist(boolean enforceWordlist) {
+        this.enforceWordlist = enforceWordlist;
     }
 
     public AnswerBean getAnswer() {

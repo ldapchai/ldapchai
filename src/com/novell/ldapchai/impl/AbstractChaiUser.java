@@ -217,4 +217,13 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     {
         return this.isPasswordLocked();
     }
+
+    public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+        return null;
+    }
+
+    public boolean isAccountExpired() throws ChaiOperationException, ChaiUnavailableException {
+        final Date accountExpirationDate = readAccountExpirationDate();
+        return accountExpirationDate != null && accountExpirationDate.before(new Date());
+    }
 }

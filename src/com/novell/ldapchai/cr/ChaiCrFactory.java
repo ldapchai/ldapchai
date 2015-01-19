@@ -197,6 +197,26 @@ public final class ChaiCrFactory {
                 final String errorString = "response text is too long for challenge '" + loopChallenge.getChallengeText() + "'";
                 throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_LONG,loopChallenge.getChallengeText());
             }
+
+            if (loopChallenge.getMaxQuestionCharsInAnswer() > 0) {
+                final int maxChallengeLengthInResponse = loopChallenge.getMaxQuestionCharsInAnswer();
+                if (loopChallenge.getChallengeText() != null) {
+                    final String[] challengeWords = loopChallenge.getChallengeText().toLowerCase().split("\\s");
+                    final String responseTextLower = answerText.toLowerCase();
+                    for (final String challengeWord : challengeWords) {
+                        if (challengeWord.length() > maxChallengeLengthInResponse) {
+                            for (int i = 0; i <= challengeWord.length() - (maxChallengeLengthInResponse + 1); i++) {
+                                final String wordPart = challengeWord.substring(i, i + (maxChallengeLengthInResponse + 1));
+                                if (responseTextLower.contains(wordPart)) {
+                                    final String errorString = "response text contains too many challenge characters for challenge '" + loopChallenge.getChallengeText() + "'";
+                                    throw new ChaiValidationException(errorString, ChaiError.CR_TOO_MANY_QUESTION_CHARS, loopChallenge.getChallengeText());
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
         }
 
         if (!allowDuplicates) {

@@ -130,7 +130,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
 
         // check if Complexity XML value is populated.
         {
-            final List<String> complexityValues = entryValues.get("nspmComplexityRules");
+            final List<String> complexityValues = entryValues.get(Attribute.AD_COMPLEXITY_RULES.getLdapAttribute());
             if (complexityValues != null && !complexityValues.isEmpty()) {
                 final String strValue = complexityValues.get(0);
                 returnMap.putAll(createRuleMapUsingComplexityRules(strValue));

@@ -320,4 +320,9 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         }
         return true;
     }
+
+    @Override
+    public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+        return readDateAttribute("accountExpires");
+    }
 }

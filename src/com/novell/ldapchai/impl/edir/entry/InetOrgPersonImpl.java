@@ -286,4 +286,9 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
         return this.readDateAttribute("pwdChangedTime");
     }
+
+    @Override
+    public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+        return readDateAttribute("loginExpirationTime");
+    }
 }

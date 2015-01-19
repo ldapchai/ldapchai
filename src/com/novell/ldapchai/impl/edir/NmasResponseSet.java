@@ -72,7 +72,7 @@ public class NmasResponseSet extends AbstractResponseSet {
 
             final String challengeText = readDisplayString(loopQ, locale);
 
-            final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, true);
+            final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, true, 0, false);
             returnList.add(challenge);
         }
 
@@ -80,7 +80,7 @@ public class NmasResponseSet extends AbstractResponseSet {
             final Element loopQ = (Element) iter.next();
             final int maxLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MaxLength"), 255);
             final int minLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MinLength"), 1);
-            final Challenge challenge = new ChaiChallenge(required, null, minLength, maxLength, false);
+            final Challenge challenge = new ChaiChallenge(required, null, minLength, maxLength, false, 0, false);
             returnList.add(challenge);
         }
 
@@ -193,7 +193,7 @@ public class NmasResponseSet extends AbstractResponseSet {
             final boolean required = typeStrValue.equalsIgnoreCase("Required");
             final String challengeText = loopQ.getText();
 
-            final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
+            final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined, 0, false);
             returnList.add(challenge);
         }
 

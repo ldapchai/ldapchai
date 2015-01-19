@@ -394,6 +394,14 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
 
 
         /**
+         * AD 2003 Complexity Policy
+         */
+        AD_COMPLEXITY_RULES(
+                TYPE.OTHER,
+                "nspmComplexityRules",
+                "",
+                null),
+        /**
          * AD 2008 Complexity Policy
          */
         AD_2008_COMPLEXITY(

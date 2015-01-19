@@ -36,6 +36,9 @@ public class ChaiChallenge implements Challenge, Serializable {
 
     private int minLength;
     private int maxLength;
+    
+    private int maxQuestionCharsInAnswer;
+    private boolean enforceWordlist;
 
     private boolean locked;
 
@@ -46,7 +49,9 @@ public class ChaiChallenge implements Challenge, Serializable {
             final String challengeText,
             final int minLength,
             final int maxLength,
-            final boolean adminDefined
+            final boolean adminDefined,
+            final int maxQuestionCharsInAnswer,
+            final boolean enforceWordlist
     )
     {
         this.adminDefined = adminDefined;
@@ -54,6 +59,8 @@ public class ChaiChallenge implements Challenge, Serializable {
         this.challengeText = challengeText == null ? null : challengeText.trim();
         this.minLength = minLength < 0 ? 2 : minLength;
         this.maxLength = maxLength < 0 ? 255 : maxLength;
+        this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer < 0 ? 0 : maxQuestionCharsInAnswer;
+        this.enforceWordlist = enforceWordlist;
     }
 
 // --------------------- GETTER / SETTER METHODS ---------------------
@@ -101,7 +108,17 @@ public class ChaiChallenge implements Challenge, Serializable {
         return required;
     }
 
-// ------------------------ CANONICAL METHODS ------------------------
+    @Override
+    public int getMaxQuestionCharsInAnswer() {
+        return maxQuestionCharsInAnswer;
+    }
+
+    @Override
+    public boolean isEnforceWordlist() {
+        return enforceWordlist;
+    }
+
+    // ------------------------ CANONICAL METHODS ------------------------
 
     /**
      * Tests for equality of Challenges.  Challenges are equal when the following elements of a challenge are equal:
@@ -173,6 +190,8 @@ public class ChaiChallenge implements Challenge, Serializable {
         challengeBean.setChallengeText(challengeText);
         challengeBean.setMaxLength(maxLength);
         challengeBean.setMinLength(minLength);
+        challengeBean.setMaxQuestionCharsInAnswer(maxQuestionCharsInAnswer);
+        challengeBean.setEnforceWordlist(enforceWordlist);
         return challengeBean;
     }
 
@@ -182,7 +201,10 @@ public class ChaiChallenge implements Challenge, Serializable {
                 challengeBean.getChallengeText(),
                 challengeBean.getMinLength(),
                 challengeBean.getMaxLength(),
-                challengeBean.isAdminDefined()
+                challengeBean.isAdminDefined(),
+                challengeBean.getMaxQuestionCharsInAnswer(),
+                challengeBean.isEnforceWordlist()
+                
         );
     }
 }

@@ -95,6 +95,10 @@ public interface Challenge extends Serializable {
      * @throws IllegalStateException    if the challenge is locked
      */
     public void setChallengeText(String challengeText);
-
+    
     public ChallengeBean asChallengeBean();
+    
+    public int getMaxQuestionCharsInAnswer();
+    
+    public boolean isEnforceWordlist();
 }

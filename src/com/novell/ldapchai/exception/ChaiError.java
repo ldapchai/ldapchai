@@ -85,6 +85,7 @@ public enum ChaiError {
     CR_RESPONSE_TOO_LONG               ("ResponseTooLong",             605),
     CR_TOO_FEW_CHALLENGES              ("TooFewChallenges",            606),
     CR_DUPLICATE_RESPONSES             ("DuplicateResponses",          607),
+    CR_TOO_MANY_QUESTION_CHARS         ("TooManyQuestionChars",        608),
 
 
     ;

@@ -386,7 +386,7 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
             final int minLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MIN_LENGTH).getIntValue();
             final int maxLength = loopResponseElement.getAttribute(XNL_ATTRIBUTE_MAX_LENGTH).getIntValue();
 
-            return new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined);
+            return new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined, 0, false);
         }
     }
 
