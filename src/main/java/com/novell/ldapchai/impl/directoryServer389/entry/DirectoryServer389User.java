@@ -71,7 +71,15 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
     @Override
     public void unlockPassword() throws ChaiOperationException, ChaiUnavailableException {
         this.writeStringAttribute("passwordRetryCount", "0");
-        this.deleteAttribute("accountUnlockTime", null);    }
+        
+        // Only attempt to remove the attribute if it already
+        // exists to avoid exceptions trying to remove a
+        // non-existent attribute
+        final Date unlockDate = readDateAttribute("accountUnlockTime");
+        if (unlockDate != null) {
+           this.deleteAttribute("accountUnlockTime", null);
+        }
+    }
 
     @Override
     public boolean isPasswordLocked()
