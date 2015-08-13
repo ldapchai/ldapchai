@@ -220,6 +220,7 @@
 						</goals>
 						<configuration>
 							<show>private</show>
+							<additionalparam>-Xdoclint:none</additionalparam>
 							<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
 							<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
 							<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
@@ -232,6 +233,7 @@
 						</goals>
 						<configuration>
 							<show>public</show>
+							<additionalparam>-Xdoclint:none</additionalparam>
 							<excludePackageNames>com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
 							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
 								default -->
