@@ -505,6 +505,21 @@ public enum ChaiSetting {
      */
     AD_SET_POLICY_HINTS_ON_PW_SET("chai.ad.setPolicyHintsOnPwSet", "false", true, Validator.BOOLEAN_VALIDATOR),
 
+    /**
+     * Enable support for search result paging.  If set to "auto" then the RootDSE will be checked to see if it
+     * lists OID 1.2.840.113556.1.4.319.  If it does then paging will be used. Otherwise setting to true or false
+     * will explicitly disable LDAPChai's search result paging functionality.
+     *
+     * <i>Default: </i><b>auto</b>
+     */
+    LDAP_SEARCH_PAGING_ENABLE("chai.ldap.paging.enable", "auto", true, Validator.AUTO_OR_BOOLEAN_VALIDATOR),
+
+    /**
+     * If {@link #LDAP_SEARCH_PAGING_ENABLE} is enabled, then this setting will control the page size.
+     *
+     * <i>Default: </i><b>500</b>
+     */
+    LDAP_SEARCH_PAGING_SIZE("chai.ldap.paging.size", "1000", true, Validator.INTEGER_VALIDATOR),
     ;
 
 // ------------------------------ FIELDS ------------------------------
@@ -612,6 +627,18 @@ public enum ChaiSetting {
                     Boolean.parseBoolean(value);
                 } catch (Exception e) {
                     throw new IllegalArgumentException(e.getMessage());
+                }
+            }
+        };
+
+        static final Validator AUTO_OR_BOOLEAN_VALIDATOR = new Validator() {
+            public void validate(final String value) {
+                if (!"auto".equalsIgnoreCase(value)) {
+                    try {
+                        Boolean.parseBoolean(value);
+                    } catch (Exception e) {
+                        throw new IllegalArgumentException(e.getMessage());
+                    }
                 }
             }
         };
