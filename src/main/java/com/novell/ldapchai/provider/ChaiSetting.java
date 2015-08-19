@@ -519,7 +519,7 @@ public enum ChaiSetting {
      *
      * <i>Default: </i><b>500</b>
      */
-    LDAP_SEARCH_PAGING_SIZE("chai.ldap.paging.size", "1000", true, Validator.INTEGER_VALIDATOR),
+    LDAP_SEARCH_PAGING_SIZE("chai.ldap.paging.size", "500", true, Validator.INTEGER_VALIDATOR),
     ;
 
 // ------------------------------ FIELDS ------------------------------

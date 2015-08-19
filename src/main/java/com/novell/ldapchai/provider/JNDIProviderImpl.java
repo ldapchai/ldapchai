@@ -400,7 +400,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         } finally {
             // close the enumeration
             try {
-                namingEnum.close();
+                if (namingEnum != null) {
+                    namingEnum.close();
+                }
             } catch (Exception e) {
                 //doesnt matter
             }
@@ -439,7 +441,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             return null;
         } finally {
             try {
-                namingEnum.close();
+                if (namingEnum != null) {
+                    namingEnum.close();
+                }
             } catch (Exception e) {
                 // nothing to do
             }
@@ -960,17 +964,22 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         final int maxPageSize = getChaiConfiguration().getIntSetting(ChaiSetting.LDAP_SEARCH_PAGING_SIZE);
 
-        // only bother enabling paging if search count is unlimited (0) or bigger than the max page size.
-        final boolean pagingEnabled = searchControls.getCountLimit() > 0
-                && searchControls.getCountLimit() > maxPageSize
-                && supportsSearchResultPaging();
+        // enabling paging if search count is unlimited (0) or bigger than the max page size.
+        final boolean pagingEnabled = (searchControls.getCountLimit() == 0 || (searchControls.getCountLimit() > maxPageSize)
+                && supportsSearchResultPaging());
 
         final LdapContext ldapConnection = getLdapConnection();
 
         NamingEnumeration<SearchResult> answer = null;
         try {
             byte[] pageCookie = null;
+            int safetyLoopCounter = 0;
+            final int MAX_LOOPS = 10 * 1000 * 1000;
             do {
+                safetyLoopCounter++;
+                if (safetyLoopCounter > MAX_LOOPS) {
+                    throw new IllegalStateException("safety loop counter exceeded maximum during search operation");
+                }
                 // set the paging control if using paging
                 if (pagingEnabled) {
                     final Control pagedControl = pageCookie == null
@@ -982,16 +991,13 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 // execute the search
                 answer = ldapConnection.search(addJndiEscape(baseDN), searchHelper.getFilter(), searchControls);
 
-                // determine how many results we need to read
-                /*
+                // determine how many results we need to read (ad will return forever regardless of maxcount limit)
                 final int maxParseResults = searchHelper.getMaxResults() == 0
                         ? 0
                         : searchHelper.getMaxResults() - results.size();
-                        */
 
                 { // read the values into our results output object
-
-                    final Map<String, Map<String, List<String>>> loopResults = parseSearchResults(answer, baseDN, returnAllValues);
+                    final Map<String, Map<String, List<String>>> loopResults = parseSearchResults(answer, baseDN, returnAllValues, maxParseResults);
                     results.putAll(loopResults);
                 }
 
@@ -1061,14 +1067,14 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     private static Map<String, Map<String, List<String>>> parseSearchResults(
             final NamingEnumeration<SearchResult> answer,
             final String baseDN,
-            final boolean returnAllValues
-            //final int maxParseResults
+            final boolean returnAllValues,
+            final int maxParseResults
 
     )
             throws NamingException
     {
         final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
-        while (answer.hasMore()) {
+        while (answer.hasMore() && (maxParseResults == 0 || maxParseResults > results.size())) {
             final SearchResult searchResult = answer.next();
             final StringBuilder entryDN = new StringBuilder();
             entryDN.append(removeJndiEscapes(searchResult.getName()));
