@@ -78,6 +78,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(JNDIProviderImpl.class);
 
+    private Boolean cachedPagingEnableSupport = null;
     private LdapContext jndiConnection;
 
 
@@ -553,7 +554,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         INPUT_VALIDATOR.search(baseDN, searchHelper);
 
         // perform search
-        final Map<String, Map<String, List<String>>> results = this.searchImplementation(baseDN, searchHelper, false);
+        final SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, false);
+        final Map<String, Map<String, List<String>>> results = searchEngine.getResults();
 
         // convert to <String, Properties> return set.
         if (results != null) {
@@ -593,8 +595,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     {
         activityPreCheck();
         INPUT_VALIDATOR.searchMultiValues(baseDN, searchHelper);
-
-        return this.searchImplementation(baseDN, searchHelper, true);
+        SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, true);
+        return searchEngine.getResults();
     }
 
     public final Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope)
@@ -608,7 +610,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         searchHelper.setAttributes(attributes);
         searchHelper.setSearchScope(searchScope);
 
-        return this.searchImplementation(baseDN, searchHelper, true);
+        final SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, true);
+        return searchEngine.getResults();
     }
 
     @LdapOperation
@@ -931,186 +934,187 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return env;
     }
 
-    private Map<String, Map<String, List<String>>> searchImplementation(
-            String baseDN,
-            SearchHelper searchHelper,
-            final boolean returnAllValues
-    )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        activityPreCheck();
+    private class SearchEngine {
+        final int MAX_SEARCH_LOOPS = 10 * 1000 * 1000;
 
-        try { // make a copy so if it changes somewhere else we won't be affected.
-            searchHelper = (SearchHelper) searchHelper.clone();
-        } catch (CloneNotSupportedException e) {
-            LOGGER.fatal("unexpected clone of SearchHelper failed during chai search", e);
-            throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiError.UNKNOWN);
+        private final String baseDN;
+        private final SearchHelper searchHelper;
+        private final boolean returnAllValues;
+
+        public SearchEngine(String baseDN, SearchHelper searchHelper, boolean returnAllValues) throws ChaiOperationException {
+            this.baseDN = baseDN != null ? baseDN : "";
+            try { // make a copy so if it changes somewhere else we won't be affected.
+                this.searchHelper = (SearchHelper) searchHelper.clone();
+            } catch (CloneNotSupportedException e) {
+                LOGGER.fatal("unexpected clone of SearchHelper failed during chai search", e);
+                throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiError.UNKNOWN);
+            }
+            this.returnAllValues = returnAllValues;
         }
 
-        // replace a null dn with an empty string
-        baseDN = baseDN != null ? baseDN : "";
+        public Map<String, Map<String, List<String>>> getResults()
+                throws ChaiUnavailableException, ChaiOperationException
+        {
+            activityPreCheck();
 
-        // Define the Search Controls object.
-        final SearchControls searchControls = new SearchControls();
-        searchControls.setReturningObjFlag(false);
-        searchControls.setReturningAttributes(new String[0]);
-        searchControls.setSearchScope(searchHelper.getSearchScope().getJndiScopeInt());
-        final String[] returnAttributes = searchHelper.getAttributes() == null ? null : searchHelper.getAttributes().toArray(new String[searchHelper.getAttributes().size()]);
-        searchControls.setReturningAttributes(returnAttributes);
-        searchControls.setTimeLimit(searchHelper.getTimeLimit());
-        searchControls.setCountLimit(searchHelper.getMaxResults());
+            // Define the Search Controls object.
+            final SearchControls searchControls = makeSearchControls();
 
-        final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
+            final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
 
-        final int maxPageSize = getChaiConfiguration().getIntSetting(ChaiSetting.LDAP_SEARCH_PAGING_SIZE);
+            final int maxPageSize = getChaiConfiguration().getIntSetting(ChaiSetting.LDAP_SEARCH_PAGING_SIZE);
 
-        // enabling paging if search count is unlimited (0) or bigger than the max page size.
-        final boolean pagingEnabled = (searchControls.getCountLimit() == 0 || (searchControls.getCountLimit() > maxPageSize)
-                && supportsSearchResultPaging());
+            // enabling paging if search count is unlimited (0) or bigger than the max page size.
+            final boolean pagingEnabled = (searchControls.getCountLimit() == 0 || (searchControls.getCountLimit() > maxPageSize)
+                    && supportsSearchResultPaging());
 
-        final LdapContext ldapConnection = getLdapConnection();
+            final LdapContext ldapConnection = getLdapConnection();
 
-        NamingEnumeration<SearchResult> answer = null;
-        try {
-            byte[] pageCookie = null;
-            int safetyLoopCounter = 0;
-            final int MAX_LOOPS = 10 * 1000 * 1000;
-            do {
-                safetyLoopCounter++;
-                if (safetyLoopCounter > MAX_LOOPS) {
-                    throw new IllegalStateException("safety loop counter exceeded maximum during search operation");
-                }
-                // set the paging control if using paging
-                if (pagingEnabled) {
-                    final Control pagedControl = pageCookie == null
-                            ? new PagedResultsControl(maxPageSize, Control.NONCRITICAL)
-                            : new PagedResultsControl(maxPageSize, pageCookie, Control.CRITICAL);
-                    ldapConnection.setRequestControls(new Control[]{pagedControl});
-                }
+            NamingEnumeration<SearchResult> answer = null;
+            try {
+                byte[] pageCookie = null;
+                int safetyLoopCounter = 0;
+                do {
+                    safetyLoopCounter++;
+                    if (safetyLoopCounter > MAX_SEARCH_LOOPS) {
+                        throw new IllegalStateException("safety loop counter exceeded maximum during search operation");
+                    }
+                    // set the paging control if using paging
+                    if (pagingEnabled) {
+                        final Control pagedControl = pageCookie == null
+                                ? new PagedResultsControl(maxPageSize, Control.NONCRITICAL)
+                                : new PagedResultsControl(maxPageSize, pageCookie, Control.CRITICAL);
+                        ldapConnection.setRequestControls(new Control[]{pagedControl});
+                    }
 
-                // execute the search
-                answer = ldapConnection.search(addJndiEscape(baseDN), searchHelper.getFilter(), searchControls);
+                    // execute the search
+                    answer = ldapConnection.search(addJndiEscape(baseDN), searchHelper.getFilter(), searchControls);
 
-                // determine how many results we need to read (ad will return forever regardless of maxcount limit)
-                final int maxParseResults = searchHelper.getMaxResults() == 0
-                        ? 0
-                        : searchHelper.getMaxResults() - results.size();
+                    // determine how many results we need to read (ad will return forever regardless of max count limit)
+                    final int maxParseResults = searchHelper.getMaxResults() == 0
+                            ? 0
+                            : searchHelper.getMaxResults() - results.size();
 
-                { // read the values into our results output object
-                    final Map<String, Map<String, List<String>>> loopResults = parseSearchResults(answer, baseDN, returnAllValues, maxParseResults);
-                    results.putAll(loopResults);
-                }
+                    { // read the values into our results output object
+                        final Map<String, Map<String, List<String>>> loopResults = parseSearchResults(answer, maxParseResults);
+                        results.putAll(loopResults);
+                    }
 
-                // if paging enabled, read the cookie value.
-                pageCookie = pagingEnabled
-                        ? readResultResponsePageCookie(ldapConnection.getResponseControls())
-                        : null;
+                    // if paging enabled, read the cookie value.
+                    pageCookie = pagingEnabled
+                            ? readResultResponsePageCookie(ldapConnection.getResponseControls())
+                            : null;
 
-            } while (pageCookie != null);  // loop until no more paged results.
+                } while (pagingEnabled && pageCookie != null);  // loop until no more paged results.
 
-            return Collections.unmodifiableMap(results);
-        } catch (IOException e) {
-            throw new ChaiOperationException("io error during paged search result: " + e.getMessage(),ChaiError.COMMUNICATION);
-        } catch (NullPointerException e) {
-            return null;
-        } catch (NamingException e) {
-            // check if any results have been returned, if so return the result.  Otherwise,
-            // throw an error.  Common cause is a search size/time limit exceeded.
-            if (results.size() > 0) {
-                return results;
-            }
-
-            convertNamingException(e);
-            return null;
-        } finally {
-            if (answer != null) {
-                try {
-                    answer.close();
-                } catch (NamingException e) {
-                    // nothing to do
+                return Collections.unmodifiableMap(results);
+            } catch (IOException e) {
+                throw new ChaiOperationException("io error during paged search result: " + e.getMessage(),ChaiError.COMMUNICATION);
+            } catch (NamingException e) {
+                convertNamingException(e);
+                throw new ChaiOperationException("unexpected error during search: " + e.getMessage(),ChaiError.CHAI_INTERNAL_ERROR);
+            } finally {
+                if (answer != null) {
+                    try {
+                        answer.close();
+                    } catch (NamingException e) {
+                        // nothing to do
+                    }
                 }
             }
+        }
+
+        private SearchControls makeSearchControls() {
+            final SearchControls searchControls = new SearchControls();
+            searchControls.setReturningObjFlag(false);
+            searchControls.setReturningAttributes(new String[0]);
+            searchControls.setSearchScope(searchHelper.getSearchScope().getJndiScopeInt());
+            final String[] returnAttributes = searchHelper.getAttributes() == null
+                    ? null
+                    : searchHelper.getAttributes().toArray(new String[searchHelper.getAttributes().size()]);
+
+            searchControls.setReturningAttributes(returnAttributes);
+            searchControls.setTimeLimit(searchHelper.getTimeLimit());
+            searchControls.setCountLimit(searchHelper.getMaxResults());
+            return searchControls;
+        }
+
+        private byte[] readResultResponsePageCookie(final Control[] controls) {
+            if (controls != null) {
+                for (Control control : controls) {
+                    if (control instanceof PagedResultsResponseControl) {
+                        final PagedResultsResponseControl prrc = (PagedResultsResponseControl) control;
+                        byte[] cookie = prrc.getCookie();
+                        if (cookie != null) {
+                            return cookie;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        private Map<String, Map<String, List<String>>> parseSearchResults(
+                final NamingEnumeration<SearchResult> answer,
+                final int maxParseResults
+        )
+                throws NamingException
+        {
+            final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
+            while ((maxParseResults == 0 || results.size() < maxParseResults) && answer.hasMore()) {
+                final SearchResult searchResult = answer.next();
+                final StringBuilder entryDN = new StringBuilder();
+                entryDN.append(removeJndiEscapes(searchResult.getName()));
+                if (baseDN.length() > 0) {
+                    if (entryDN.length() > 0) {
+                        entryDN.append(',');
+                    }
+                    entryDN.append(baseDN);
+                }
+
+                final NamingEnumeration attributeEnum = searchResult.getAttributes().getAll();
+                if (attributeEnum.hasMore()) {
+                    final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
+                    while (attributeEnum.hasMore()) {
+                        final Attribute loopAttribute = (Attribute) attributeEnum.next();
+                        final String attrName = loopAttribute.getID();
+                        final List<String> valueList = new ArrayList<String>();
+                        for (NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore();) {
+                            final Object value = attrValueEnum.next();
+                            valueList.add(value.toString());
+                            if (!returnAllValues) {
+                                attrValueEnum.close();
+                                break;
+                            }
+                        }
+                        attrValues.put(attrName, Collections.unmodifiableList(valueList));
+                    }
+                    results.put(entryDN.toString(), Collections.unmodifiableMap(attrValues));
+                } else {
+                    results.put(entryDN.toString(), Collections.<String,List<String>>emptyMap());
+                }
+            }
+
+
+            return results;
         }
     }
 
-    private Boolean cachedPagingEnable = null;
     private boolean supportsSearchResultPaging()
             throws ChaiUnavailableException, ChaiOperationException
     {
         final String enableSettingStr = this.getChaiConfiguration().getSetting(ChaiSetting.LDAP_SEARCH_PAGING_ENABLE);
         if ("auto".equalsIgnoreCase(enableSettingStr)) {
-            if (cachedPagingEnable == null) {
+            if (cachedPagingEnableSupport == null) {
                 final ChaiEntry rootDse = ChaiUtility.getRootDSE(this);
                 final Set<String> supportedControls = rootDse.readMultiStringAttribute("supportedControl");
-                cachedPagingEnable = supportedControls.contains(PagedResultsControl.OID);
+                cachedPagingEnableSupport = supportedControls.contains(PagedResultsControl.OID);
             }
-            return cachedPagingEnable;
+            return cachedPagingEnableSupport;
         }
         return Boolean.parseBoolean(enableSettingStr);
     }
 
-    private static byte[] readResultResponsePageCookie(final Control[] controls) {
-        if (controls != null) {
-            for (Control control : controls) {
-                if (control instanceof PagedResultsResponseControl) {
-                    final PagedResultsResponseControl prrc = (PagedResultsResponseControl) control;
-                    byte[] cookie = prrc.getCookie();
-                    if (cookie != null) {
-                        return cookie;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    private static Map<String, Map<String, List<String>>> parseSearchResults(
-            final NamingEnumeration<SearchResult> answer,
-            final String baseDN,
-            final boolean returnAllValues,
-            final int maxParseResults
-
-    )
-            throws NamingException
-    {
-        final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
-        while (answer.hasMore() && (maxParseResults == 0 || maxParseResults > results.size())) {
-            final SearchResult searchResult = answer.next();
-            final StringBuilder entryDN = new StringBuilder();
-            entryDN.append(removeJndiEscapes(searchResult.getName()));
-            if (baseDN != null && baseDN.length() > 0) {
-                if (entryDN.length() > 0) {
-                    entryDN.append(',');
-                }
-                entryDN.append(baseDN);
-            }
-
-            final NamingEnumeration attributeEnum = searchResult.getAttributes().getAll();
-            if (attributeEnum.hasMore()) {
-                final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
-                while (attributeEnum.hasMore()) {
-                    final Attribute loopAttribute = (Attribute) attributeEnum.next();
-                    final String attrName = loopAttribute.getID();
-                    final List<String> valueList = new ArrayList<String>();
-                    for (NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore();) {
-                        final Object value = attrValueEnum.next();
-                        valueList.add(value.toString());
-                        if (!returnAllValues) {
-                            attrValueEnum.close();
-                            break;
-                        }
-                    }
-                    attrValues.put(attrName, Collections.unmodifiableList(valueList));
-                }
-                results.put(entryDN.toString(), Collections.unmodifiableMap(attrValues));
-            } else {
-                results.put(entryDN.toString(), Collections.<String,List<String>>emptyMap());
-            }
-        }
-
-
-        return results;
-    }
 
     private LdapContext getLdapConnection()
             throws ChaiUnavailableException
