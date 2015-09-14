@@ -325,7 +325,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
         final Date futureDate = new Date(910692730085477l); //magic future date timestamp that also means not expired.
         final Date theDate = this.readDateAttribute("accountExpires");
-        return !theDate.before(futureDate) ? null : theDate;
+        return theDate == null
+                ? null
+                : !theDate.before(futureDate)
+                ? null
+                : theDate;
     }
 
     @Override
