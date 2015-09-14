@@ -935,11 +935,12 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     }
 
     private class SearchEngine {
-        final int MAX_SEARCH_LOOPS = 10 * 1000 * 1000;
-
         private final String baseDN;
         private final SearchHelper searchHelper;
         private final boolean returnAllValues;
+
+        private boolean used = false;
+        private final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
 
         public SearchEngine(String baseDN, SearchHelper searchHelper, boolean returnAllValues) throws ChaiOperationException {
             this.baseDN = baseDN != null ? baseDN : "";
@@ -955,12 +956,16 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         public Map<String, Map<String, List<String>>> getResults()
                 throws ChaiUnavailableException, ChaiOperationException
         {
+            if (used) {
+                throw new IllegalStateException("SearchEngine instance can only be used once");
+            }
+            used = true;
+
             activityPreCheck();
 
             // Define the Search Controls object.
             final SearchControls searchControls = makeSearchControls();
 
-            final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
 
             final int maxPageSize = getChaiConfiguration().getIntSetting(ChaiSetting.LDAP_SEARCH_PAGING_SIZE);
 
@@ -973,12 +978,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             NamingEnumeration<SearchResult> answer = null;
             try {
                 byte[] pageCookie = null;
-                int safetyLoopCounter = 0;
                 do {
-                    safetyLoopCounter++;
-                    if (safetyLoopCounter > MAX_SEARCH_LOOPS) {
-                        throw new IllegalStateException("safety loop counter exceeded maximum during search operation");
-                    }
                     // set the paging control if using paging
                     if (pagingEnabled) {
                         final Control pagedControl = pageCookie == null
@@ -990,14 +990,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     // execute the search
                     answer = ldapConnection.search(addJndiEscape(baseDN), searchHelper.getFilter(), searchControls);
 
-                    // determine how many results we need to read (ad will return forever regardless of max count limit)
-                    final int maxParseResults = searchHelper.getMaxResults() == 0
-                            ? 0
-                            : searchHelper.getMaxResults() - results.size();
-
-                    { // read the values into our results output object
-                        final Map<String, Map<String, List<String>>> loopResults = parseSearchResults(answer, maxParseResults);
-                        results.putAll(loopResults);
+                    // read search results from ldap into the result map
+                    final int previousResultSize = results.size();
+                    parseSearchResults(answer);
+                    if (pageCookie != null && previousResultSize == results.size()) {
+                        LOGGER.warn("ldap paged search has returned an empty result page, current result size=" + results.size());
                     }
 
                     // if paging enabled, read the cookie value.
@@ -1006,8 +1003,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                             : null;
 
                 } while (pagingEnabled && pageCookie != null);  // loop until no more paged results.
-
-                return Collections.unmodifiableMap(results);
+            } catch (SizeLimitExceededException e) {
+                // ignore
             } catch (IOException e) {
                 throw new ChaiOperationException("io error during paged search result: " + e.getMessage(),ChaiError.COMMUNICATION);
             } catch (NamingException e) {
@@ -1022,6 +1019,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     }
                 }
             }
+
+            return Collections.unmodifiableMap(results);
         }
 
         private SearchControls makeSearchControls() {
@@ -1054,14 +1053,12 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             return null;
         }
 
-        private Map<String, Map<String, List<String>>> parseSearchResults(
-                final NamingEnumeration<SearchResult> answer,
-                final int maxParseResults
+        private void parseSearchResults(
+                final NamingEnumeration<SearchResult> answer
         )
                 throws NamingException
         {
-            final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
-            while ((maxParseResults == 0 || results.size() < maxParseResults) && answer.hasMore()) {
+            while (answer.hasMore()) {
                 final SearchResult searchResult = answer.next();
                 final StringBuilder entryDN = new StringBuilder();
                 entryDN.append(removeJndiEscapes(searchResult.getName()));
@@ -1072,32 +1069,46 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     entryDN.append(baseDN);
                 }
 
-                final NamingEnumeration attributeEnum = searchResult.getAttributes().getAll();
-                if (attributeEnum.hasMore()) {
-                    final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
-                    while (attributeEnum.hasMore()) {
-                        final Attribute loopAttribute = (Attribute) attributeEnum.next();
-                        final String attrName = loopAttribute.getID();
-                        final List<String> valueList = new ArrayList<String>();
-                        for (NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore();) {
-                            final Object value = attrValueEnum.next();
-                            valueList.add(value.toString());
-                            if (!returnAllValues) {
-                                attrValueEnum.close();
-                                break;
-                            }
-                        }
-                        attrValues.put(attrName, Collections.unmodifiableList(valueList));
-                    }
-                    results.put(entryDN.toString(), Collections.unmodifiableMap(attrValues));
+                final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
+                {
+                    final NamingEnumeration attributeEnum = searchResult.getAttributes().getAll();
+                    attrValues.putAll(parseAttributeValues(attributeEnum, returnAllValues));
+                }
+
+                final String entryDNString = entryDN.toString();
+                if (results.containsKey(entryDNString)) {
+                    LOGGER.warn("ignoring duplicate DN in search result from ldap server: " + entryDNString);
                 } else {
-                    results.put(entryDN.toString(), Collections.<String,List<String>>emptyMap());
+                    results.put(entryDNString, Collections.unmodifiableMap(attrValues));
                 }
             }
-
-
-            return results;
         }
+    }
+
+    private Map<String, List<String>> parseAttributeValues(
+            final NamingEnumeration attributeEnum,
+            final boolean returnAllValues
+    )
+            throws NamingException
+    {
+        final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
+        if (attributeEnum != null && attributeEnum.hasMore()) {
+            while (attributeEnum.hasMore()) {
+                final Attribute loopAttribute = (Attribute) attributeEnum.next();
+                final String attrName = loopAttribute.getID();
+                final List<String> valueList = new ArrayList<String>();
+                for (NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore(); ) {
+                    final Object value = attrValueEnum.next();
+                    valueList.add(value.toString());
+                    if (!returnAllValues) {
+                        attrValueEnum.close();
+                        break;
+                    }
+                }
+                attrValues.put(attrName, Collections.unmodifiableList(valueList));
+            }
+        }
+        return Collections.unmodifiableMap(attrValues);
     }
 
     private boolean supportsSearchResultPaging()
@@ -1159,7 +1170,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             return null;
         }
 
-        // remove surrounding quotes if the internal value contains a / charachter
+        // remove surrounding quotes if the internal value contains a / character
         final String slashEscapePattern = "^\".*/.*\"$";
         if (input.matches(slashEscapePattern)) {
             return input.replaceAll("^\"|\"$","");
