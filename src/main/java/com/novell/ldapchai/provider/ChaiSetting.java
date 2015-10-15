@@ -20,6 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.cr.Answer;
+import com.novell.ldapchai.exception.ChaiRuntimeException;
 
 import java.io.Serializable;
 import java.net.URI;
@@ -391,7 +392,7 @@ public enum ChaiSetting {
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    EDIRECTORY_ENABLE_NMAS("chai.edirectory.enableNMAS", "false", true, Validator.BOOLEAN_VALIDATOR),
+    EDIRECTORY_ENABLE_NMAS("chai.edirectory.enableNMAS", "false", true, Validator.ENABLE_NMAS_VALIDATOR),
 
     /**
      * Cache failed operations due to unknown extended operations.  Once an unknown extended operation for a
@@ -648,6 +649,25 @@ public enum ChaiSetting {
                 try {
                     if (Answer.FormatType.valueOf(value) == null) {
                         throw new IllegalArgumentException("unknown ChaiResponseSet.FormatType");
+                    }
+                } catch (Exception e) {
+                    throw new IllegalArgumentException(e.getMessage());
+                }
+            }
+        };
+
+        static final Validator ENABLE_NMAS_VALIDATOR = new Validator() {
+            public void validate(final String value)
+            {
+                try {
+                    boolean enableNmas = Boolean.parseBoolean(value);
+
+                    if (enableNmas) {
+                        try {
+                            Class.forName("com.novell.security.nmas.mgmt.NMASChallengeResponse");
+                        } catch (ClassNotFoundException ex) {
+                            throw new ChaiRuntimeException("Error: Unable to enable NMAS support.  One or more classes could not be loaded from the NMAS Toolkit.  Check to make sure NMASToolkit.jar is available on the classpath.");
+                        }
                     }
                 } catch (Exception e) {
                     throw new IllegalArgumentException(e.getMessage());

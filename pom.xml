@@ -81,25 +81,6 @@
 			<artifactId>jldap</artifactId>
 			<version>2009-10-07</version>
 		</dependency>
-		<dependency>
-			<groupId>com.Novell.edirectory</groupId>
-			<artifactId>NMASToolkit</artifactId>
-			<version>0.0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/NMASToolkit.jar</systemPath>
-		</dependency>
-		<!-- Need to be made available
-			<dependency>
-			<groupId>com.Novell.edirectory</groupId>
-			<artifactId>NMASToolkit</artifactId>
-			<version>8.8.8-0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-			<groupId>com.Novell.edirectory</groupId>
-			<artifactId>NMASClient</artifactId>
-			<version>8.8.8-0-SNAPSHOT</version>
-			<scope>test</scope>
-			</dependency> -->
 
 		<!-- Test dependencies -->
 		<dependency>
@@ -168,6 +149,18 @@
 							</artifacts>
 						</configuration>
 					</execution>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/external/java</source>
+							</sources>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>
@@ -177,6 +170,11 @@
 					<execution>
 						<id>default-jar</id>
 						<configuration>
+							<!-- Exclude NMAS stubs, since we want to use the ones from NMASToolkit.jar, if available -->
+							<excludes>
+								<exclude>com/novell/security/</exclude>
+							</excludes>
+
 							<archive>
 								<manifest>
 									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
@@ -201,6 +199,12 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<!-- Exclude NMAS stubs, since we want to use the ones from NMASToolkit.jar, if available -->
+							<excludes>
+								<exclude>com/novell/security/</exclude>
+							</excludes>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -234,7 +238,7 @@
 						<configuration>
 							<show>public</show>
 							<additionalparam>-Xdoclint:none</additionalparam>
-							<excludePackageNames>com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
 							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
 								default -->
 						</configuration>

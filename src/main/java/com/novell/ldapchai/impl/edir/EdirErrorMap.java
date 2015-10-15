@@ -22,7 +22,6 @@ package com.novell.ldapchai.impl.edir;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
-import com.novell.security.nmas.NMASConstants;
 
 public class EdirErrorMap implements ErrorMap {
 
@@ -65,28 +64,28 @@ public class EdirErrorMap implements ErrorMap {
 
     enum EdirError {
         // nmas errors
-        PASSWORD_TOO_LONG             (NMASConstants.NMAS_E_PASSWORD_TOO_LONG,             ChaiError.PASSWORD_TOO_LONG,              true, false),
-        PASSWORD_NOT_ENOUGH_NUM       (NMASConstants.NMAS_E_PASSWORD_NUMERIC_MIN,          ChaiError.PASSWORD_NOT_ENOUGH_NUM,        true, false),
-        PASSWORD_NOT_ENOUGH_SPECIAL   (NMASConstants.NMAS_E_PASSWORD_SPECIAL_MIN,          ChaiError.PASSWORD_NOT_ENOUGH_SPECIAL,    true, false),
-        PASSWORD_NOT_ENOUGH_LOWER     (NMASConstants.NMAS_E_PASSWORD_LOWER_MIN,            ChaiError.PASSWORD_NOT_ENOUGH_LOWER,      true, false),
-        PASSWORD_NOT_ENOUGH_UPPER     (NMASConstants.NMAS_E_PASSWORD_UPPER_MIN,            ChaiError.PASSWORD_NOT_ENOUGH_UPPER,      true, false),
-        PASSWORD_NOT_ENOUGH_UNIQUE    (NMASConstants.NMAS_E_PASSWORD_UNIQUE_MIN,           ChaiError.PASSWORD_NOT_ENOUGH_UNIQUE,     true, false),
-        PASSWORD_TOO_MANY_REPEAT      (NMASConstants.NMAS_E_PASSWORD_REPEAT_CHAR_MAX,      ChaiError.PASSWORD_TOO_MANY_REPEAT,       true, false),
-        PASSWORD_TOO_MANY_NUMERIC     (NMASConstants.NMAS_E_PASSWORD_NUMERIC_MAX,          ChaiError.PASSWORD_TOO_MANY_NUMERIC,      true, false),
-        PASSWORD_TOO_MANY_LOWER       (NMASConstants.NMAS_E_PASSWORD_LOWER_MAX,            ChaiError.PASSWORD_TOO_MANY_LOWER,        true, false),
-        PASSWORD_TOO_MANY_UPPER       (NMASConstants.NMAS_E_PASSWORD_UPPER_MAX,            ChaiError.PASSWORD_TOO_MANY_UPPER,        true, false),
-        PASSWORD_FIRST_IS_NUMERIC     (NMASConstants.NMAS_E_PASSWORD_NUMERIC_FIRST,        ChaiError.PASSWORD_FIRST_IS_NUMERIC,      true, false),
-        PASSWORD_LAST_IS_NUMERIC      (NMASConstants.NMAS_E_PASSWORD_NUMERIC_LAST,         ChaiError.PASSWORD_LAST_IS_NUMERIC,       true, false),
-        PASSWORD_FIRST_IS_SPECIAL     (NMASConstants.NMAS_E_PASSWORD_SPECIAL_FIRST,        ChaiError.PASSWORD_FIRST_IS_SPECIAL,      true, false),
-        PASSWORD_LAST_IS_SPECIAL      (NMASConstants.NMAS_E_PASSWORD_SPECIAL_LAST,         ChaiError.PASSWORD_LAST_IS_SPECIAL,       true, false),
-        PASSWORD_TOO_MANY_SPECIAL     (NMASConstants.NMAS_E_PASSWORD_SPECIAL_MAX,          ChaiError.PASSWORD_TOO_MANY_SPECIAL,      true, false),
-        PASSWORD_INVALID_CHAR         (NMASConstants.NMAS_E_PASSWORD_EXTENDED_DISALLOWED,  ChaiError.PASSWORD_INVALID_CHAR,          true, false),
-        PASSWORD_INWORDLIST           (NMASConstants.NMAS_E_PASSWORD_EXCLUDE,              ChaiError.PASSWORD_INWORDLIST,            true, false),
-        PASSWORD_SAMEASATTR           (NMASConstants.NMAS_E_PASSWORD_ATTR_VALUE,           ChaiError.PASSWORD_SAMEASATTR,            true, false),
-        PASSWORD_HISTORY_FULL         (NMASConstants.NMAS_E_PASSWORD_HISTORY_FULL,         ChaiError.PASSWORD_HISTORY_FULL,          true, false),
-        PASSWORD_NUMERIC_DISALLOWED   (NMASConstants.NMAS_E_PASSWORD_NUMERIC_DISALLOWED,   ChaiError.PASSWORD_NUMERIC_DISALLOWED,    true, false),
-        PASSWORD_SPECIAL_DISALLOWED   (NMASConstants.NMAS_E_PASSWORD_SPECIAL_DISALLOWED,   ChaiError.PASSWORD_SPECIAL_DISALLOWED,    true, false),
-        PASSWORD_TOO_SOON             (NMASConstants.NMAS_E_PASSWORD_LIFE_MIN,             ChaiError.PASSWORD_TOO_SOON,              true, false),
+        PASSWORD_TOO_LONG             (-16000,   ChaiError.PASSWORD_TOO_LONG,              true, false),
+        PASSWORD_NOT_ENOUGH_NUM       (-16008,   ChaiError.PASSWORD_NOT_ENOUGH_NUM,        true, false),
+        PASSWORD_NOT_ENOUGH_SPECIAL   (-16013,   ChaiError.PASSWORD_NOT_ENOUGH_SPECIAL,    true, false),
+        PASSWORD_NOT_ENOUGH_LOWER     (-16003,   ChaiError.PASSWORD_NOT_ENOUGH_LOWER,      true, false),
+        PASSWORD_NOT_ENOUGH_UPPER     (-16001,   ChaiError.PASSWORD_NOT_ENOUGH_UPPER,      true, false),
+        PASSWORD_NOT_ENOUGH_UNIQUE    (-16017,   ChaiError.PASSWORD_NOT_ENOUGH_UNIQUE,     true, false),
+        PASSWORD_TOO_MANY_REPEAT      (-16015,   ChaiError.PASSWORD_TOO_MANY_REPEAT,       true, false),
+        PASSWORD_TOO_MANY_NUMERIC     (-16009,   ChaiError.PASSWORD_TOO_MANY_NUMERIC,      true, false),
+        PASSWORD_TOO_MANY_LOWER       (-16004,   ChaiError.PASSWORD_TOO_MANY_LOWER,        true, false),
+        PASSWORD_TOO_MANY_UPPER       (-16002,   ChaiError.PASSWORD_TOO_MANY_UPPER,        true, false),
+        PASSWORD_FIRST_IS_NUMERIC     (-16006,   ChaiError.PASSWORD_FIRST_IS_NUMERIC,      true, false),
+        PASSWORD_LAST_IS_NUMERIC      (-16007,   ChaiError.PASSWORD_LAST_IS_NUMERIC,       true, false),
+        PASSWORD_FIRST_IS_SPECIAL     (-16011,   ChaiError.PASSWORD_FIRST_IS_SPECIAL,      true, false),
+        PASSWORD_LAST_IS_SPECIAL      (-16012,   ChaiError.PASSWORD_LAST_IS_SPECIAL,       true, false),
+        PASSWORD_TOO_MANY_SPECIAL     (-16014,   ChaiError.PASSWORD_TOO_MANY_SPECIAL,      true, false),
+        PASSWORD_INVALID_CHAR         (-16021,   ChaiError.PASSWORD_INVALID_CHAR,          true, false),
+        PASSWORD_INWORDLIST           (-16019,   ChaiError.PASSWORD_INWORDLIST,            true, false),
+        PASSWORD_SAMEASATTR           (-16020,   ChaiError.PASSWORD_SAMEASATTR,            true, false),
+        PASSWORD_HISTORY_FULL         (-1696,    ChaiError.PASSWORD_HISTORY_FULL,          true, false),
+        PASSWORD_NUMERIC_DISALLOWED   (-16005,   ChaiError.PASSWORD_NUMERIC_DISALLOWED,    true, false),
+        PASSWORD_SPECIAL_DISALLOWED   (-16010,   ChaiError.PASSWORD_SPECIAL_DISALLOWED,    true, false),
+        PASSWORD_TOO_SOON             (-16018,   ChaiError.PASSWORD_TOO_SOON,              true, false),
 
         BUFFER_TOO_SMALL                               (-119, ChaiError.UNKNOWN,                       true, false),
         VOLUME_FLAG_NOT_SET                            (-120, ChaiError.UNKNOWN,                       true, false),
