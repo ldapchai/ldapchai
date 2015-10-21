@@ -13,40 +13,24 @@
 	<artifactId>ldapchai</artifactId>
 	<packaging>jar</packaging>
 
-	<name>LDAP Chai</name>
+	<name>${project.groupId}:${project.artifactId}</name>
 	<description>The LDAP Chai API, easy to use LDAP for Java developers.
 
 		LDAP Chai is a wrapper library that makes using ldap services as simple and easy as it can be.
 		LDAP Chai has methods for commonly used functions, and relieves developers of the need to write code that has been written many times before.
 	</description>
-
+	<url>https://github.com/ldapchai/ldapchai</url>
+	
 	<properties>
 		<maven.compiler.source>1.5</maven.compiler.source>
 		<maven.compiler.target>1.5</maven.compiler.target>
 		<skipTests>true</skipTests>  <!-- missing test configuration from source? -->
 		<outputDirectory.private>${project.build.directory}/private</outputDirectory.private>
-            <timestamp.iso>${maven.build.timestamp}</timestamp.iso>
-            <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
+		<timestamp.iso>${maven.build.timestamp}</timestamp.iso>
+		<maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 	</properties>
 
-	<!-- Not usable when deploying to Central
-	<repositories>
-		<repository>
-			<id>nsl.nexus</id>
-			<url>http://nexus.novell.com:8080/nexus/content/groups/netiq</url>
-			<releases>
-				<checksumPolicy>fail</checksumPolicy>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-	-->
-
 	<dependencies>
-
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
@@ -190,62 +174,16 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<!-- Exclude NMAS stubs, since we want to use the ones from NMASToolkit.jar, if available -->
-							<excludes>
-								<exclude>com/novell/security/</exclude>
-							</excludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.9.1</version>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.6</version>
+				<extensions>true</extensions>
 				<configuration>
-					<doctitle>LDAP Chai API</doctitle>
-					<windowtitle>LDAP Chai API</windowtitle>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs-private</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<show>private</show>
-							<additionalparam>-Xdoclint:none</additionalparam>
-							<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
-							<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
-							<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
-						</configuration>
-					</execution>
-					<execution>
-						<id>attach-javadocs-public</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<show>public</show>
-							<additionalparam>-Xdoclint:none</additionalparam>
-							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
-							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
-								default -->
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -262,19 +200,13 @@
 
 	<profiles>
 		<profile>
-			<id>sonatype-oss-release</id>
-			<activation>
-				<property>
-					<name>performRelease</name>
-					<value>true</value>
-				</property>
-			</activation>
+			<id>release</id>
 			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.1</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
@@ -288,24 +220,56 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
 						<executions>
 							<execution>
 								<id>attach-sources</id>
 								<goals>
 									<goal>jar</goal>
 								</goals>
+								<configuration>
+									<!-- Exclude NMAS stubs, since we want to use the ones from NMASToolkit.jar, if available -->
+									<excludes>
+										<exclude>com/novell/security/</exclude>
+									</excludes>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>2.9.1</version>
+						<configuration>
+							<doctitle>LDAP Chai API</doctitle>
+							<windowtitle>LDAP Chai API</windowtitle>
+						</configuration>
 						<executions>
 							<execution>
-								<id>attach-javadocs</id>
+								<id>attach-javadocs-private</id>
 								<goals>
 									<goal>jar</goal>
 								</goals>
+								<configuration>
+									<show>private</show>
+									<additionalparam>-Xdoclint:none</additionalparam>
+									<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
+									<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
+									<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
+								</configuration>
+							</execution>
+							<execution>
+								<id>attach-javadocs-public</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<show>public</show>
+									<additionalparam>-Xdoclint:none</additionalparam>
+									<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+									<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+										default -->
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
@@ -358,4 +322,40 @@
 			</build>
 		</profile>
 	</profiles>
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License, version 2.1 (LGPLv2.1)</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+		</license>
+	</licenses>
+	
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+	
+	<developers>
+		<developer>
+			<name>Jason Rivard</name>
+			<email>https://github.com/jrivard</email>
+			<organization>LDAP Chai</organization>
+			<organizationUrl>https://github.com/ldapchai/</organizationUrl>
+		</developer>
+		<developer>
+			<name>James Albright</name>
+			<email>https://github.com/jalbr74</email>
+			<organization>LDAP Chai</organization>
+			<organizationUrl>https://github.com/ldapchai/</organizationUrl>
+		</developer>
+	</developers>
+	
+	<scm>
+		<connection>scm:git:git@github.com:ldapchai/ldapchai.git</connection>
+		<developerConnection>scm:git:git@github.com:ldapchai/ldapchai.git</developerConnection>
+		<url>git@github.com:ldapchai/ldapchai.git</url>
+	</scm>
+
 </project>
