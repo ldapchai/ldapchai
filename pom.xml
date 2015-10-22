@@ -133,6 +133,7 @@
 						</configuration>
 					</execution>
 					<!-- Capture secondary private javadoc -->
+					<!--
 					<execution>
 						<id>add-private-javadoc</id>
 						<phase>package</phase>
@@ -149,6 +150,7 @@
 							</artifacts>
 						</configuration>
 					</execution>
+					-->
 					<execution>
 						<id>add-source</id>
 						<phase>generate-sources</phase>
