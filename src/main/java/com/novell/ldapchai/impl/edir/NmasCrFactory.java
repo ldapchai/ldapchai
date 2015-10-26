@@ -43,6 +43,11 @@ import org.jdom2.JDOMException;
 import java.io.IOException;
 import java.util.*;
 
+
+/**
+ * Utility class for reading and writing challenge response sets too and from eDirectory.  The functionality in this class
+ * is enabled regardless of the configuration setting {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS}.
+ */
 public class NmasCrFactory {
 
     final static private ChaiLogger LOGGER = ChaiLogger.getLogger(NmasCrFactory.class);

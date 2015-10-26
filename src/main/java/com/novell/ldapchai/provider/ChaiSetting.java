@@ -385,7 +385,8 @@ public enum ChaiSetting {
 
     /**
      * Enable NMAS support for Novell eDirectory.  NMAS support makes some operations more efficient,
-     * and provides more descriptive error messages.
+     * and provides more descriptive error messages.  NMAS support requires libraries from the NMAS SDK.
+     *
      * <p/>
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.edirectory.enableNMAS</td></tr>
