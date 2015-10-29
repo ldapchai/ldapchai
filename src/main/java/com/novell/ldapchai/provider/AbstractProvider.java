@@ -25,23 +25,15 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.URI;
 import java.util.*;
 
 abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor {
@@ -212,32 +204,6 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
 
         return false;
-    }
-
-    public static abstract class ThreadLocalSocketFactory
-            extends SocketFactory
-    {
-
-        static ThreadLocal<SocketFactory> local = new ThreadLocal<SocketFactory>();
-
-        public static SocketFactory getDefault()
-        {
-            SocketFactory result = local.get();
-            if ( result == null )
-                throw new IllegalStateException();
-            return result;
-        }
-
-        public static void set( SocketFactory factory )
-        {
-            local.set( factory );
-        }
-
-        public static void remove()
-        {
-            local.remove();
-        }
-
     }
 
     static class PromiscuousTrustManager implements X509TrustManager {

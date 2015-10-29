@@ -32,6 +32,7 @@ import com.novell.ldapchai.util.SearchHelper;
 import javax.naming.*;
 import javax.naming.directory.*;
 import javax.naming.ldap.*;
+import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
@@ -80,6 +81,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     private Boolean cachedPagingEnableSupport = null;
     private LdapContext jndiConnection;
+    private SocketFactory socketFactory;
 
 
 // -------------------------- STATIC METHODS --------------------------
@@ -903,7 +905,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 try {
                     final SSLContext sc = SSLContext.getInstance("SSL");
                     sc.init(null, new X509TrustManager[]{new PromiscuousTrustManager()}, new java.security.SecureRandom());
-                    ThreadLocalSocketFactory.set(sc.getSocketFactory());
+                    socketFactory = sc.getSocketFactory();
+                    ThreadLocalSocketFactory.set(socketFactory);
                     env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
                 } catch (Exception e) {
                     LOGGER.error("error configuring promiscuous socket factory");
@@ -913,7 +916,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 try {
                     final SSLContext sc = SSLContext.getInstance("SSL");
                     sc.init(null, chaiConfig.getTrustManager(), new java.security.SecureRandom());
-                    ThreadLocalSocketFactory.set(sc.getSocketFactory());
+                    socketFactory = sc.getSocketFactory();
+                    ThreadLocalSocketFactory.set(socketFactory);
+
                     env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
                 } catch (Exception e) {
                     LOGGER.error("error configuring promiscuous socket factory");
@@ -1131,6 +1136,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException
     {
         try {
+            if (socketFactory != null) {
+                ThreadLocalSocketFactory.set(socketFactory);
+            }
             return jndiConnection.newInstance(null);
         } catch (NamingException e) {
             final String errorMsg = "error creating new jndiConnection instance: " + e.getMessage();
@@ -1141,11 +1149,28 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     private void convertNamingException(final NamingException e)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        if (errorIsRetryable(e)) {
-            throw new ChaiUnavailableException(e.getMessage(), ChaiError.COMMUNICATION, false, false);
+        // important safety tip: naming exceptions sometimes come with null messages....
+        String errorMsg = e.getClass().getName();
+        if (e.getMessage() != null) {
+            errorMsg += ": " + e.getMessage();
         }
 
-        throw ChaiOperationException.forErrorMessage(e.getMessage());
+        Throwable cause = e.getCause();
+        int safetyCounter = 0;
+        while (cause != null && safetyCounter < 10) {
+            safetyCounter++;
+            errorMsg += ", cause:" + cause.getClass().getName();
+            if (cause.getMessage() != null) {
+                errorMsg += ": " + cause.getMessage();
+            }
+            cause = cause.getCause();
+        }
+
+        if (errorIsRetryable(e)) {
+            throw new ChaiUnavailableException(errorMsg, ChaiError.COMMUNICATION, false, false);
+        }
+
+        throw ChaiOperationException.forErrorMessage(errorMsg);
     }
 
 
@@ -1200,4 +1225,31 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         return newControls;
     }
+
+    public static abstract class ThreadLocalSocketFactory
+            extends SocketFactory
+    {
+
+        static ThreadLocal<SocketFactory> local = new ThreadLocal<SocketFactory>();
+
+        public static SocketFactory getDefault()
+        {
+            final SocketFactory result = local.get();
+            if ( result == null )
+                throw new IllegalStateException("missing threadlocal socketfactory for ChaiProvider");
+            return result;
+        }
+
+        public static void set( SocketFactory factory )
+        {
+            local.set( factory );
+        }
+
+        public static void remove()
+        {
+            local.remove();
+        }
+
+    }
+
 }
