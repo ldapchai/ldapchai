@@ -186,6 +186,62 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<!-- Exclude NMAS stubs, since we want to use the ones from NMASToolkit.jar, if available -->
+							<excludes>
+								<exclude>com/novell/security/</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<doctitle>LDAP Chai API</doctitle>
+					<windowtitle>LDAP Chai API</windowtitle>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs-private</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<show>private</show>
+							<additionalparam>${javadoc.opts}</additionalparam>
+							<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
+							<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
+							<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
+						</configuration>
+					</execution>
+					<execution>
+						<id>attach-javadocs-public</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+						<configuration>
+							<show>public</show>
+							<additionalparam>${javadoc.opts}</additionalparam>
+							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+								default -->
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -215,62 +271,6 @@
 								<goals>
 									<goal>sign</goal>
 								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.2.1</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-								<configuration>
-									<!-- Exclude NMAS stubs, since we want to use the ones from NMASToolkit.jar, if available -->
-									<excludes>
-										<exclude>com/novell/security/</exclude>
-									</excludes>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.9.1</version>
-						<configuration>
-							<doctitle>LDAP Chai API</doctitle>
-							<windowtitle>LDAP Chai API</windowtitle>
-						</configuration>
-						<executions>
-							<execution>
-								<id>attach-javadocs-private</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-								<configuration>
-									<show>private</show>
-									<additionalparam>${javadoc.opts}</additionalparam>
-									<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
-									<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
-									<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
-								</configuration>
-							</execution>
-							<execution>
-								<id>attach-javadocs-public</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-								<configuration>
-									<show>public</show>
-									<additionalparam>${javadoc.opts}</additionalparam>
-									<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
-									<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
-										default -->
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
