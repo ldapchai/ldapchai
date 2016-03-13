@@ -1,7 +1,7 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.SCrypt;
+import com.novell.ldapchai.util.SCryptUtil;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.jdom2.Element;
 
@@ -39,7 +39,7 @@ class PasswordCryptAnswer implements Answer {
                 break;
 
             case SCRYPT:
-                answerHash = SCrypt.scrypt(casedAnswer);
+                answerHash = SCryptUtil.scrypt(casedAnswer);
                 break;
 
             default:
@@ -65,7 +65,7 @@ class PasswordCryptAnswer implements Answer {
                 return OpenBSDBCrypt.checkPassword(answerHash, casedAnswer.toCharArray());
 
             case SCRYPT:
-                return SCrypt.check(casedAnswer, answerHash);
+                return SCryptUtil.check(casedAnswer, answerHash);
         }
         throw new IllegalArgumentException("can't test answer for unknown format " + formatType.toString());
     }
