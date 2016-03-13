@@ -1,9 +1,11 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.BCrypt;
 import com.novell.ldapchai.util.SCrypt;
+import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.jdom2.Element;
+
+import java.security.SecureRandom;
 
 class PasswordCryptAnswer implements Answer {
     private final String answerHash;
@@ -30,7 +32,10 @@ class PasswordCryptAnswer implements Answer {
         final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
         switch (formatType) {
             case BCRYPT:
-                answerHash = BCrypt.hashpw(casedAnswer, BCrypt.gensalt());
+                final int bcryptRounds = 10;
+                final byte[] salt = new byte[16];
+                (new SecureRandom()).nextBytes(salt);
+                answerHash = OpenBSDBCrypt.generate(casedAnswer.toCharArray(), salt, bcryptRounds);
                 break;
 
             case SCRYPT:
@@ -57,7 +62,7 @@ class PasswordCryptAnswer implements Answer {
         final String casedAnswer = caseInsensitive ? testResponse.toLowerCase() : testResponse;
         switch (formatType) {
             case BCRYPT:
-                return BCrypt.checkpw(casedAnswer, answerHash);
+                return OpenBSDBCrypt.checkPassword(answerHash, casedAnswer.toCharArray());
 
             case SCRYPT:
                 return SCrypt.check(casedAnswer, answerHash);
