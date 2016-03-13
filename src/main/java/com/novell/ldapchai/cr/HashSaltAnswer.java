@@ -20,7 +20,7 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.internal.Base64Util;
+import net.iharder.Base64;
 import org.jdom2.Element;
 
 import java.security.MessageDigest;
@@ -155,13 +155,13 @@ class HashSaltAnswer implements Answer {
         switch (version) {
             case A:
                 hashedBytes = md.digest(hashedBytes);
-                return Base64Util.encodeBytes(hashedBytes);
+                return Base64.encodeBytes(hashedBytes);
 
             case B:
                 for (int i = 0; i < hashCount; i++) {
                     hashedBytes = md.digest(hashedBytes);
                 }
-                return Base64Util.encodeBytes(hashedBytes);
+                return Base64.encodeBytes(hashedBytes);
 
             default:
                 throw new IllegalStateException("unexpected version enum in hash method");

@@ -1,7 +1,7 @@
 
 package com.novell.ldapchai.util;
 
-import com.novell.ldapchai.util.internal.Base64Util;
+import net.iharder.Base64;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -254,7 +254,7 @@ public class SCrypt {
 
     /**
      * Hash the supplied plaintext password and generate output in the format described
-     * in {@link SCryptUtil}.
+     * in {@link SCrypt}.
      * Simple {@link SCrypt} interface for hashing passwords using the
      * <a href="http://www.tarsnap.com/scrypt.html">scrypt</a> key derivation function
      * and comparing a plain text password to a hashed one. The hashed output is an
@@ -291,8 +291,8 @@ public class SCrypt {
 
             StringBuilder sb = new StringBuilder((salt.length + derived.length) * 2);
             sb.append("$s0$").append(params).append('$');
-            sb.append(Base64Util.encodeBytes(salt)).append('$');
-            sb.append(Base64Util.encodeBytes(derived));
+            sb.append(Base64.encodeBytes(salt)).append('$');
+            sb.append(Base64.encodeBytes(derived));
 
             return sb.toString();
         } catch (UnsupportedEncodingException e) {
@@ -319,8 +319,8 @@ public class SCrypt {
             }
 
             long params = Long.parseLong(parts[2], 16);
-            byte[] salt = Base64Util.decode(parts[3]);
-            byte[] derived0 = Base64Util.decode(parts[4]);
+            byte[] salt = Base64.decode(parts[3]);
+            byte[] derived0 = Base64.decode(parts[4]);
 
             int N = (int) Math.pow(2, params >> 16 & 0xffff);
             int r = (int) params >> 8 & 0xff;

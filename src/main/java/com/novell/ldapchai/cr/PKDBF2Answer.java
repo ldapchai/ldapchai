@@ -1,7 +1,7 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.internal.Base64Util;
+import net.iharder.Base64;
 import org.jdom2.Element;
 
 import javax.crypto.SecretKeyFactory;
@@ -77,7 +77,7 @@ class PKDBF2Answer implements Answer {
             final PBEKeySpec spec = new PBEKeySpec(chars, saltBytes, hashCount, 64 * 8);
             final SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
             final byte[] hash = skf.generateSecret(spec).getEncoded();
-            return Base64Util.encodeBytes(hash);
+            return Base64.encodeBytes(hash);
         } catch (Exception e) {
             throw new IllegalStateException("unable to perform PBKDF2 hashing operation: " + e.getMessage());
         }

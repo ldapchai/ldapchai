@@ -22,7 +22,7 @@ package com.novell.ldapchai.cr;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.util.internal.Base64Util;
+import net.iharder.Base64;
 import org.jdom2.Element;
 
 import javax.crypto.Cipher;
@@ -76,7 +76,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer {
             final Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters());
             final byte[] encrypted = cipher.doFinal(value.getBytes());
-            return Base64Util.encodeBytes(encrypted, Base64Util.URL_SAFE | Base64Util.GZIP);
+            return Base64.encodeBytes(encrypted, Base64.URL_SAFE | Base64.GZIP);
         } catch (Exception e) {
             final String errorMsg = "unexpected error performing helpdesk answer crypt operation: " + e.getMessage();
             throw new ChaiOperationException(errorMsg,ChaiError.CHAI_INTERNAL_ERROR);
@@ -91,7 +91,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer {
             }
 
             final SecretKey secretKey = makeKey(key);
-            final byte[] decoded = Base64Util.decode(value, Base64Util.URL_SAFE | Base64Util.GZIP);
+            final byte[] decoded = Base64.decode(value, Base64.URL_SAFE | Base64.GZIP);
             final Cipher cipher = Cipher.getInstance("AES");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
             final byte[] decrypted = cipher.doFinal(decoded);

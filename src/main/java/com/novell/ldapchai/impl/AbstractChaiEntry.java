@@ -29,11 +29,12 @@ import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
-import com.novell.ldapchai.util.internal.Base64Util;
+import net.iharder.Base64;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
+
 
 /**
  * A complete implementation of {@code ChaiEntry} interface.
@@ -432,6 +433,6 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
             return null;
         }
         final byte[] guidValue = guidValues[0];
-        return Base64Util.encodeBytes(guidValue);
+        return Base64.encodeBytes(guidValue);
     }
 }
