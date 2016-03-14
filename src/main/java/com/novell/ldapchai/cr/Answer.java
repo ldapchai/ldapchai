@@ -21,6 +21,8 @@ public interface Answer {
         BCRYPT(new PasswordCryptAnswer.PasswordCryptAnswerFactory()),
         SCRYPT(new PasswordCryptAnswer.PasswordCryptAnswerFactory()),
         PBKDF2(new PKDBF2Answer.PKDBF2AnswerFactory()),
+        PBKDF2_SHA256(new PKDBF2Answer.PKDBF2AnswerFactory()),
+        PBKDF2_SHA512(new PKDBF2Answer.PKDBF2AnswerFactory()),
         HELPDESK(new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory()),
         NMAS(null),
         ;

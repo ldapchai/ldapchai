@@ -14,16 +14,35 @@ class PKDBF2Answer implements Answer {
     protected final int hashCount;
     protected final boolean caseInsensitive;
 
+    protected final FormatType formatType;
+
     PKDBF2Answer(
+            final FormatType formatType,
             final String answerHash,
             final String salt,
             final int hashCount,
             final boolean caseInsensitive
     ) {
+        if (formatType == null) {
+            throw new IllegalArgumentException("missing formatType");
+        }
+
+        switch (formatType) {
+            case PBKDF2:
+            case PBKDF2_SHA256:
+            case PBKDF2_SHA512:
+                break;
+
+            default:
+                throw new IllegalArgumentException("unsupported formatType: " + formatType);
+        }
+
+
         if (answerHash == null || answerHash.length() < 1) {
             throw new IllegalArgumentException("missing answerHash");
         }
 
+        this.formatType = formatType;
         this.answerHash = answerHash;
         this.salt = salt;
         this.hashCount = hashCount;
@@ -34,6 +53,7 @@ class PKDBF2Answer implements Answer {
         this.hashCount = answerConfiguration.hashCount;
         this.caseInsensitive = answerConfiguration.caseInsensitive;
         this.salt = generateSalt(32);
+        this.formatType = answerConfiguration.getFormatType();
 
         if (answer == null || answer.length() < 1) {
             throw new IllegalArgumentException("missing answerHash text");
@@ -52,7 +72,7 @@ class PKDBF2Answer implements Answer {
         if (salt != null && salt.length() > 0) {
             answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT,salt);
         }
-        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.PBKDF2.toString());
+        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString());
         if (hashCount > 1) {
             answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT,String.valueOf(hashCount));
         }
@@ -72,10 +92,38 @@ class PKDBF2Answer implements Answer {
 
     protected String hashValue(final String input) {
         try {
-            final char[] chars = input.toCharArray();
-            final byte[] saltBytes = salt.getBytes("UTF-8");
-            final PBEKeySpec spec = new PBEKeySpec(chars, saltBytes, hashCount, 64 * 8);
-            final SecretKeyFactory skf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            final PBEKeySpec spec;
+            final SecretKeyFactory skf;
+            {
+                final String methodName;
+                final int keyLength;
+                switch (formatType) {
+                    case PBKDF2:
+                        methodName = "PBKDF2WithHmacSHA1";
+                        keyLength = 64 * 8;
+                        break;
+
+                    case PBKDF2_SHA256:
+                        methodName = "PBKDF2WithHmacSHA256";
+                        keyLength = 128 * 8;
+                        break;
+
+                    case PBKDF2_SHA512:
+                        methodName = "PBKDF2WithHmacSHA512";
+                        keyLength = 192 * 8;
+                        break;
+
+                    default:
+                        throw new IllegalStateException("formatType not supported: " + formatType.toString());
+
+                }
+
+                final char[] chars = input.toCharArray();
+                final byte[] saltBytes = salt.getBytes("UTF-8");
+
+                spec = new PBEKeySpec(chars, saltBytes, hashCount, keyLength);
+                skf = SecretKeyFactory.getInstance(methodName);
+            }
             final byte[] hash = skf.generateSecret(spec).getEncoded();
             return Base64.encodeBytes(hash);
         } catch (Exception e) {
@@ -95,7 +143,7 @@ class PKDBF2Answer implements Answer {
 
     public AnswerBean asAnswerBean() {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(FormatType.PBKDF2);
+        answerBean.setType(formatType);
         answerBean.setAnswerHash(answerHash);
         answerBean.setCaseInsensitive(caseInsensitive);
         answerBean.setHashCount(hashCount);
@@ -120,6 +168,7 @@ class PKDBF2Answer implements Answer {
             }
 
             return new PKDBF2Answer(
+                    input.getType(),
                     input.getAnswerHash(),
                     input.getSalt(),
                     input.getHashCount(),
@@ -136,9 +185,11 @@ class PKDBF2Answer implements Answer {
 
             final String salt = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT) == null ? "" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT).getValue();
             final String hashCount = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT) == null ? "1" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT).getValue();
+            final String formatTypeStr = element.getAttributeValue(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT);
+            final FormatType formatTypeEnum = FormatType.valueOf(formatTypeStr);
             int saltCount = 1;
             try { saltCount = Integer.parseInt(hashCount); } catch (NumberFormatException e) { /* noop */ }
-            return new PKDBF2Answer(answerValue,salt,saltCount,caseInsensitive);
+            return new PKDBF2Answer(formatTypeEnum, answerValue,salt,saltCount,caseInsensitive);
         }
     }
 }
