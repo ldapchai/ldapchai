@@ -412,7 +412,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
             throws ChaiUnavailableException, ChaiOperationException
     {
         final String value = this.readStringAttribute(attributeName);
-        if (value != null) {
+        if (value != null && !value.equalsIgnoreCase("0")) {
             return EdirEntries.convertZuluToDate(value);
         }
         return null;

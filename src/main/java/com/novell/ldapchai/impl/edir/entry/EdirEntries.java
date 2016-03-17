@@ -99,7 +99,7 @@ public class EdirEntries {
      * Convert the commonly used eDirectory zulu time string to java Date object.
      * See the <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk5701.html">eDirectory Time attribute syntax definition</a> for more details.
      *
-     * @param dateString a date string in the format of "yyyyMMddHHmmss'Z'", for example "199412161032Z"
+     * @param dateString a date string in the format of "yyyyMMddHHmmss'Z'", for example "19941216103200Z"
      * @return A Date object representing the string date
      * @throws IllegalArgumentException if dateString is incorrectly formatted
      */
@@ -126,6 +126,7 @@ public class EdirEntries {
         cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(dateString.substring(8, 10)));
         cal.set(Calendar.MINUTE, Integer.parseInt(dateString.substring(10, 12)));
         cal.set(Calendar.SECOND, Integer.parseInt(dateString.substring(12, 14)));
+        cal.set(Calendar.MILLISECOND, 0);
 
         return cal.getTime();
     }
