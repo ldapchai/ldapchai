@@ -237,9 +237,17 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     public Date readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String[] attrsToRead = new String[] {"pwdLastSet", "userAccountControl" };
-
+        final String[] attrsToRead = new String[] {
+                "pwdLastSet",
+                "userAccountControl",
+                "msDS-UserPasswordExpiryTimeComputed"
+        };
         final Map<String,String> readAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
+
+        final String computedValue = readAttrs.get("msDS-UserPasswordExpiryTimeComputed");
+        if (computedValue != null && computedValue.length() > 0) {
+            return ADEntries.convertWinEpochToDate(computedValue);
+        }
 
         final String uacStrValue = readAttrs.get("userAccountControl");
 
@@ -323,13 +331,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
 
 
     public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
-        final Date futureDate = new Date(910692730085477l); //magic future date timestamp that also means not expired.
-        final Date theDate = this.readDateAttribute("accountExpires");
-        return theDate == null
-                ? null
-                : !theDate.before(futureDate)
-                ? null
-                : theDate;
+        return this.readDateAttribute("accountExpires");
     }
 
     @Override

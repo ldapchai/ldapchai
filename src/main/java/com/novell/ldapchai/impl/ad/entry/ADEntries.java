@@ -77,6 +77,10 @@ public class ADEntries {
         final long timestampAsMs = timestampAsNs / 10000;
         final long timestampAsJavaMs = timestampAsMs + AD_EPOCH_OFFSET_MS;
 
+        if (timestampAsJavaMs >= 910692730085477L) {  //magic future date timestamp that also means no date. (long)
+            return null;
+        }
+
         return new Date(timestampAsJavaMs);
     }
 
