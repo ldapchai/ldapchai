@@ -22,6 +22,7 @@ package com.novell.ldapchai.impl.openldap.entry;
 import java.util.Date;
 
 import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
 import com.novell.ldapchai.ChaiUser;
@@ -36,6 +37,14 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
 
     public OpenLDAPUser(String userDN, ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
+    }
+
+    public void addGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+        theGroup.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    }
+
+    public void removeGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+        theGroup.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
     }
 
     @Override
