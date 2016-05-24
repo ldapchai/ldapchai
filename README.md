@@ -8,7 +8,20 @@ Contrasted to the Java JNDI LDAP interface, LDAP Chai does not require dealing w
 
 LDAP Chai is well suited for business applications and general purpose LDAP development
 
-Features:
+
+### Maven
+
+LDAP Chai is available from maven central repository.  You can import by adding the following fragment to your _pom.xml_.
+
+```xml
+        <dependency>
+            <groupId>com.github.ldapchai</groupId>
+            <artifactId>ldapchai</artifactId>
+            <version>version</version>
+        </dependency>
+```
+
+### Features:
 
 * Full use of Java 1.5 language enhancements including generics, enums and annotations
 * LDAP multi-server failover support
