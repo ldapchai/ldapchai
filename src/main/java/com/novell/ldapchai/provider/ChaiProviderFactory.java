@@ -30,6 +30,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Properties;
 
 
 /**
@@ -130,9 +131,14 @@ public final class ChaiProviderFactory {
     public static ChaiProvider createProvider(final String ldapURL, final String bindDN, final String password)
             throws ChaiUnavailableException
     {
-        final ChaiConfiguration chaiConfig = new ChaiConfiguration(ldapURL, bindDN, password);
+        final ChaiConfiguration chaiConfig = new ChaiConfiguration();
+        Properties settings = ChaiConfiguration.getDefaultSettings();
+        settings.putAll(System.getProperties());
+        chaiConfig.setSettings(settings);
+        chaiConfig.setSetting(ChaiSetting.BIND_URLS, ldapURL);
+        chaiConfig.setSetting(ChaiSetting.BIND_DN, bindDN);
+        chaiConfig.setSetting(ChaiSetting.BIND_PASSWORD, password);
         chaiConfig.setSetting(ChaiSetting.PROVIDER_IMPLEMENTATION, JNDIProviderImpl.class.getName());
-
         return createProvider(chaiConfig);
     }
 
@@ -153,7 +159,7 @@ public final class ChaiProviderFactory {
 
         ChaiProviderImplementor providerImpl;
         try {
-            final boolean enableFailover = chaiConfiguration.getSetting(ChaiSetting.FAILOVER_ENABLE).equalsIgnoreCase("true");
+            final boolean enableFailover = "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.FAILOVER_ENABLE));
 
             if (enableFailover) {
                 providerImpl = FailOverWrapper.forConfiguration(chaiConfiguration);
@@ -170,7 +176,7 @@ public final class ChaiProviderFactory {
                 providerImpl = createConcreateProvider(chaiConfiguration, true);
             }
         } catch (Exception e) {
-            LOGGER.debug("unable to create connection: " + e.getClass().getName() + ":" + e.getMessage());
+            LOGGER.debug("unable to create connection: " + e.getClass().getName() + ":" + e.getMessage(), e);
             throw new ChaiUnavailableException("unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
         }
 

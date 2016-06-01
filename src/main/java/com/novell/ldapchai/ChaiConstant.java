@@ -1,4 +1,3 @@
-
 /*
  * LDAP Chai API
  * Copyright (c) 2006-2010 Novell, Inc.
@@ -20,18 +19,25 @@
 
 package com.novell.ldapchai;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 /**
- * Constants used by the Chai API.  In general, it is encouraged to use the constants defined
- * here for attribute names instead of arbitrary strings. For example:
- * <h3>Discouraged</h3>
+ * Constants used by the Chai API. In general, it is encouraged to use the
+ * constants defined here for attribute names instead of arbitrary strings. For
+ * example: <h3>Discouraged</h3>
+ * 
  * <pre>
- *    chaiUser.readStringAttribute("givenName");
+ * chaiUser.readStringAttribute(&quot;givenName&quot;);
  * </pre>
+ * 
  * <h3>Recommended</h3>
+ * 
  * <pre>
- *    chaiUser.readStringAttribute(ChaiConstant.ATTR_LDAP_GIVEN_NAME);
+ * chaiUser.readStringAttribute(ChaiConstant.ATTR_LDAP_GIVEN_NAME);
  * </pre>
  * <p/>
  * See the Constant Field Definitions for a list of actual values.
@@ -39,7 +45,7 @@ import java.util.*;
  * @author Jason D. Rivard
  */
 public interface ChaiConstant {
-// ----------------------------- CONSTANTS ----------------------------
+    // ----------------------------- CONSTANTS ----------------------------
 
     /**
      * Attribute name to define the Object Class
@@ -80,7 +86,6 @@ public interface ChaiConstant {
      * Attribute name to define the user's minimum allowed password length
      */
     public static final String ATTR_LDAP_PASSWORD_MINIMUM_LENGTH = "passwordMinimumLength";
-
 
     /**
      * Attribute name to define the first name
@@ -218,9 +223,7 @@ public interface ChaiConstant {
      */
     public static final String ATTR_LDAP_EQUIVALENT_TO_ME = "equivalentToMe";
 
-
     public static final String ATTR_LDAP_LOCKED_BY_INTRUDER = "lockedByIntruder";
-
 
     /**
      * RBAC schema
@@ -301,6 +304,35 @@ public interface ChaiConstant {
     public static final String ATTR_ORACLEDS_PASSWORD_POLICY_MIN_PASSWORD_AGE = "pwdMinAge";
     public static final String ATTR_ORACLEDS_PASSWORD_SUB_ENTRY = "passwordPolicySubentry";
 
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY = "pwdCheckQuality";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_EXPIRE_WARNING = "pwdExpireWarning";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_FAILURE_COUNT_INTERVAL = "pwdFailureCountInterval";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_GRACE_AUTHN_LIMIT = "pwdGraceAuthNLimit";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT = "pwdInHistory";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_LOCKOUT = "pwdLockout";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_LOCKOUT_DURATION = "pwdLockoutDuration";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_AGE = "pwdMaxAge";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_FAILURE = "pwdMaxFailure";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_MAX_TOTAL_ATTEMPTS = "pwdMaxTotalAttempts";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_PASSWORD_AGE = "pwdMinAge";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LENGTH = "pwdMinLength";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MUST_CHANGE = "pwdMustChange";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_SAFE_MODIFY = "pwdSafeModify";
+    public static final String ATTR_OPENLDAP_PASSWORD_SUB_ENTRY = "pwdPolicySubentry";
+
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_UPPER_CHARACTERS = "minUpper";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LOWER_CHARACTERS = "minLower";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS = "minNumeric";
+    public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS = "minPunct";
+
+    public static final String ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME = "pwdAccountLockedTime";
+    public static final String ATTR_OPENLDAP_PASSWORD_CHANGED_TIME = "pwdChangedTime";
+    public static final String ATTR_OPENLDAP_PASSWORD_FAILURE_TIME = "pwdFailureTime";
+    public static final String ATTR_OPENLDAP_PASSWORD_GRACE_USE_TIME = "pwdGraceUseTime";
+    public static final String ATTR_OPENLDAP_PASSWORD_HISTORY = "pwdHistory";
+    public static final String ATTR_OPENLDAP_PASSWORD_RESET = "pwdReset";
+    public static final String ATTR_OPENLDAP_PASSWORD_UNIQUE_ATTEMPTS = "pwdUniqueAttempts";
+
     public static final String OBJECTCLASS_BASE_LDAP_USER = "inetOrgPerson";
     public static final String OBJECTCLASS_BASE_LDAP_GROUP = "groupOfNames";
     public static final String OBJECTCLASS_BASE_LDAP_ORGANIZATIONAL_UNIT = "organizationalUnit";
@@ -313,12 +345,12 @@ public interface ChaiConstant {
 
     public static final String CHAI_API_VERSION = CHAI_API_BUILD_PROPERTIES.get("chai.version");
 
-// -------------------------- INNER CLASSES --------------------------
+    // -------------------------- INNER CLASSES --------------------------
 }
 
 /**
- * Added as a second class in the {@code ChaiConstant} .java file to hide the implementation
- * from public javadocs.
+ * Added as a second class in the {@code ChaiConstant} .java file to hide the
+ * implementation from public javadocs.
  */
 abstract class ChaiConstant_BuildPropertiesPopulator {
     static final Map<String, String> BUILD_PROPERTIES;

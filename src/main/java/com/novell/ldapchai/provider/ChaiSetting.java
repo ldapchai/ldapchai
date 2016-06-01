@@ -522,6 +522,11 @@ public enum ChaiSetting {
      * <i>Default: </i><b>500</b>
      */
     LDAP_SEARCH_PAGING_SIZE("chai.ldap.paging.size", "500", true, Validator.INTEGER_VALIDATOR),
+
+    /**
+     * Distinguished name of the default password policy.
+     */
+    PASSWORD_POLICY_DN("chai.ldap.passwordPolicyDn", "", true, null),
     ;
 
 // ------------------------------ FIELDS ------------------------------

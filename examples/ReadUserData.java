@@ -41,6 +41,12 @@ public class ReadUserData {
         String ldapBindDN =   "cn=admin,ou=ou,o=o";
         String ldapBindPW =   "novell";
 
+        if (args.length == 3) {
+            ldapURL = args[0];
+            ldapBindDN = args[1];
+            ldapBindPW = args[2];
+        }
+
         try {
             // create a provider using the standard JNDI factory.
             ChaiUser user = ChaiFactory.quickProvider(ldapURL,ldapBindDN,ldapBindPW);
@@ -50,7 +56,7 @@ public class ReadUserData {
 
             System.out.println("UserDN: " + user.getEntryDN());
 
-            // Output each of the user's attributes, and one value for each attriubte:
+            // Output each of the user's attributes, and one value for each attribute:
             for (String key : allUserAttributes.keySet()) {
                 String value = allUserAttributes.get(key);
                 System.out.println(key + ": " + value);
@@ -59,6 +65,11 @@ public class ReadUserData {
             // Detect the user's password and output the debug string
             ChaiPasswordPolicy pwdPolicy = user.getPasswordPolicy();
             System.out.println("PasswordPolicy = " + pwdPolicy);
+
+            System.out.println("PasswordModificationDate = " + user.readPasswordModificationDate());
+            System.out.println("PasswordExpirationDate = " + user.readPasswordExpirationDate());
+            System.out.println("PasswordExpired = " + user.isPasswordExpired());
+            System.out.println("PasswordLocked = " + user.isPasswordLocked());
 
             // Read the user's group membership, and output each group DN.
             System.out.println(user.getEntryDN() + " groups: ");
