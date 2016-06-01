@@ -25,10 +25,13 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.util.ChaiLogger;
 
 import java.util.Date;
 
 public class OpenLDAPEntries {
+
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(OpenLDAPEntries.class);
     
     public static Date convertZuluToDate(final String dateString)
     {
@@ -52,6 +55,7 @@ public class OpenLDAPEntries {
             if (searchEntry.isValid()) {
                 final String pwdPolicySubentryValue = searchEntry.readStringAttribute(
                         ChaiConstant.ATTR_OPENLDAP_PASSWORD_SUB_ENTRY);
+                LOGGER.trace("pwdPolicySubentryValue = " + pwdPolicySubentryValue);
                 if (pwdPolicySubentryValue != null && !pwdPolicySubentryValue.isEmpty()) {
                     final OpenLDAPEntry policyEntry = new OpenLDAPEntry(pwdPolicySubentryValue,
                             person.getChaiProvider());
@@ -68,6 +72,7 @@ public class OpenLDAPEntries {
         }
         
         final String passwordPolicyDn = person.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.PASSWORD_POLICY_DN);
+        LOGGER.debug("passwordPolicyDn = " + passwordPolicyDn);
         if (passwordPolicyDn != null && passwordPolicyDn.trim().length() > 0) {
             final OpenLDAPPasswordPolicy defaultPolicy = new OpenLDAPPasswordPolicy(passwordPolicyDn, person.getChaiProvider());
             if (defaultPolicy.isValid()) {
