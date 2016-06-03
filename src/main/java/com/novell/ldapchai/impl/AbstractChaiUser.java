@@ -78,7 +78,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return Collections.unmodifiableSet(reports);
     }
 
-    public final Set<ChaiGroup> getGroups()
+    public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
         final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();

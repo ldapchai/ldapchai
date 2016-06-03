@@ -219,7 +219,12 @@ public interface ChaiConstant {
     public static final String ATTR_LDAP_MEMBER = "member";
 
     /**
-     * Attribute name to define the Security Equivalnce.
+     * Attribute name to define the User Member Of.
+     */
+    public static final String ATTR_LDAP_MEMBER_OF = "memberOf";
+
+    /**
+     * Attribute name to define the Security Equivalence.
      */
     public static final String ATTR_LDAP_EQUIVALENT_TO_ME = "equivalentToMe";
 
