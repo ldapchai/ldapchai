@@ -279,7 +279,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             return (Map) properties;
         }
         catch (IOException e) {
-            LOGGER.trace("Error opening checkpassword.conf", e);
+            LOGGER.trace("Error opening " + CHECK_PASSWORD_CONFIGURATION, e);
         }
         finally {
             if (reader != null) {

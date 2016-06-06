@@ -141,7 +141,6 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     public void setPassword(final String newPassword)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        LOGGER.trace("newPassword = " + newPassword);
         this.setPassword(newPassword, false);
     }
 
