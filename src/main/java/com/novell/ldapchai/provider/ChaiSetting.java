@@ -527,7 +527,16 @@ public enum ChaiSetting {
      * Distinguished name of the default password policy.
      */
     PASSWORD_POLICY_DN("chai.ldap.passwordPolicyDn", "", true, null),
+
+    /**
+     * OpenLDAP Password Policies can be read from the local file system.  This setting allows specifying the local
+     * file URL of the password file.
+     */
+    OPENLDAP_LOCAL_PASSWORD_POLICY_URL("chai.openldap.passwordPolicy.url","file:/etc/openldap/check_password.conf", true, null),
+
     ;
+
+
 
 // ------------------------------ FIELDS ------------------------------
 

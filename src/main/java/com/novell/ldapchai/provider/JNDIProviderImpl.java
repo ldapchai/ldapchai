@@ -1149,7 +1149,6 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     private void convertNamingException(final NamingException e)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        LOGGER.trace(e.getMessage(), e);
         // important safety tip: naming exceptions sometimes come with null messages....
         String errorMsg = e.getClass().getName();
         if (e.getMessage() != null) {

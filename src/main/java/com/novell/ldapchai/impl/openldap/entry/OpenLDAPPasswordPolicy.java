@@ -19,15 +19,6 @@
 
 package com.novell.ldapchai.impl.openldap.entry;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiPasswordPolicy;
@@ -35,8 +26,13 @@ import com.novell.ldapchai.ChaiPasswordRule;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
+
+import java.io.*;
+import java.net.URL;
+import java.util.*;
 
 public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswordPolicy {
 
@@ -235,8 +231,6 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             return null;
         }
     }
-    
-    private static final String CHECK_PASSWORD_CONFIGURATION = "/etc/openldap/check_password.conf";
 
     static final Set<String> LDAP_PASSWORD_ATTRIBUTES;
 
@@ -251,6 +245,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
     private final Map<String, String> ruleMap = new HashMap<String, String>();
     private final Map<String, String> allEntryValues = new HashMap<String, String>();
+    private final ChaiProvider provider;
 
     public OpenLDAPPasswordPolicy(final String entryDN, final ChaiProvider chaiProvider) throws ChaiUnavailableException,
             ChaiOperationException {
@@ -267,24 +262,36 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
         LOGGER.trace("allEntryValues = " + allEntryValues);
         ruleMap.putAll(createRuleMapUsingAttributeValues(allEntryValues));
         LOGGER.trace("ruleMap = " + ruleMap);
+
+        this.provider = chaiProvider;
     }
     
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static Map<String, String> readCheckPasswordAttributes() {
-        FileReader reader = null;
+    private Map<String, String> readCheckPasswordAttributes() {
+        final String policyFileUrl = this.chaiProvider.getChaiConfiguration().getSetting(ChaiSetting.OPENLDAP_LOCAL_PASSWORD_POLICY_URL);
+        if (policyFileUrl == null || policyFileUrl.length() < 1) {
+            return Collections.emptyMap();
+        }
+
+        InputStream inputStream = null;
         try {
-            reader = new FileReader(CHECK_PASSWORD_CONFIGURATION);
-            Properties properties = new Properties();
-            properties.load(reader);
-            return (Map) properties;
+            final URL url = new URL(policyFileUrl);
+            inputStream = url.openStream();
+            final Properties properties = new Properties();
+            properties.load(inputStream);
+
+            final Map<String,String> returnMap = new HashMap<String, String>();
+            for (final Object key : properties.keySet()) {
+                returnMap.put((String)key, properties.getProperty((String)key));
+            }
+            return returnMap;
         }
         catch (IOException e) {
-            LOGGER.trace("Error opening " + CHECK_PASSWORD_CONFIGURATION, e);
+            LOGGER.debug("unable to read openldap password policy configuration attributes from " + policyFileUrl + ", error=" + e.getMessage());
         }
         finally {
-            if (reader != null) {
+            if (inputStream != null) {
                 try {
-                    reader.close();
+                    inputStream.close();
                 }
                 catch (IOException e) {
                     // ignore
