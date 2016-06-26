@@ -19,9 +19,14 @@
 
 package com.novell.ldapchai.impl.openldap.entry;
 
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
 import com.novell.ldapchai.ChaiUser;
@@ -36,6 +41,25 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
 
     public OpenLDAPUser(String userDN, ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
+    }
+
+    public Set<ChaiGroup> getGroups()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
+        final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER_OF);
+        for (final String group : groups) {
+            returnGroups.add(ChaiFactory.createChaiGroup(group, this.getChaiProvider()));
+        }
+        return Collections.unmodifiableSet(returnGroups);
+    }
+
+    public void addGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+        theGroup.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    }
+
+    public void removeGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+        theGroup.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
     }
 
     @Override

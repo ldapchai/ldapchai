@@ -19,12 +19,24 @@
 
 package com.novell.ldapchai.impl.openldap.entry;
 
+import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class OpenLDAPGroup extends AbstractChaiGroup implements ChaiGroup {
     public OpenLDAPGroup(final String groupDN, final ChaiProvider chaiProvider) {
         super(groupDN, chaiProvider);
+    }
+
+    public void addMember(final ChaiUser theUser) throws ChaiUnavailableException, ChaiOperationException {
+        this.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN());
+    }
+
+    public void removeMember(final ChaiUser theUser) throws ChaiUnavailableException, ChaiOperationException {
+        this.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN());
     }
 }

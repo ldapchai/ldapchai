@@ -258,11 +258,15 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
         // read all attribute values from entry.
         allEntryValues.putAll(readStringAttributes(LDAP_PASSWORD_ATTRIBUTES));
+        LOGGER.trace("allEntryValues = " + allEntryValues);
         String pwdCheckQuality = allEntryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY);
+        LOGGER.debug("pwdCheckQuality = " + pwdCheckQuality);
         if (pwdCheckQuality != null && ("1".equals(pwdCheckQuality) || "2".equals(pwdCheckQuality))) {
             allEntryValues.putAll(readCheckPasswordAttributes());
         }
+        LOGGER.trace("allEntryValues = " + allEntryValues);
         ruleMap.putAll(createRuleMapUsingAttributeValues(allEntryValues));
+        LOGGER.trace("ruleMap = " + ruleMap);
     }
     
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -275,7 +279,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             return (Map) properties;
         }
         catch (IOException e) {
-            // ignore
+            LOGGER.trace("Error opening " + CHECK_PASSWORD_CONFIGURATION, e);
         }
         finally {
             if (reader != null) {
@@ -305,6 +309,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             if (attribute != null) {
                 returnMap.put(rule.getKey(), attribute.getDefaultValue());
                 final String attributeName = attribute.getLdapAttribute();
+                LOGGER.trace("attributeName = " + attributeName);
                 if (attributeName != null && entryValues != null && entryValues.containsKey(attributeName)) {
                     returnMap.put(rule.getKey(), entryValues.get(attributeName));
                 }

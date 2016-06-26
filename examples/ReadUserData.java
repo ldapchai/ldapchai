@@ -74,7 +74,7 @@ public class ReadUserData {
             // Read the user's group membership, and output each group DN.
             System.out.println(user.getEntryDN() + " groups: ");
             for (ChaiGroup group : user.getGroups()) {
-                System.out.print(group.getEntryDN());
+                System.out.println(group.getEntryDN());
             }
             System.out.println("");
 
