@@ -8,6 +8,8 @@ Contrasted to the Java JNDI LDAP interface, LDAP Chai does not require dealing w
 
 LDAP Chai is well suited for business applications and general purpose LDAP development
 
+[![Javadocs](https://www.javadoc.io/badge/com.github.ldapchai/ldapchai.svg)](https://www.javadoc.io/doc/com.github.ldapchai/ldapchai)
+
 
 ### Maven
 
