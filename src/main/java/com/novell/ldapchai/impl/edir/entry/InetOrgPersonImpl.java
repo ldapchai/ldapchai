@@ -135,11 +135,20 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         if (response != null) {
             final GetPwdResponse getResponse = (GetPwdResponse) response;
             final int responseCode = getResponse.getNmasRetCode();
-            if (responseCode != 0) {
+            switch(responseCode) {
+            case 0:         /* Success */
+               return getResponse.getPwdStr();
+
+            case (-16049): /* NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND */
+                LOGGER.debug("readPassword() reports: NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND " + responseCode);
+                throw new ChaiOperationException("object has no password attribute: error " + responseCode, ChaiError.NO_SUCH_ATTRIBUTE);
+                break;
+
+            default:
                 LOGGER.debug("error testing nmas password: " + responseCode);
                 throw new ChaiOperationException("error reading nmas password: error " + responseCode, ChaiError.UNKNOWN);
+                break;
             }
-            return getResponse.getPwdStr();
         }
 
         LOGGER.debug("unknown error retreiving password (null response)");
