@@ -47,6 +47,15 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         super(userDN, chaiProvider);
     }
 
+    public Set<ChaiGroup> getGroups() throws ChaiOperationException, ChaiUnavailableException {
+        final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
+        final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER_OF);
+        for (final String group : groups) {
+            returnGroups.add(ChaiFactory.createChaiGroup(group, this.getChaiProvider()));
+        }
+        return Collections.unmodifiableSet(returnGroups);
+    }
+
     public void addGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
         theGroup.addAttribute("member",this.getEntryDN());
     }
