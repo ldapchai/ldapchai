@@ -33,11 +33,13 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.StringHelper;
 import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigRequest;
 import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigResponse;
 import com.novell.security.nmas.mgmt.NMASChallengeResponse;
+
 import org.jdom2.JDOMException;
 
 import java.io.IOException;
@@ -184,6 +186,11 @@ public class NmasCrFactory {
 
     public static void clearResponseSet(final ChaiUser theUser)
             throws ChaiUnavailableException, ChaiOperationException {
+        final boolean useNmasSetting = theUser.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
+        if (!useNmasSetting) {
+            throw new UnsupportedOperationException("clearResponseSet() is not supported when ChaiSetting.EDIRECTORY_ENABLE_NMAS is false");
+        }
+
         final ChaiProvider provider = theUser.getChaiProvider();
 
         final DeleteLoginConfigRequest request = new DeleteLoginConfigRequest();

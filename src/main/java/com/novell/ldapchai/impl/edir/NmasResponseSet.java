@@ -26,10 +26,12 @@ import com.novell.ldapchai.cr.bean.ChallengeBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.StringHelper;
 import com.novell.security.nmas.jndi.ldap.ext.*;
 import com.novell.security.nmas.mgmt.NMASChallengeResponse;
+
 import org.jdom2.*;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.input.SAXBuilder;
@@ -37,6 +39,7 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import javax.naming.ldap.ExtendedResponse;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -129,6 +132,11 @@ public class NmasResponseSet extends AbstractResponseSet {
     )
             throws ChaiUnavailableException, ChaiValidationException
     {
+        final boolean useNmasSetting = theUser.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
+        if (!useNmasSetting) {
+            throw new UnsupportedOperationException("readNmasUserResponseSet() is not supported when ChaiSetting.EDIRECTORY_ENABLE_NMAS is false");
+        }
+
         final GetLoginConfigRequest request = new GetLoginConfigRequest();
         request.setObjectDN(theUser.getEntryDN());
         request.setTag("ChallengeResponseQuestions");
@@ -238,6 +246,11 @@ public class NmasResponseSet extends AbstractResponseSet {
     boolean write()
             throws ChaiUnavailableException, ChaiOperationException
     {
+        final boolean useNmasSetting = user.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
+        if (!useNmasSetting) {
+            throw new UnsupportedOperationException("write() is not supported when ChaiSetting.EDIRECTORY_ENABLE_NMAS is false");
+        }
+
         if (this.state != STATE.NEW) {
             throw new IllegalStateException("RepsonseSet not suitable for writing (not in NEW state)");
         }
