@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.57</version>
+			<version>1.55</version>
 		</dependency>
 
 		<!-- Directory Access -->
@@ -82,7 +82,7 @@
 		<dependency>
 			<groupId>org.apache.directory.api</groupId>
 			<artifactId>api-all</artifactId>
-			<version>1.0.0-RC2</version>
+			<version>1.0.0-RC1</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- Test dependencies -->
@@ -200,7 +200,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>2.3.2</version>
 				<executions>
 					<execution>
 						<id>default-jar</id>
@@ -267,7 +267,7 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>attach-javadocs</id> <!-- referenced automatically by jar builder -->
+						<id>attach-javadocs-private</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -276,8 +276,6 @@
 							<additionalparam>${javadoc.opts}</additionalparam>
 							<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
 							<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
-							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
-							<excludePackageNames>com.novell.security.nmas.*</excludePackageNames>
 							<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
 						</configuration>
 					</execution>
@@ -290,7 +288,6 @@
 							<show>public</show>
 							<additionalparam>${javadoc.opts}</additionalparam>
 							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
-							<excludePackageNames>com.novell.security.nmas.*</excludePackageNames>
 							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
 								default -->
 						</configuration>
@@ -300,7 +297,6 @@
 		</plugins>
 	</build>
 
-	<!--
 	<reporting>
 		<plugins>
 			<plugin>
@@ -310,7 +306,6 @@
 			</plugin>
 		</plugins>
 	</reporting>
-	-->
 
 	<profiles>
 		<profile>
