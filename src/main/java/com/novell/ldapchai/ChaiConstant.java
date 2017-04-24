@@ -350,6 +350,9 @@ public interface ChaiConstant {
 
     public static final String CHAI_API_VERSION = CHAI_API_BUILD_PROPERTIES.get("chai.version");
 
+    public static final String FILTER_OBJECTCLASS_ANY = "(" + ATTR_LDAP_OBJECTCLASS + "=" + "*" + ")";
+
+
     // -------------------------- INNER CLASSES --------------------------
 }
 

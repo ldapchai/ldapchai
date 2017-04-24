@@ -2,7 +2,7 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	
+
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
 		<artifactId>oss-parent</artifactId>
@@ -14,13 +14,24 @@
 	<artifactId>ldapchai</artifactId>
 	<packaging>jar</packaging>
 
-	<name>${project.groupId}:${project.artifactId}</name>
-	<description>The LDAP Chai API, easy to use LDAP for Java developers.
+	<name>LDAP Chai Library</name>
 
-		LDAP Chai is a wrapper library that makes using ldap services as simple and easy as it can be.
-		LDAP Chai has methods for commonly used functions, and relieves developers of the need to write code that has been written many times before.
+	<organization>
+		<name>LDAP Chai Project</name>
+		<url>https://github.com/ldapchai/ldapchai</url>
+	</organization>
+
+	<description>
+		The LDAP Chai API, easy to use LDAP for Java developers.  LDAP Chai is a wrapper library that makes using ldap services as simple and easy as it can be.  LDAP Chai has methods for commonly used functions, and relieves developers of the need to write code that has been written many times before.
 	</description>
-	<url>https://github.com/ldapchai/ldapchai</url>
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License, version 2.1 (LGPLv2.1)</name>
+			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
+		</license>
+	</licenses>
+
 
 	<properties>
 		<maven.compiler.source>1.5</maven.compiler.source>
@@ -32,32 +43,31 @@
 	</properties>
 
 	<dependencies>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.6.2</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>2.0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
-        <dependency>
-            <groupId>net.iharder</groupId>
-            <artifactId>base64</artifactId>
-            <version>2.3.9</version>
-        </dependency>
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.54</version>
-        </dependency>
-
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jdom</groupId>
+			<artifactId>jdom2</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.17</version>
+		</dependency>
+		<dependency>
+			<groupId>net.iharder</groupId>
+			<artifactId>base64</artifactId>
+			<version>2.3.9</version>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk15on</artifactId>
+			<version>1.55</version>
+		</dependency>
 
 		<!-- Directory Access -->
 		<dependency>
@@ -66,7 +76,12 @@
 			<version>2009-10-07</version>
 			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.directory.api</groupId>
+			<artifactId>api-all</artifactId>
+			<version>1.0.0-RC1</version>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -83,11 +98,11 @@
 	</dependencies>
 
 	<build>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
 			<resource>
 				<directory>src/main/java</directory> <!-- include the src in the main output jar -->
 				<targetPath>src</targetPath>
@@ -170,6 +185,10 @@
 									<mainClass>com.novell.ldapchai.util.MainHandler</mainClass>
 								</manifest>
 								<manifestEntries>
+									<Implementation-Title>${project.name}</Implementation-Title>
+									<Implementation-Version>${project.version}</Implementation-Version>
+									<Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+									<Implementation-URL>${project.organization.url}</Implementation-URL>
 									<Implementation-Description>${project.description}</Implementation-Description>
 								</manifestEntries>
 							</archive>
@@ -279,7 +298,7 @@
 				</plugins>
 			</build>
 		</profile>
-		
+
 		<profile>
 			<id>doclint-java8-disable</id>
 			<activation>
@@ -336,20 +355,13 @@
 		</profile>
 	</profiles>
 
-	<licenses>
-		<license>
-			<name>GNU Lesser General Public License, version 2.1 (LGPLv2.1)</name>
-			<url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
-		</license>
-	</licenses>
-	
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
 			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-	
+
 	<developers>
 		<developer>
 			<name>Jason Rivard</name>
@@ -364,7 +376,7 @@
 			<organizationUrl>https://github.com/ldapchai/</organizationUrl>
 		</developer>
 	</developers>
-	
+
 	<scm>
 		<connection>scm:git:git@github.com:ldapchai/ldapchai.git</connection>
 		<developerConnection>scm:git:git@github.com:ldapchai/ldapchai.git</developerConnection>
