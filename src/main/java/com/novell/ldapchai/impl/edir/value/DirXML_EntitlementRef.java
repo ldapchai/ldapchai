@@ -17,10 +17,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/**
- * An immutable wrapper for the value of an eDirectory DirXML-EntitlementRef value.
- * <p/>
- */
 package com.novell.ldapchai.impl.edir.value;
 
 import com.novell.ldapchai.provider.ChaiProvider;
@@ -54,7 +50,7 @@ public class DirXML_EntitlementRef implements Serializable {
 
         private int numValue;
 
-        private State(final int intValue)
+        State(final int intValue)
         {
             this.numValue = intValue;
         }

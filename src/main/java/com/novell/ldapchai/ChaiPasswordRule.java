@@ -122,8 +122,13 @@ public enum ChaiPasswordRule {
         return key;
     }
 
-    public static enum RuleType {
-        MIN, MAX, BOOLEAN, TEXT, OTHER, NUMERIC
+    public enum RuleType {
+        MIN,
+        MAX,
+        BOOLEAN,
+        TEXT,
+        OTHER,
+        NUMERIC,
     }
 
     public static ChaiPasswordRule forKey(final String key) {

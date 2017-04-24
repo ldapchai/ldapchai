@@ -22,7 +22,17 @@ package com.novell.ldapchai.util;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * {@code SearchHelper} is a mutable helper class for managing LDAP search queries.
@@ -52,6 +62,14 @@ public class SearchHelper implements Serializable, Cloneable {
      */
     public SearchHelper()
     {
+    }
+
+    public SearchHelper(final SearchHelper source) {
+        this.filter = source.filter;
+        this.searchScope = source.searchScope;
+        this.attributes = source.attributes;
+        this.maxResults = source.maxResults;
+        this.timeLimit = source.timeLimit;
     }
 
     /**
@@ -327,24 +345,33 @@ public class SearchHelper implements Serializable, Cloneable {
 
 // ------------------------ CANONICAL METHODS ------------------------
 
-    public Object clone()
-            throws CloneNotSupportedException
-    {
-        return super.clone();
-    }
-
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final SearchHelper that = (SearchHelper) o;
 
-        if (maxResults != that.maxResults) return false;
-        if (timeLimit != that.timeLimit) return false;
-        if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null) return false;
-        if (filter != null ? !filter.equals(that.filter) : that.filter != null) return false;
-        if (searchScope != that.searchScope) return false;
+        if (maxResults != that.maxResults) {
+            return false;
+        }
+        if (timeLimit != that.timeLimit) {
+            return false;
+        }
+        if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null) {
+            return false;
+        }
+        if (filter != null ? !filter.equals(that.filter) : that.filter != null) {
+            return false;
+        }
+        if (searchScope != that.searchScope) {
+            return false;
+        }
 
         return true;
     }
@@ -451,7 +478,7 @@ public class SearchHelper implements Serializable, Cloneable {
     }
 
     /**
-     * Convienence wrapper for {@link #setFilterAnd(java.util.Map)}
+     * Convenience wrapper for {@link #setFilterAnd(java.util.Map)}
      *
      * @param nameValuePairs A valid map of name=value pairs.
      * @see #setFilterAnd(java.util.Map)
@@ -463,7 +490,7 @@ public class SearchHelper implements Serializable, Cloneable {
         }
 
         final Map<String, String> newMap = new HashMap<String, String>();
-        for (Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements();) {
+        for (Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); ) {
             final String name = (String) enumer.nextElement();
             newMap.put(name, nameValuePairs.getProperty(name));
         }
@@ -588,7 +615,7 @@ public class SearchHelper implements Serializable, Cloneable {
     }
 
     /**
-     * Convienence wrapper for {@link #setFilterOr(java.util.Map)}
+     * Convenience wrapper for {@link #setFilterOr(java.util.Map)}
      *
      * @param nameValuePairs A valid map of name=value pairs.
      * @see #setFilterOr(java.util.Map)
@@ -600,7 +627,7 @@ public class SearchHelper implements Serializable, Cloneable {
         }
 
         final Map<String, String> newMap = new HashMap<String, String>();
-        for (Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements();) {
+        for (Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); ) {
             final String name = (String) enumer.nextElement();
             newMap.put(name, nameValuePairs.getProperty(name));
         }
@@ -618,7 +645,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
             private String matchCode;
 
-            private MatchingRuleEnum(final String matchCode)
+            MatchingRuleEnum(final String matchCode)
             {
                 this.matchCode = matchCode;
             }
@@ -634,7 +661,7 @@ public class SearchHelper implements Serializable, Cloneable {
         private MatchingRuleEnum matchingRule;
 
 
-        public FilterSequence(final String attr, final String value, final MatchingRuleEnum matchingRule)
+        FilterSequence(final String attr, final String value, final MatchingRuleEnum matchingRule)
         {
             if (attr == null) {
                 throw new NullPointerException("attr is required");
@@ -645,7 +672,7 @@ public class SearchHelper implements Serializable, Cloneable {
             this.matchingRule = matchingRule;
         }
 
-        public FilterSequence(final String attr, final String value)
+        FilterSequence(final String attr, final String value)
         {
             this(attr, value, MatchingRuleEnum.EQUALS);
         }

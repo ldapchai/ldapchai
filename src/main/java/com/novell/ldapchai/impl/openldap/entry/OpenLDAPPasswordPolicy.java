@@ -30,9 +30,15 @@ import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswordPolicy {
 
@@ -51,46 +57,46 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * Minimum total length of the password.
          */
         MIN_LENGTH(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LENGTH,
-                "0",
-                ChaiPasswordRule.MinimumLength),
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LENGTH,
+            "0",
+            ChaiPasswordRule.MinimumLength),
 
         /**
          * Minimum number of upper case characters in the password.
          */
         MIN_UPPER(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_UPPER_CHARACTERS,
-                "0",
-                ChaiPasswordRule.MinimumUpperCase),
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_UPPER_CHARACTERS,
+            "0",
+            ChaiPasswordRule.MinimumUpperCase),
 
         /**
          * Minimim total length of the password.
          */
         MIN_LOWER(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LOWER_CHARACTERS,
-                "0",
-                ChaiPasswordRule.MinimumLowerCase),
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LOWER_CHARACTERS,
+            "0",
+            ChaiPasswordRule.MinimumLowerCase),
 
         /**
          * Minimum number of times a numeric character may appear in the password.
          */
         MIN_NUMERIC(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS,
-                "0",
-                ChaiPasswordRule.MinimumNumeric),
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS,
+            "0",
+            ChaiPasswordRule.MinimumNumeric),
 
         /**
          * Minimum number of times a special (non-alphanumeric) character may appear in the password.
          */
         MIN_SPECIAL(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS,
-                "0",
-                ChaiPasswordRule.MinimumSpecial),
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS,
+            "0",
+            ChaiPasswordRule.MinimumSpecial),
 
         /**
          * If the password must be unique when compared to previously used
@@ -98,20 +104,20 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * Chai API.
          */
         PASSWORD_HISTORY_COUNT(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT,
-                "0",
-                null),
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT,
+            "0",
+            null),
 
         /**
          * The time interval between required password changes (true/false).
          * This rule is not directly enforced by the Chai API.
          */
         EXPIRATION_INTERVAL(
-                TYPE.MAX,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_AGE,
-                "0",
-                ChaiPasswordRule.ExpirationInterval),
+            TYPE.MAX,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_AGE,
+            "0",
+            ChaiPasswordRule.ExpirationInterval),
 
         /**
          * Minimum lifetime of the user's password. Once set, the user will not
@@ -119,10 +125,10 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * passed. Value is in seconds.
          */
         MIN_LIFETIME(
-                TYPE.MIN,
-                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_PASSWORD_AGE,
-                "0",
-                ChaiPasswordRule.MinimumLifetime);
+            TYPE.MIN,
+            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_PASSWORD_AGE,
+            "0",
+            ChaiPasswordRule.MinimumLifetime);
 
         private final TYPE type;
         private final String ldapAttr;
@@ -248,13 +254,13 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
     private final ChaiProvider provider;
 
     public OpenLDAPPasswordPolicy(final String entryDN, final ChaiProvider chaiProvider) throws ChaiUnavailableException,
-            ChaiOperationException {
+        ChaiOperationException {
         super(entryDN, chaiProvider);
 
         // read all attribute values from entry.
         allEntryValues.putAll(readStringAttributes(LDAP_PASSWORD_ATTRIBUTES));
         LOGGER.trace("allEntryValues = " + allEntryValues);
-        String pwdCheckQuality = allEntryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY);
+        final String pwdCheckQuality = allEntryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY);
         LOGGER.debug("pwdCheckQuality = " + pwdCheckQuality);
         if (pwdCheckQuality != null && ("1".equals(pwdCheckQuality) || "2".equals(pwdCheckQuality))) {
             allEntryValues.putAll(readCheckPasswordAttributes());
@@ -265,7 +271,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
         this.provider = chaiProvider;
     }
-    
+
     private Map<String, String> readCheckPasswordAttributes() {
         final String policyFileUrl = this.chaiProvider.getChaiConfiguration().getSetting(ChaiSetting.OPENLDAP_LOCAL_PASSWORD_POLICY_URL);
         if (policyFileUrl == null || policyFileUrl.length() < 1) {
@@ -284,21 +290,18 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
                 returnMap.put((String)key, properties.getProperty((String)key));
             }
             return returnMap;
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             LOGGER.debug("unable to read openldap password policy configuration attributes from " + policyFileUrl + ", error=" + e.getMessage());
-        }
-        finally {
+        } finally {
             if (inputStream != null) {
                 try {
                     inputStream.close();
-                }
-                catch (IOException e) {
+                } catch (IOException e) {
                     // ignore
                 }
             }
         }
-        
+
         return Collections.emptyMap();
     }
 
@@ -333,21 +336,20 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
                 if (historyCount > 0) {
                     returnMap.put(ChaiPasswordRule.UniqueRequired.getKey(), "true");
                 }
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 LOGGER.error("error while parsing " + ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT + " value: "
-                        + e.getMessage());
+                    + e.getMessage());
             }
         }
 
         return returnMap;
     }
 
-    public String getValue(String key) {
+    public String getValue(final String key) {
         return ruleMap.get(key);
     }
 
-    public String getValue(ChaiPasswordRule rule) {
+    public String getValue(final ChaiPasswordRule rule) {
         return ruleMap.get(rule.getKey());
     }
 

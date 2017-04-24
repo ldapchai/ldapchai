@@ -32,7 +32,14 @@ import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -233,7 +240,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          *
          * @param intValue an int value of a bit mask.
          */
-        public PolicyOptions(final String intValue)
+        PolicyOptions(final String intValue)
         {
             bitMask = StringHelper.convertStrToInt(intValue, 0);
         }

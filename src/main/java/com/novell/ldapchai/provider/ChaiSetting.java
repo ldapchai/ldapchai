@@ -625,7 +625,7 @@ public enum ChaiSetting {
     private interface Validator extends Serializable {
         void validate(String value);
 
-        static final Validator INTEGER_VALIDATOR = new Validator() {
+        Validator INTEGER_VALIDATOR = new Validator() {
             public void validate(final String value)
             {
                 try {
@@ -636,7 +636,7 @@ public enum ChaiSetting {
             }
         };
 
-        static final Validator BOOLEAN_VALIDATOR = new Validator() {
+        Validator BOOLEAN_VALIDATOR = new Validator() {
             public void validate(final String value)
             {
                 try {
@@ -647,7 +647,7 @@ public enum ChaiSetting {
             }
         };
 
-        static final Validator AUTO_OR_BOOLEAN_VALIDATOR = new Validator() {
+        Validator AUTO_OR_BOOLEAN_VALIDATOR = new Validator() {
             public void validate(final String value) {
                 if (!"auto".equalsIgnoreCase(value)) {
                     try {
@@ -659,7 +659,7 @@ public enum ChaiSetting {
             }
         };
 
-        static final Validator CR_FORMAT_VALIDATOR = new Validator() {
+        Validator CR_FORMAT_VALIDATOR = new Validator() {
             public void validate(final String value) {
                 try {
                     if (Answer.FormatType.valueOf(value) == null) {
@@ -671,11 +671,11 @@ public enum ChaiSetting {
             }
         };
 
-        static final Validator ENABLE_NMAS_VALIDATOR = new Validator() {
+        Validator ENABLE_NMAS_VALIDATOR = new Validator() {
             public void validate(final String value)
             {
                 try {
-                    boolean enableNmas = Boolean.parseBoolean(value);
+                    final boolean enableNmas = Boolean.parseBoolean(value);
 
                     if (enableNmas) {
                         try {

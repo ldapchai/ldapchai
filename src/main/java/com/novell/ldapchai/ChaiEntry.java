@@ -25,7 +25,10 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.SearchHelper;
 
 import java.net.InetAddress;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * {@code ChaiEntry} instances represent ldap entries.  Most other {@code Chai*} interfaces in this package inherit from
@@ -62,7 +65,6 @@ public interface ChaiEntry {
      * @param attributeValue A string value to be added to the ldap entry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void addAttribute(String attributeName, String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -79,7 +81,6 @@ public interface ChaiEntry {
      * @param attributeValues A set of string values to be added to the ldap entry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void addAttribute(String attributeName, Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -96,7 +97,6 @@ public interface ChaiEntry {
      * @param attributeValues A set of string values to be added to the ldap entry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void addAttribute(String attributeName, String... attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -378,7 +378,6 @@ public interface ChaiEntry {
      * @param attributeValue New value for the attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void writeStringAttribute(String attributeName, String attributeValue)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -390,7 +389,6 @@ public interface ChaiEntry {
      * @param attributeValues New values for the attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttribute(String, String, java.util.List, boolean)
      */
     void writeStringAttribute(String attributeName, Set<String> attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
@@ -402,7 +400,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public void writeDateAttribute(final String attributeName, final Date date)
+    void writeDateAttribute(String attributeName, Date date)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -436,7 +434,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeBinaryAttribute(final String attributeName, final byte[]... attributeValues)
+    void writeBinaryAttribute(String attributeName, byte[]... attributeValues)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -451,7 +449,7 @@ public interface ChaiEntry {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see com.novell.ldapchai.provider.ChaiProvider#replaceStringAttribute(String,String,String,String)
      */
-    void replaceBinaryAttribute(final String attributeName, final byte[] oldValue, final byte[] newValue)
+    void replaceBinaryAttribute(String attributeName, byte[] oldValue, byte[] newValue)
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -471,4 +469,3 @@ public interface ChaiEntry {
     String readGUID()
             throws ChaiOperationException, ChaiUnavailableException;
 }
-

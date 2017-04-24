@@ -24,7 +24,7 @@ import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class DirectoryServer389Group extends AbstractChaiGroup implements ChaiGroup {
-    public DirectoryServer389Group(final String groupDN, final ChaiProvider chaiProvider) {
+    DirectoryServer389Group(final String groupDN, final ChaiProvider chaiProvider) {
         super(groupDN, chaiProvider);
     }
 }

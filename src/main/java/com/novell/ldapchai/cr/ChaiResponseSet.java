@@ -30,7 +30,12 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
-import org.jdom2.*;
+import org.jdom2.Attribute;
+import org.jdom2.DataConversionException;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Text;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -40,7 +45,15 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
+import java.util.TimeZone;
 
 public class ChaiResponseSet extends AbstractResponseSet implements Serializable {
 // ----------------------------- CONSTANTS ----------------------------
@@ -52,31 +65,31 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
     static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    final static String XML_NODE_ROOT = "ResponseSet";
-    final static String XML_ATTRIBUTE_MIN_RANDOM_REQUIRED = "minRandomRequired";
-    final static String XML_ATTRIBUTE_LOCALE = "locale";
+    static final String XML_NODE_ROOT = "ResponseSet";
+    static final String XML_ATTRIBUTE_MIN_RANDOM_REQUIRED = "minRandomRequired";
+    static final String XML_ATTRIBUTE_LOCALE = "locale";
 
-    final static String XML_NODE_RESPONSE = "response";
-    final static String XML_NODE_HELPDESK_RESPONSE = "helpdesk-response";
-    final static String XML_NODE_CHALLENGE = "challenge";
-    final static String XML_NODE_ANSWER_VALUE = "answer";
+    static final String XML_NODE_RESPONSE = "response";
+    static final String XML_NODE_HELPDESK_RESPONSE = "helpdesk-response";
+    static final String XML_NODE_CHALLENGE = "challenge";
+    static final String XML_NODE_ANSWER_VALUE = "answer";
 
-    final static String XML_ATTRIBUTE_VERSION = "version";
-    final static String XML_ATTRIBUTE_CHAI_VERSION = "chaiVersion";
-    final static String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
-    final static String XML_ATTRIBUTE_REQUIRED = "required";
-    final static String XML_ATTRIBUTE_HASH_COUNT = "hashcount";
-    final static String XML_ATTRIBUTE_CONTENT_FORMAT = "format";
-    final static String XML_ATTRIBUTE_SALT = "salt";
-    final static String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
-    final static String XNL_ATTRIBUTE_MAX_LENGTH = "maxLength";
-    final static String XML_ATTRIBUTE_CASE_INSENSITIVE = "caseInsensitive";
-    final static String XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER = "challengeSetID"; // identifier from challenge set.
-    final static String XML_ATTRIBUTE_TIMESTAMP = "time";
+    static final String XML_ATTRIBUTE_VERSION = "version";
+    static final String XML_ATTRIBUTE_CHAI_VERSION = "chaiVersion";
+    static final String XML_ATTRIBUTE_ADMIN_DEFINED = "adminDefined";
+    static final String XML_ATTRIBUTE_REQUIRED = "required";
+    static final String XML_ATTRIBUTE_HASH_COUNT = "hashcount";
+    static final String XML_ATTRIBUTE_CONTENT_FORMAT = "format";
+    static final String XML_ATTRIBUTE_SALT = "salt";
+    static final String XNL_ATTRIBUTE_MIN_LENGTH = "minLength";
+    static final String XNL_ATTRIBUTE_MAX_LENGTH = "maxLength";
+    static final String XML_ATTRIBUTE_CASE_INSENSITIVE = "caseInsensitive";
+    static final String XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER = "challengeSetID"; // identifier from challenge set.
+    static final String XML_ATTRIBUTE_TIMESTAMP = "time";
 
-    final static String VALUE_VERSION = "2";
+    static final String VALUE_VERSION = "2";
 
-    final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+    static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
     private final boolean caseInsensitive;
 
@@ -410,15 +423,15 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         }
     }
 
-    public List<ChallengeBean> asChallengeBeans(boolean includeAnswers) {
+    public List<ChallengeBean> asChallengeBeans(final boolean includeAnswers) {
         return asBeans(crMap,includeAnswers);
     }
 
-    public List<ChallengeBean> asHelpdeskChallengeBeans(boolean includeAnswers) {
+    public List<ChallengeBean> asHelpdeskChallengeBeans(final boolean includeAnswers) {
         return asBeans(helpdeskCrMap,includeAnswers);
     }
 
-    public static List<ChallengeBean> asBeans(final Map inputMap, boolean includeAnswers) {
+    public static List<ChallengeBean> asBeans(final Map inputMap, final boolean includeAnswers) {
         if (inputMap == null) {
             return Collections.emptyList();
         }

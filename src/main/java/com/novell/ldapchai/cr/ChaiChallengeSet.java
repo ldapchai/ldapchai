@@ -23,7 +23,13 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiValidationException;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
 
 public class ChaiChallengeSet implements ChallengeSet, Serializable {
 // ------------------------------ FIELDS ------------------------------
@@ -36,12 +42,12 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
 // --------------------------- CONSTRUCTORS ---------------------------
 
     public ChaiChallengeSet(
-            final Collection<Challenge> challenges,
-            final int minRandomRequired,
-            final Locale locale,
-            final String identifer
+        final Collection<Challenge> challenges,
+        final int minRandomRequired,
+        final Locale locale,
+        final String identifer
     )
-            throws ChaiValidationException
+        throws ChaiValidationException
     {
         this.challenges = Collections.unmodifiableList(new LinkedList<Challenge>(challenges));
         this.minRandomRequired = minRandomRequired > getRandomChallenges().size() ? getRandomChallenges().size() : minRandomRequired;
@@ -51,7 +57,7 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
     }
 
     private void isValid()
-            throws ChaiValidationException
+        throws ChaiValidationException
     {
         if (this.minRandomRequired > this.getRandomChallenges().size()) {
             throw new ChaiValidationException("number of required responses greater then count of supplied random challenges", ChaiError.CR_NOT_ENOUGH_RANDOM_RESPONSES);
@@ -108,45 +114,55 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
     public final List<Challenge> getAdminDefinedChallenges()
     {
         final List<Challenge> tempList = new ArrayList<Challenge>();
-        for (final Challenge loopChallenge : challenges)
-            if (loopChallenge.isAdminDefined())
+        for (final Challenge loopChallenge : challenges) {
+            if (loopChallenge.isAdminDefined()) {
                 tempList.add(loopChallenge);
+            }
+        }
         return Collections.unmodifiableList(tempList);
     }
 
     public List<String> getChallengeTexts()
     {
         final List<String> tempList = new ArrayList<String>();
-        for (final Challenge loopChallenge : challenges)
-            if (loopChallenge.getChallengeText() != null && loopChallenge.getChallengeText().length() > 0)
+        for (final Challenge loopChallenge : challenges) {
+            if (loopChallenge.getChallengeText() != null && loopChallenge.getChallengeText().length() > 0) {
                 tempList.add(loopChallenge.getChallengeText());
+            }
+        }
         return Collections.unmodifiableList(tempList);
     }
 
     public final List<Challenge> getRandomChallenges()
     {
         final List<Challenge> tempList = new ArrayList<Challenge>();
-        for (final Challenge loopChallenge : challenges)
-            if (!loopChallenge.isRequired())
+        for (final Challenge loopChallenge : challenges) {
+            if (!loopChallenge.isRequired()) {
                 tempList.add(loopChallenge);
+            }
+        }
         return Collections.unmodifiableList(tempList);
     }
 
     public final List<Challenge> getRequiredChallenges()
     {
         final List<Challenge> tempList = new ArrayList<Challenge>();
-        for (final Challenge loopChallenge : challenges)
-            if (loopChallenge.isRequired())
+        for (final Challenge loopChallenge : challenges) {
+            if (loopChallenge.isRequired()) {
                 tempList.add(loopChallenge);
+            }
+        }
         return Collections.unmodifiableList(tempList);
     }
 
     public final List<Challenge> getUserDefinedChallenges()
     {
         final List<Challenge> tempList = new ArrayList<Challenge>();
-        for (final Challenge loopChallenge : challenges)
-            if (!loopChallenge.isAdminDefined())
+        for (final Challenge loopChallenge : challenges) {
+            if (!loopChallenge.isAdminDefined()) {
                 tempList.add(loopChallenge);
+            }
+        }
         return Collections.unmodifiableList(tempList);
     }
 
@@ -162,17 +178,19 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
 
     public boolean isLocked()
     {
-        for (final Challenge loopChallenge : challenges)
-            if (!loopChallenge.isLocked())
+        for (final Challenge loopChallenge : challenges) {
+            if (!loopChallenge.isLocked()) {
                 return false;
+            }
+        }
 
         return true;
     }
 
-    public void lock()
-    {
-        for (final Challenge loopChallenge : challenges)
+    public void lock() {
+        for (final Challenge loopChallenge : challenges) {
             loopChallenge.lock();
+        }
     }
 
     public String getIdentifier() {

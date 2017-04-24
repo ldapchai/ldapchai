@@ -19,7 +19,14 @@
 
 package com.novell.ldapchai.util;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public class StringHelper {
 
@@ -36,10 +43,10 @@ public class StringHelper {
      */
     public static boolean convertStrToBoolean(final String string)
     {
-        return !(string == null || string.length() < 1) && (string.equalsIgnoreCase("true") ||
-                string.equalsIgnoreCase("1") ||
-                string.equalsIgnoreCase("yes") ||
-                string.equalsIgnoreCase("y"));
+        return !(string == null || string.length() < 1) && ("true".equalsIgnoreCase(string) ||
+            "1".equalsIgnoreCase(string) ||
+            "yes".equalsIgnoreCase(string) ||
+            "y".equalsIgnoreCase(string));
     }
 
     /**
@@ -94,8 +101,8 @@ public class StringHelper {
      * @return a {@code List} of {@code String}s.  An emtpy list is returned if <i>inputString</i> is null.
      */
     public static List<String> tokenizeString(
-            final String inputString,
-            final String seperator
+        final String inputString,
+        final String seperator
     )
     {
         if (inputString == null || inputString.length() < 1) {
@@ -108,9 +115,9 @@ public class StringHelper {
     }
 
     public static Map<String, String> tokenizeString(
-            final String inputString,
-            final String seperator,
-            final String subSeperator
+        final String inputString,
+        final String seperator,
+        final String subSeperator
     )
     {
         if (inputString == null || inputString.length() < 1) {
@@ -135,21 +142,22 @@ public class StringHelper {
         return returnProps;
     }
 
-    public static String stringCollectionToString(final Collection<String> c, String seperator) {
+    public static String stringCollectionToString(final Collection<String> c, final String separator) {
         if (c == null || c.isEmpty()) {
             return "";
         }
 
-        if (seperator == null) {
-            seperator = ", ";
-        }
+        final String effectiveSeparator = separator == null
+            ? ", "
+            : separator;
+
 
         final StringBuilder sb = new StringBuilder();
         for (final String value : c) {
             sb.append(value);
-            sb.append(seperator);
+            sb.append(effectiveSeparator);
         }
-        sb.delete(sb.length() - seperator.length(), sb.length());
+        sb.delete(sb.length() - effectiveSeparator.length(), sb.length());
         return sb.toString();
     }
 

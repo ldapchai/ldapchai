@@ -40,7 +40,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
     /**
      * Enumeration that describes the selected mode for password recovery.
      */
-    static enum FORGOTTEN_MODE {
+    enum FORGOTTEN_MODE {
         CHANGE_PASSWORD("ChangePassword"),
         EMAIL_PASSWORD("EmailPassword"),
         EMAIL_HINT("EmailHint"),
@@ -520,5 +520,5 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
         }
     }
 
-    public String getChallengeSetDN();    
+    String getChallengeSetDN();
 }

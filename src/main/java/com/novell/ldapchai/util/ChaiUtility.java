@@ -19,7 +19,13 @@
 
 package com.novell.ldapchai.util;
 
-import com.novell.ldapchai.*;
+import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.ChaiPasswordPolicy;
+import com.novell.ldapchai.ChaiPasswordRule;
+import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
@@ -29,7 +35,14 @@ import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.provider.ChaiSetting;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
@@ -96,19 +109,19 @@ public class ChaiUtility {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static String findUniqueName(String baseName, final String containerDN, final ChaiProvider provider)
+    public static String findUniqueName(final String baseName, final String containerDN, final ChaiProvider provider)
             throws ChaiOperationException, ChaiUnavailableException
     {
         char ch;
         final StringBuilder cnStripped = new StringBuilder();
 
-        if (baseName == null) {
-            baseName = "";
-        }
+        final String effectiveBasename = (baseName == null)
+            ? ""
+            : baseName;
 
         // First boil down the root name. Preserve only the alpha-numerics.
-        for (int i = 0; i < baseName.length(); i++) {
-            ch = baseName.charAt(i);
+        for (int i = 0; i < effectiveBasename.length(); i++) {
+            ch = effectiveBasename.charAt(i);
             if (Character.isLetterOrDigit(ch)) {
                 cnStripped.append(ch);
             }
@@ -124,15 +137,15 @@ public class ChaiUtility {
         StringBuilder filter;
 
         final Random randomNumber = new Random();
-        int iExt = randomNumber.nextInt() % 1000; // Start with a random 3 digit number
-        String sExt = null;
 
+        String stringCounter = null;
+        int counter = randomNumber.nextInt() % 1000; // Start with a random 3 digit number
         while (true) {
             // Initialize the String Buffer and Unique DN.
             filter = new StringBuilder(64);
 
-            if (sExt != null) {
-                uniqueCN = cnStripped.append(sExt).toString();
+            if (stringCounter != null) {
+                uniqueCN = cnStripped.append(stringCounter).toString();
             } else {
                 uniqueCN = cnStripped.toString();
             }
@@ -144,7 +157,7 @@ public class ChaiUtility {
                 break;
             } else {
                 // Increment it every time
-                sExt = Integer.toString(iExt++);
+                stringCounter = Integer.toString(counter++);
             }
         }
 
@@ -272,14 +285,15 @@ public class ChaiUtility {
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
      */
-    public static boolean testAttributeReplication(final ChaiEntry chaiEntry, final String attribute, String value)
+    public static boolean testAttributeReplication(final ChaiEntry chaiEntry, final String attribute, final String value)
             throws ChaiOperationException, ChaiUnavailableException
     {
-        if (value == null || value.length() < 1) {
-            value = chaiEntry.readStringAttribute(attribute);
-        }
+        final String effectiveValue = (value == null || value.length() < 1)
+            ? chaiEntry.readStringAttribute(attribute)
+            : value;
 
-        if (value == null) {
+
+        if (effectiveValue == null) {
             throw ChaiOperationException.forErrorMessage("unreadable to read test attribute from primary ChaiProvider");
         }
 
@@ -301,7 +315,7 @@ public class ChaiUtility {
             ChaiProvider loopProvider = null;
             try {
                 loopProvider = ChaiProviderFactory.createProvider(loopConfiguration);
-                if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, value)) {
+                if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, effectiveValue)) {
                     successCount++;
                 }
 
@@ -404,7 +418,7 @@ public class ChaiUtility {
                 "vendorVersion",
                 "vendorName",
                 "rootDomainNamingContext",
-                "objectClass"
+                "objectClass",
         };
 
         final SearchHelper searchHelper = new SearchHelper();

@@ -170,11 +170,11 @@ public final class ChaiFactory {
     }
 
     public interface ChaiEntryFactory {
-        ChaiUser createChaiUser(final String entryDN, final ChaiProvider provider);
+        ChaiUser createChaiUser(String entryDN, ChaiProvider provider);
 
-        ChaiGroup createChaiGroup(final String entryDN, final ChaiProvider provider);
+        ChaiGroup createChaiGroup(String entryDN, ChaiProvider provider);
 
-        ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider);
+        ChaiEntry createChaiEntry(String entryDN, ChaiProvider provider);
 
         ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor();
 

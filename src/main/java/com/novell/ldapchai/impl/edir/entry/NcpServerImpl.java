@@ -37,7 +37,7 @@ class NcpServerImpl extends TopImpl implements NcpServer {
 
     // --------------------------- CONSTRUCTORS ---------------------------
 
-    public NcpServerImpl(final String entryDN, final ChaiProvider chaiProvider)
+    NcpServerImpl(final String entryDN, final ChaiProvider chaiProvider)
     {
         super(entryDN, chaiProvider);
     }
@@ -78,10 +78,10 @@ class NcpServerImpl extends TopImpl implements NcpServer {
 
         for (final byte[] addy : addies) {
             final StringBuilder sb = new StringBuilder();
-            int i = 0;
+            int valueI = 0;
             for (final byte b : addy) {
-                i++;
-                if (i % 2 == 0) {
+                valueI++;
+                if (valueI % 2 == 0) {
                     sb.append((char) b);
                 }
             }

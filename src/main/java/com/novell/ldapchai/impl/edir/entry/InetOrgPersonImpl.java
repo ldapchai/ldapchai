@@ -23,12 +23,23 @@ import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.*;
+import com.novell.ldapchai.exception.ChaiError;
+import com.novell.ldapchai.exception.ChaiErrors;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.StringHelper;
-import com.novell.security.nmas.jndi.ldap.ext.*;
+import com.novell.security.nmas.jndi.ldap.ext.ChangePwdRequest;
+import com.novell.security.nmas.jndi.ldap.ext.ChangePwdResponse;
+import com.novell.security.nmas.jndi.ldap.ext.GetPwdRequest;
+import com.novell.security.nmas.jndi.ldap.ext.GetPwdResponse;
+import com.novell.security.nmas.jndi.ldap.ext.PwdPolicyCheckRequest;
+import com.novell.security.nmas.jndi.ldap.ext.PwdPolicyCheckResponse;
+import com.novell.security.nmas.jndi.ldap.ext.SetPwdRequest;
+import com.novell.security.nmas.jndi.ldap.ext.SetPwdResponse;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.util.Arrays;
@@ -193,7 +204,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         final String[] attrsToRead = new String[] {
                 ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT,
                 ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING,
-                ATTR_PASSWORD_EXPIRE_TIME
+                ATTR_PASSWORD_EXPIRE_TIME,
         };
 
         final Map<String,String> userAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));

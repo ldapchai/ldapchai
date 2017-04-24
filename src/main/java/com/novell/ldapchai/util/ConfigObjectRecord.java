@@ -23,7 +23,11 @@ import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * Represents a config object record stored in eDirectory used for holding complex data types.
@@ -62,8 +66,8 @@ public class ConfigObjectRecord {
 // ----------------------------- CONSTANTS ----------------------------
 
     // ------------------------- PUBLIC CONSTANTS -------------------------
-    public static final String EMPTY_RECORD_VALUE = ".";
-    public static final String RECORD_SEPERATOR = "#";
+    static final String EMPTY_RECORD_VALUE = ".";
+    static final String RECORD_SEPERATOR = "#";
 
 // ------------------------------ FIELDS ------------------------------
 
@@ -91,7 +95,7 @@ public class ConfigObjectRecord {
      */
     public static ConfigObjectRecord createNew(final ChaiEntry entry,
                                                final String attr,
-                                               String recordType,
+                                               final String recordType,
                                                final String guid1,
                                                final String guid2)
     {
@@ -110,15 +114,16 @@ public class ConfigObjectRecord {
             throw new NullPointerException("attr can not be null");
         }
 
-        // truncate recod type to 4 chars.
-        if (recordType.length() > 4) {
-            recordType = recordType.substring(0, 4);
-        }
+        // truncate record type to 4 chars.
+        final String effectiveRecordType = recordType.length() > 4
+            ? recordType.substring(0, 4)
+            : recordType;
+
 
         final ConfigObjectRecord cor = new ConfigObjectRecord();
         cor.objectEntry = entry;
         cor.attr = attr;
-        cor.recordType = recordType;
+        cor.recordType = effectiveRecordType;
 
         cor.guid1 = (guid1 == null || guid1.length() < 1) ? EMPTY_RECORD_VALUE : guid1;
         cor.guid2 = (guid2 == null || guid2.length() < 1) ? EMPTY_RECORD_VALUE : guid2;
@@ -138,7 +143,13 @@ public class ConfigObjectRecord {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static List<ConfigObjectRecord> readRecordFromLDAP(final ChaiEntry ldapEntry, final String attr, final String recordType, final Set guid1, final Set guid2)
+    public static List<ConfigObjectRecord> readRecordFromLDAP(
+        final ChaiEntry ldapEntry,
+        final String attr,
+        final String recordType,
+        final Set guid1,
+        final Set guid2
+    )
             throws ChaiOperationException, ChaiUnavailableException
     {
         if (ldapEntry == null) {

@@ -17,11 +17,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/**
- * An enumeration of all the known LDAP and Chai ErrorCodes
- *
- * @author Jason D. Rivard
- */
 package com.novell.ldapchai.exception;
 
 /**
@@ -100,7 +95,7 @@ public enum ChaiError {
 
     // --------------------------- CONSTRUCTORS ---------------------------
 
-    private ChaiError(final String errorKey, final int errorCode)
+    ChaiError(final String errorKey, final int errorCode)
     {
         this.errorCode = errorCode;
     }

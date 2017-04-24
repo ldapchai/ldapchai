@@ -29,7 +29,11 @@ import com.novell.ldapchai.util.ChaiLogger;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A {@link ChaiProvider} implementation wrapper that handles automatic idle disconnects.
@@ -46,15 +50,17 @@ class WatchdogWrapper implements InvocationHandler {
 
 // -------------------------- ENUMERATIONS --------------------------
 
-    private static enum STATUS {
-        ACTIVE, IDLE, CLOSED
+    private enum STATUS {
+        ACTIVE,
+        IDLE,
+        CLOSED,
     }
 
 // ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(WatchdogWrapper.class);
 
-    private static final WatchdogManager watchdogManager = new WatchdogManager();
+    private static final WatchdogManager WATCHDOG_MANAGER = new WatchdogManager();
 
     private static long setting_watchdogFrequency = Integer.parseInt(ChaiSetting.WATCHDOG_CHECK_FREQUENCY.getDefaultValue());
 
@@ -134,7 +140,7 @@ class WatchdogWrapper implements InvocationHandler {
         setting_operationTimeout = Integer.parseInt(originalProviderConfig.getSetting(ChaiSetting.WATCHDOG_OPERATION_TIMEOUT));
         setting_idleTimeout = Integer.parseInt(originalProviderConfig.getSetting(ChaiSetting.WATCHDOG_IDLE_TIMEOUT));
 
-        watchdogManager.registerInstance(this);
+        WATCHDOG_MANAGER.registerInstance(this);
 
         checkForPwExpiration();
     }
@@ -167,13 +173,12 @@ class WatchdogWrapper implements InvocationHandler {
         }
     }
 
-// ------------------------ CANONICAL METHODS ------------------------
-
+    @SuppressWarnings(value = "NoFinalizer")
     protected void finalize()
             throws Throwable
     {
         super.finalize();
-        watchdogManager.deRegisterInstance(this);  //safegaurd, this should be done in #handleClient
+        WATCHDOG_MANAGER.deRegisterInstance(this);  //safegaurd, this should be done in #handleClient
     }
 
 // ------------------------ INTERFACE METHODS ------------------------
@@ -272,7 +277,7 @@ class WatchdogWrapper implements InvocationHandler {
                 this.realProvider.close();
             }
             wdStatus = STATUS.IDLE;
-            watchdogManager.deRegisterInstance(this);
+            WATCHDOG_MANAGER.deRegisterInstance(this);
         }
     }
 
@@ -291,7 +296,7 @@ class WatchdogWrapper implements InvocationHandler {
                 this.realProvider.close();
             }
             wdStatus = STATUS.IDLE;
-            watchdogManager.deRegisterInstance(this);
+            WATCHDOG_MANAGER.deRegisterInstance(this);
         }
     }
 
@@ -301,7 +306,7 @@ class WatchdogWrapper implements InvocationHandler {
         if (realProvider != null) {
             realProvider.close();
         }
-        watchdogManager.deRegisterInstance(this);
+        WATCHDOG_MANAGER.deRegisterInstance(this);
     }
 
     private synchronized void reopenRealProvider()
@@ -346,13 +351,13 @@ class WatchdogWrapper implements InvocationHandler {
 
         lastBeginTimestamp = System.currentTimeMillis();
         wdStatus = STATUS.ACTIVE;
-        watchdogManager.registerInstance(this);
+        WATCHDOG_MANAGER.registerInstance(this);
     }
 
 // -------------------------- INNER CLASSES --------------------------
 
     private static class WatchdogManager {
-        private final static String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
+        private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
 
         private final Collection<WatchdogWrapper> activeWrappers = Collections.synchronizedSet(new HashSet<WatchdogWrapper>());
 

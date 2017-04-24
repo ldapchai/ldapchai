@@ -28,7 +28,7 @@ import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class OpenLDAPGroup extends AbstractChaiGroup implements ChaiGroup {
-    public OpenLDAPGroup(final String groupDN, final ChaiProvider chaiProvider) {
+    OpenLDAPGroup(final String groupDN, final ChaiProvider chaiProvider) {
         super(groupDN, chaiProvider);
     }
 

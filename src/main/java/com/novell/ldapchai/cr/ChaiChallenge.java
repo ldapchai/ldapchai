@@ -108,12 +108,10 @@ public class ChaiChallenge implements Challenge, Serializable {
         return required;
     }
 
-    @Override
     public int getMaxQuestionCharsInAnswer() {
         return maxQuestionCharsInAnswer;
     }
 
-    @Override
     public boolean isEnforceWordlist() {
         return enforceWordlist;
     }
@@ -136,15 +134,31 @@ public class ChaiChallenge implements Challenge, Serializable {
      */
     public boolean equals(final Object o)
     {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         final ChaiChallenge challenge = (ChaiChallenge) o;
 
-        if (adminDefined != challenge.adminDefined) return false;
-        if (maxLength != challenge.maxLength) return false;
-        if (minLength != challenge.minLength) return false;
-        if (required != challenge.required) return false;
+        if (adminDefined != challenge.adminDefined) {
+            return false;
+        }
+
+        if (maxLength != challenge.maxLength) {
+            return false;
+        }
+
+        if (minLength != challenge.minLength) {
+            return false;
+        }
+
+        if (required != challenge.required) {
+            return false;
+        }
+
         if (adminDefined) {
             if (challengeText != null ? !challengeText.equals(challenge.challengeText) : challenge.challengeText != null) {
                 return false;

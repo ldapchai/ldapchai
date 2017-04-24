@@ -66,8 +66,10 @@ class PasswordCryptAnswer implements Answer {
 
             case SCRYPT:
                 return SCryptUtil.check(casedAnswer, answerHash);
+
+            default:
+                throw new IllegalArgumentException("can't test answer for unknown format " + formatType.toString());
         }
-        throw new IllegalArgumentException("can't test answer for unknown format " + formatType.toString());
     }
 
     public AnswerBean asAnswerBean() {

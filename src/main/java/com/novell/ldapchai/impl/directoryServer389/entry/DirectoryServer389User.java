@@ -90,12 +90,12 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
             return false;
         }
 
-        return unlockDate.after(new Date());    }
+        return unlockDate.after(new Date());
+    }
 
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
         this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, "19800101010101Z");
     }
-
 }

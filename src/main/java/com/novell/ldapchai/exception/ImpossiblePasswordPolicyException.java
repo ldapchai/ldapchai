@@ -53,11 +53,8 @@ public class ImpossiblePasswordPolicyException extends RuntimeException {
         UNEXPECTED_ERROR
     }
 
-// ------------------------------ FIELDS ------------------------------
 
-    private ErrorEnum error;
-
-// --------------------------- CONSTRUCTORS ---------------------------
+    private final ErrorEnum error;
 
     public ImpossiblePasswordPolicyException(final ErrorEnum error)
     {

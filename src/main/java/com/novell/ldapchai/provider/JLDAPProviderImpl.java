@@ -19,7 +19,19 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldap.*;
+import com.novell.ldap.LDAPAttribute;
+import com.novell.ldap.LDAPAttributeSet;
+import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPConstraints;
+import com.novell.ldap.LDAPControl;
+import com.novell.ldap.LDAPEntry;
+import com.novell.ldap.LDAPException;
+import com.novell.ldap.LDAPExtendedOperation;
+import com.novell.ldap.LDAPExtendedResponse;
+import com.novell.ldap.LDAPJSSESecureSocketFactory;
+import com.novell.ldap.LDAPModification;
+import com.novell.ldap.LDAPSearchConstraints;
+import com.novell.ldap.LDAPSearchResults;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
@@ -34,7 +46,14 @@ import javax.naming.ldap.ExtendedResponse;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * JLDAP {@code ChaiProvider} implementation.  This
@@ -553,29 +572,26 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return sb.toString();
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     public Map<String, Map<String, List<String>>> searchImpl(
-            String baseDN,
-            SearchHelper searchHelper,
-            final boolean onlyFirstValue)
+            final String baseDN,
+            final SearchHelper searchHelper,
+            final boolean onlyFirstValue
+    )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         activityPreCheck();
 
-        try { // make a copy so if it changes somewhere else we won't be affected.
-            searchHelper = (SearchHelper) searchHelper.clone();
-        } catch (CloneNotSupportedException e) {
-            LOGGER.fatal("unexpected clone of SearchHelper failed during chai search", e);
-            throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiError.UNKNOWN);
-        }
+         // make a copy so if it changes somewhere else we won't be affected.
+        final SearchHelper effectiveSearchHelper = new SearchHelper(searchHelper);
 
         // replace a null dn with an empty string
-        baseDN = baseDN != null ? baseDN : "";
+        final String effectiveBaseDN = baseDN != null
+            ? baseDN
+            : "";
 
 
         final int ldapScope;
-        switch (searchHelper.getSearchScope()) {
+        switch (effectiveSearchHelper.getSearchScope()) {
             case ONE:
                 ldapScope = LDAPConnection.SCOPE_ONE;
                 break;
@@ -592,16 +608,16 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         final Map<String, Map<String, List<String>>> returnMap = new LinkedHashMap<String, Map<String, List<String>>>();
 
         final LDAPSearchConstraints constraints = new LDAPSearchConstraints();
-        constraints.setMaxResults(searchHelper.getMaxResults());
-        constraints.setTimeLimit(searchHelper.getTimeLimit());
+        constraints.setMaxResults(effectiveSearchHelper.getMaxResults());
+        constraints.setTimeLimit(effectiveSearchHelper.getTimeLimit());
 
-        final String[] returnAttributes = searchHelper.getAttributes() == null ? null : searchHelper.getAttributes().toArray(new String[searchHelper.getAttributes().size()]);
+        final String[] returnAttributes = effectiveSearchHelper.getAttributes() == null ? null : effectiveSearchHelper.getAttributes().toArray(new String[effectiveSearchHelper.getAttributes().size()]);
 
         final LDAPSearchResults results;
         try {
             results = ldapConnection.search(
-                    baseDN,
-                    ldapScope, searchHelper.getFilter(),
+                    effectiveBaseDN,
+                    ldapScope, effectiveSearchHelper.getFilter(),
                     returnAttributes,
                     false,
                     constraints

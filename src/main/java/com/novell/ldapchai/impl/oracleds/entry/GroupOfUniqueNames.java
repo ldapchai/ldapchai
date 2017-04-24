@@ -25,8 +25,8 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 public class GroupOfUniqueNames extends AbstractChaiGroup implements ChaiGroup {
     public GroupOfUniqueNames(
-            String groupDN,
-            ChaiProvider chaiProvider
+            final String groupDN,
+            final ChaiProvider chaiProvider
     )
     {
         super(groupDN, chaiProvider);

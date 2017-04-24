@@ -28,7 +28,7 @@ class ChaiEntryImpl extends TopImpl implements ChaiEntry {
         return "";
     }
 
-    public ChaiEntryImpl(String entryDN, ChaiProvider chaiProvider)
+    ChaiEntryImpl(final String entryDN, final ChaiProvider chaiProvider)
     {
         super(entryDN, chaiProvider);
     }

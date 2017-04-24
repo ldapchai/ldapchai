@@ -59,14 +59,14 @@
  * <h5>Chai Format (SHA1) XML example:</h5><pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;ResponseSet minRandomRequired="0" locale="en_US"&gt;
- * 	&lt;response adminDefined="true" required="true" minLength="5" maxLength="200"&gt;
- * 		&lt;challenge&gt;&lt;![CDATA[c2]]&gt;&lt;/challenge&gt;
- * 		&lt;answer format="SHA1"&gt;&lt;![CDATA[fsEw6G4j3sbdBWt6yKmIn2oz63I=]]&gt;&lt;/answer&gt;
- * 	&lt;/response&gt;
- * 	&lt;response adminDefined="true" required="true" minLength="5" maxLength="200"&gt;
- * 		&lt;challenge&gt;&lt;![CDATA[c1]]&gt;&lt;/challenge&gt;
- * 		&lt;answer format="SHA1"&gt;&lt;![CDATA[2fm396fcv62PZUlWwQWN6pvLOhQ=]]&gt;&lt;/answer&gt;
- * 	&lt;/response&gt;
+ * &lt;response adminDefined="true" required="true" minLength="5" maxLength="200"&gt;
+ *      &lt;challenge&gt;&lt;![CDATA[c2]]&gt;&lt;/challenge&gt;
+ *      &lt;answer format="SHA1"&gt;&lt;![CDATA[fsEw6G4j3sbdBWt6yKmIn2oz63I=]]&gt;&lt;/answer&gt;
+ * &lt;/response&gt;
+ * &lt;response adminDefined="true" required="true" minLength="5" maxLength="200"&gt;
+ *      &lt;challenge&gt;&lt;![CDATA[c1]]&gt;&lt;/challenge&gt;
+ *     &lt;answer format="SHA1"&gt;&lt;![CDATA[2fm396fcv62PZUlWwQWN6pvLOhQ=]]&gt;&lt;/answer&gt;
+ * &lt;/response&gt;
  * &lt;/ResponseSet&gt;
  * </pre>
  *

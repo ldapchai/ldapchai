@@ -21,10 +21,14 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.util.StringHelper;
 
-import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Properties;
 
 /**
  * LDAP Chai API configuration settings.  This class represents the primary means
@@ -49,10 +53,10 @@ public class ChaiConfiguration implements Serializable {
 
     public static final String LDAP_URL_SEPERATOR_REGEX_PATTERN = ",| "; // comma <or> space (regex)
 
-    private final static Properties DEFAULT_SETTINGS = new Properties();
+    private static final Properties DEFAULT_SETTINGS = new Properties();
 
     private Serializable implementationConfiguration;
-    private volatile transient boolean locked;
+    private transient volatile boolean locked;
     private Properties settings = new Properties(DEFAULT_SETTINGS);
     private X509TrustManager[] trustManager = null;
 
@@ -114,7 +118,7 @@ public class ChaiConfiguration implements Serializable {
     public ChaiConfiguration(final ChaiConfiguration existingConfiguration)
     {
         final Properties newSettings = new Properties();
-        for (final Enumeration keyEnum = existingConfiguration.settings.propertyNames(); keyEnum.hasMoreElements();) {
+        for (final Enumeration keyEnum = existingConfiguration.settings.propertyNames(); keyEnum.hasMoreElements(); ) {
             final String keyName = (String) keyEnum.nextElement();
             newSettings.setProperty(keyName, existingConfiguration.settings.getProperty(keyName));
         }

@@ -30,10 +30,10 @@ package com.novell.ldapchai.exception;
 public class ChaiException extends Exception {
 // ------------------------------ FIELDS ------------------------------
 
-    private boolean permenant = true;
-    private boolean authentication = false;
+    private final boolean permanent;
+    private final boolean authentication;
 
-    private ChaiError errorCode;
+    private final ChaiError errorCode;
 
 // -------------------------- STATIC METHODS --------------------------
 
@@ -55,10 +55,10 @@ public class ChaiException extends Exception {
         this(message, errorCode, ChaiErrors.isPermanent(message), ChaiErrors.isAuthenticationRelated(message));
     }
 
-    public ChaiException(final String message, final ChaiError errorCode, final boolean permenant, final boolean authentication)
+    public ChaiException(final String message, final ChaiError errorCode, final boolean permanent, final boolean authentication)
     {
         super(message);
-        this.permenant = permenant;
+        this.permanent = permanent;
         this.authentication = authentication;
         this.errorCode = errorCode;
     }
@@ -70,9 +70,9 @@ public class ChaiException extends Exception {
         return errorCode;
     }
 
-    public boolean isPermenant()
+    public boolean isPermanent()
     {
-        return permenant;
+        return permanent;
     }
 
     public boolean isAuthentication()

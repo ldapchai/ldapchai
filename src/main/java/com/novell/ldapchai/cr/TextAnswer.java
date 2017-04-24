@@ -20,7 +20,6 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.ChaiLogger;
 import org.jdom2.Element;
 
 class TextAnswer implements Answer {
@@ -66,7 +65,7 @@ class TextAnswer implements Answer {
             return new TextAnswer(answer,caseInsensitive);
         }
 
-        public Answer fromAnswerBean(AnswerBean input, String challengeText) {
+        public Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
             return new TextAnswer(input.getAnswerText(), input.isCaseInsensitive());
         }
 

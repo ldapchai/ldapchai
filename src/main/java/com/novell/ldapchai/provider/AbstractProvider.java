@@ -34,7 +34,12 @@ import javax.naming.ldap.ExtendedResponse;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor {
 // ----------------------------- CONSTANTS ----------------------------
@@ -45,7 +50,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractProvider.class.getName());
 
-    private volatile static long instanceCounter;
+    private static volatile long instanceCounter;
 
     protected ChaiConfiguration chaiConfig;
     protected volatile ConnectionState state = ConnectionState.NEW;
@@ -65,7 +70,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         debugStr.append(theMethod.getName());
         debugStr.append('(');
         if (parameters != null) {
-            for (Iterator iter = Arrays.asList(parameters).iterator(); iter.hasNext();) {
+            for (final Iterator iter = Arrays.asList(parameters).iterator(); iter.hasNext(); ) {
                 final Object nextValue = iter.next();
                 try {
                     debugStr.append(parameterToString(nextValue));
@@ -106,7 +111,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     // --------------------------- CONSTRUCTORS ---------------------------
 
-    public AbstractProvider()
+    AbstractProvider()
     {
         instanceCounter++;
         instanceCount = instanceCounter;
@@ -200,7 +205,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         if (e instanceof IOException) {
             return true;
         } else if (e instanceof ChaiException) {
-            return !(((ChaiException) e).isPermenant());
+            return !(((ChaiException) e).isPermanent());
         }
 
         return false;

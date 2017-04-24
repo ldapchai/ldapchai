@@ -56,7 +56,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         return Collections.unmodifiableSet(returnGroups);
     }
 
-    public void addGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+    public void addGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
         theGroup.addAttribute("member",this.getEntryDN());
     }
 

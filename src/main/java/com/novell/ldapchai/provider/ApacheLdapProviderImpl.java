@@ -10,9 +10,33 @@ import com.novell.ldapchai.util.SearchHelper;
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
-import org.apache.directory.api.ldap.model.entry.*;
+import org.apache.directory.api.ldap.model.entry.Attribute;
+import org.apache.directory.api.ldap.model.entry.BinaryValue;
+import org.apache.directory.api.ldap.model.entry.DefaultAttribute;
+import org.apache.directory.api.ldap.model.entry.DefaultEntry;
+import org.apache.directory.api.ldap.model.entry.DefaultModification;
+import org.apache.directory.api.ldap.model.entry.Entry;
+import org.apache.directory.api.ldap.model.entry.Modification;
+import org.apache.directory.api.ldap.model.entry.ModificationOperation;
+import org.apache.directory.api.ldap.model.entry.StringValue;
+import org.apache.directory.api.ldap.model.entry.Value;
 import org.apache.directory.api.ldap.model.exception.LdapException;
-import org.apache.directory.api.ldap.model.message.*;
+import org.apache.directory.api.ldap.model.message.AddRequest;
+import org.apache.directory.api.ldap.model.message.AddRequestImpl;
+import org.apache.directory.api.ldap.model.message.AddResponse;
+import org.apache.directory.api.ldap.model.message.Control;
+import org.apache.directory.api.ldap.model.message.DeleteRequest;
+import org.apache.directory.api.ldap.model.message.DeleteRequestImpl;
+import org.apache.directory.api.ldap.model.message.DeleteResponse;
+import org.apache.directory.api.ldap.model.message.MessageTypeEnum;
+import org.apache.directory.api.ldap.model.message.ModifyRequest;
+import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
+import org.apache.directory.api.ldap.model.message.ModifyResponse;
+import org.apache.directory.api.ldap.model.message.ResultCodeEnum;
+import org.apache.directory.api.ldap.model.message.ResultResponse;
+import org.apache.directory.api.ldap.model.message.SearchRequest;
+import org.apache.directory.api.ldap.model.message.SearchRequestImpl;
+import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -23,7 +47,15 @@ import javax.naming.ldap.ExtendedResponse;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProviderImplementor {
 
@@ -76,7 +108,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
   }
 
   @Override
-  public void init(ChaiConfiguration chaiConfig) throws ChaiUnavailableException {
+  public void init(final ChaiConfiguration chaiConfig) throws ChaiUnavailableException {
     this.chaiConfig = chaiConfig;
     super.init(chaiConfig);
 
@@ -137,17 +169,17 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
   }
 
   @Override
-  public boolean errorIsRetryable(Exception e) {
+  public boolean errorIsRetryable(final Exception e) {
     return super.errorIsRetryable(e);
   }
 
   @Override
-  protected void preCheckExtendedOperation(ExtendedRequest request) throws ChaiOperationException {
+  protected void preCheckExtendedOperation(final ExtendedRequest request) throws ChaiOperationException {
     super.preCheckExtendedOperation(request);
   }
 
   @Override
-  protected void cacheExtendedOperationException(ExtendedRequest request, Exception e) throws ChaiOperationException {
+  protected void cacheExtendedOperationException(final ExtendedRequest request, final Exception e) throws ChaiOperationException {
     super.cacheExtendedOperationException(request, e);
   }
 
@@ -161,7 +193,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return super.getIdentifier();
   }
 
-  public boolean compareStringAttribute(String entryDN, String attributeName, String value) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public boolean compareStringAttribute(final String entryDN, final String attributeName, final String value) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.compareStringAttribute(entryDN, attributeName, value);
 
@@ -172,14 +204,14 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void createEntry(String entryDN, String baseObjectClass, Map<String, String> stringAttributes) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void createEntry(final String entryDN, final String baseObjectClass, final Map<String, String> stringAttributes) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.createEntry(entryDN, baseObjectClass, stringAttributes);
 
     createEntry(entryDN, Collections.singleton(baseObjectClass), stringAttributes);
   }
 
-  public void createEntry(String entryDN, Set<String> baseObjectClasses, Map<String, String> stringAttributes) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void createEntry(final String entryDN, final Set<String> baseObjectClasses, final Map<String, String> stringAttributes) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.createEntry(entryDN, baseObjectClasses, stringAttributes);
 
@@ -202,7 +234,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void deleteEntry(String entryDN) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void deleteEntry(final String entryDN) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.deleteEntry(entryDN);
 
@@ -216,7 +248,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void deleteStringAttributeValue(String entryDN, String attributeName, String value) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void deleteStringAttributeValue(final String entryDN, final String attributeName, final String value) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.deleteStringAttributeValue(entryDN, attributeName, value);
 
@@ -244,23 +276,23 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return request.getID();
       }
 
-      public org.apache.directory.api.ldap.model.message.ExtendedRequest setRequestName(String oid) {
+      public org.apache.directory.api.ldap.model.message.ExtendedRequest setRequestName(final String oid) {
         return this;
       }
 
-      public org.apache.directory.api.ldap.model.message.ExtendedRequest setMessageId(int messageId) {
+      public org.apache.directory.api.ldap.model.message.ExtendedRequest setMessageId(final int messageId) {
         return this;
       }
 
-      public org.apache.directory.api.ldap.model.message.ExtendedRequest addControl(Control control) {
+      public org.apache.directory.api.ldap.model.message.ExtendedRequest addControl(final Control control) {
         return null;
       }
 
-      public org.apache.directory.api.ldap.model.message.ExtendedRequest addAllControls(Control[] controls) {
+      public org.apache.directory.api.ldap.model.message.ExtendedRequest addAllControls(final Control[] controls) {
         return null;
       }
 
-      public org.apache.directory.api.ldap.model.message.ExtendedRequest removeControl(Control control) {
+      public org.apache.directory.api.ldap.model.message.ExtendedRequest removeControl(final Control control) {
         return null;
       }
 
@@ -284,11 +316,11 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return null;
       }
 
-      public Control getControl(String oid) {
+      public Control getControl(final String oid) {
         return null;
       }
 
-      public boolean hasControl(String oid) {
+      public boolean hasControl(final String oid) {
         return false;
       }
 
@@ -296,11 +328,11 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return 0;
       }
 
-      public Object get(Object key) {
+      public Object get(final Object key) {
         return null;
       }
 
-      public Object put(Object key, Object value) {
+      public Object put(final Object key, final Object value) {
         return null;
       }
     };
@@ -325,7 +357,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return null;
   }
 
-  public byte[][] readMultiByteAttribute(String entryDN, String attribute) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public byte[][] readMultiByteAttribute(final String entryDN, final String attribute) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.readStringAttribute(entryDN, attribute);
 
@@ -342,7 +374,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
 
 
-  public Set<String> readMultiStringAttribute(String entryDN, String attribute) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public Set<String> readMultiStringAttribute(final String entryDN, final String attribute) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.readStringAttribute(entryDN, attribute);
 
@@ -357,7 +389,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return Collections.unmodifiableSet(returnSet);
   }
 
-  private List<Value> readMultiAttribute(String entryDN, String attribute) throws ChaiOperationException {
+  private List<Value> readMultiAttribute(final String entryDN, final String attribute) throws ChaiOperationException {
     try {
       final EntryCursor entries = connection.search(entryDN, ChaiConstant.FILTER_OBJECTCLASS_ANY, SearchScope.OBJECT, attribute);
       final Entry entry = entries.iterator().next();
@@ -379,7 +411,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
   }
 
-  public String readStringAttribute(String entryDN, String attribute) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public String readStringAttribute(final String entryDN, final String attribute) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.readStringAttribute(entryDN, attribute);
 
@@ -394,7 +426,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public Map<String, String> readStringAttributes(String entryDN, Set<String> attributes) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public Map<String, String> readStringAttributes(final String entryDN, final Set<String> attributes) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.readStringAttributes(entryDN, attributes);
 
@@ -416,14 +448,14 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void replaceStringAttribute(String entryDN, String attributeName, String oldValue, String newValue) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void replaceStringAttribute(final String entryDN, final String attributeName, final String oldValue, final String newValue) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.replaceStringAttribute(entryDN, attributeName, oldValue, newValue);
 
     replaceAttributeImpl(entryDN, attributeName, new StringValue(oldValue), new StringValue(newValue));
   }
 
-  private void replaceAttributeImpl(String entryDN, String attributeName, Value oldValue, Value newValue) throws ChaiOperationException {
+  private void replaceAttributeImpl(final String entryDN, final String attributeName, final Value oldValue, final Value newValue) throws ChaiOperationException {
     try {
       final ModifyRequest modifyRequest = new ModifyRequestImpl();
       modifyRequest.setName(new Dn(entryDN));
@@ -446,7 +478,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public Map<String, Map<String, String>> search(String baseDN, SearchHelper searchHelper) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public Map<String, Map<String, String>> search(final String baseDN, final SearchHelper searchHelper) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.search(baseDN, searchHelper);
 
@@ -464,7 +496,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return Collections.unmodifiableMap(returnObj);
   }
 
-  public Map<String, Map<String, String>> search(String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public Map<String, Map<String, String>> search(final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.search(baseDN, filter, attributes, searchScope);
 
@@ -476,14 +508,14 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return search(baseDN, searchHelper);
   }
 
-  public Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, SearchHelper searchHelper) throws ChaiUnavailableException, ChaiOperationException {
+  public Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final SearchHelper searchHelper) throws ChaiUnavailableException, ChaiOperationException {
     activityPreCheck();
     INPUT_VALIDATOR.searchMultiValues(baseDN, searchHelper);
 
     return searchImpl(baseDN, searchHelper, true);
   }
 
-  public Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.searchMultiValues(baseDN, filter, attributes, searchScope);
 
@@ -495,7 +527,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return searchImpl(baseDN, searchHelper, true);
   }
 
-  private Map<String, Map<String, List<String>>> searchImpl(String baseDN, SearchHelper searchHelper, boolean multivalued) throws ChaiUnavailableException, ChaiOperationException {
+  private Map<String, Map<String, List<String>>> searchImpl(final String baseDN, final SearchHelper searchHelper, final boolean multivalued) throws ChaiUnavailableException, ChaiOperationException {
     try {
       final SearchRequest searchRequest = new SearchRequestImpl();
       searchRequest.setBase(new Dn(baseDN));
@@ -537,7 +569,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void writeBinaryAttribute(String entryDN, String attributeName, byte[][] values, boolean overwrite) throws ChaiUnavailableException, ChaiOperationException {
+  public void writeBinaryAttribute(final String entryDN, final String attributeName, final byte[][] values, final boolean overwrite) throws ChaiUnavailableException, ChaiOperationException {
     activityPreCheck();
     INPUT_VALIDATOR.writeBinaryAttribute(entryDN, attributeName, values, overwrite);
 
@@ -557,7 +589,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void writeBinaryAttribute(String entryDN, String attributeName, byte[][] values, boolean overwrite, ChaiRequestControl[] controls) throws ChaiUnavailableException, ChaiOperationException {
+  public void writeBinaryAttribute(final String entryDN, final String attributeName, final byte[][] values, final boolean overwrite, final ChaiRequestControl[] controls) throws ChaiUnavailableException, ChaiOperationException {
     try {
       final ModifyRequest modifyRequest = new ModifyRequestImpl();
       modifyRequest.setName(new Dn(entryDN));
@@ -576,7 +608,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
   }
 
-  public void writeStringAttribute(String entryDN, String attributeName, Set<String> values, boolean overwrite) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void writeStringAttribute(final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.writeStringAttribute(entryDN, attributeName, values, overwrite);
 
@@ -596,7 +628,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void writeStringAttributes(String entryDN, Map<String, String> attributeValueProps, boolean overwrite) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+  public void writeStringAttributes(final String entryDN, final Map<String, String> attributeValueProps, final boolean overwrite) throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
     activityPreCheck();
     INPUT_VALIDATOR.writeStringAttributes(entryDN, attributeValueProps, overwrite);
 
@@ -617,7 +649,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
   }
 
-  public void replaceBinaryAttribute(String entryDN, String attributeName, byte[] oldValue, byte[] newValue) throws ChaiUnavailableException, ChaiOperationException {
+  public void replaceBinaryAttribute(final String entryDN, final String attributeName, final byte[] oldValue, final byte[] newValue) throws ChaiUnavailableException, ChaiOperationException {
     activityPreCheck();
     INPUT_VALIDATOR.replaceBinaryAttribute(entryDN, attributeName, oldValue, newValue);
 
@@ -628,7 +660,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     return connection != null && connection.isConnected();
   }
 
-  private static void processResponse(ResultResponse response) throws ChaiOperationException {
+  private static void processResponse(final ResultResponse response) throws ChaiOperationException {
     final boolean success = response.getLdapResult().getResultCode() == ResultCodeEnum.SUCCESS;
     if (!success) {
       final String msg = response.getLdapResult().getDiagnosticMessage();
@@ -664,7 +696,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
           return chaiControl.isCritical();
         }
 
-        public void setCritical(boolean isCritical) {
+        public void setCritical(final boolean isCritical) {
 
         }
       };

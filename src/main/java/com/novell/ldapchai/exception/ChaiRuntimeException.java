@@ -27,7 +27,7 @@ public class ChaiRuntimeException extends RuntimeException {
         super();    
     }
 
-    public ChaiRuntimeException(String message) {
+    public ChaiRuntimeException(final String message) {
         super(message);
     }
 }

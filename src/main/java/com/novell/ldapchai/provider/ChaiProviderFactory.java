@@ -132,7 +132,7 @@ public final class ChaiProviderFactory {
             throws ChaiUnavailableException
     {
         final ChaiConfiguration chaiConfig = new ChaiConfiguration();
-        Properties settings = ChaiConfiguration.getDefaultSettings();
+        final Properties settings = ChaiConfiguration.getDefaultSettings();
         settings.putAll(System.getProperties());
         chaiConfig.setSettings(settings);
         chaiConfig.setSetting(ChaiSetting.BIND_URLS, ldapURL);
@@ -212,7 +212,7 @@ public final class ChaiProviderFactory {
         return providerImpl;
     }
 
-    static ChaiProviderImplementor addProviderWrappers(ChaiProviderImplementor providerImpl)
+    static ChaiProviderImplementor addProviderWrappers(final ChaiProviderImplementor providerImpl)
     {
         final ChaiConfiguration chaiConfiguration = providerImpl.getChaiConfiguration();
 
@@ -222,32 +222,33 @@ public final class ChaiProviderFactory {
         final boolean enableStatistics =    "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.STATISTICS_ENABLE));
         final boolean enableCaching =       "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.CACHE_ENABLE));
 
-        if (enableReadOnly && !(providerImpl instanceof ReadOnlyWrapper)) {
+        ChaiProviderImplementor outputProvider = providerImpl;
+        if (enableReadOnly && !(outputProvider instanceof ReadOnlyWrapper)) {
             LOGGER.trace("adding ReadOnlyWrapper to provider instance");
-            providerImpl = ReadOnlyWrapper.forProvider(providerImpl);
+            outputProvider = ReadOnlyWrapper.forProvider(outputProvider);
         }
 
-        if (enableWatchdog && !(providerImpl instanceof WatchdogWrapper)) {
+        if (enableWatchdog && !(outputProvider instanceof WatchdogWrapper)) {
             LOGGER.trace("adding WatchdogWrapper to provider instance");
-            providerImpl = WatchdogWrapper.forProvider(providerImpl);
+            outputProvider = WatchdogWrapper.forProvider(outputProvider);
         }
 
-        if (enableWireTrace && !(providerImpl instanceof WireTraceWrapper)) {
+        if (enableWireTrace && !(outputProvider instanceof WireTraceWrapper)) {
             LOGGER.trace("adding WireTraceWrapper to provider instance");
-            providerImpl = WireTraceWrapper.forProvider(providerImpl);
+            outputProvider = WireTraceWrapper.forProvider(outputProvider);
         }
 
-        if (enableStatistics && !(providerImpl instanceof StatisticsWrapper)) {
+        if (enableStatistics && !(outputProvider instanceof StatisticsWrapper)) {
             LOGGER.trace("adding StatisticsWrapper to provider instance");
-            providerImpl = StatisticsWrapper.forProvider(providerImpl);
+            outputProvider = StatisticsWrapper.forProvider(outputProvider);
         }
 
-        if (enableCaching && !(providerImpl instanceof CachingWrapper)) {
+        if (enableCaching && !(outputProvider instanceof CachingWrapper)) {
             LOGGER.trace("adding CachingWrapper to provider instance");
-            providerImpl = CachingWrapper.forProvider(providerImpl);
+            outputProvider = CachingWrapper.forProvider(outputProvider);
         }
 
-        return providerImpl;
+        return outputProvider;
     }
 
     /**
@@ -284,7 +285,7 @@ public final class ChaiProviderFactory {
         private final ChaiProvider realProvider;
         private final Object lock = new Object();
 
-        public SynchronizedProvider(final ChaiProvider realProvider)
+        SynchronizedProvider(final ChaiProvider realProvider)
         {
             this.realProvider = realProvider;
         }

@@ -41,21 +41,21 @@ public interface Challenge extends Serializable {
      *
      * @return A string containing the challenge text (question), or null if not available
      */
-    public String getChallengeText();
+    String getChallengeText();
 
     /**
      * Get the maximum length allowed for the response to this {@code Challege}.
      *
      * @return Maximum character length
      */
-    public int getMaxLength();
+    int getMaxLength();
 
     /**
      * Get the minimum length allowed for the response to this {@code Challege}.
      *
      * @return Minimum character length
      */
-    public int getMinLength();
+    int getMinLength();
 
     /**
      * Get a boolean indicating if the question is defined by the administrator or
@@ -64,7 +64,7 @@ public interface Challenge extends Serializable {
      * @return true if the question is defined by the administrator, false if defined
      *         by the user.
      */
-    public boolean isAdminDefined();
+    boolean isAdminDefined();
 
     /**
      * Check if the {@code Challege} is locked.  Once locked, a {@code Challenge} is immutable.
@@ -79,7 +79,7 @@ public interface Challenge extends Serializable {
      *
      * @return true if the question is required, false if random.
      */
-    public boolean isRequired();
+    boolean isRequired();
 
     /**
      * Lock this {@code Challenge}.  Once locked, it is immutable.
@@ -94,11 +94,11 @@ public interface Challenge extends Serializable {
      * @throws IllegalArgumentException if the challenge is admin defined
      * @throws IllegalStateException    if the challenge is locked
      */
-    public void setChallengeText(String challengeText);
+    void setChallengeText(String challengeText);
     
-    public ChallengeBean asChallengeBean();
+    ChallengeBean asChallengeBean();
     
-    public int getMaxQuestionCharsInAnswer();
+    int getMaxQuestionCharsInAnswer();
     
-    public boolean isEnforceWordlist();
+    boolean isEnforceWordlist();
 }

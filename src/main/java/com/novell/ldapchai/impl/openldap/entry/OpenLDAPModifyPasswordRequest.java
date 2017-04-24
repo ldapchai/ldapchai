@@ -32,7 +32,7 @@ import java.io.Serializable;
  * @see javax.naming.ldap.ExtendedRequest
  */
 public class OpenLDAPModifyPasswordRequest
-        implements ExtendedRequest, Serializable
+    implements ExtendedRequest, Serializable
 {
     /**
      * Creates a new <code>OpenLDAPUser</code> instance.
@@ -43,8 +43,8 @@ public class OpenLDAPModifyPasswordRequest
      * @exception javax.naming.SizeLimitExceededException when the dn or password
      *            is too long
      */
-    public OpenLDAPModifyPasswordRequest(String dn, String password)
-            throws NullPointerException, SizeLimitExceededException
+    public OpenLDAPModifyPasswordRequest(final String dn, final String password)
+        throws NullPointerException, SizeLimitExceededException
     {
         if (dn == null)
         {
@@ -56,9 +56,9 @@ public class OpenLDAPModifyPasswordRequest
             throw new NullPointerException("password cannot be null");
         }
 
-        int dnlen = dn.length();
-        int passlen = password.length();
-        int totallen = 4 + dnlen + passlen;
+        final int dnlen = dn.length();
+        final int passlen = password.length();
+        final int totallen = 4 + dnlen + passlen;
 
         if (dnlen <= 0)
         {
@@ -68,26 +68,26 @@ public class OpenLDAPModifyPasswordRequest
         if (dnlen > 0xFF)
         {
             throw new SizeLimitExceededException(
-                    "dn cannot be larger then 255 characters");
+                "dn cannot be larger then 255 characters");
         }
 
         if (passlen <= 0)
         {
             throw new SizeLimitExceededException(
-                    "password cannot be 0 length");
+                "password cannot be 0 length");
         }
 
         if (passlen > 0xFF)
         {
             throw new SizeLimitExceededException(
-                    "password cannot be larger then 255 characters");
+                "password cannot be larger then 255 characters");
         }
 
         if (totallen > 0xFF)
         {
             throw new SizeLimitExceededException(
-                    "the lengh of the dn + the lengh of the password cannot" +
-                            " exceed 251 characters");
+                "the lengh of the dn + the lengh of the password cannot" +
+                    " exceed 251 characters");
         }
 
         mDn = dn;
@@ -111,33 +111,33 @@ public class OpenLDAPModifyPasswordRequest
      */
     public byte[] getEncodedValue()
     {
-        byte[] password = mPassword.getBytes();
-        byte[] dn = mDn.getBytes();
+        final byte[] password = mPassword.getBytes();
+        final byte[] dn = mDn.getBytes();
 
         // Sequence tag (1) + sequence length (1) + dn tag (1) +
         // dn length (1) + dn (variable) + password tag (1) +
         // password length (1) + password (variable)
-        int encodedLength = 6 + dn.length + password.length;
+        final int encodedLength = 6 + dn.length + password.length;
 
-        byte[] encoded = new byte[encodedLength];
+        final byte[] encoded = new byte[encodedLength];
 
-        int i = 0;
-        encoded[i++] = (byte) 0x30; // sequence start
+        int valueI = 0;
+        encoded[valueI++] = (byte) 0x30; // sequence start
         // length of body
-        encoded[i++] = (byte) (4 + dn.length + password.length);
+        encoded[valueI++] = (byte) (4 + dn.length + password.length);
 
 
-        encoded[i++] = LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID;
-        encoded[i++] = (byte) dn.length;
+        encoded[valueI++] = LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID;
+        encoded[valueI++] = (byte) dn.length;
 
-        System.arraycopy(dn, 0, encoded, i, dn.length);
-        i += dn.length;
+        System.arraycopy(dn, 0, encoded, valueI, dn.length);
+        valueI += dn.length;
 
-        encoded[i++] = LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW;
-        encoded[i++] = (byte) password.length;
+        encoded[valueI++] = LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW;
+        encoded[valueI++] = (byte) password.length;
 
-        System.arraycopy(password, 0, encoded, i, password.length);
-        i += password.length;
+        System.arraycopy(password, 0, encoded, valueI, password.length);
+        valueI += password.length;
 
         return encoded;
     }
@@ -154,22 +154,24 @@ public class OpenLDAPModifyPasswordRequest
      * @return returns null as the modify password operation doesn't
      *         generate a response.
      */
-    public ExtendedResponse createExtendedResponse(String id,
-                                                   byte[] berValue,
-                                                   int offset, int length)
+    public ExtendedResponse createExtendedResponse(
+        final String id,
+        final byte[] berValue,
+        final int offset,
+        final int length)
     {
         return null;
     }
 
     /** The OID of the modify password extended operation */
     public static final String LDAP_EXOP_X_MODIFY_PASSWD =
-            "1.3.6.1.4.1.4203.1.11.1";
+        "1.3.6.1.4.1.4203.1.11.1";
     /** The BER tag for the modify password dn entry */
     private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID =
-            (byte) 0x80;
+        (byte) 0x80;
     /** The BER tag for the modify password new password entry */
     private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW =
-            (byte) 0x82;
+        (byte) 0x82;
     /** The dn we want to change */
     private String mDn;
     /** The password to change to */

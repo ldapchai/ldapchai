@@ -20,7 +20,11 @@
 package com.novell.ldapchai.impl.edir.value;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * An immutable representation of an eDirectory DirXML-Attribute value.
@@ -74,7 +78,7 @@ public class DirXML_Association implements Serializable, Comparable {
 
         private int numValue;
 
-        private State(final int numValue)
+        State(final int numValue)
         {
             this.numValue = numValue;
         }

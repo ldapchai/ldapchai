@@ -37,12 +37,12 @@ public interface ChaiGroup extends ChaiEntry {
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_GROUP_NAME = ChaiConstant.ATTR_LDAP_DESCRIPTION;
+    String ATTR_GROUP_NAME = ChaiConstant.ATTR_LDAP_DESCRIPTION;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_AUXCLASS_DYNAMIC = ChaiConstant.OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP;
+    String ATTR_AUXCLASS_DYNAMIC = ChaiConstant.OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP;
 
 // -------------------------- OTHER METHODS --------------------------
 

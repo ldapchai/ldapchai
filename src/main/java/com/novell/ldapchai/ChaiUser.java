@@ -41,97 +41,97 @@ public interface ChaiUser extends ChaiEntry {
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_COMMON_NAME = ChaiConstant.ATTR_LDAP_COMMON_NAME;
+    String ATTR_COMMON_NAME = ChaiConstant.ATTR_LDAP_COMMON_NAME;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_UID = ChaiConstant.ATTR_LDAP_UID;
+    String ATTR_UID = ChaiConstant.ATTR_LDAP_UID;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_GIVEN_NAME = ChaiConstant.ATTR_LDAP_GIVEN_NAME;
+    String ATTR_GIVEN_NAME = ChaiConstant.ATTR_LDAP_GIVEN_NAME;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_SURNAME = ChaiConstant.ATTR_LDAP_SURNAME;
+    String ATTR_SURNAME = ChaiConstant.ATTR_LDAP_SURNAME;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_INITIAL = ChaiConstant.ATTR_LDAP_INITIAL;
+    String ATTR_INITIAL = ChaiConstant.ATTR_LDAP_INITIAL;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_PASSWORD = ChaiConstant.ATTR_LDAP_USER_PASSWORD;
+    String ATTR_PASSWORD = ChaiConstant.ATTR_LDAP_USER_PASSWORD;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_EMAIL = ChaiConstant.ATTR_LDAP_EMAIL;
+    String ATTR_EMAIL = ChaiConstant.ATTR_LDAP_EMAIL;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_PASSWORD_MINIMUM_LENGTH = ChaiConstant.ATTR_LDAP_PASSWORD_MINIMUM_LENGTH;
+    String ATTR_PASSWORD_MINIMUM_LENGTH = ChaiConstant.ATTR_LDAP_PASSWORD_MINIMUM_LENGTH;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_LOGIN_DISABLED = ChaiConstant.ATTR_LDAP_LOGIN_DISABLED;
+    String ATTR_LOGIN_DISABLED = ChaiConstant.ATTR_LDAP_LOGIN_DISABLED;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_INTRUDER_RESET_TIME = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME;
+    String ATTR_INTRUDER_RESET_TIME = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_LOCKED_BY_INTRUDER = ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER;
+    String ATTR_LOCKED_BY_INTRUDER = ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_PASSWORD_EXPIRE_INTERVAL = ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_INTERVAL;
+    String ATTR_PASSWORD_EXPIRE_INTERVAL = ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_INTERVAL;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_PASSWORD_EXPIRE_TIME = ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_TIME;
+    String ATTR_PASSWORD_EXPIRE_TIME = ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_TIME;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_MANAGER = ChaiConstant.ATTR_LDAP_MANAGER;
+    String ATTR_MANAGER = ChaiConstant.ATTR_LDAP_MANAGER;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_ASSISTANT = ChaiConstant.ATTR_LDAP_ASSISTANT;
+    String ATTR_ASSISTANT = ChaiConstant.ATTR_LDAP_ASSISTANT;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_DIRECT_REPORTS = ChaiConstant.ATTR_LDAP_DIRECT_REPORTS;
+    String ATTR_DIRECT_REPORTS = ChaiConstant.ATTR_LDAP_DIRECT_REPORTS;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_GROUP_MEMBERSHIP = ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP;
+    String ATTR_GROUP_MEMBERSHIP = ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_TELEPHONE = ChaiConstant.ATTR_LDAP_TELEPHONE_NUMBER;
+    String ATTR_TELEPHONE = ChaiConstant.ATTR_LDAP_TELEPHONE_NUMBER;
 
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_WORKFORCEID = ChaiConstant.ATTR_LDAP_WORFORCE_ID;
+    String ATTR_WORKFORCEID = ChaiConstant.ATTR_LDAP_WORFORCE_ID;
 
 // -------------------------- OTHER METHODS --------------------------
 

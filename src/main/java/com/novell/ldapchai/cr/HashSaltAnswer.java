@@ -31,7 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 class HashSaltAnswer implements Answer {
-    private static final Map<FormatType,String> supportedFormats;
+    private static final Map<FormatType,String> SUPPORTED_FORMATS;
     private static final String VERSION_SEPARATOR = ":";
     private static final VERSION DEFAULT_VERSION = VERSION.B;
 
@@ -54,7 +54,7 @@ class HashSaltAnswer implements Answer {
         map.put(FormatType.SHA1_SALT,"SHA1");
         map.put(FormatType.SHA256_SALT,"SHA-256");
         map.put(FormatType.SHA512_SALT,"SHA-512");
-        supportedFormats = Collections.unmodifiableMap(map);
+        SUPPORTED_FORMATS = Collections.unmodifiableMap(map);
     }
 
     HashSaltAnswer(
@@ -69,7 +69,7 @@ class HashSaltAnswer implements Answer {
             throw new IllegalArgumentException("missing answerHash");
         }
 
-        if (formatType == null || !supportedFormats.containsKey(formatType)) {
+        if (formatType == null || !SUPPORTED_FORMATS.containsKey(formatType)) {
             throw new IllegalArgumentException("unsupported format type '" + (formatType == null ? "null" : formatType.toString() + "'"));
         }
 
@@ -91,7 +91,7 @@ class HashSaltAnswer implements Answer {
             throw new IllegalArgumentException("missing answerHash text");
         }
 
-        if (formatType == null || !supportedFormats.containsKey(formatType)) {
+        if (formatType == null || !SUPPORTED_FORMATS.containsKey(formatType)) {
             throw new IllegalArgumentException("unsupported format type '" + (formatType == null ? "null" : formatType.toString() + "'"));
         }
 
@@ -142,7 +142,7 @@ class HashSaltAnswer implements Answer {
     )
             throws IllegalStateException
     {
-        final String algorithm = supportedFormats.get(formatType);
+        final String algorithm = SUPPORTED_FORMATS.get(formatType);
         final MessageDigest md;
         try {
             md = MessageDigest.getInstance(algorithm);

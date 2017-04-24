@@ -25,7 +25,7 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 
 public interface GroupOfNames extends Top, ChaiGroup {
-    public static final String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP;
+    String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP;
 
     
 

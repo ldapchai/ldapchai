@@ -19,7 +19,9 @@
 
 package com.novell.ldapchai.cr.bean;
 
-import com.novell.ldapchai.cr.*;
+
+import com.novell.ldapchai.cr.Answer;
+import com.novell.ldapchai.cr.AnswerFactory;
 
 import java.io.Serializable;
 
@@ -35,7 +37,7 @@ public class AnswerBean implements Serializable {
         return type;
     }
 
-    public void setType(Answer.FormatType type) {
+    public void setType(final Answer.FormatType type) {
         this.type = type;
     }
 
@@ -43,7 +45,7 @@ public class AnswerBean implements Serializable {
         return answerText;
     }
 
-    public void setAnswerText(String answerText) {
+    public void setAnswerText(final String answerText) {
         this.answerText = answerText;
     }
 
@@ -51,7 +53,7 @@ public class AnswerBean implements Serializable {
         return answerHash;
     }
 
-    public void setAnswerHash(String answerHash) {
+    public void setAnswerHash(final String answerHash) {
         this.answerHash = answerHash;
     }
 
@@ -59,7 +61,7 @@ public class AnswerBean implements Serializable {
         return salt;
     }
 
-    public void setSalt(String salt) {
+    public void setSalt(final String salt) {
         this.salt = salt;
     }
 
@@ -67,7 +69,7 @@ public class AnswerBean implements Serializable {
         return hashCount;
     }
 
-    public void setHashCount(int hashCount) {
+    public void setHashCount(final int hashCount) {
         this.hashCount = hashCount;
     }
 
@@ -75,7 +77,7 @@ public class AnswerBean implements Serializable {
         return caseInsensitive;
     }
 
-    public void setCaseInsensitive(boolean caseInsensitive) {
+    public void setCaseInsensitive(final boolean caseInsensitive) {
         this.caseInsensitive = caseInsensitive;
     }
 

@@ -20,7 +20,13 @@
 package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.cr.*;
+import com.novell.ldapchai.cr.AbstractResponseSet;
+import com.novell.ldapchai.cr.Answer;
+import com.novell.ldapchai.cr.ChaiChallenge;
+import com.novell.ldapchai.cr.ChaiChallengeSet;
+import com.novell.ldapchai.cr.Challenge;
+import com.novell.ldapchai.cr.ChallengeSet;
+import com.novell.ldapchai.cr.HelpdeskAnswer;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.cr.bean.ChallengeBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
@@ -28,9 +34,17 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.StringHelper;
-import com.novell.security.nmas.jndi.ldap.ext.*;
+import com.novell.security.nmas.jndi.ldap.ext.GetLoginConfigRequest;
+import com.novell.security.nmas.jndi.ldap.ext.PutLoginConfigRequest;
+import com.novell.security.nmas.jndi.ldap.ext.PutLoginConfigResponse;
+import com.novell.security.nmas.jndi.ldap.ext.PutLoginSecretRequest;
+import com.novell.security.nmas.jndi.ldap.ext.PutLoginSecretResponse;
 import com.novell.security.nmas.mgmt.NMASChallengeResponse;
-import org.jdom2.*;
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.Namespace;
 import org.jdom2.filter.ElementFilter;
 import org.jdom2.input.SAXBuilder;
 import org.jdom2.output.Format;
@@ -41,7 +55,16 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 public class NmasResponseSet extends AbstractResponseSet {
 // ----------------------------- CONSTANTS ----------------------------
@@ -65,8 +88,8 @@ public class NmasResponseSet extends AbstractResponseSet {
         final Document doc = builder.build(xmlreader);
         final boolean required = doc.getRootElement().getName().equals("RequiredQuestions");
 
-        for (Iterator qIter = doc.getDescendants(new ElementFilter("Question")); qIter.hasNext();) {
-            final Element loopQ = (Element) qIter.next();
+        for (final Iterator questionIterator = doc.getDescendants(new ElementFilter("Question")); questionIterator.hasNext(); ) {
+            final Element loopQ = (Element) questionIterator.next();
             final int maxLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MaxLength"), 255);
             final int minLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MinLength"), 1);
 
@@ -76,7 +99,7 @@ public class NmasResponseSet extends AbstractResponseSet {
             returnList.add(challenge);
         }
 
-        for (Iterator iter = doc.getDescendants(new ElementFilter("UserDefined")); iter.hasNext();) {
+        for (Iterator iter = doc.getDescendants(new ElementFilter("UserDefined")); iter.hasNext(); ) {
             final Element loopQ = (Element) iter.next();
             final int maxLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MaxLength"), 255);
             final int minLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MinLength"), 1);
@@ -103,8 +126,8 @@ public class NmasResponseSet extends AbstractResponseSet {
 
         // convert the xml 'display' elements to a map of locales/strings
         final Map<Locale, String> localizedStringMap = new HashMap<Locale, String>();
-        for (final Object aDisplayChildren : displayChildren) {
-            final Element loopDisplay = (Element) aDisplayChildren;
+        for (final Object loopDisplayChild : displayChildren) {
+            final Element loopDisplay = (Element) loopDisplayChild;
             final Attribute localeAttr = loopDisplay.getAttribute("lang",XML_NAMESPACE);
             if (localeAttr != null) {
                 final String localeStr = localeAttr.getValue();
@@ -183,14 +206,14 @@ public class NmasResponseSet extends AbstractResponseSet {
             guidValue = guidAttribute == null ? null : guidAttribute.getValue();
         }
 
-        for (Iterator iter = doc.getDescendants(new ElementFilter("Challenge")); iter.hasNext();) {
+        for (Iterator iter = doc.getDescendants(new ElementFilter("Challenge")); iter.hasNext(); ) {
             final Element loopQ = (Element) iter.next();
             final int maxLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MaxLength"), 255);
             final int minLength = StringHelper.convertStrToInt(loopQ.getAttributeValue("MinLength"), 2);
             final String defineStrValue = loopQ.getAttributeValue("Define");
-            final boolean adminDefined = defineStrValue.equalsIgnoreCase("Admin");
+            final boolean adminDefined = "Admin".equalsIgnoreCase(defineStrValue);
             final String typeStrValue = loopQ.getAttributeValue("Type");
-            final boolean required = typeStrValue.equalsIgnoreCase("Required");
+            final boolean required = "Required".equalsIgnoreCase(typeStrValue);
             final String challengeText = loopQ.getText();
 
             final Challenge challenge = new ChaiChallenge(required, challengeText, minLength, maxLength, adminDefined, 0, false);
@@ -427,7 +450,7 @@ public class NmasResponseSet extends AbstractResponseSet {
     private static class NmasAnswer implements Answer {
         private String answerText;
 
-        private NmasAnswer(String answerText) {
+        private NmasAnswer(final String answerText) {
             this.answerText = answerText;
         }
 
@@ -435,7 +458,7 @@ public class NmasResponseSet extends AbstractResponseSet {
             return answerText;
         }
 
-        public boolean testAnswer(String answer) {
+        public boolean testAnswer(final String answer) {
             //@todo TODO
             throw new UnsupportedOperationException("NMAS Response testing not yet implemented");
         }
@@ -449,7 +472,7 @@ public class NmasResponseSet extends AbstractResponseSet {
         }
     }
 
-    public List<ChallengeBean> asChallengeBeans(boolean includeAnswers) {
+    public List<ChallengeBean> asChallengeBeans(final boolean includeAnswers) {
         if (includeAnswers) {
             throw new UnsupportedOperationException("NMAS stored responses do not support retrieval of answers");
         }
@@ -465,7 +488,7 @@ public class NmasResponseSet extends AbstractResponseSet {
         return returnList;
     }
 
-    public List<ChallengeBean> asHelpdeskChallengeBeans(boolean includeAnswers) {
+    public List<ChallengeBean> asHelpdeskChallengeBeans(final boolean includeAnswers) {
         //@todo TODO
         throw new UnsupportedOperationException("NMAS stored responses do not support Helpdesk Challenges");
     }

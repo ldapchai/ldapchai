@@ -28,9 +28,10 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import java.util.Date;
 
 class GroupImpl extends AbstractChaiGroup implements Group, ChaiGroup {
-    public GroupImpl(final String groupDN, final ChaiProvider chaiProvider) {
+    GroupImpl(final String groupDN, final ChaiProvider chaiProvider) {
         super(groupDN, chaiProvider);
     }
+
     @Override
     public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
         return ADEntries.readDateAttribute(this, attributeName);

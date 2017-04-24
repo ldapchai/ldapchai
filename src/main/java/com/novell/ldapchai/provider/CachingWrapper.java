@@ -26,7 +26,12 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Implenents a 'naive' caching wrapper around a provider.
@@ -262,7 +267,7 @@ class CachingWrapper extends AbstractWrapper {
             private List<Object> key;
             private Object value;
 
-            public ValueWrapper(final Method method, final List<Object> key, final Object value)
+            ValueWrapper(final Method method, final List<Object> key, final Object value)
             {
                 this.timestamp = System.currentTimeMillis();
 

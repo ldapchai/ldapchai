@@ -35,80 +35,80 @@ public interface PasswordRuleHelper {
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowNumeric
      */
-    public boolean isAllowNumeric();
+    boolean isAllowNumeric();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowFirstCharNumeric
      */
-    public boolean isAllowFirstCharNumeric();
+    boolean isAllowFirstCharNumeric();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowFirstCharNumeric
      */
-    public boolean isAllowLastCharNumeric();
+    boolean isAllowLastCharNumeric();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowSpecial
      */
-    public boolean isAllowSpecial();
+    boolean isAllowSpecial();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowFirstCharSpecial
      */
-    public boolean isAllowFirstCharSpecial();
+    boolean isAllowFirstCharSpecial();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowLastCharSpecial
      */
-    public boolean isAllowLastCharSpecial();
+    boolean isAllowLastCharSpecial();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#MaximumSequentialRepeat
      */
-    public int getMaximumSequentialRepeat();
+    int getMaximumSequentialRepeat();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#MaximumRepeat
      */
-    public int getMaximumRepeat();
+    int getMaximumRepeat();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#MinimumLifetime
      */
-    public int getMinimumLifetime();
+    int getMinimumLifetime();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#ChangeMessage
      */
-    public String getChangeMessage();
+    String getChangeMessage();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#ExpirationInterval
      */
-    public int getExpirationInterval();
+    int getExpirationInterval();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#CaseSensitive
      */
-    public boolean isCaseSensitive();
+    boolean isCaseSensitive();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#EnforceAtLogin
      */
-    public boolean isEnforceAtLogin();
+    boolean isEnforceAtLogin();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowNumeric
      */
-    public boolean isUniqueRequired();
+    boolean isUniqueRequired();
 
     /**
      * @see com.novell.ldapchai.ChaiPasswordRule#PolicyEnabled
      */
-    public boolean isPolicyEnabled();
+    boolean isPolicyEnabled();
 
-    public List<String> getDisallowedValues();
+    List<String> getDisallowedValues();
 
-    public List<String> getDisallowedAttributes();
+    List<String> getDisallowedAttributes();
 
 }

@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.util;
 
-import javax.swing.*;
+import javax.swing.JOptionPane;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -35,9 +35,9 @@ class MainHandler {
 
 // ------------------------------ FIELDS ------------------------------
 
-    private static final ResourceBundle buildInfoBundle = ResourceBundle.getBundle("com.novell.ldapchai.BuildInformation");
-    private static final String CHAI_VERSION = buildInfoBundle.getString("chai.version");
-    private static final String CHAI_WEBSITE = buildInfoBundle.getString("chai.website");
+    private static final ResourceBundle BUILD_INFO_BUNDLE = ResourceBundle.getBundle("com.novell.ldapchai.BuildInformation");
+    private static final String CHAI_VERSION = BUILD_INFO_BUNDLE.getString("chai.version");
+    private static final String CHAI_WEBSITE = BUILD_INFO_BUNDLE.getString("chai.website");
 
 // --------------------------- main() method ---------------------------
 
@@ -61,12 +61,12 @@ class MainHandler {
         sb.append("Build Information: \n");
 
         final Set<String> keySet = new TreeSet<String>();
-        for (Enumeration<String> keyEnum = buildInfoBundle.getKeys(); keyEnum.hasMoreElements();) {
+        for (Enumeration<String> keyEnum = BUILD_INFO_BUNDLE.getKeys(); keyEnum.hasMoreElements(); ) {
             keySet.add(keyEnum.nextElement());
         }
 
         for (final String key : keySet) {
-            final String property = buildInfoBundle.getString(key);
+            final String property = BUILD_INFO_BUNDLE.getString(key);
             sb.append("    ").append(key).append("=").append(property);
             sb.append("\n");
         }

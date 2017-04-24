@@ -29,8 +29,7 @@ public class OracleDSErrorMap implements ErrorMap {
         return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
     }
 
-    public ChaiError errorForMessage(String message)
-
+    public ChaiError errorForMessage(final String message)
     {
         return forMessage(message).getChaiErrorCode();
     }

@@ -19,7 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.novell.ldapchai.util.ChaiLogger;
 

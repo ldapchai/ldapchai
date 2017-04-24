@@ -19,11 +19,6 @@
 
 package com.novell.ldapchai.impl.openldap.entry;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
-
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
@@ -36,10 +31,15 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
+
 public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
 {
 
-    public OpenLDAPUser(String userDN, ChaiProvider chaiProvider) {
+    public OpenLDAPUser(final String userDN, final ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
     }
 
@@ -54,11 +54,11 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         return Collections.unmodifiableSet(returnGroups);
     }
 
-    public void addGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+    public void addGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
         theGroup.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
     }
 
-    public void removeGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+    public void removeGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
         theGroup.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
     }
 

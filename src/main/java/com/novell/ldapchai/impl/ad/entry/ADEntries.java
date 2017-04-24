@@ -31,7 +31,7 @@ import java.util.TimeZone;
 
 public class ADEntries {
 
-    final static long AD_EPOCH_OFFSET_MS;
+    static final long AD_EPOCH_OFFSET_MS;
 
     static {
         final Calendar msEpochCalender = new GregorianCalendar(TimeZone.getTimeZone("UTC"));

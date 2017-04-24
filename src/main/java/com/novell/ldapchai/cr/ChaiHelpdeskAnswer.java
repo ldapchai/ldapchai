@@ -120,11 +120,11 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer {
     }
 
     static class ChaiHelpdeskAnswerFactory implements ImplementationFactory {
-        public Answer newAnswer(AnswerFactory.AnswerConfiguration answerConfiguration, String answerText) {
+        public Answer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answerText) {
             return new ChaiHelpdeskAnswer(answerText, answerConfiguration.getChallengeText());
         }
 
-        public Answer fromAnswerBean(AnswerBean input, String challengeText) {
+        public Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
             return new ChaiHelpdeskAnswer(input.answerText, challengeText);
         }
 

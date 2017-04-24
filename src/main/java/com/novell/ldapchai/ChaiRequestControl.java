@@ -27,9 +27,9 @@ public class ChaiRequestControl implements Serializable {
     private final byte[] value;
 
     public ChaiRequestControl(
-            String id,
-            boolean critical,
-            byte[] value
+            final String id,
+            final boolean critical,
+            final byte[] value
     )
     {
         this.id = id;

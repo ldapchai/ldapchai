@@ -21,14 +21,18 @@ package com.novell.ldapchai.impl.oracleds.entry;
 
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.*;
+import com.novell.ldapchai.exception.ChaiError;
+import com.novell.ldapchai.exception.ChaiErrors;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Date;
 
 public class InetOrgPerson extends AbstractChaiUser implements ChaiUser {
-    public InetOrgPerson(String entryDN, ChaiProvider chaiProvider) {
+    public InetOrgPerson(final String entryDN, final ChaiProvider chaiProvider) {
         super(entryDN, chaiProvider);
     }
 

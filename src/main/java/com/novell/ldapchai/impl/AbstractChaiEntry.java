@@ -33,7 +33,14 @@ import net.iharder.Base64;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -119,12 +126,21 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
 
     public boolean equals(final Object o)
     {
-        if (this == o) return true;
-        if (!(o instanceof ChaiEntry)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChaiEntry)) {
+            return false;
+        }
 
         final AbstractChaiEntry chaiEntry = (AbstractChaiEntry) o;
 
-        return !(chaiProvider != null ? !chaiProvider.equals(chaiEntry.chaiProvider) : chaiEntry.chaiProvider != null) && !(entryDN != null ? !entryDN.equals(chaiEntry.entryDN) : chaiEntry.entryDN != null);
+        return !(chaiProvider != null
+            ? !chaiProvider.equals(chaiEntry.chaiProvider)
+            : chaiEntry.chaiProvider != null) && !(entryDN != null
+            ? !entryDN.equals(chaiEntry.entryDN)
+            : chaiEntry.entryDN != null
+        );
     }
 
     public int hashCode()
@@ -157,37 +173,37 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
 // --------------------- Interface ChaiEntry ---------------------
 
     public final void addAttribute(final String attributeName, final String attributeValue)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute(entryDN, attributeName, Collections.singleton(attributeValue), false);
     }
 
     public final void addAttribute(final String attributeName, final Set<String> attributeValues)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute(entryDN, attributeName, attributeValues, false);
     }
 
     public final void addAttribute(final String attributeName, final String... attributeValues)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute(entryDN, attributeName, new HashSet<String>(Arrays.asList(attributeValues)), false);
     }
 
     public final boolean compareStringAttribute(final String attributeName, final String attributeValue)
-            throws ChaiUnavailableException, ChaiOperationException
+        throws ChaiUnavailableException, ChaiOperationException
     {
         return chaiProvider.compareStringAttribute(this.getEntryDN(), attributeName, attributeValue);
     }
 
     public final void deleteAttribute(final String attributeName, final String attributeValue)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.deleteStringAttributeValue(this.entryDN, attributeName, attributeValue);
     }
 
     public final Set<ChaiEntry> getChildObjects()
-            throws ChaiUnavailableException, ChaiOperationException
+        throws ChaiUnavailableException, ChaiOperationException
     {
         final Set<ChaiEntry> returnSet = new HashSet<ChaiEntry>();
         final String filter = "(" + ChaiConstant.ATTR_LDAP_OBJECTCLASS + "=*)";
@@ -199,7 +215,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     }
 
     public final ChaiEntry getParentEntry()
-            throws ChaiUnavailableException
+        throws ChaiUnavailableException
     {
         final String parentDNString = getParentDNString(this.getEntryDN());
         if (parentDNString == null) {
@@ -242,14 +258,14 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     }
 
     public final boolean readBooleanAttribute(final String attributeName)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         final String value = this.readStringAttribute(attributeName);
-        return value != null && value.equalsIgnoreCase("TRUE");
+        return value != null && "TRUE".equalsIgnoreCase(value);
     }
 
     public String readCanonicalDN()
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.returnNoAttributes();
@@ -269,7 +285,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     }
 
     public final int readIntAttribute(final String attributeName)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         final String value = this.readStringAttribute(attributeName);
         try {
@@ -280,19 +296,19 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     }
 
     public final byte[][] readMultiByteAttribute(final String attributeName)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         return chaiProvider.readMultiByteAttribute(this.getEntryDN(), attributeName);
     }
 
     public final Set<String> readMultiStringAttribute(final String attributeName)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         return chaiProvider.readMultiStringAttribute(entryDN, attributeName);
     }
 
     public List<InetAddress> readNetAddressAttribute(final String attributeName)
-            throws ChaiUnavailableException, ChaiOperationException
+        throws ChaiUnavailableException, ChaiOperationException
     {
         final byte[][] values = this.readMultiByteAttribute(attributeName);
         final List<InetAddress> returnValues = new ArrayList<InetAddress>();
@@ -316,44 +332,48 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
                     } catch (ArrayIndexOutOfBoundsException e) {
                         LOGGER.error("error while parsing network address '" + strValue + "' " + e.getMessage());
                     }
+                    break;
+
+                default:
+                    throw new IllegalStateException("unable to parse non-ipv4 address");
             }
         }
         return returnValues;
     }
 
     public final Set<String> readObjectClass()
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS);
     }
 
     public final String readStringAttribute(final String attributeName)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         // Using the LDAP Helper, get the attribute for the selected attribute name.
         return chaiProvider.readStringAttribute(entryDN, attributeName);
     }
 
     public final Map<String,String> readStringAttributes(final Set<String> attributes)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         return chaiProvider.readStringAttributes(this.entryDN, attributes);
     }
 
     public final void replaceAttribute(final String attributeName, final String oldValue, final String newValue)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.replaceStringAttribute(this.entryDN, attributeName, oldValue, newValue);
     }
 
     public final Set<ChaiEntry> search(final String filter)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         return this.search(new SearchHelper(filter));
     }
 
     public Set<ChaiEntry> search(final SearchHelper searchHelper)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         final Set<ChaiEntry> resultSet = new HashSet<ChaiEntry>();
         final Map<String, Map<String,String>> results = chaiProvider.search(this.getEntryDN(), searchHelper.getFilter(), searchHelper.getAttributes(), searchHelper.getSearchScope());
@@ -364,62 +384,62 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     }
 
     public final Set<ChaiEntry> search(final String filter, final ChaiProvider.SEARCH_SCOPE searchScope)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         return this.search(new SearchHelper(filter, searchScope));
     }
 
     public final void writeStringAttribute(final String attributeName, final String attributeValue)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValue == null ? null : Collections.<String>singleton(attributeValue), true);
     }
 
     public final void writeStringAttributes(final Map<String,String> attributeValueProps)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttributes(this.entryDN, attributeValueProps, true);
     }
 
     public final void writeStringAttribute(final String attributeName, final Set<String> attributeValues)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         // Using the LDAP Helper, set the attributes.
         chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValues, true);
     }
 
     public void writeStringAttribute(final String attributeName, final String... attributeValues)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         // Using the LDAP Helper, set the attributes.
         chaiProvider.writeStringAttribute(this.entryDN, attributeName, attributeValues == null ? null : new HashSet<String>(Arrays.asList(attributeValues)), true);
     }
 
     public void writeBinaryAttribute(final String attributeName, final byte[]... attributeValues)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         // Using the LDAP Helper, set the attributes.
         chaiProvider.writeBinaryAttribute(this.entryDN, attributeName, attributeValues, true);
     }
 
     public void replaceBinaryAttribute(final String attributeName, final byte[] oldValue, final byte[] newValue)
-            throws ChaiOperationException, ChaiUnavailableException
+        throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.replaceBinaryAttribute(this.entryDN, attributeName, oldValue, newValue);
     }
 
     public Date readDateAttribute(final String attributeName)
-            throws ChaiUnavailableException, ChaiOperationException
+        throws ChaiUnavailableException, ChaiOperationException
     {
         final String value = this.readStringAttribute(attributeName);
-        if (value != null && !value.equalsIgnoreCase("0")) {
+        if (value != null && !"0".equalsIgnoreCase(value)) {
             return EdirEntries.convertZuluToDate(value);
         }
         return null;
     }
 
     public void writeDateAttribute(final String attributeName, final Date date)
-            throws ChaiUnavailableException, ChaiOperationException
+        throws ChaiUnavailableException, ChaiOperationException
     {
         if (date == null) {
             throw new NullPointerException("date cannot be null");

@@ -20,13 +20,11 @@
 package com.novell.ldapchai.impl.generic.entry;
 
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class GenericChaiUser extends AbstractChaiUser implements ChaiUser {
-    public GenericChaiUser(final String userDN, final ChaiProvider chaiProvider) {
+    GenericChaiUser(final String userDN, final ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
     }
 }

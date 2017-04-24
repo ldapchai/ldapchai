@@ -30,7 +30,14 @@ import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Factory for generating {@code Challenge}s, {@code ChallengeSet}s and {@code ResponseSet}s.
@@ -266,5 +273,4 @@ public final class ChaiCrFactory {
     {
         return ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML(inputXmlString);
     }
-
 }

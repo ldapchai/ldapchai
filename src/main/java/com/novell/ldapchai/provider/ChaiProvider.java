@@ -22,9 +22,6 @@ package com.novell.ldapchai.provider;
 import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.impl.ad.ADErrorMap;
-import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.ldap.ExtendedRequest;
@@ -74,7 +71,7 @@ public interface ChaiProvider {
     /**
      * LDAP search scope of BASE, ONE or SUBTREE.
      */
-    public static enum SEARCH_SCOPE {
+    enum SEARCH_SCOPE {
         /**
          * Search the container below the specified context, but not any children of the
          */
@@ -91,7 +88,7 @@ public interface ChaiProvider {
 
         private final int jndiScopeInt;
 
-        private SEARCH_SCOPE(final int jndiScopeInt)
+        SEARCH_SCOPE(final int jndiScopeInt)
         {
             this.jndiScopeInt = jndiScopeInt;
         }
@@ -107,7 +104,7 @@ public interface ChaiProvider {
         }
     }
 
-    public static enum DIRECTORY_VENDOR {
+    enum DIRECTORY_VENDOR {
         GENERIC,
         NOVELL_EDIRECTORY,
         OPEN_LDAP,
@@ -123,7 +120,7 @@ public interface ChaiProvider {
      * {@code com.novell.ldapchai.provider.ChaiProviderImplementor.LdapOperation})
      * should throw an exception if called after this method.
      */
-    public void close();
+    void close();
 
     /**
      * Compares the value of a string to an ldap entry's specified attribute.  Implementers
@@ -140,7 +137,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#compareStringAttribute(String, String)
      */
     @ChaiProviderImplementor.LdapOperation
-    public boolean compareStringAttribute(String entryDN, String attributeName, String value)
+    boolean compareStringAttribute(String entryDN, String attributeName, String value)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -155,7 +152,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void createEntry(String entryDN, String baseObjectClass, Map<String,String> stringAttributes)
+    void createEntry(String entryDN, String baseObjectClass, Map<String,String> stringAttributes)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -170,7 +167,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void createEntry(String entryDN, Set<String> baseObjectClasses, Map<String,String> stringAttributes)
+    void createEntry(String entryDN, Set<String> baseObjectClasses, Map<String,String> stringAttributes)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -183,7 +180,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void deleteEntry(String entryDN)
+    void deleteEntry(String entryDN)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -199,7 +196,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void deleteStringAttributeValue(String entryDN, String attributeName, String value)
+    void deleteStringAttributeValue(String entryDN, String attributeName, String value)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -215,7 +212,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public ExtendedResponse extendedOperation(ExtendedRequest request)
+    ExtendedResponse extendedOperation(ExtendedRequest request)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -224,7 +221,7 @@ public interface ChaiProvider {
      *
      * @return A locked copy of the working {@code ChaiConfiguration}
      */
-    public ChaiConfiguration getChaiConfiguration();
+    ChaiConfiguration getChaiConfiguration();
 
 
     /**
@@ -233,7 +230,7 @@ public interface ChaiProvider {
      * @return a bean containing statistics of the provider, or null if statistics tracking is not enabled.
      * @see ChaiSetting#STATISTICS_ENABLE
      */
-    public ProviderStatistics getProviderStatistics();
+    ProviderStatistics getProviderStatistics();
 
 
     /**
@@ -250,7 +247,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readMultiByteAttribute(String)
      */
     @ChaiProviderImplementor.LdapOperation
-    public byte[][] readMultiByteAttribute(String entryDN, String attribute)
+    byte[][] readMultiByteAttribute(String entryDN, String attribute)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -265,7 +262,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readMultiStringAttribute(String)
      */
     @ChaiProviderImplementor.LdapOperation
-    public Set<String> readMultiStringAttribute(String entryDN, String attribute)
+    Set<String> readMultiStringAttribute(String entryDN, String attribute)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -281,7 +278,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readStringAttribute(String)
      */
     @ChaiProviderImplementor.LdapOperation
-    public String readStringAttribute(String entryDN, String attribute)
+    String readStringAttribute(String entryDN, String attribute)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -298,7 +295,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readStringAttributes(java.util.Set<java.lang.String>)
      */
     @ChaiProviderImplementor.LdapOperation
-    public Map<String,String> readStringAttributes(String entryDN, Set<String> attributes)
+    Map<String,String> readStringAttributes(String entryDN, Set<String> attributes)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -315,7 +312,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void replaceStringAttribute(String entryDN, String attributeName, String oldValue, String newValue)
+    void replaceStringAttribute(String entryDN, String attributeName, String oldValue, String newValue)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -373,7 +370,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    public Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, SearchHelper searchHelper)
+    Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, SearchHelper searchHelper)
             throws ChaiUnavailableException, ChaiOperationException;
 
 
@@ -393,7 +390,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    public Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final String filter, final Set<String> attributes, SEARCH_SCOPE searchScope)
+    Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -445,7 +442,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void writeStringAttribute(String entryDN, String attributeName, Set<String> values, boolean overwrite)
+    void writeStringAttribute(String entryDN, String attributeName, Set<String> values, boolean overwrite)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -460,7 +457,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    public void writeStringAttributes(String entryDN, Map<String,String> attributeValueProps, boolean overwrite)
+    void writeStringAttributes(String entryDN, Map<String,String> attributeValueProps, boolean overwrite)
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -473,7 +470,7 @@ public interface ChaiProvider {
      * @throws ChaiUnavailableException If no directory servers are reachable
      */
     @ChaiProviderImplementor.LdapOperation
-    public DIRECTORY_VENDOR getDirectoryVendor()
+    DIRECTORY_VENDOR getDirectoryVendor()
             throws ChaiUnavailableException;
 
     /**

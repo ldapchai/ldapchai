@@ -21,7 +21,11 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 abstract class AbstractWrapper implements InvocationHandler {
 // ----------------------------- CONSTANTS ----------------------------

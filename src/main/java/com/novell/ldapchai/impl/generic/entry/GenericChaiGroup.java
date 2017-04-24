@@ -24,7 +24,7 @@ import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class GenericChaiGroup extends AbstractChaiGroup implements ChaiGroup {
-    public GenericChaiGroup(final String groupDN, final ChaiProvider chaiProvider) {
+    GenericChaiGroup(final String groupDN, final ChaiProvider chaiProvider) {
         super(groupDN, chaiProvider);
     }
 }

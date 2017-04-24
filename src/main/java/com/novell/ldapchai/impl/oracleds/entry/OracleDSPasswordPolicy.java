@@ -29,7 +29,11 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswordPolicy {
 

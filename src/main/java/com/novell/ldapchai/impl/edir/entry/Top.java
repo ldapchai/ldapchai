@@ -30,7 +30,5 @@ import com.novell.ldapchai.ChaiEntry;
  * @author Jason D. Rivard
  */
 public interface Top extends ChaiEntry, EdirEntry {
-// -------------------------- OTHER METHODS --------------------------
-
-    public String getLdapObjectClassName();    
+    String getLdapObjectClassName();
 }

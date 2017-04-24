@@ -24,7 +24,7 @@ import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class OpenLDAPEntry extends AbstractChaiEntry implements ChaiEntry {
-    public OpenLDAPEntry(String entryDN, ChaiProvider chaiProvider) {
+    OpenLDAPEntry(final String entryDN, final ChaiProvider chaiProvider) {
         super(entryDN, chaiProvider);
     }
 }

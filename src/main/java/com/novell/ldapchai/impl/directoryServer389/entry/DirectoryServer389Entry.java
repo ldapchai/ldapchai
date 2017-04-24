@@ -24,7 +24,7 @@ import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class DirectoryServer389Entry extends AbstractChaiEntry implements ChaiEntry {
-    public DirectoryServer389Entry(String entryDN, ChaiProvider chaiProvider) {
+    DirectoryServer389Entry(final String entryDN, final ChaiProvider chaiProvider) {
         super(entryDN, chaiProvider);
     }
 }

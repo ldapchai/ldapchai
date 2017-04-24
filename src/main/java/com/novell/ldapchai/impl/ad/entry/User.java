@@ -25,8 +25,8 @@ interface User extends Organizational_Person, ChaiUser {
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_LAST_LOGIN = "lastLogon";
+    String ATTR_LAST_LOGIN = "lastLogon";
 
-    public static final String ATTR_LAST_LOGIN_TIMESTAMP = "lastLogonTimestamp";
+    String ATTR_LAST_LOGIN_TIMESTAMP = "lastLogonTimestamp";
 
 }

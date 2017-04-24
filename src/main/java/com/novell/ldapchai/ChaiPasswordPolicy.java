@@ -89,7 +89,5 @@ public interface ChaiPasswordPolicy {
      *
      * @return a {@link com.novell.ldapchai.util.PasswordRuleHelper} object for this {@code com.novell.ldapchai.ChaiPasswordPolicy}.
      */
-    public PasswordRuleHelper getRuleHelper();
-
-
+    PasswordRuleHelper getRuleHelper();
 }

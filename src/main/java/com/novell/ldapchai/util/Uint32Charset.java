@@ -29,7 +29,7 @@ import java.nio.charset.CoderResult;
 class Uint32Charset extends Charset {
 // --------------------------- CONSTRUCTORS ---------------------------
 
-    public Uint32Charset()
+    Uint32Charset()
     {
         super("unit32", null);
     }
@@ -54,7 +54,7 @@ class Uint32Charset extends Charset {
 // -------------------------- INNER CLASSES --------------------------
 
     static class Uint32CharsetDecoder extends CharsetDecoder {
-        public Uint32CharsetDecoder(final Charset cs)
+        Uint32CharsetDecoder(final Charset cs)
         {
             super(cs, 0.5f, 1);
         }

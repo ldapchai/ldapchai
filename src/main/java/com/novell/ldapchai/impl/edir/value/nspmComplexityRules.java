@@ -28,7 +28,11 @@ import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class nspmComplexityRules {
 // ------------------------------ FIELDS ------------------------------
@@ -146,12 +150,18 @@ public class nspmComplexityRules {
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
-        nspmComplexityRules that = (nspmComplexityRules) o;
+        final nspmComplexityRules that = (nspmComplexityRules) o;
 
-        if (!policies.equals(that.policies)) return false;
+        if (!policies.equals(that.policies)) {
+            return false;
+        }
 
         return true;
     }
@@ -180,7 +190,7 @@ public class nspmComplexityRules {
          LastCharNumericDisallowed,
          FirstCharSpecialDisallowed,
          LastCharSpecialDisallowed,
-         ExtendedCharDisallowed
+         ExtendedCharDisallowed,
      }
 
 // -------------------------- INNER CLASSES --------------------------
@@ -200,13 +210,19 @@ public class nspmComplexityRules {
          }
 
         @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+        public boolean equals(final Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
 
-            Policy policy = (Policy) o;
+            final Policy policy = (Policy) o;
 
-            if (!ruleSets.equals(policy.ruleSets)) return false;
+            if (!ruleSets.equals(policy.ruleSets)) {
+                return false;
+            }
 
             return true;
         }
@@ -238,16 +254,22 @@ public class nspmComplexityRules {
          }
 
          @Override
-         public boolean equals(Object o) {
-             if (this == o) return true;
-             if (o == null || getClass() != o.getClass()) return false;
-
-             RuleSet ruleSet = (RuleSet) o;
-
-             if (violationsAllowed != ruleSet.violationsAllowed) return false;
-             if (complexityRules != null ? !complexityRules.equals(ruleSet.complexityRules) : ruleSet.complexityRules != null)
+         public boolean equals(final Object o) {
+             if (this == o) {
+                 return true;
+             }
+             if (o == null || getClass() != o.getClass()) {
                  return false;
+             }
 
+             final RuleSet ruleSet = (RuleSet) o;
+
+             if (violationsAllowed != ruleSet.violationsAllowed) {
+                 return false;
+             }
+             if (complexityRules != null ? !complexityRules.equals(ruleSet.complexityRules) : ruleSet.complexityRules != null) {
+                 return false;
+             }
              return true;
          }
 

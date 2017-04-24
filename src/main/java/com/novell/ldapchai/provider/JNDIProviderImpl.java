@@ -29,16 +29,43 @@ import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
 
-import javax.naming.*;
-import javax.naming.directory.*;
-import javax.naming.ldap.*;
+import javax.naming.CommunicationException;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.ServiceUnavailableException;
+import javax.naming.SizeLimitExceededException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.BasicAttribute;
+import javax.naming.directory.BasicAttributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.ModificationItem;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+import javax.naming.ldap.BasicControl;
+import javax.naming.ldap.Control;
+import javax.naming.ldap.ExtendedRequest;
+import javax.naming.ldap.ExtendedResponse;
+import javax.naming.ldap.InitialLdapContext;
+import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.PagedResultsControl;
+import javax.naming.ldap.PagedResultsResponseControl;
 import javax.net.SocketFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Default {@code ChaiProvider} implementation; wraps the standard JNDI ldap API.  Runs in a standard Java SE 1.5 (or greater) environment.  Supports
@@ -140,10 +167,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             return new Byte[0];
         }
         final Byte[] result = new Byte[array.length];
-        int i = 0;
-        while (i < array.length) {
-            result[i] = array[i];
-            i++;
+        int counter = 0;
+        while (counter < array.length) {
+            result[counter] = array[counter];
+            counter++;
         }
         return result;
     }
@@ -597,7 +624,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     {
         activityPreCheck();
         INPUT_VALIDATOR.searchMultiValues(baseDN, searchHelper);
-        SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, true);
+        final SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, true);
         return searchEngine.getResults();
     }
 
@@ -947,14 +974,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         private boolean used = false;
         private final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
 
-        public SearchEngine(String baseDN, SearchHelper searchHelper, boolean returnAllValues) throws ChaiOperationException {
+        SearchEngine(final String baseDN, final SearchHelper searchHelper, final boolean returnAllValues) throws ChaiOperationException {
             this.baseDN = baseDN != null ? baseDN : "";
-            try { // make a copy so if it changes somewhere else we won't be affected.
-                this.searchHelper = (SearchHelper) searchHelper.clone();
-            } catch (CloneNotSupportedException e) {
-                LOGGER.fatal("unexpected clone of SearchHelper failed during chai search", e);
-                throw new ChaiOperationException("unexpected clone of SearchHelper failed during chai search", ChaiError.UNKNOWN);
-            }
+
+            // make a copy so if it changes somewhere else we won't be affected.
+            this.searchHelper = new SearchHelper(searchHelper);
             this.returnAllValues = returnAllValues;
         }
 
@@ -1048,7 +1072,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 for (Control control : controls) {
                     if (control instanceof PagedResultsResponseControl) {
                         final PagedResultsResponseControl prrc = (PagedResultsResponseControl) control;
-                        byte[] cookie = prrc.getCookie();
+                        final byte[] cookie = prrc.getCookie();
                         if (cookie != null) {
                             return cookie;
                         }
@@ -1226,7 +1250,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return newControls;
     }
 
-    public static abstract class ThreadLocalSocketFactory
+    public abstract static class ThreadLocalSocketFactory
             extends SocketFactory
     {
 
@@ -1235,12 +1259,13 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         public static SocketFactory getDefault()
         {
             final SocketFactory result = local.get();
-            if ( result == null )
+            if ( result == null ) {
                 throw new IllegalStateException("missing threadlocal socketfactory for ChaiProvider");
+            }
             return result;
         }
 
-        public static void set( SocketFactory factory )
+        public static void set( final SocketFactory factory )
         {
             local.set( factory );
         }
@@ -1251,5 +1276,4 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
 
     }
-
 }

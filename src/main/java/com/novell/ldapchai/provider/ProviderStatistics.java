@@ -86,12 +86,12 @@ public interface ProviderStatistics extends Serializable {
      * @param statistic requested statistc
      * @return the string value of the statistic, typically a number or timestamp.
      */
-    public String getStatistic(final Statistic statistic);
+    String getStatistic(Statistic statistic);
 
     /**
      * Get all of the available statistics in a convenient map.
      *
      * @return An unmodifiable map of statistic values.
      */
-    public Map<Statistic, String> getStatistics();
+    Map<Statistic, String> getStatistics();
 }

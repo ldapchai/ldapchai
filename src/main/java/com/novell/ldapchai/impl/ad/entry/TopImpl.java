@@ -29,7 +29,7 @@ import java.util.Date;
 
 class TopImpl extends AbstractChaiEntry implements ChaiEntry {
 
-    public TopImpl(final String entryDN, final ChaiProvider chaiProvider) {
+    TopImpl(final String entryDN, final ChaiProvider chaiProvider) {
         super(entryDN, chaiProvider);
     }
 
@@ -47,5 +47,4 @@ class TopImpl extends AbstractChaiEntry implements ChaiEntry {
     public String readCanonicalDN() throws ChaiOperationException, ChaiUnavailableException {
         return readStringAttribute("distinguishedName");
     }
-
 }

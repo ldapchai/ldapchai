@@ -19,7 +19,11 @@
 
 package com.novell.ldapchai.impl;
 
-import com.novell.ldapchai.*;
+import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.ChaiPasswordPolicy;
+import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiErrors;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;

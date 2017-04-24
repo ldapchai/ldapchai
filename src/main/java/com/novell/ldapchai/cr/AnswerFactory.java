@@ -39,7 +39,7 @@ public class AnswerFactory {
             return caseInsensitive;
         }
 
-        public void setCaseInsensitive(boolean caseInsensitive) {
+        public void setCaseInsensitive(final boolean caseInsensitive) {
             this.caseInsensitive = caseInsensitive;
         }
 
@@ -47,7 +47,7 @@ public class AnswerFactory {
             return hashCount;
         }
 
-        public void setHashCount(int hashCount) {
+        public void setHashCount(final int hashCount) {
             this.hashCount = hashCount;
         }
 
@@ -55,7 +55,7 @@ public class AnswerFactory {
             return formatType;
         }
 
-        public void setFormatType(Answer.FormatType formatType) {
+        public void setFormatType(final Answer.FormatType formatType) {
             this.formatType = formatType;
         }
 
@@ -63,7 +63,7 @@ public class AnswerFactory {
             return challengeText;
         }
 
-        public void setChallengeText(String challengeText) {
+        public void setChallengeText(final String challengeText) {
             this.challengeText = challengeText;
         }
     }

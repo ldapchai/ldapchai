@@ -5,13 +5,13 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import org.jdom2.Element;
 
 public interface Answer {
-    public boolean testAnswer(final String answer);
+    boolean testAnswer(String answer);
 
-    public Element toXml() throws ChaiOperationException;
+    Element toXml() throws ChaiOperationException;
 
-    public AnswerBean asAnswerBean();
+    AnswerBean asAnswerBean();
 
-    public enum FormatType {
+    enum FormatType {
         TEXT(new TextAnswer.TextAnswerFactory()),
         MD5(new HashSaltAnswer.HashSaltAnswerFactory()),
         SHA1(new HashSaltAnswer.HashSaltAnswerFactory()),
@@ -30,7 +30,7 @@ public interface Answer {
         private ImplementationFactory factory;
 
 
-        private FormatType(final ImplementationFactory implementationClass) {
+        FormatType(final ImplementationFactory implementationClass) {
             this.factory = implementationClass;
         }
 

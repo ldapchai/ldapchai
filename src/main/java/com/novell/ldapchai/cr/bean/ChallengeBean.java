@@ -36,7 +36,7 @@ public class ChallengeBean implements Serializable {
         return challengeText;
     }
 
-    public void setChallengeText(String challengeText) {
+    public void setChallengeText(final String challengeText) {
         this.challengeText = challengeText;
     }
 
@@ -44,7 +44,7 @@ public class ChallengeBean implements Serializable {
         return minLength;
     }
 
-    public void setMinLength(int minLength) {
+    public void setMinLength(final int minLength) {
         this.minLength = minLength;
     }
 
@@ -52,7 +52,7 @@ public class ChallengeBean implements Serializable {
         return maxLength;
     }
 
-    public void setMaxLength(int maxLength) {
+    public void setMaxLength(final int maxLength) {
         this.maxLength = maxLength;
     }
 
@@ -60,7 +60,7 @@ public class ChallengeBean implements Serializable {
         return adminDefined;
     }
 
-    public void setAdminDefined(boolean adminDefined) {
+    public void setAdminDefined(final boolean adminDefined) {
         this.adminDefined = adminDefined;
     }
 
@@ -68,7 +68,7 @@ public class ChallengeBean implements Serializable {
         return required;
     }
 
-    public void setRequired(boolean required) {
+    public void setRequired(final boolean required) {
         this.required = required;
     }
 
@@ -76,7 +76,7 @@ public class ChallengeBean implements Serializable {
         return maxQuestionCharsInAnswer;
     }
 
-    public void setMaxQuestionCharsInAnswer(int maxQuestionCharsInAnswer) {
+    public void setMaxQuestionCharsInAnswer(final int maxQuestionCharsInAnswer) {
         this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer;
     }
 
@@ -84,7 +84,7 @@ public class ChallengeBean implements Serializable {
         return enforceWordlist;
     }
 
-    public void setEnforceWordlist(boolean enforceWordlist) {
+    public void setEnforceWordlist(final boolean enforceWordlist) {
         this.enforceWordlist = enforceWordlist;
     }
 
@@ -92,7 +92,7 @@ public class ChallengeBean implements Serializable {
         return answer;
     }
 
-    public void setAnswer(AnswerBean answer) {
+    public void setAnswer(final AnswerBean answer) {
         this.answer = answer;
     }
 }

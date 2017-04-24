@@ -22,7 +22,6 @@ package com.novell.ldapchai.exception;
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,11 +30,11 @@ import java.util.Map;
  */
 public final class ChaiErrors {
 
-    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ErrorMap> errorMaps = new LinkedHashMap<ChaiProvider.DIRECTORY_VENDOR,ErrorMap>();
+    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ErrorMap> ERROR_MAPS = new LinkedHashMap<ChaiProvider.DIRECTORY_VENDOR,ErrorMap>();
 
     static {
         for (final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values()) {
-            errorMaps.put(vendor, ChaiFactory.getErrorMap(vendor));
+            ERROR_MAPS.put(vendor, ChaiFactory.getErrorMap(vendor));
         }
     }
 
@@ -44,7 +43,7 @@ public final class ChaiErrors {
 
     public static ChaiError getErrorForMessage(final String message)
     {
-        for (final ErrorMap errorMap : errorMaps.values()) {
+        for (final ErrorMap errorMap : ERROR_MAPS.values()) {
             final ChaiError errorCode = errorMap.errorForMessage(message);
             if (errorCode != null && errorCode != ChaiError.UNKNOWN) {
                 return errorCode;
@@ -61,7 +60,7 @@ public final class ChaiErrors {
      */
     static boolean isAuthenticationRelated(final String message)
     {
-        for (final ErrorMap errorMap : errorMaps.values()) {
+        for (final ErrorMap errorMap : ERROR_MAPS.values()) {
             if (errorMap.isAuthenticationRelated(message)) {
                 return true;
             }
@@ -84,7 +83,7 @@ public final class ChaiErrors {
      */
     static boolean isPermanent(final String message)
     {
-        for (final ErrorMap errorMap : errorMaps.values()) {
+        for (final ErrorMap errorMap : ERROR_MAPS.values()) {
             if (!errorMap.isPermanent(message)) {
                 return false;
             }

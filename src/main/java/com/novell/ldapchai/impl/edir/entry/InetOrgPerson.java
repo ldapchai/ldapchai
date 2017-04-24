@@ -27,9 +27,9 @@ public interface InetOrgPerson extends OrganizationalPerson, ChaiUser {
     /**
      * Convenience LDAP attribute definition
      */
-    public static final String ATTR_LAST_LOGIN = ChaiConstant.ATTR_LDAP_LAST_LOGIN_TIME;
+    String ATTR_LAST_LOGIN = ChaiConstant.ATTR_LDAP_LAST_LOGIN_TIME;
 
 
-    public static final String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASE_LDAP_USER;
+    String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASE_LDAP_USER;
 
 }
