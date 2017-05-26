@@ -30,10 +30,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A {@link ChaiProvider} implementation wrapper that handles automatic idle disconnects.
@@ -359,43 +362,45 @@ class WatchdogWrapper implements InvocationHandler {
     private static class WatchdogManager {
         private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
 
-        private final Collection<WatchdogWrapper> activeWrappers = Collections.synchronizedSet(new HashSet<WatchdogWrapper>());
+        private final Map<WatchdogWrapper,Object> activeWrappers = new ConcurrentHashMap<WatchdogWrapper,Object>();
+
+        static final Object FILLER = new Object();
+        static final Lock LOCK = new ReentrantLock();
 
         /**
          * timer instance used to watch all the outstanding providers
          */
         private volatile Timer watchDogTimer = null;
 
-        private synchronized void registerInstance(final WatchdogWrapper wdWrapper)
+        private void registerInstance(final WatchdogWrapper wdWrapper)
         {
-            activeWrappers.add(wdWrapper);
+            activeWrappers.put(wdWrapper, FILLER);
             checkTimer();
         }
 
-        private synchronized void deRegisterInstance(final WatchdogWrapper wdWrapper)
+        private void deRegisterInstance(final WatchdogWrapper wdWrapper)
         {
             activeWrappers.remove(wdWrapper);
-            checkTimer();
         }
 
         /**
          * Regulate the timer.  This is important because the timer task creates its own thread,
          * and if the task isn't cleaned up, there could be a thread leak.
          */
-        public synchronized void checkTimer()
+        private void checkTimer()
         {
-            if (watchDogTimer == null) {  // if there is NOT an active timer
-                if (!activeWrappers.isEmpty()) { // if there are active providers.
-                    LOGGER.debug("starting up " + THREAD_NAME + ", " + setting_watchdogFrequency + "ms check frequency");
-                    watchDogTimer = new Timer(THREAD_NAME, true);  // create a new timer
-                    watchDogTimer.schedule(new WatchdogTask(), setting_watchdogFrequency, setting_watchdogFrequency);
+            try {
+                LOCK.lock();
+
+                if (watchDogTimer == null) {  // if there is NOT an active timer
+                    if (!activeWrappers.isEmpty()) { // if there are active providers.
+                        LOGGER.debug("starting up " + THREAD_NAME + ", " + setting_watchdogFrequency + "ms check frequency");
+                        watchDogTimer = new Timer(THREAD_NAME, true);  // create a new timer
+                        watchDogTimer.schedule(new WatchdogTask(), setting_watchdogFrequency, setting_watchdogFrequency);
+                    }
                 }
-            } else { // if there IS an active timer
-                if (activeWrappers.isEmpty()) { // if there are no active providers
-                    LOGGER.debug("exiting " + THREAD_NAME + ", no connections requiring monitoring are in use");
-                    watchDogTimer.cancel(); // kill the timer.
-                    watchDogTimer = null;
-                }
+            } finally {
+                LOCK.unlock();
             }
         }
 
@@ -420,17 +425,30 @@ class WatchdogWrapper implements InvocationHandler {
         private class WatchdogTask extends TimerTask implements Runnable {
             public void run()
             {
-                final Collection<WatchdogWrapper> c = new HashSet<WatchdogWrapper>(activeWrappers);
-                for (final WatchdogWrapper wdWrapper : c) {
+                final Collection<WatchdogWrapper> copyCollection = new HashSet<WatchdogWrapper>();
+                synchronized (activeWrappers) {
+                    copyCollection.addAll(activeWrappers.keySet());
+                }
+
+                for (final WatchdogWrapper wdWrapper : copyCollection) {
                     try {
                         checkProvider(wdWrapper);
-                    } catch (Exception e) {
-                        try {
-                            LOGGER.error("error during watchdog timer check: " + e.getMessage(),e);
-                        } catch (Exception e2) {
-                        }
+                    } catch (Throwable e) {
+                        LOGGER.error("error during watchdog timer check: " + e.getMessage());
                     }
                 }
+
+                if (copyCollection.isEmpty()) { // if there are no active providers
+                    LOGGER.debug("exiting " + THREAD_NAME + ", no connections requiring monitoring are in use");
+                    try {
+                        LOCK.lock();
+                        watchDogTimer.cancel(); // kill the timer.
+                        watchDogTimer = null;
+                    } finally {
+                        LOCK.unlock();
+                    }
+                }
+
             }
         }
     }
