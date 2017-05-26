@@ -66,6 +66,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+
 public class NmasResponseSet extends AbstractResponseSet {
 // ----------------------------- CONSTANTS ----------------------------
 
@@ -165,13 +166,74 @@ public class NmasResponseSet extends AbstractResponseSet {
                 return null;
             }
 
-            String xmlString = new String(responseValue);
-            if (xmlString.length() <= 16) {
+            final String xmlString = new String(responseValue,"UTF8");
+            LOGGER.trace("[parse v3]: read ChallengeResponseQuestions from server: " + xmlString);
+
+            ChallengeSet cs = null;
+            int parseAttempts = 0;
+            final StringBuilder parsingErrorMsg = new StringBuilder();
+
+            {
+                final int beginIndex = xmlString.indexOf("<");
+                if (beginIndex > 0) {
+                    try {
+                        parseAttempts++;
+                        final String xmlSubstring = xmlString.substring(beginIndex, xmlString.length());
+                        LOGGER.trace("attempting parse of index stripped value: " + xmlSubstring);
+                        cs = parseNmasUserResponseXML(xmlSubstring);
+                        LOGGER.trace("successfully parsed nmas ChallengeResponseQuestions response after index " + beginIndex);
+                    } catch (JDOMException e) {
+                        if (parsingErrorMsg.length() > 0) {
+                            parsingErrorMsg.append(", ");
+                        }
+                        parsingErrorMsg.append("error parsing index stripped value: ").append(e.getMessage());
+                        LOGGER.trace("unable to parse index stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage());
+                    }
+                }
+            }
+
+            if (cs == null) {
+                if (xmlString.startsWith("<?xml")) {
+                    try {
+                        parseAttempts++;
+                        cs = parseNmasUserResponseXML(xmlString);
+                    } catch (JDOMException e) {
+                        parsingErrorMsg.append("error parsing raw value: ").append(e.getMessage());
+                        LOGGER.trace("unable to parse raw ChallengeResponseQuestions nmas response; will retry after stripping header; error: " + e.getMessage());
+                    }
+                    LOGGER.trace("successfully parsed full nmas ChallengeResponseQuestions response");
+                }
+            }
+
+            if (cs == null) {
+                if (xmlString.length() > 16) {
+                    final String strippedXml = xmlString.substring(16); // first 16 bytes are non-xml header.
+                    try {
+                        parseAttempts++;
+                        cs = parseNmasUserResponseXML(strippedXml);
+                        LOGGER.trace("successfully parsed full nmas ChallengeResponseQuestions response");
+                    } catch (JDOMException e) {
+                        if (parsingErrorMsg.length() > 0) {
+                            parsingErrorMsg.append(", ");
+                        }
+                        parsingErrorMsg.append("error parsing header stripped value: ").append(e.getMessage());
+                        LOGGER.trace("unable to parse stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage());
+                    }
+                }
+            }
+
+
+            if (cs == null) {
+                final String logMsg = "unable to parse nmas ChallengeResponseQuestions: " + parsingErrorMsg;
+                if (parseAttempts > 0 && xmlString.length() > 16) {
+                    LOGGER.error(logMsg);
+                } else {
+                    LOGGER.trace(logMsg);
+
+                }
                 return null;
             }
 
-            xmlString = xmlString.substring(16); // first 16 bytes are non-xml header.
-            final ChallengeSet cs = parseNmasUserResponseXML(xmlString);
             final Map<Challenge, String> crMap = new HashMap<Challenge, String>();
             for (final Challenge loopChallenge : cs.getChallenges()) {
                 crMap.put(loopChallenge, null);
@@ -179,8 +241,6 @@ public class NmasResponseSet extends AbstractResponseSet {
 
             return new NmasResponseSet(crMap, cs.getLocale(), cs.getMinRandomRequired(), AbstractResponseSet.STATE.READ, theUser, cs.getIdentifier());
         } catch (ChaiOperationException e) {
-            LOGGER.error("error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage());
-        } catch (JDOMException e) {
             LOGGER.error("error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage());
         } catch (IOException e) {
             LOGGER.error("error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage());

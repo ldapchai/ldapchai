@@ -43,6 +43,7 @@ import org.jdom2.output.XMLOutputter;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -89,15 +90,8 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
     static final String VALUE_VERSION = "2";
 
-    static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 
     private final boolean caseInsensitive;
-
-    static {
-        DATE_FORMATTER.setTimeZone(TimeZone.getTimeZone("Zulu"));
-    }
-
-// -------------------------- STATIC METHODS --------------------------
 
     static ChaiResponseSet readUserResponseSet(final ChaiUser theUser)
             throws ChaiUnavailableException, ChaiValidationException, ChaiOperationException
@@ -262,7 +256,7 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         }
 
         if (rs.timestamp != null) {
-            rootElement.setAttribute(XML_ATTRIBUTE_TIMESTAMP, DATE_FORMATTER.format(rs.timestamp));
+            rootElement.setAttribute(XML_ATTRIBUTE_TIMESTAMP, getDateFormat().format(rs.timestamp));
         }
 
         if (rs.crMap != null) {
@@ -346,7 +340,7 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
                     if (timeAttr != null) {
                         final String timeStr = timeAttr.getValue();
                         try {
-                            timestamp = DATE_FORMATTER.parse(timeStr);
+                            timestamp = getDateFormat().parse(timeStr);
                         } catch (ParseException e) {
                             LOGGER.error("unexpected error attempting to parse timestamp: " + e.getMessage());
                         }
@@ -465,4 +459,11 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         final String variant = st.nextToken("");
         return new Locale(language, country, variant);
     }
+
+    static DateFormat getDateFormat() {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Zulu"));
+        return dateFormat;
+    }
+
 }

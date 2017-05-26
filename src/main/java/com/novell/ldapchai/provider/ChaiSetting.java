@@ -248,7 +248,7 @@ public enum ChaiSetting {
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
      */
-    WATCHDOG_CHECK_FREQUENCY("chai.connection.watchdog.frequency", "5000", true, Validator.INTEGER_VALIDATOR),
+    WATCHDOG_CHECK_FREQUENCY("chai.connection.watchdog.frequency", "1000", true, Validator.INTEGER_VALIDATOR),
 
     /**
      * Sets the Chai Provider to use a promiscuous SSL socket factory when making ldaps connections.  By default
