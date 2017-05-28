@@ -45,9 +45,9 @@ import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiEntry} interface.
- * <p/>
+ *
  * Clients looking to obtain a {@code ChaiEntry} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
- * <p/>
+ *
  * @author Jason D. Rivard
  */
 public abstract class AbstractChaiEntry implements ChaiEntry {

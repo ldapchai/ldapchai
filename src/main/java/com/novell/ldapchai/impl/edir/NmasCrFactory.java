@@ -101,7 +101,7 @@ public class NmasCrFactory {
      * to the ChaiConfiguration found by looking at the ChaiProvider underlying the ChaiEntry.  For example,
      * the setting {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS} determines if NMAS calls
      * are used to discover a universal password c/r policy.
-     * <p/>
+     *
      * This method is preferred over {@link #readAssignedChallengeSet(com.novell.ldapchai.ChaiUser)}, as it does not
      * require a (possibly unneccessary) call to read the user's assigned password policy.
      *

@@ -403,15 +403,6 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         }
     }
 
-    /**
-     *
-     * @param inputXmlString
-     * @param theUser
-     * @deprecated {@link ChaiCrFactory#parseChaiResponseSetXML(String)}
-     * @see  {@link ChaiCrFactory#parseChaiResponseSetXML(String)}
-     * @return
-     * @throws ChaiValidationException
-     */
     @Deprecated
     public static ResponseSet parseChaiResponseSetXML(final String inputXmlString, final ChaiUser theUser)
             throws ChaiValidationException

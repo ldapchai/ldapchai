@@ -23,7 +23,7 @@ import com.novell.ldapchai.ChaiEntry;
 
 /**
  * eDirectory "top" class.  All other eDirectory classes inherit from this class.
- * <p/>
+ *
  * See <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk714.html#sdk714">eDirectory schema documentation</a> for
  * more information.
  *

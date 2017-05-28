@@ -28,9 +28,9 @@ import java.util.Set;
 
 /**
  * Represents an ldap user entry.
- * <p/>
+ *
  * This interface should be the primary means by which the LDAP Chai API is used to interact with ldap user entries.
- * <p/>
+ *
  * Instances of ChaiUser can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
@@ -151,13 +151,13 @@ public interface ChaiUser extends ChaiEntry {
      * Changes this ChaiUser's password.  This uses the normal change password method in ldap (remove the old, add the new).
      * If the old password is not correct, or the new password does not meet the server's requirements, a ChaiOperationException exception
      * will be thrown.
-     * <p/>
+     *
      * This method should only be used when the user is the one changing his or her *own* password.  For admin
      * password changes, use {@link #setPassword(String)}.
-     * <p/>
+     *
      * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
      * will typically future date the expiration time during the change operation.
-     * <p/>
+     *
      * It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
      * set.
      *
@@ -332,17 +332,17 @@ public interface ChaiUser extends ChaiEntry {
      * Sets this ChaiUser's password.  This uses the normal administrative set password method in ldap.
      * If the old password is not correct, or the new password does not meet the server's requirements, a discriptive exception
      * will be thrown.
-     * <p/>
+     *
      * This method should only be used for administrators setting a different user's password.  For self
      * changes, use {@link #changePassword(String,String)}.
-     * <p/>
+     *
      * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
      * will typically mark the current date as the password expiration time during the set operation, causing the password to
      * be expired (and changed) for the user during the next authentication.
-     * <p/>
+     *
      * It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
      * set.
-     * <p/>
+     *
      *
      * @param newPassword A new password value that conforms to the users password policy
      * @param enforcePasswordPolicy Indicates if the password policy should be enforced.  The ldap vendor may or may not
@@ -359,9 +359,9 @@ public interface ChaiUser extends ChaiEntry {
     /**
      * See {@link #setPassword(String, boolean)}. Sets enforcePasswordPolicy to false.
      * @param newPassword
-     * @throws ChaiUnavailableException
-     * @throws ChaiPasswordPolicyException
-     * @throws ChaiOperationException
+     * @throws ChaiUnavailableException     If the directory is unreachable
+     * @throws ChaiPasswordPolicyException  If the password policy is violated
+     * @throws ChaiOperationException       If some operational issue prevents the password from veing set.
      */
     void setPassword(String newPassword)
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;
@@ -370,9 +370,9 @@ public interface ChaiUser extends ChaiEntry {
      * Test a users value for this ChaiUser's password.  Appropriate rights are required for this to work properly.  This call
      * generally only tests the password value itself, and not any other authentication meta attributes such as account
      * disabled, or other authentication restrictions.
-     * <p/>
+     *
      * Thus, a succcessfull test does not neccessarily mean that an authentication (BIND) would work with this password.
-     * <p/>
+     *
      * <i>Implementation Note:</i> Calling this method is essentially the same as calling {@link #compareStringAttribute(String USER_PASSWORD, String value)} and converting
      * {@code ChaiOperationalException} to {@code ChaiPasswordPolicyException}.
      *
@@ -389,7 +389,7 @@ public interface ChaiUser extends ChaiEntry {
     /**
      * Test a new value for this ChaiUser's password.  This method does not cause a change or set to actually occur.  This
      * is useful before calling the {@link #setPassword(String)} or {@link #changePassword(String, String)} methods.
-     * <p/>
+     *
      *
      * @param testPassword A new password value that conforms to the users password policy
      * @return true if password meets the user's policy.  Never returns false (returns {@code ChaiPasswordPolicyException} instead)
@@ -463,8 +463,7 @@ public interface ChaiUser extends ChaiEntry {
 
     /**
      * Read the user's account expiration date.  The implementation will attempt to read the user's defined or calculated
-     * account expiration date, if supported
-     * <ol>
+     * account expiration date, if supported.
      *
      * @return the date at which the password is expired, or the current time if the password is expired but a date cannot be determined
      * @throws UnsupportedOperationException If the configuration of the provider is not suitable for retreiving passwords.

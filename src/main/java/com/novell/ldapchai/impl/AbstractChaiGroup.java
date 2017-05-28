@@ -33,9 +33,9 @@ import java.util.Set;
 
 /**
 * A complete implementation of {@code ChaiGroup} interface.
-* <p/>
+*
 * Clients looking to obtain a {@code ChaiGroup} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
-* <p/>
+*
  * @author Jason D. Rivard
 */
 public abstract class AbstractChaiGroup extends AbstractChaiEntry implements ChaiGroup {

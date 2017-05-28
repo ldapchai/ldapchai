@@ -70,14 +70,14 @@ import java.util.Set;
 /**
  * Default {@code ChaiProvider} implementation; wraps the standard JNDI ldap API.  Runs in a standard Java SE 1.5 (or greater) environment.  Supports
  * fail-over to multiple servers.  It does not however, support load balancing.
- * <p/>
+ *
  * This implementation will use the list of servers in the {@code ChaiConfiguration} in order, meaning that
  * all requests will go the the first server in the configured list as long as it is available.  If that server fails it
  * will go to the next in the list until it finds an available server.  Afterwords it will periodicaly retry the servers
  * at the top of the list to see if they have returned to life.
- * <p/>
+ *
  * Instances can be obtained using {@link com.novell.ldapchai.provider.ChaiProviderFactory}.
- * <p/>
+ *
  * During initialization, {@link com.novell.ldapchai.provider.ChaiConfiguration#getImplementationConfiguration()} is called, and if a Hashtable is
  * found, the settings within are applied during the construction of the underlying {@link javax.naming.ldap.LdapContext}
  * instance(s) used by {@code JNDIProviderImpl}.
@@ -151,9 +151,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     /**
      * <p>Converts an array of primitive bytes to objects.</p>
-     * <p/>
+     *
      * <p>This method returns <code>null</code> for a <code>null</code> input array.</p>
-     * <p/>
+     *
      * <p>From Jakarta Commons project</p>
      *
      * @param array a <code>byte</code> array
@@ -177,9 +177,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     /**
      * <p>Converts an array of object Bytes to primitives.</p>
-     * <p/>
+     *
      * <p>This method returns <code>null</code> for a <code>null</code> input array.</p>
-     * <p/>
+     *
      * <p>From Jakarta Commons project</p>
      *
      * @param array a <code>Byte</code> array, may be <code>null</code>

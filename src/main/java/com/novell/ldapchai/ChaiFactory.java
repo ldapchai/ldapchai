@@ -43,7 +43,7 @@ import java.util.Map;
  * For clarity the "create"
  * methods in this class create <i>instances</i> of {@code ChaiEntry}.  They do not
  * actualy create a new entry in the ldap directory.
- * <p/>
+ *
  * {@code ChaiProvider} instances can be obtained using the
  * {@link com.novell.ldapchai.provider.ChaiProviderFactory} factory.
  *
@@ -139,7 +139,7 @@ public final class ChaiFactory {
 
     /**
      * Convenience method for {@link com.novell.ldapchai.provider.ChaiProviderFactory#quickProvider(String,String,String)}.
-     * <p/>
+     *
      * Get a ChaiUser using a standard JNDI ChaiProvider with default settings.
      *
      * @param bindDN   ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.

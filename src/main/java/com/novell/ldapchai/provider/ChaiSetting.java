@@ -42,24 +42,24 @@ public enum ChaiSetting {
     /**
      * A list of URLs to be used for ldap connections.  {@link #validateValue(String)} will be used to to ensure that
      * each provided value is a valid URL.
-     * <p/>
+     *
      * Multiple ldap URLs can be specified by separating with a comma or space character.
-     * <p/>
+     *
      * A value that does not conform to {@link URI#create(String)} requirements or has a scheme other than "ldap" or "ldaps"
      * will result in an {@link IllegalArgumentException}.
      * <table border="1">
-     *  <tr><td><b>Examples</b></tr></td>
-     *  <tr><td>ldap://192.168.10.1</tr></td>
-     *  <tr><td>ldaps://192.168.10.2</tr></td>
-     *  <tr><td>ldaps://192.168.10.3:6322</tr></td>
-     *  <tr><td>ldap://host1.example.com:382</tr></td>
-     *  <tr><td>ldap://host1.example.com,ldaps://host2.example.com,ldaps://10.8.31.1:6322</tr></td>
-     *  <tr><td>ldaps://host1.example.com ldaps://10.8.31.1:6322</tr></td>
+     *  <tr><td><b>Examples</b></td></tr>
+     *  <tr><td>ldap://192.168.10.1</td></tr>
+     *  <tr><td>ldaps://192.168.10.2</td></tr>
+     *  <tr><td>ldaps://192.168.10.3:6322</td></tr>
+     *  <tr><td>ldap://host1.example.com:382</td></tr>
+     *  <tr><td>ldap://host1.example.com,ldaps://host2.example.com,ldaps://10.8.31.1:6322</td></tr>
+     *  <tr><td>ldaps://host1.example.com ldaps://10.8.31.1:6322</td></tr>
      * </table>
-     * <p/>
+     *
      * Unless {@link #FAILOVER_ENABLE} is set to <i>true</i>, the use of values by a {@code ChaiProvider}
      * beyond the first value is unspecified.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.bind.URLs</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>ldap://localhost</td></tr>
@@ -97,7 +97,7 @@ public enum ChaiSetting {
      * <pre>
      * cn=administrator,ou=container,o=Organization
      * </pre>
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.bind.dn</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>(blank)</td></tr>
@@ -108,7 +108,7 @@ public enum ChaiSetting {
     /**
      * Password to use during chai LDAP bind.  An empty password will cause an anonymous connection
      * to be used.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.bind.password</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>(blank)</td></tr>
@@ -120,24 +120,24 @@ public enum ChaiSetting {
      * Enables ldap data caching.  Calls to the provider will
      * be cached and subsequent calls will be returned from memory instead of being fetched
      * from the ldap server.
-     * <p/>
+     *
      * The wrapped provider is intended for "request scope" type operations, and allows routines that make
      * redundent ldap calls to be more efficient.
-     * <p/>
+     *
      * The cache is limited in size, and beyond a specific amount of cache entries, results are moved
      * to a collection using {@link java.lang.ref.WeakReference}s that are subject to garbage collection.  This provides some protection
      * against memory leaks.
-     * <p/>
+     *
      * Only read operations are cached.  Performing any operation which may cause a modify (such as
      * {@link ChaiProvider#createEntry(String, String, java.util.Map)} or
      * {@link ChaiProvider#writeStringAttribute(String, String, java.util.Set, boolean)} ) will cause
      * the cache to be cleared.
-     * <p/>
+     *
      * There are many ways for this behavior to cause problems.  Enabling this setting should be done
      * with caution and extensive testing.
      * In particular, no cache synchronization is performed between providers, which can cause unexpected
      * results if not carefully gaurded against.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cache.enable</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
@@ -147,7 +147,7 @@ public enum ChaiSetting {
 
     /**
      * Maximum number of cached results to retain in memory.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cache.maximumSize</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>128</td></tr>
@@ -157,7 +157,7 @@ public enum ChaiSetting {
 
     /**
      * Maximum amount of time to cache results.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cache.maximumAge</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
@@ -168,7 +168,7 @@ public enum ChaiSetting {
     /**
      * Enable chai statistics.  If enabled, each ChaiProvider will maintain statistics and make them
      * available via {@link com.novell.ldapchai.provider.ChaiProvider#getProviderStatistics()}.
-     * <p/>
+     *
      * <i>Default: </i><b>true</b>
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.statistics.enable</td></tr>
@@ -184,10 +184,10 @@ public enum ChaiSetting {
      * close the ldap connection after their has been no activity for some duration of time.  If another
      * ldap api is called after the idle connection has caused a close, the {@code ChaiProvider} will automatically
      * re-open a new connection using the originally supplied connection settings and credentials.
-     * <p/>
+     *
      * Note that if this setting is enabled, a lightweight watchdog thread will be running so long as their are any
      * {@code ChaiProvider} instances open.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.enable</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
@@ -199,7 +199,7 @@ public enum ChaiSetting {
      * Maximum time an operation can be in progress (in ms).  If this time is exceeded, the connection will
      * be closed.  Future ldap api's called to the ChaiProvider will attempt to re-open a new
      * ldap connection.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.operationTimeout</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>60000</td></tr>
@@ -212,7 +212,7 @@ public enum ChaiSetting {
      * Maximum time a ChaiProvider can remain inactive (in ms).  If this time is exceeded, the connection will
      * be closed.  Future ldap api's called to the ChaiProvider will attempt to re-open a new
      * ldap connection.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.idleTimeout</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>30000</td></tr>
@@ -225,9 +225,9 @@ public enum ChaiSetting {
      * to check timeouts at this frequency.  This will have a direct impact on the enforcement of timeouts.  For
      * example, if the idle timeout is 30 seconds, and the frequency is 30 seconds, then connections may actually
      * be able to remain idle between 30 and 60 seconds.
-     * <p/>
+     *
      * Note that this setting MUST be set before any ChaiProvider instances are created.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.watchdog.frequency</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
@@ -240,9 +240,9 @@ public enum ChaiSetting {
      * to check timeouts at this frequency.  This will have a direct impact on the enforcement of timeouts.  For
      * example, if the idle timeout is 30 seconds, and the frequency is 30 seconds, then connections may actually
      * be able to remain idle between 30 and 60 seconds.
-     * <p/>
+     *
      * Note that this setting MUST be set before any ChaiProvider instances are created.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.watchdog.frequency</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
@@ -254,10 +254,10 @@ public enum ChaiSetting {
      * Sets the Chai Provider to use a promiscuous SSL socket factory when making ldaps connections.  By default
      * this settings is false, which means that when making an SSL connection, the remote certificate must be
      * trusted by the local JVM keystore.
-     * <p/>
+     *
      * This setting is intented for use with development environments only, and should not be enabled for
      * production usage.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.promiscuousSSL</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
@@ -268,10 +268,10 @@ public enum ChaiSetting {
     /**
      * Enable wire trace debugging.  This will cause all data in/out of chai to be output to the
      * log4j TRACE debug level.  This will generate a large volume of debug messages.
-     * <p/>
+     *
      * <b>WARNING:</b> Enabling this setting will cause all data values to be output to debug mode, including
      * sensitive values such as passwords.  Enable this setting with care!
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.wireDebug.enable</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
@@ -282,7 +282,7 @@ public enum ChaiSetting {
     /**
      * Enable fail over when multiple servers are present.  Also allows retries to a single server
      * in case of connection problems.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.enable</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
@@ -295,7 +295,7 @@ public enum ChaiSetting {
      * Indicates if the failover engine will use it's "last known good" mechanism.  When a new connection is made, if
      * this setting is enabled, the provider will start with the last known good server instead of the first server in
      * the connection url list.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.useLastKnownGoodHint</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
@@ -305,7 +305,7 @@ public enum ChaiSetting {
 
     /**
      * Minimum time Chai will wait before retrying a server marked as down.  Time is in milliseconds.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.failBackTime</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>90000</td></tr>
@@ -315,7 +315,7 @@ public enum ChaiSetting {
 
     /**
      * Minimum number of attempts Chai will make to contact a server if there is a communication problem.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.failover.connectRetries</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>4</td></tr>
@@ -329,7 +329,7 @@ public enum ChaiSetting {
      * <ul><li>always</li><li>never</li><li>finding</li><li>searching</li></ul>
      * See <a href="http://java.sun.com/products/jndi/tutorial/ldap/misc/aliases.html">JNDI alias
      * documentation</a>
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.dereferenceAliases</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>never</td></tr>
@@ -340,7 +340,7 @@ public enum ChaiSetting {
 
     /**
      * Ldap socket timeout, if supported by the ChaiProvider implementation.  Time is in milliseconds.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.ldapTimeout</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
@@ -352,7 +352,7 @@ public enum ChaiSetting {
      * Ldap read timeout, if supported by the ChaiProvider implementation.  Time is in milliseconds.
      * A value of zero will leave the default value of the implementation.
      *.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.ldapReadTimeout</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
@@ -362,7 +362,7 @@ public enum ChaiSetting {
 
     /**
      * Enable LDAP referral following.  Valid settings are "true" or "false".
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.ldap.followReferrals</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
@@ -373,7 +373,7 @@ public enum ChaiSetting {
     /**
      * Set the fully qualified class name of the {@code ChaiProvider} class name to be used.  By default this is
      * the class name for the {@link JNDIProviderImpl} class.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.implementation</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>com.novell.ldapchai.provider.JNDIProviderImpl</td></tr>
@@ -387,7 +387,7 @@ public enum ChaiSetting {
      * Enable NMAS support for Novell eDirectory.  NMAS support makes some operations more efficient,
      * and provides more descriptive error messages.  NMAS support requires libraries from the NMAS SDK.
      *
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.edirectory.enableNMAS</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
@@ -398,7 +398,7 @@ public enum ChaiSetting {
     /**
      * Cache failed operations due to unknown extended operations.  Once an unknown extended operation for a
      * given {@link ChaiProvider} occurs it will not be retried.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.extendedOperation.failureCache</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
@@ -410,7 +410,7 @@ public enum ChaiSetting {
      * Set to read-only mode.   When enabled, no "write" opertions will be permitted, and will fail with an {@link com.novell.ldapchai.exception.ChaiOperationException} of
      * type {@link com.novell.ldapchai.exception.ChaiError#READ_ONLY_VIOLATION}.  This error will also be occured for operations that are only potentially "write"
      * operations such s {@link ChaiProvider#extendedOperation(javax.naming.ldap.ExtendedRequest)}.
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.readonly</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
@@ -422,11 +422,11 @@ public enum ChaiSetting {
      * Specify a default directory vendor.  If not empty, {@link ChaiProvider} implementations <b>should</b> always
      * return the configured value regardless of the actual directory type when {@link ChaiProvider#getDirectoryVendor()} 
      * is called.
-     * <p/>
+     *
      * The value must exactly match a known value for {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR}.
-     * <p/>
+     *
      * <i>Default: </i><b>(blank)</b>
-     * <p/>
+     *
      * <table border="0">
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.vendor.default</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>(blank)</td></tr>
@@ -468,7 +468,7 @@ public enum ChaiSetting {
 
     /**
      * Setting key to control the ldap attribute name used when reading/writing Chai Challenge/Response formats.
-     * <p/>
+     *
      * <i>Default: </i><b>carLicense</b>
      *
      * @see com.novell.ldapchai.cr.ChaiResponseSet
@@ -479,7 +479,7 @@ public enum ChaiSetting {
     /**
      * Setting key to control the {@link com.novell.ldapchai.util.ConfigObjectRecord COR}
      * RecordType used when reading/writing Chai Challenge/Response formats.
-     * <p/>
+     *
      * <i>Default: </i><b>0002</b>
      *
      * @see com.novell.ldapchai.cr.ChaiResponseSet
@@ -490,7 +490,7 @@ public enum ChaiSetting {
     /**
      * Setting key to control the number of iterations to perform the CR Salt when the
      * format type is set to a hash type that allows for multiple iterations such as {@link com.novell.ldapchai.cr.Answer.FormatType#SHA1_SALT}
-     * <p/>
+     *
      * <i>Default: </i><b>1000</b>
      *
      * @see com.novell.ldapchai.cr.ChaiResponseSet
@@ -502,7 +502,7 @@ public enum ChaiSetting {
      * If true, then during the {@link com.novell.ldapchai.ChaiUser#setPassword(String),true} operation, the control for
      * OID LDAP_SERVER_POLICY_HINTS_OID - 1.2.840.113556.1.4.2066 will be sent, causing AD to enforce password policy
      * rules including history rule requirements on the operation.
-     * <p/>
+     *
      * <i>Default: </i><b>false</b>
      */
     AD_SET_POLICY_HINTS_ON_PW_SET("chai.ad.setPolicyHintsOnPwSet", "false", true, Validator.BOOLEAN_VALIDATOR),

@@ -39,7 +39,7 @@ import java.util.ResourceBundle;
  * <pre>
  * chaiUser.readStringAttribute(ChaiConstant.ATTR_LDAP_GIVEN_NAME);
  * </pre>
- * <p/>
+ *
  * See the Constant Field Definitions for a list of actual values.
  *
  * @author Jason D. Rivard

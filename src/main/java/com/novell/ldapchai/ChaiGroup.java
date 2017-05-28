@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * Represents an ldap group entry.
- * <p/>
+ *
  * Instances of ChaiGroup can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard

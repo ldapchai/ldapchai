@@ -35,13 +35,13 @@ import java.util.Set;
  * {@code ChaiEntry}. Each instance wraps a ldap distinguished name (DN) value that it then uses for all subsequent operations.  Methods are
  * provided to easily access or modify attributes of the entry, as well as to find related objects.  Clients can consume
  * {@code ChaiEntry} instances as if they were beans baacked by some persistant store.
- * <p/>
+ *
  * This interface is extended by several sub-interfaces that provide added functionality for specific
  * entry types such as users and groups.
- * <p/>
+ *
  * This interface and its sub-interfaces are intended to be the primary interface that callers to the
  * LDAP Chai API reference in their code.
- * <p/>
+ *
  * Instances of ChaiEntry can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
@@ -57,7 +57,7 @@ public interface ChaiEntry {
      * Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
      * supplied value will be set.
-     * <p/>
+     *
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
      * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
@@ -70,11 +70,11 @@ public interface ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Writes an additional attribute value to an attribute on an ldap entry.  This operation
+     * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
-     * supplied value will be set.
-     * <p/>
-     * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
+     * supplied value will be set.</p>
+     *
+     * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
      * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
      * @param attributeName   A valid attribute for the entry
@@ -86,12 +86,12 @@ public interface ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Writes an additional attribute value to an attribute on an ldap entry.  This operation
+     * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
-     * supplied value will be set.
-     * <p/>
-     * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
+     * supplied value will be set.</p>
+     *
+     * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.</p>
      *
      * @param attributeName   A valid attribute for the entry
      * @param attributeValues A set of string values to be added to the ldap entry
@@ -187,7 +187,7 @@ public interface ChaiEntry {
      * as defined by the LDAP server.  The returned value may differ from {@link ChaiEntry#getEntryDN()}
      * in terms of case, spacing, or other syntax differences, however they should resolve to the
      * same entry by the ldap server.
-     * <p/>
+     *
      * Canonical values are particularly useful when storing in a collection, as you
      * can gaurentee that two
      *
@@ -239,7 +239,7 @@ public interface ChaiEntry {
      * Retreives an attribute value from the LDAP entry represented by the
      * instance of this class.  If the attribute syntax is not a string, the value will be
      * converted to a string.
-     * <p/>
+     *
      * Callers of this method should use the values specified in the {@link ChaiConstant} class
      * when possible.
      *
@@ -278,7 +278,7 @@ public interface ChaiEntry {
      * instance of this class.  If the attribute has multiple values then only a single value
      * is returned.  If the attribute does not have a string syntax, the value will be converted
      * to a string.
-     * <p/>
+     *
      * Callers of this method should use the values specified in the {@link ChaiConstant} class
      * when possible.
      *
@@ -295,7 +295,7 @@ public interface ChaiEntry {
      * Read an array of specified attributes.  If any of the attributes has multiple values, only the first value
      * returned by the directory is returned.  If the attribute does not have a string syntax, the value will be converted
      * to a string.
-     * <p/>
+     *
      * Callers of this method are encouraged to use the values specified in {@link ChaiConstant} when possible for attribute names.
      *
      * @param attributes Valid  attributes on the object.
@@ -341,7 +341,7 @@ public interface ChaiEntry {
      * Perform an ldap search using this entry as the search root.  A {@link com.novell.ldapchai.util.SearchHelper} is required
      * and its values are used to perform the search.  The result is a collection of {@code ChaiEntry} instances that
      * can then be further minipulated.
-     * <p/>
+     *
      * Note, although the {@code SearchHelper} can specify return attributes, the attributes are not requested using
      * this search method.  Instead, the result ChaiEntries can be used to read attribute values.
      *

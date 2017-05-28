@@ -37,9 +37,9 @@ import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiUser} interface.
- * <p/>
+ *
  * Clients looking to obtain a {@code ChaiUser} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
- * <p/>
+ *
  * @author Jason D. Rivard
  */
 

@@ -69,7 +69,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpkix-jdk15on</artifactId>
-			<version>1.56</version>
+			<version>1.57</version>
 		</dependency>
 
 		<!-- Directory Access -->
@@ -267,7 +267,7 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>attach-javadocs-private</id>
+						<id>attach-javadocs</id> <!-- referenced automatically by jar builder -->
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -276,6 +276,8 @@
 							<additionalparam>${javadoc.opts}</additionalparam>
 							<outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
 							<jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
+							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+							<excludePackageNames>com.novell.security.nmas.*</excludePackageNames>
 							<attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
 						</configuration>
 					</execution>
@@ -288,6 +290,7 @@
 							<show>public</show>
 							<additionalparam>${javadoc.opts}</additionalparam>
 							<excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+							<excludePackageNames>com.novell.security.nmas.*</excludePackageNames>
 							<!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
 								default -->
 						</configuration>
@@ -297,6 +300,7 @@
 		</plugins>
 	</build>
 
+	<!--
 	<reporting>
 		<plugins>
 			<plugin>
@@ -306,6 +310,7 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	-->
 
 	<profiles>
 		<profile>

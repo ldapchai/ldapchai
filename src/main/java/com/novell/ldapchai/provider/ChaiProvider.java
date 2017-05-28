@@ -33,29 +33,29 @@ import java.util.Set;
 /**
  * {@code ChaiProvider} is the foundation interface for the LDAP Chai API.  {@code ChaiProvider} provides
  * methods to access an ldap directory.
- * <p/>
+ *
  * Use the {@link ChaiProviderFactory} factory to obtain a {@code ChaiProvider} instance.
- * <p/>
+ *
  * {@code ChaiProvider}s can be used directly for raw ldap access. However, it is generally desirable to use the
  * {@link com.novell.ldapchai.ChaiEntry} wrappers instead.  Using a {@code ChaiProvider} requires the caller
  * to keep track of ldap distinguished names (DN) and be aware of context and other ldap concepts.
- * <p/>
+ *
  * It is helpful to think of a {@code ChaiProvider} as a logical connection to the ldap server.
  * Implementations may provide some type of pooling, or an instance of {@code ChaiProvider} may actually
  * represent a single physical connection to the server.
- * <p/>
+ *
  * {@code ChaiProvider} does not support any notion of asynchronous or non-blocking requests.  Every method call
  * will block until a result or error is returned from the server, or some other type of Exception
  * occurs.  
- * <p/>
+ *
  * The underlying implementations of this interface may use a variety of strategies for actually reaching the ldap directory,
  * including the standard JNDI interface {@link javax.naming.directory} , and Novell's JLDAP API.  Different implementations may or may not provide support
  * for server fail-over or other failure recovery.
- * <p/>
+ *
  * {@code ChaiProvider} implementations are <i>not</i> guarenteed to be thread safe by LDAP Chai.  Individual implementations
  * may provide thread safety.  Check with the implementation before sharing an {@code ChaiProvider} instance accross multiple
  * threads.  For a guaranteed thread safe ChaiProvider, use {@link com.novell.ldapchai.provider.ChaiProviderFactory#synchronizedProvider(ChaiProvider)}.
- * <p/>
+ *
  * To prevent leaks the {@link #close()} method should be called when a {@code ChaiProvider} instance is no longer
  * used.  Once closed, any operation annotated with {@link com.novell.ldapchai.provider.ChaiProviderImplementor.LdapOperation}  will throw an {@link IllegalStateException}.
  *

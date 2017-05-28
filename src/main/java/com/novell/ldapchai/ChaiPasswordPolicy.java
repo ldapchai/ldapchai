@@ -27,14 +27,14 @@ import java.util.Set;
  * Represents a password policy ldap entry.  The actual implementation for this
  * class may or may not represent a one to one relationship with an ldap entry, such
  * functionality is directory implementation specific.
- * <p/>
+ *
  * Generally, a {@code ChaiPasswordPolicy} will behave as an
  * immutable object.  Specifically, there are no set operations to modify a
  * {@code ChaiPasswordPolicy} once instantiated.
  * However, an instance of {@code ChaiPasswordPolicy}
  * may be backed directly by interaction with the underlying directory; therefore
  * it is possible that returned values change over time.
- * <p/>
+ *
  * {@code ChaiPasswordPolicy} instances can generally be
  * thought of as simple wrappers for a Map of String/String where the keys are
  * keys defined by {@link ChaiPasswordRule#getKey()} and values

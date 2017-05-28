@@ -71,11 +71,11 @@ public final class ChaiErrors {
 
     /**
      * Indicates if the error is deemed permanent or temporary.
-     * <p/>
+     *
      * Permanent errors are those that, if retried, the error would most likely
      * occur indefinitely.  This would generally include any error that if repeated against
      * a different server, the error returned would be the same.
-     * <p/>
+     *
      * Fail-over mechanisms use this indication to decide if an operation that
      * generated an error should be retried.
      *

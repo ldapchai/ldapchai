@@ -49,13 +49,13 @@ public interface ChaiProviderImplementor extends ChaiProvider {
     /**
      * Return the underlying connection object.  The implementating class must decide
      * which type of object to return, if any.
-     * <p/>
+     *
      * Extreme care must be taken when using this menu.  The chai provider implementation
      * typically does things with the underyling connection that your code will not
      * expect, as well as the reverse.  For example, Chai may invalidate the connection
      * object in cases of load balancing or fail over.
-     * <p/>
-     * <p/>
+     *
+     *
      * For this reason, use of this method is strongly discouraged.
      *
      * @return a connection-level object used by the {@code ChaiProvider} implementation.

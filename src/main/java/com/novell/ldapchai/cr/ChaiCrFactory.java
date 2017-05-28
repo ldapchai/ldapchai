@@ -64,6 +64,8 @@ public final class ChaiCrFactory {
      * @param challengeResponseMap  A map containing Challenges as the key, and string responses for values
      * @param locale                The locale the response set is stored in
      * @param minimumRandomRequired Minimum random responses required
+     * @param chaiConfiguration     Appropriate configuration to use during this operation
+     * @param csIdentifier          Identifier to store on generated ChaiResponseSet
      * @return A ResponseSet suitable for writing.
      * @throws com.novell.ldapchai.exception.ChaiValidationException
      *          when there is a logical problem with the response set data, such as more randoms required then exist
@@ -252,7 +254,7 @@ public final class ChaiCrFactory {
 
     /**
      * Read the user's configured ResponseSet from the directory.
-     * <p/>
+     *
      * A caller would typically use the returned {@code ResponseSet} for testing responses by calling the ResponseSet's
      * {@link ResponseSet#test(java.util.Map<com.novell.ldapchai.cr.Challenge,java.lang.String>)} method.
      *

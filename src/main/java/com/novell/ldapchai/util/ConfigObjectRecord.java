@@ -33,17 +33,17 @@ import java.util.StringTokenizer;
  * Represents a config object record stored in eDirectory used for holding complex data types.
  * Config object records are comprised of guids and a payload.  The payload is typically an XML document
  * but can be any data type representable as a string (and potentially even binary data).
- * <p/>
+ *
  * Config object records, or CORs are useful for storing blobs, xml documents, and even access control lists.
- * <p/>
+ *
  * CORs should be stored on a multi-valued case-ignore-string attribute.  Mutiple CORs can be written to a single attribute value.  The
  * {@code ConfigObjectRecord} class is capable of distinguishing the appropriate COR based on the supplied guids.
- * <p/>
+ *
  * The guid values are used to tie a COR on one entry to a remote entry.  For some use cases, it is useful to think
  * of a COR as a sort of advanced DN attribute.  It indicates a relationship to another entry, however it is also possible
  * to add aditional information about the remote object reference.  This information can be used to describe the conditions
  * of the relationship.
- * <p/>
+ *
  * <h4>Format</h4><pre>
  * +------+-------+-------+---------------------------+
  * | TYPE | GUID1 | GUID2 | PAYLOAD                   |
@@ -52,7 +52,7 @@ import java.util.StringTokenizer;
  * <pre>
  * 0002#{3F2504E0-4F89-11D3-9A0C-0305E82C3301}#.#&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;config"&gt;...&lt;/config&gt;
  * </pre>
- * <p/>
+ *
  * <table border="1">
  * <tr><td>{@link #getRecordType() TYPE}</td><td>Indicates the TYPE of data resting in the payload.  By convention, a four character string integer such as "0001" is used.</tr>
  * <tr><td>{@link #getGuid1() GUID1}</td><td> Optional value for the GUID of a related object</tr>

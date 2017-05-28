@@ -35,11 +35,11 @@ import java.util.Properties;
  * of controling Chai behavior.  Instances of {@code ChaiConfiguration} are semi-mutable.
  * Once instantiated, the setters may be called to modify the instance.  However, once {@link #lock()} is
  * called, all setters will throw an {@link IllegalStateException}.
- * <p/>
+ *
  * When a {@code ChaiConfiguration} instance is used to configure a new ChaiProvider
  * instance, it is automatically locked.  Thus, a {@link ChaiProvider}'s configuration can not be modifed
  * once it is used to create a {@link ChaiProvider}.
- * <p/>
+ *
  * This class is <i>cloneable</i> and clones are created in an unlocked state.
  *
  * @author Jason D. Rivard
@@ -318,7 +318,7 @@ public class ChaiConfiguration implements Serializable {
     /**
      * Set an object to be used for the {@link ChaiProvider} implementation to be used for its configuration.  Depending
      * on the implementation, this could be any type of object such as a Properties, Map, or even an implementation specific object.
-     * <p/>
+     *
      * When used with the default provider, {@code JNDIProviderImpl}, this object must be a {@link java.util.Hashtable} environment as specified by the
      * {@link javax.naming.ldap.InitialLdapContext}.
      *

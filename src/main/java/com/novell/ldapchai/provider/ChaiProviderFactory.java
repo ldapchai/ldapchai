@@ -37,20 +37,20 @@ import java.util.Properties;
  * Static factory methods for obtaining an {@code ChaiProvider}.  {@code ChaiProvider} instances can be
  * used directly, but they are more commonly used to obtain an {@link com.novell.ldapchai.ChaiEntry}
  * instance.
- * <p/>
+ *
  * Access to "wrapped" {@code ChaiProvider}s are also availble, including wrappers for caching
  * or synchronization.
- * <p/>
+ *
  * If there are no specific requirements for how to establish a connection, the
  * "quick" factory method can be used to get a Provider with just one line of code:
- * <p/>
+ *
  * <hr/><blockquote><pre>
  *   ChaiProvider provider = ChaiProviderFactory.createProvider("ldap://host:port","cn=admin,o=org","password");
  * </pre></blockquote><hr/>
- * <p/>
+ *
  * If a more control is required, allocate a {@code ChaiConfiguration} first, and then
  * use this factory to generate a provider:
- * <p/>
+ *
  * <hr/><blockquote><pre>
  *   // setup connecton variables
  *   final String bindUsername = "cn=admin,o=org";
@@ -59,17 +59,17 @@ import java.util.Properties;
  *   serverURLs.add("ldap://server1:port");
  *   serverURLs.add("ldaps://server2:port");
  *   serverURLs.add("ldap://server3");
- * <p/>
+ *
  *   // allocate a new configuration
  *   ChaiConfiguration chaiConfig = new ChaiConfiguration(
  *            serverURLs,
  *            bindUsername,
  *            bindPassword);
- * <p/>
+ *
  *   // set any desired settings.
  *   chaiConfig.setSettings(ChaiConfiguration.SETTING_LDAP_TIMEOUT,"9000");
  *   chaiConfig.setSettings(ChaiConfiguration.SETTING_PROMISCUOUS_SSL,"true");
- * <p/>
+ *
  *   // generate the new provider
  *   ChaiProvider provider = ChaiProviderFactory.createProvider(chaiConfig);
  * </pre></blockquote><hr/>
@@ -145,7 +145,7 @@ public final class ChaiProviderFactory {
     /**
      * Create a {@code ChaiProvider} using the specified <i>chaiConfiguration</i>.  A ChaiProvider will be created
      * according to the implementation class and configuration settings contained within the configuration.
-     * <p/>
+     *
      * All other factory methods are simply convenience wrappers around this method.
      *
      * @param chaiConfiguration A completed, lockable configuration
@@ -254,7 +254,7 @@ public final class ChaiProviderFactory {
     /**
      * Returns a thread-safe "wrapped" {@code ChaiProvider}.  All ldap operations will be forced through a single
      * lock and then sent to the backing provider.
-     * <p/>
+     *
      * Note that depending on the ldap server and the configured timeouts, calling methods on a synchronized
      * provider may result in significant blocking delays.
      *

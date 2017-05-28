@@ -33,13 +33,13 @@ import java.util.Map;
  * A representation of the responses part of challenge/response set.  {@code RespnseSet}s include an embedded {@link com.novell.ldapchai.cr.ChallengeSet}.
  * This means that a full copy of the challenges are embedded at the response set, and a seperate challenge set instance
  * is not required to test responses.
- * <p/>
+ *
  * Response sets are associated to a user.
- * <p/>
+ *
  * The underlying implementation may pull all response information into memory at time of
  * creation, or there may be directory communication required for operation of methods on this
  * interface.
- * <p/>
+ *
  * Instances of {@code ResponseSet} can be created or read using {@link ChaiCrFactory}.
  *
  * @author Jason D. Rivard
@@ -71,7 +71,7 @@ public interface ResponseSet {
     /**
      * Tests the {@code ResponseSet} to see if it meets the requirements of the supplied {@link com.novell.ldapchai.cr.ChallengeSet}.
      * This method does not test any response values.
-     * <p/>
+     *
      * A typical use case for this method is to validate if an existing, stored {@code com.novell.ldapchai.cr.ResponseSet} of
      * a user satisfies a current {@code com.novell.ldapchai.cr.ChallengeSet} policy.
      *
@@ -95,7 +95,7 @@ public interface ResponseSet {
 
     /**
      * Test the returned response set.
-     * <p/>
+     *
      * <b>Note:</b> There is no implementation (yet) for testing NMAS response sets.  Attempting
      * to test an NMAS ResponseSet will throw an {@link UnsupportedOperationException}.
      *

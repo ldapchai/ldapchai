@@ -568,7 +568,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
     /**
      * Set up a standard filter attribute name and value pair.
-     * <h4>Example Values</h4>
+     * <b>Example Values</b>
      * <table border="1">
      * <tr><td><b>Attribute</b></td><td><b>Value</b></td></tr>
      * <tr><td>givenName</td><td>John</td></tr>
@@ -586,7 +586,7 @@ public class SearchHelper implements Serializable, Cloneable {
 
     /**
      * Set up an OR filter for each map key and value.  Consider the following example.
-     * <h4>Example Values</h4>
+     * <b>Example Values</b>
      * <table border="1">
      * <tr><td><b>Attribute</b></td><td><b>Value</b></td></tr>
      * <tr><td>givenName</td><td>John</td></tr>

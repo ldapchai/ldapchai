@@ -58,9 +58,9 @@ import java.util.Set;
 /**
  * JLDAP {@code ChaiProvider} implementation.  This
  * class wraps the JLDAP api at <a href="http://www.openldap.org/jldap/">OpenLDAP</a>.
- * <p/>
+ *
  * Instances can be obtained using {@link ChaiProviderFactory}.
- * <p/>
+ *
  * The current implementation does not support fail-over.  If multiple LDAP urls are specified
  * in the configuration, only the first one is used.
  *

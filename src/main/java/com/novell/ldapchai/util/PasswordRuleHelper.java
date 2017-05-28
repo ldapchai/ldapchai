@@ -33,76 +33,91 @@ import java.util.List;
  */
 public interface PasswordRuleHelper {
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowNumeric
      */
     boolean isAllowNumeric();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowFirstCharNumeric
      */
     boolean isAllowFirstCharNumeric();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowFirstCharNumeric
      */
     boolean isAllowLastCharNumeric();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowSpecial
      */
     boolean isAllowSpecial();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowFirstCharSpecial
      */
     boolean isAllowFirstCharSpecial();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowLastCharSpecial
      */
     boolean isAllowLastCharSpecial();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#MaximumSequentialRepeat
      */
     int getMaximumSequentialRepeat();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#MaximumRepeat
      */
     int getMaximumRepeat();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#MinimumLifetime
      */
     int getMinimumLifetime();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#ChangeMessage
      */
     String getChangeMessage();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#ExpirationInterval
      */
     int getExpirationInterval();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#CaseSensitive
      */
     boolean isCaseSensitive();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#EnforceAtLogin
      */
     boolean isEnforceAtLogin();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowNumeric
      */
     boolean isUniqueRequired();
 
     /**
+     * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#PolicyEnabled
      */
     boolean isPolicyEnabled();

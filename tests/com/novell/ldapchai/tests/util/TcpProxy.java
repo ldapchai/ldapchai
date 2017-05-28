@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * Simple java TcpProxy class.
- * <p/>
+ *
  * Used by Chai Tester to simulate multiple LDAP servers for failover testing.
  *
  * @author Jason D. Rivard

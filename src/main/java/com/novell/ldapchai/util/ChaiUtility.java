@@ -46,7 +46,7 @@ import java.util.Set;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
- * <p/>
+ *
  * Generally, consumers of the LDAP Chai API should avoid calling these methods directly.  Where possible,
  * use the {@link com.novell.ldapchai.ChaiEntry} wrappers instead.
  *
@@ -234,7 +234,7 @@ public class ChaiUtility {
     /**
      * Test the replication of an attribute.  It is left to the implementation to determine the means and criteria for
      * this operation.  Typically this method would be used just after a write operation in some type of time delayed loop.
-     * <p/>
+     *
      * Typical implementations will do the following:
      * <ul>
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#readStringAttribute(String)} to read a value</li>
@@ -242,14 +242,14 @@ public class ChaiUtility {
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#compareStringAttribute(String, String)} to to each server directly</li>
      * <li>return true if each server contacted has the same value, false if not</li>
      * </ul>
-     * <p/>
+     *
      * Target servers that are unreachable or return errors are ignored, and do not influence the results. It is entirely
      * possible that no matter how many times this method is called, false will always be returned, so the caller should
      * take care not to repeat a test indefinitly.
-     * <p/>
+     *
      * This operation is potentially expensive, as it may establish new LDAP level connections to each target server each
      * time it is invoked.
-     * <p/>
+     *
      * The following sample shows how this method might be used.  There are a few important attributes of the sample:
      * <ul>
      * <li>Multiple ldap servers are specified</li>
@@ -259,12 +259,12 @@ public class ChaiUtility {
      * <hr/><blockquote><pre>
      *   ChaiUser theUser =                                                                     // create a new chai user.
      *      ChaiFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
-     * <p/>
+     *
      *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
-     * <p/>
+     *
      *   final int maximumWaitTime = 120 * 1000;                                                // maximum time to wait for replication
      *   final int pauseTime = 3 * 1000;                                                        // time between iterations
-     * <p/>
+     *
      *   final long startTime = System.currentTimeMillis();                                     // timestamp of beginning of wait
      *   boolean replicated = false;
      *   while (System.currentTimeMillis() - startTime < maximumWaitTime) {                     // loop until

@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 
 /**
  * An immutable representation of an eDirectory DirXML-Attribute value.
- * <p/>
+ *
  * <b>Example value in ldap representation:</b>
  * <pre>
  * cn=driver1,cn=DriverSet,ou=orgUnit,o=org#1#USER_ID=1,table=USERS,schema=IDM
