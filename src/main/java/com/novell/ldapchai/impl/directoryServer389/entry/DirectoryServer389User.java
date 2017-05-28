@@ -29,7 +29,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import java.util.Date;
 
 class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
-    public DirectoryServer389User(final String userDN, final ChaiProvider chaiProvider) {
+    DirectoryServer389User(final String userDN, final ChaiProvider chaiProvider) {
         super(userDN, chaiProvider);
     }
 

@@ -48,6 +48,9 @@ import java.util.HashSet;
 import java.util.Map;
 
 class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser {
+
+    private static final String PW_EXPIRATION_ZULU_TIMESTAMP = "19800101010101Z";
+
     public String getLdapObjectClassName()
     {
         return InetOrgPerson.OBJECT_CLASS_VALUE;
@@ -105,7 +108,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS;
             this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS, "0");
             writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME;
-            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, "19800101010101Z");
+            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, PW_EXPIRATION_ZULU_TIMESTAMP);
 
             final String limit = this.readStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT);
             if (limit != null) {
@@ -153,12 +156,10 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             case (-16049): /* NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND */
                 LOGGER.debug("readPassword() reports: NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND " + responseCode);
                 throw new ChaiOperationException("object has no password attribute: error " + responseCode, ChaiError.NO_SUCH_ATTRIBUTE);
-                break;
 
             default:
                 LOGGER.debug("error testing nmas password: " + responseCode);
                 throw new ChaiOperationException("error reading nmas password: error " + responseCode, ChaiError.UNKNOWN);
-                break;
             }
         }
 
@@ -273,7 +274,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, "19800101010101Z");
+        this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, PW_EXPIRATION_ZULU_TIMESTAMP);
     }
 
     public boolean isPasswordLocked()

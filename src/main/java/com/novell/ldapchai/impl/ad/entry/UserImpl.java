@@ -19,8 +19,19 @@
 
 package com.novell.ldapchai.impl.ad.entry;
 
-import com.novell.ldapchai.*;
-import com.novell.ldapchai.exception.*;
+import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.ChaiPasswordPolicy;
+import com.novell.ldapchai.ChaiPasswordRule;
+import com.novell.ldapchai.ChaiRequestControl;
+import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiError;
+import com.novell.ldapchai.exception.ChaiErrors;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
@@ -29,7 +40,13 @@ import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,15 +112,15 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         throw new UnsupportedOperationException("ChaiUser#readPassword not implemented in ad-impl ldapChai API");
     }
 
-    public void removeGroupMembership(ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
+    public void removeGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
         theGroup.deleteAttribute("member",this.getEntryDN());
     }
 
-    public boolean testPassword(String passwordValue) throws ChaiUnavailableException, ChaiPasswordPolicyException {
+    public boolean testPassword(final String passwordValue) throws ChaiUnavailableException, ChaiPasswordPolicyException {
         throw new UnsupportedOperationException("ChaiUser#testPassword not implemented in ad-impl ldapChai API");
     }
 
-    public boolean testPasswordPolicy(String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {
+    public boolean testPasswordPolicy(final String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {
         return false;
     }
 
@@ -135,7 +152,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             }
         } catch (ChaiOperationException e) {
             if (e.getErrorCode() == ChaiError.UNKNOWN) {
-                throw new ChaiOperationException(e.getMessage(),ChaiError.PASSWORD_BADPASSWORD);
+                throw new ChaiOperationException(e.getMessage(), ChaiError.PASSWORD_BADPASSWORD);
             } else {
                 throw e;
             }
@@ -249,7 +266,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         final String[] attrsToRead = new String[] {
                 "pwdLastSet",
                 "userAccountControl",
-                "msDS-UserPasswordExpiryTimeComputed"
+                "msDS-UserPasswordExpiryTimeComputed",
         };
         final Map<String,String> readAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
 
@@ -273,10 +290,10 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         {
             final String maxPwdAgeString = readDomainValue("maxPwdAge");
             if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
-                long v = Long.parseLong(maxPwdAgeString);
-                v = Math.abs(v); // why is it stored as a negative value?  who knows.
-                v = v / 10000; // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak into the default 30 minute window a few nanoseconds early.  Thanks again MS.
-                maxPwdAgeMs = v;
+                long value = Long.parseLong(maxPwdAgeString);
+                value = Math.abs(value); // why is it stored as a negative value?  who knows.
+                value = value / 10000; // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak into the default 30 minute window a few nanoseconds early.  Thanks again MS.
+                maxPwdAgeMs = value;
             }
         }
 
