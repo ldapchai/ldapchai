@@ -13,7 +13,7 @@
 	</parent>
 
 	<groupId>com.github.ldapchai</groupId>
-	<version>0.6.10</version>
+	<version>0.6.11-SNAPSHOT</version>
 	<artifactId>ldapchai</artifactId>
 	<packaging>jar</packaging>
 
@@ -267,7 +267,7 @@
 				</configuration>
 				<executions>
 					<execution>
-						<id>attach-javadocs-private</id>
+						<id>attach-javadocs</id>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -350,7 +350,9 @@
 			<build>
 				<plugins>
 					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-site-plugin</artifactId>
+						<version>3.6</version>
 						<executions>
 							<execution>
 								<id>attach-descriptor</id>

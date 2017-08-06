@@ -534,6 +534,14 @@ public enum ChaiSetting {
      */
     OPENLDAP_LOCAL_PASSWORD_POLICY_URL("chai.openldap.passwordPolicy.url","file:/etc/openldap/check_password.conf", true, null),
 
+    /**
+     * Use the jndi
+     * the class name for the {@link JNDIProviderImpl} class.
+     **
+     * @see com.novell.ldapchai.provider.JNDIProviderImpl, com.novell.ldapchai.provider.JLDAPProviderImpl
+     */
+    JNDI_RESOLVE_IN_NAMESPACE("chai.jndi.resolveInNamespace", "true", true, Validator.BOOLEAN_VALIDATOR),
+
     ;
 
 

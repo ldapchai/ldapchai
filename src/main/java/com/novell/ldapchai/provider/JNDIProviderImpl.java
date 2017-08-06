@@ -583,7 +583,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         INPUT_VALIDATOR.search(baseDN, searchHelper);
 
         // perform search
-        final SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, false);
+        final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, false);
         final Map<String, Map<String, List<String>>> results = searchEngine.getResults();
 
         // convert to <String, Properties> return set.
@@ -624,7 +624,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     {
         activityPreCheck();
         INPUT_VALIDATOR.searchMultiValues(baseDN, searchHelper);
-        final SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, true);
+        final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, true);
         return searchEngine.getResults();
     }
 
@@ -639,7 +639,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         searchHelper.setAttributes(attributes);
         searchHelper.setSearchScope(searchScope);
 
-        final SearchEngine searchEngine = new SearchEngine(baseDN, searchHelper, true);
+        final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, true);
         return searchEngine.getResults();
     }
 
@@ -970,16 +970,26 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         private final String baseDN;
         private final SearchHelper searchHelper;
         private final boolean returnAllValues;
+        private final ChaiConfiguration chaiConfiguration;
 
         private boolean used = false;
         private final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
 
-        SearchEngine(final String baseDN, final SearchHelper searchHelper, final boolean returnAllValues) throws ChaiOperationException {
+        SearchEngine(
+                final ChaiConfiguration chaiConfiguration,
+                final String baseDN,
+                final SearchHelper searchHelper,
+                final boolean returnAllValues
+        )
+                throws ChaiOperationException
+        {
             this.baseDN = baseDN != null ? baseDN : "";
 
             // make a copy so if it changes somewhere else we won't be affected.
             this.searchHelper = new SearchHelper(searchHelper);
             this.returnAllValues = returnAllValues;
+
+            this.chaiConfiguration = chaiConfiguration;
         }
 
         public Map<String, Map<String, List<String>>> getResults()
@@ -1089,13 +1099,28 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         {
             while (answer.hasMore()) {
                 final SearchResult searchResult = answer.next();
-                final StringBuilder entryDN = new StringBuilder();
-                entryDN.append(removeJndiEscapes(searchResult.getName()));
-                if (baseDN.length() > 0) {
-                    if (entryDN.length() > 0) {
-                        entryDN.append(',');
+
+                String entryDN = null;
+                if (chaiConfiguration.getBooleanSetting(ChaiSetting.JNDI_RESOLVE_IN_NAMESPACE)) {
+                    try {
+                        entryDN = searchResult.getNameInNamespace();
+                        entryDN = removeJndiEscapes(entryDN);
+                    } catch (UnsupportedOperationException e) {
+                        LOGGER.debug("unable to use jndi NameInNamespace api: " + e.getMessage());
                     }
-                    entryDN.append(baseDN);
+                }
+
+                if (entryDN == null) {
+                    final StringBuilder entryDNbuilder = new StringBuilder();
+                    entryDNbuilder.append(removeJndiEscapes(searchResult.getName()));
+                    if (baseDN.length() > 0) {
+                        if (entryDNbuilder.length() > 0) {
+                            entryDNbuilder.append(',');
+                        }
+                        entryDNbuilder.append(baseDN);
+                    }
+
+                    entryDN = entryDNbuilder.toString();
                 }
 
                 final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
@@ -1104,11 +1129,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     attrValues.putAll(parseAttributeValues(attributeEnum, returnAllValues));
                 }
 
-                final String entryDNString = entryDN.toString();
-                if (results.containsKey(entryDNString)) {
-                    LOGGER.warn("ignoring duplicate DN in search result from ldap server: " + entryDNString);
+                if (results.containsKey(entryDN)) {
+                    LOGGER.warn("ignoring duplicate DN in search result from ldap server: " + entryDN);
                 } else {
-                    results.put(entryDNString, Collections.unmodifiableMap(attrValues));
+                    results.put(entryDN, Collections.unmodifiableMap(attrValues));
                 }
             }
         }
