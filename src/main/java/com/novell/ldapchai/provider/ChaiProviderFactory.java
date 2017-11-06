@@ -23,9 +23,11 @@ import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiErrors;
+import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -176,7 +178,12 @@ public final class ChaiProviderFactory {
                 providerImpl = createConcreateProvider(chaiConfiguration, true);
             }
         } catch (Exception e) {
-            LOGGER.debug("unable to create connection: " + e.getClass().getName() + ":" + e.getMessage(), e);
+            final String errorMsg = "unable to create connection: " + e.getClass().getName() + ":" + e.getMessage();
+            if (e instanceof ChaiException || e instanceof IOException) {
+                LOGGER.debug(errorMsg);
+            } else {
+                LOGGER.debug(errorMsg, e);
+            }
             throw new ChaiUnavailableException("unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
         }
 
