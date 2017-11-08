@@ -20,7 +20,6 @@
 package com.novell.ldapchai.impl;
 
 import com.novell.ldapchai.ChaiConstant;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
@@ -55,12 +54,6 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         super(userDN, chaiProvider);
     }
 
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChaiUser ---------------------
-
-
     public final ChaiUser getAssistant()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -68,7 +61,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         if (mgrDN == null) {
             return null;
         }
-        return ChaiFactory.createChaiUser(mgrDN, this.getChaiProvider());
+        return getChaiProvider().getEntryFactory().createChaiUser(mgrDN);
     }
 
     public final Set<ChaiUser> getDirectReports()
@@ -77,7 +70,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         final Set<String> reportDNs = this.readMultiStringAttribute(ATTR_MANAGER);
         final Set<ChaiUser> reports = new HashSet<ChaiUser>(reportDNs.size());
         for (final String reporteeDN : reportDNs) {
-            reports.add(ChaiFactory.createChaiUser(reporteeDN, this.getChaiProvider()));
+            reports.add(getChaiProvider().getEntryFactory().createChaiUser(reporteeDN));
         }
         return Collections.unmodifiableSet(reports);
     }
@@ -88,7 +81,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
         final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP);
         for (final String group : groups) {
-            returnGroups.add(ChaiFactory.createChaiGroup(group, this.getChaiProvider()));
+            returnGroups.add(getChaiProvider().getEntryFactory().createChaiGroup(group));
         }
         return Collections.unmodifiableSet(returnGroups);
     }
@@ -100,7 +93,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         if (mgrDN == null) {
             return null;
         }
-        return ChaiFactory.createChaiUser(mgrDN, this.getChaiProvider());
+        return getChaiProvider().getEntryFactory().createChaiUser(mgrDN);
     }
 
 

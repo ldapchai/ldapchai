@@ -6,12 +6,6 @@ import com.novell.ldapchai.ChaiPasswordRule;
 
 public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy {
 
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
-
-
     /**
      * All attributes used by the password policy.  Several "helper" values for each attribute are available, such as the ldap attribute name,
      * and default values.

@@ -77,8 +77,8 @@ public class DefaultChaiPasswordPolicy implements ChaiPasswordPolicy {
     public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicyByRule(final Map<ChaiPasswordRule, String> rules) {
         final com.novell.ldapchai.util.DefaultChaiPasswordPolicy newPolicy = new com.novell.ldapchai.util.DefaultChaiPasswordPolicy();
         if (rules != null) {
-            for (final ChaiPasswordRule rule : rules.keySet()) {
-                newPolicy.rules.put(rule.getKey(),rules.get(rule));
+            for (final Map.Entry<ChaiPasswordRule,String> entry : rules.entrySet()) {
+                newPolicy.rules.put(entry.getKey().getKey(), entry.getValue());
             }
         }
         return newPolicy;

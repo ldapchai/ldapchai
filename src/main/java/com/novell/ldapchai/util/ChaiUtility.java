@@ -21,7 +21,6 @@ package com.novell.ldapchai.util;
 
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
@@ -31,7 +30,6 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiProvider;
-import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.provider.ChaiSetting;
 
 import java.net.URI;
@@ -42,7 +40,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
@@ -53,14 +50,12 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public class ChaiUtility {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiUtility.class);
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Creates a new group entry in the ldap directory.  A new "groupOfNames" object is created.
@@ -90,13 +85,13 @@ public class ChaiUtility {
         provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap());
 
         //Now build an ldapentry object to add attributes to it
-        final ChaiEntry theObject = ChaiFactory.createChaiEntry(entryDN.toString(), provider);
+        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry(entryDN.toString());
 
         //Add the description
         theObject.writeStringAttribute(ChaiConstant.ATTR_LDAP_DESCRIPTION, name);
 
         //Return the newly created group.
-        return ChaiFactory.createChaiGroup(entryDN.toString(), provider);
+        return provider.getEntryFactory().createChaiGroup(entryDN.toString());
     }
 
     /**
@@ -186,7 +181,7 @@ public class ChaiUtility {
         provider.createEntry(userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes);
 
         //lets create a user object
-        return ChaiFactory.createChaiUser(userDN, provider);
+        return provider.getEntryFactory().createChaiUser(userDN);
     }
 
     /**
@@ -206,29 +201,15 @@ public class ChaiUtility {
         final Map<String, Map<String, List<String>>> results = theEntry.getChaiProvider().searchMultiValues(theEntry.getEntryDN(), "(objectClass=*)", null, ChaiProvider.SEARCH_SCOPE.BASE);
         final Map<String, List<String>> props = results.get(theEntry.getEntryDN());
 
-        for (final String attrName : props.keySet()) {
-            final List<String> values = props.get(attrName);
+        for (final Map.Entry<String,List<String>> entry : props.entrySet()) {
+            final String attrName = entry.getKey();
+            final List<String> values = entry.getValue();
             for (final String value : values) {
                 sb.append(attrName).append(": ").append(value).append('\n');
             }
         }
 
         return sb.toString();
-    }
-
-    private static ChaiEntry findPartitionRoot(final ChaiEntry theEntry)
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        ChaiEntry loopEntry = theEntry;
-
-        while (loopEntry != null) {
-            final Set<String> objClasses = loopEntry.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS);
-            if (objClasses.contains(ChaiConstant.OBJECTCLASS_BASE_LDAP_PARTITION)) {
-                return loopEntry;
-            }
-            loopEntry = loopEntry.getParentEntry();
-        }
-        return null;
     }
 
     /**
@@ -258,7 +239,7 @@ public class ChaiUtility {
      * </ul>
      * <hr/><blockquote><pre>
      *   ChaiUser theUser =                                                                     // create a new chai user.
-     *      ChaiFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
+     *      VendorFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
      *
      *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
      *
@@ -314,7 +295,7 @@ public class ChaiUtility {
         for (final ChaiConfiguration loopConfiguration : perReplicaProviders) {
             ChaiProvider loopProvider = null;
             try {
-                loopProvider = ChaiProviderFactory.createProvider(loopConfiguration);
+                loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider(loopConfiguration);
                 if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, effectiveValue)) {
                     successCount++;
                 }
@@ -359,9 +340,9 @@ public class ChaiUtility {
             final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfiguration);
             loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
             if (additionalSettings != null) {
-                for (final ChaiSetting setting : additionalSettings.keySet()) {
-                    final String value = additionalSettings.get(setting);
-                    loopConfig.setSetting(setting,value);
+                for (final Map.Entry<ChaiSetting,String> entry : additionalSettings.entrySet()) {
+                    final String value = entry.getValue();
+                    loopConfig.setSetting(entry.getKey(), value);
                 }
             }
             returnProviders.add(loopConfig);
@@ -370,8 +351,6 @@ public class ChaiUtility {
         return returnProviders;
     }
 
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     private ChaiUtility()
     {
@@ -510,10 +489,12 @@ public class ChaiUtility {
         }
 
         rootDSEChaiConfig.setSetting(ChaiSetting.BIND_URLS,newUrlConfig.toString());
-        final ChaiProvider rootDseProvider = currentURLsHavePath ? ChaiProviderFactory.createProvider(rootDSEChaiConfig) : provider;
+        final ChaiProvider rootDseProvider = currentURLsHavePath
+                ? provider.getProviderFactory().newProvider(rootDSEChaiConfig)
+                : provider;
 
-        // can not call the ChaiFactory here, because ChaiFactory in turn calls this method to get the
-        // directory vendor.  Instead, we will go directly to the Generic ChaiFactory
+        // can not call the VendorFactory here, because VendorFactory in turn calls this method to get the
+        // directory vendor.  Instead, we will go directly to the Generic VendorFactory
         final GenericEntryFactory genericEntryFactory = new GenericEntryFactory();
         return genericEntryFactory.createChaiEntry("",rootDseProvider);
     }

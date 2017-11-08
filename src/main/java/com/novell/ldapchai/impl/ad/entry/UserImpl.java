@@ -21,7 +21,6 @@ package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
@@ -68,7 +67,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
         final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER_OF);
         for (final String group : groups) {
-            returnGroups.add(ChaiFactory.createChaiGroup(group, this.getChaiProvider()));
+            returnGroups.add(getChaiProvider().getEntryFactory().createChaiGroup(group));
         }
         return Collections.unmodifiableSet(returnGroups);
     }

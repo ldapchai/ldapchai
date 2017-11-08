@@ -24,7 +24,7 @@ import com.novell.ldapchai.ChaiPasswordRule;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.impl.edir.value.nspmComplexityRules;
+import com.novell.ldapchai.impl.edir.value.NspmComplexityRules;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
@@ -122,7 +122,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
     private static Map<String,String> createRuleMapUsingComplexityRules(final String input) {
         final Map<String, String> returnMap = new HashMap<String,String>();
 
-        final nspmComplexityRules complexityRules = new nspmComplexityRules(input);
+        final NspmComplexityRules complexityRules = new NspmComplexityRules(input);
         if (complexityRules.isMsComplexityPolicy()) {
             returnMap.put(ChaiPasswordRule.ADComplexity.getKey(),String.valueOf(true));
             return returnMap;

@@ -25,12 +25,10 @@ package com.novell.ldapchai.util;
  * @author Jason D. Rivard
  */
 public class ChaiLogger {
-// ------------------------------ FIELDS ------------------------------
+
 
     private final String name;
     private final org.apache.log4j.Logger logger;
-
-// -------------------------- STATIC METHODS --------------------------
 
     public static ChaiLogger getLogger(final Class className)
     {
@@ -42,22 +40,16 @@ public class ChaiLogger {
         return new ChaiLogger(name);
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     public ChaiLogger(final String name)
     {
         this.name = name;
         logger = org.apache.log4j.Logger.getLogger(name);
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     public String getName()
     {
         return name;
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     public void debug(final Object message)
     {

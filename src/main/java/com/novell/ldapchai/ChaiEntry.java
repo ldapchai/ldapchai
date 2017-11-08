@@ -48,10 +48,6 @@ import java.util.Set;
  */
 
 public interface ChaiEntry {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Writes an additional attribute value to an attribute on an ldap entry.  This operation

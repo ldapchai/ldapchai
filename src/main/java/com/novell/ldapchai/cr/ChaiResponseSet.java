@@ -57,10 +57,10 @@ import java.util.StringTokenizer;
 import java.util.TimeZone;
 
 public class ChaiResponseSet extends AbstractResponseSet implements Serializable {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-    // ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiResponseSet.class.getName());
 
@@ -115,9 +115,6 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         return returnVal;
     }
 
-
-// --------------------------- CONSTRUCTORS ---------------------------
-
     ChaiResponseSet(
             final Map<Challenge, Answer> crMap,
             final Map<Challenge, HelpdeskAnswer> helpdeskCrMap,
@@ -135,8 +132,6 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         this.timestamp = timestamp;
     }
 
-// ------------------------ CANONICAL METHODS ------------------------
-
     public String toString()
     {
         final StringBuilder sb = new StringBuilder(super.toString());
@@ -144,11 +139,6 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         sb.append(")");
         return sb.toString();
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ResponseSet ---------------------
 
     public String stringValue()
             throws UnsupportedOperationException, ChaiOperationException {
@@ -197,9 +187,6 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
         return correctRandoms >= minimumRandomRequired;
     }
-
-// -------------------------- OTHER METHODS --------------------------
-
 
     boolean write(final ChaiUser user)
             throws ChaiUnavailableException, ChaiOperationException

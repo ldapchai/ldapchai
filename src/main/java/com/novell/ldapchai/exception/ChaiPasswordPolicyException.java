@@ -26,7 +26,7 @@ package com.novell.ldapchai.exception;
  * @author Jason D. Rivard
  */
 public class ChaiPasswordPolicyException extends ChaiOperationException {
-// ----------------------------- CONSTANTS ----------------------------
+
 
 
     public ChaiPasswordPolicyException(final String message, final ChaiError errorCode) {

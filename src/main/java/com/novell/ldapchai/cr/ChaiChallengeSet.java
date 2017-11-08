@@ -32,14 +32,12 @@ import java.util.Locale;
 
 
 public class ChaiChallengeSet implements ChallengeSet, Serializable {
-// ------------------------------ FIELDS ------------------------------
+
 
     private List<Challenge> challenges;
     private int minRandomRequired;
     private Locale locale;
     private String identifier;
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     public ChaiChallengeSet(
         final Collection<Challenge> challenges,
@@ -68,8 +66,6 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
         }
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     public final List<Challenge> getChallenges()
     {
         return challenges;
@@ -84,8 +80,6 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
     {
         return minRandomRequired;
     }
-
-// ------------------------ CANONICAL METHODS ------------------------
 
     public final String toString()
     {
@@ -105,11 +99,6 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable {
 
         return sb.toString();
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChallengeSet ---------------------
 
     public final List<Challenge> getAdminDefinedChallenges()
     {

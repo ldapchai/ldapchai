@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Package name="~com\.novell\.security\.nmas\..*"/>
+    </Match>
+    <Match>
+        <Package name="~com\.novell\.ldapchai\.cr.*"/>
+    </Match>
+</FindBugsFilter>
+
+

@@ -37,12 +37,10 @@ import java.util.StringTokenizer;
  * @author Jason D. Rivard
  */
 public class DirXML_EntitlementRef implements Serializable {
-// ----------------------------- CONSTANTS ----------------------------
+
 
     //@todo make this class public
     public static final String ASN_VALUE = "2.16.840.1.113719.1.14.4.1.2087";
-
-// -------------------------- ENUMERATIONS --------------------------
 
     public enum State {
         REVOKED(0),
@@ -71,13 +69,9 @@ public class DirXML_EntitlementRef implements Serializable {
         }
     }
 
-// ------------------------------ FIELDS ------------------------------
-
     private String entitlementDN;
     private int state;
     private String payload;
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     public DirXML_EntitlementRef(final String value, final ChaiProvider provider)
     {
@@ -88,8 +82,7 @@ public class DirXML_EntitlementRef implements Serializable {
         final StringTokenizer st = new StringTokenizer(value, "#");
         this.entitlementDN = st.nextToken();
         final String stateString = st.nextToken();
-        final int stateNumber = Integer.valueOf(stateString);
-        this.state = stateNumber;
+        this.state = Integer.parseInt(stateString);
         if (st.hasMoreTokens()) {
             this.payload = st.nextToken();
         } else {
@@ -111,8 +104,6 @@ public class DirXML_EntitlementRef implements Serializable {
         }
         return doc;
     }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
 
     public String getEntitlementDN()
     {

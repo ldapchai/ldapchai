@@ -45,7 +45,6 @@ import java.util.Map;
  * @author Jason D. Rivard
  */
 public interface ResponseSet {
-// ------------------------ CANONICAL METHODS ------------------------
 
     /**
      * Get a debug-friendly representation of this {@code ResponseSet}.
@@ -53,8 +52,6 @@ public interface ResponseSet {
      * @return A string suitable for debug logging
      */
     String toString();
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Get a {@link com.novell.ldapchai.cr.ChallengeSet} that governs the responses

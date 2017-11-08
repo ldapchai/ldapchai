@@ -28,14 +28,12 @@ package com.novell.ldapchai.exception;
  * @see ChaiError
  */
 public class ChaiException extends Exception {
-// ------------------------------ FIELDS ------------------------------
+
 
     private final boolean permanent;
     private final boolean authentication;
 
     private final ChaiError errorCode;
-
-// -------------------------- STATIC METHODS --------------------------
 
     static ChaiException createChaiException(final String message)
     {
@@ -47,8 +45,6 @@ public class ChaiException extends Exception {
             return new ChaiOperationException(message, detectedCode);
         }
     }
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     protected ChaiException(final String message, final ChaiError errorCode)
     {
@@ -62,8 +58,6 @@ public class ChaiException extends Exception {
         this.authentication = authentication;
         this.errorCode = errorCode;
     }
-
-    // --------------------- GETTER / SETTER METHODS ---------------------
 
     public ChaiError getErrorCode()
     {

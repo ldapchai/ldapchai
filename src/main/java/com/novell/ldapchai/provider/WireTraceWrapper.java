@@ -25,6 +25,7 @@ import com.novell.ldapchai.util.ChaiLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Simple wire trace provider wrapper.  Adds lots of debugging info to the log4j trace level.
@@ -33,16 +34,14 @@ import java.lang.reflect.Proxy;
  * @see ChaiSetting#WIRETRACE_ENABLE
  */
 class WireTraceWrapper extends AbstractWrapper {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(WireTraceWrapper.class);
 
-    private volatile long operationCounter;
-
-// -------------------------- STATIC METHODS --------------------------
+    private AtomicLong operationCounter = new AtomicLong(0);
 
     /**
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.
@@ -73,19 +72,12 @@ class WireTraceWrapper extends AbstractWrapper {
                 new WireTraceWrapper(chaiProvider));
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     WireTraceWrapper(
             final ChaiProviderImplementor realProvider
     )
     {
         this.realProvider = realProvider;
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface InvocationHandler ---------------------
 
     public Object invoke(
             final Object proxy,
@@ -107,8 +99,6 @@ class WireTraceWrapper extends AbstractWrapper {
             throw new RuntimeException("unexpected invocation exception: " + e.getMessage(),e);
         }
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     private Object traceInvokation(
             final Method method,
@@ -142,9 +132,8 @@ class WireTraceWrapper extends AbstractWrapper {
         return result;
     }
 
-    private synchronized long getNextCounter()
+    private long getNextCounter()
     {
-        operationCounter++;
-        return operationCounter;
+        return operationCounter.incrementAndGet();
     }
 }

@@ -46,10 +46,6 @@ import java.util.Properties;
  * @see ChaiSetting
  */
 public class ChaiConfiguration implements Serializable {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// ------------------------------ FIELDS ------------------------------
 
     public static final String LDAP_URL_SEPERATOR_REGEX_PATTERN = ",| "; // comma <or> space (regex)
 
@@ -59,8 +55,6 @@ public class ChaiConfiguration implements Serializable {
     private transient volatile boolean locked;
     private Properties settings = new Properties(DEFAULT_SETTINGS);
     private X509TrustManager[] trustManager = null;
-
-// -------------------------- STATIC METHODS --------------------------
 
     static {
         for (final ChaiSetting s : ChaiSetting.values()) {
@@ -79,8 +73,6 @@ public class ChaiConfiguration implements Serializable {
         propCopy.putAll(DEFAULT_SETTINGS);
         return propCopy;
     }
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     /**
      * Construct a default {@code ChaiConfiguration}
@@ -169,8 +161,6 @@ public class ChaiConfiguration implements Serializable {
         this.setSetting(ChaiSetting.BIND_URLS, ldapURL);
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     /**
      * Return the current implementation configuration object.
      *
@@ -190,8 +180,6 @@ public class ChaiConfiguration implements Serializable {
     {
         return locked;
     }
-
-// ------------------------ CANONICAL METHODS ------------------------
 
     /**
      * Returns a string value suitable for debugging.  Sensitive values such as passwords are
@@ -250,8 +238,6 @@ public class ChaiConfiguration implements Serializable {
     }
 
 
-// -------------------------- OTHER METHODS --------------------------
-
     /**
      * Returns an immutable list of the ldap URLs.
      *
@@ -259,7 +245,7 @@ public class ChaiConfiguration implements Serializable {
      */
     public List<String> bindURLsAsList()
     {
-        final List<String> results = new ArrayList<String>();
+        final List<String> results = new ArrayList<>();
         results.addAll(Arrays.asList(getSetting(ChaiSetting.BIND_URLS).split(LDAP_URL_SEPERATOR_REGEX_PATTERN)));
         return Collections.unmodifiableList(results);
     }
@@ -272,7 +258,7 @@ public class ChaiConfiguration implements Serializable {
     int getIntSetting(final ChaiSetting name)
     {
         try {
-            return Integer.valueOf(getSetting(name));
+            return Integer.parseInt(getSetting(name));
         } catch (Exception e) {
             // doesnt matter, we're throwing anyway.
         }
@@ -299,8 +285,7 @@ public class ChaiConfiguration implements Serializable {
      */
     public X509TrustManager[] getTrustManager()
     {
-        // make a defensive copy
-        return trustManager;
+        return trustManager == null ? null : Arrays.copyOf(trustManager, trustManager.length);
     }
 
     /**
@@ -341,7 +326,7 @@ public class ChaiConfiguration implements Serializable {
     public ChaiConfiguration setTrustManager(final X509TrustManager[] trustManager)
     {
         checkLock();
-        this.trustManager = trustManager;
+        this.trustManager = trustManager == null ? null : Arrays.copyOf(trustManager, trustManager.length);
         return this;
     }
 

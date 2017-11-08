@@ -29,10 +29,6 @@ package com.novell.ldapchai.exception;
  * @author Jason D. Rivard
  */
 public class ImpossiblePasswordPolicyException extends RuntimeException {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
 
     /**
      * Enumeration of problems with a password policy
@@ -61,8 +57,6 @@ public class ImpossiblePasswordPolicyException extends RuntimeException {
         super(error.toString());
         this.error = error;
     }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
 
     public ErrorEnum getError()
     {

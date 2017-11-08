@@ -25,7 +25,6 @@ import java.io.File;
 import java.lang.reflect.Method;
 
 public class ExampleTester extends TestCase {
-// -------------------------- OTHER METHODS --------------------------
 
     protected void setUp()
             throws Exception

@@ -32,10 +32,6 @@ import java.util.Map;
  * @author Jason D. Rivard
  */
 public interface ChaiProviderImplementor extends ChaiProvider {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
 
     /**
      * Current status of the {@code ChaiProvider} instance.
@@ -43,8 +39,6 @@ public interface ChaiProviderImplementor extends ChaiProvider {
     enum ConnectionState {
         NEW, OPEN, CLOSED
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Return the underlying connection object.  The implementating class must decide
@@ -88,8 +82,6 @@ public interface ChaiProviderImplementor extends ChaiProvider {
      */
     void init(ChaiConfiguration chaiConfig)
         throws ChaiUnavailableException, IllegalStateException;
-
-// -------------------------- INNER CLASSES --------------------------
 
     /**
      * Indicates if the method is actually performing an ldap operation.

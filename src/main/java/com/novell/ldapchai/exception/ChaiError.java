@@ -82,25 +82,15 @@ public enum ChaiError {
     CR_DUPLICATE_RESPONSES             ("DuplicateResponses",          607),
     CR_TOO_MANY_QUESTION_CHARS         ("TooManyQuestionChars",        608),
 
-
     ;
-
-// ------------------------------ FIELDS ------------------------------
 
     private final int errorCode;
     private String errorKey;
-
-// -------------------------- STATIC METHODS --------------------------
-
-
-    // --------------------------- CONSTRUCTORS ---------------------------
 
     ChaiError(final String errorKey, final int errorCode)
     {
         this.errorCode = errorCode;
     }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
 
     /**
      * Returns the underlying error code's numeric value.

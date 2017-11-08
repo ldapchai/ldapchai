@@ -20,7 +20,7 @@
 package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
@@ -32,7 +32,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
  * In most cases, this factory should not
  * be used directly.  Instead, use {@link ChaiFactory}.
  */
-public class EdirEntryFactory implements ChaiFactory.ChaiEntryFactory {
+public class EdirEntryFactory implements ChaiEntryFactory.VendorFactory {
 
     private static ErrorMap errorMap;
 

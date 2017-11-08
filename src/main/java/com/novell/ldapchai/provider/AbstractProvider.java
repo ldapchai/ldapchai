@@ -20,6 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiException;
@@ -40,29 +41,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor {
-// ----------------------------- CONSTANTS ----------------------------
 
-    public static final ChaiProviderInputValidator INPUT_VALIDATOR = new ChaiProviderInputValidator();
-
-// ------------------------------ FIELDS ------------------------------
+    private static final ChaiProviderInputValidator INPUT_VALIDATOR = new ChaiProviderInputValidator();
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractProvider.class.getName());
 
-    private static volatile long instanceCounter;
-
     protected ChaiConfiguration chaiConfig;
     protected volatile ConnectionState state = ConnectionState.NEW;
-    protected long instanceCount;
 
-    protected Map<String,Object> providerProperties = new HashMap<String,Object>();
+    private Map<String,Object> providerProperties = new HashMap<String,Object>();
     private DIRECTORY_VENDOR cachedDirectoryVendor;
 
-    private static int idCounter = 0;
-    private int counter = idCounter++;
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger(0);
+    private int counter = ID_COUNTER.getAndIncrement();
 
-// -------------------------- STATIC METHODS --------------------------
 
     static String methodToDebugStr(final Method theMethod, final Object... parameters)
     {
@@ -109,21 +104,16 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return providerProperties;
     }
 
-    // --------------------------- CONSTRUCTORS ---------------------------
+
 
     AbstractProvider()
     {
-        instanceCounter++;
-        instanceCount = instanceCounter;
-
         {  // populate the extended for 
             final Map<String, Exception> cacheFailureMap = new HashMap<String,Exception>();
             getProviderProperties().put(EXTENDED_FAILURE_CACHE_KEY, cacheFailureMap);
         }
 
     }
-
-// ------------------------ CANONICAL METHODS ------------------------
 
     /**
      * Return a debug string with connection and state information.
@@ -134,7 +124,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     {
         final StringBuilder sb = new StringBuilder();
         sb.append("ChaiProvider ");
-        sb.append("#").append(instanceCount).append(" ");
+        sb.append("#").append(counter).append(" ");
         sb.append("(").append(this.getClass().getSimpleName()).append("), ");
         sb.append(getConnectionState()).append(" ");
         if (getConnectionState().equals(ChaiProviderImplementor.ConnectionState.OPEN)) {
@@ -148,11 +138,6 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return sb.toString();
     }
 
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChaiProvider ---------------------
-
     public void close()
     {
         this.state = ConnectionState.CLOSED;
@@ -162,8 +147,6 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     {
         return chaiConfig;
     }
-
-// --------------------- Interface ChaiProviderImplementor ---------------------
 
     public ConnectionState getConnectionState()
     {
@@ -185,8 +168,6 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         state = ConnectionState.OPEN;
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     protected void activityPreCheck()
     {
         if (state == ConnectionState.NEW) {
@@ -197,8 +178,6 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             throw new IllegalStateException("ChaiProvider instance has been closed");
         }
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     public boolean errorIsRetryable(final Exception e)
     {
@@ -520,6 +499,14 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
                 throw new NullPointerException("newValue must not be null");
             }
         }
+
+        public ChaiEntryFactory getEntryFactory() {
+            return null;
+        }
+
+        public ChaiProviderFactory getProviderFactory() {
+            return null;
+        }
     }
 
     protected static final String EXTENDED_FAILURE_CACHE_KEY = "extendedFailureCache";
@@ -585,5 +572,17 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     public String getIdentifier() {
         return String.valueOf(counter);
+    }
+
+    public ChaiProviderFactory getProviderFactory() {
+        return null;
+    }
+
+    public ChaiEntryFactory getEntryFactory() {
+        return null;
+    }
+
+    protected ChaiProviderInputValidator getInputValidator() {
+        return INPUT_VALIDATOR;
     }
 }

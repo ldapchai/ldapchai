@@ -33,7 +33,6 @@ import java.io.Serializable;
  * @author Jason D. Rivard
  */
 public interface Challenge extends Serializable {
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Get the text of the {@code Challenge} question.  Depending on the origin and type of the

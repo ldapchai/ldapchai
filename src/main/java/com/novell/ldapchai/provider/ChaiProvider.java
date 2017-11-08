@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -63,10 +64,6 @@ import java.util.Set;
  * @see com.novell.ldapchai.ChaiEntry
  */
 public interface ChaiProvider {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
 
     /**
      * LDAP search scope of BASE, ONE or SUBTREE.
@@ -112,8 +109,6 @@ public interface ChaiProvider {
         ORACLE_DS,
         MICROSOFT_ACTIVE_DIRECTORY,
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Close the connection to ldap.  All other operational methods (those that are marked with
@@ -494,5 +489,13 @@ public interface ChaiProvider {
      * @return true if the connection has a valid, active connection to the ldap directory.
      */
     boolean isConnected();
+
+    /**
+     * Return the factory that produced this {@code ChaiProvider} instance.
+     * @return
+     */
+    ChaiProviderFactory getProviderFactory();
+
+    ChaiEntryFactory getEntryFactory();
 }
 

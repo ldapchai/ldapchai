@@ -32,7 +32,7 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public interface ChaiGroup extends ChaiEntry {
-// ----------------------------- CONSTANTS ----------------------------
+
 
     /**
      * Convenience LDAP attribute definition
@@ -43,8 +43,6 @@ public interface ChaiGroup extends ChaiEntry {
      * Convenience LDAP attribute definition
      */
     String ATTR_AUXCLASS_DYNAMIC = ChaiConstant.OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP;
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Make the passed in user a member of this group.  This method takes care of all four attribute assignments

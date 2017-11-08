@@ -36,10 +36,7 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractResponseSet.class.getName());
 
-// ----------------------------- CONSTANTS ----------------------------
 
-
-// -------------------------- ENUMERATIONS --------------------------
 
     public enum STATE {
         NEW(true),
@@ -59,8 +56,6 @@ public abstract class AbstractResponseSet implements ResponseSet {
         }
     }
 
-// ------------------------------ FIELDS ------------------------------
-
     protected Map<Challenge, Answer> crMap = Collections.emptyMap();
     protected ChallengeSet allChallengeSet;
     protected ChallengeSet presentableChallengeSet;
@@ -71,8 +66,6 @@ public abstract class AbstractResponseSet implements ResponseSet {
     protected Map<Challenge, HelpdeskAnswer> helpdeskCrMap = Collections.emptyMap();
 
     protected STATE state;
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     protected AbstractResponseSet(
             final Map<Challenge, Answer> crMap,
@@ -104,8 +97,6 @@ public abstract class AbstractResponseSet implements ResponseSet {
     }
 
 
-// ------------------------ CANONICAL METHODS ------------------------
-
     public String toString()
     {
         final StringBuilder sb = new StringBuilder();
@@ -121,10 +112,6 @@ public abstract class AbstractResponseSet implements ResponseSet {
         return sb.toString();
     }
 
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ResponseSet ---------------------
 
     public final ChallengeSet getChallengeSet() throws ChaiValidationException
     {
@@ -173,17 +160,17 @@ public abstract class AbstractResponseSet implements ResponseSet {
     }
 
     public Map<Challenge, String> getHelpdeskResponses() {
-        final Map<Challenge, String> returnMap = new LinkedHashMap<Challenge, String>();
+        final Map<Challenge, String> returnMap = new LinkedHashMap<>();
         if (this.helpdeskCrMap != null) {
-            for (final Challenge challenge : helpdeskCrMap.keySet()) {
-                final String answerText = helpdeskCrMap.get(challenge).answerText();
-                returnMap.put(challenge,answerText);
+            for (final Map.Entry<Challenge, HelpdeskAnswer> entry : helpdeskCrMap.entrySet()) {
+                final Challenge challenge = entry.getKey();
+                final HelpdeskAnswer answer = entry.getValue();
+                final String answerText = answer.answerText();
+                returnMap.put(challenge, answerText);
             }
         }
         return returnMap;
     }
-
-    // -------------------------- OTHER METHODS --------------------------
 
     private static ChallengeSet reduceCsToMinRandoms(final ChallengeSet allChallengeSet)
             throws ChaiValidationException
@@ -193,8 +180,8 @@ public abstract class AbstractResponseSet implements ResponseSet {
         }
 
         final SecureRandom random = new SecureRandom();
-        final List<Challenge> newChallenges = new ArrayList<Challenge>();
-        final List<Challenge> allRandoms = new ArrayList<Challenge>(allChallengeSet.getRandomChallenges());
+        final List<Challenge> newChallenges = new ArrayList<>();
+        final List<Challenge> allRandoms = new ArrayList<>(allChallengeSet.getRandomChallenges());
         while (newChallenges.size() < allChallengeSet.getMinRandomRequired()) {
             newChallenges.add(allRandoms.remove(random.nextInt(allRandoms.size())));
         }
@@ -209,10 +196,10 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
     public Map<Challenge,Answer> getChallengeAnswers() {
 
-        return crMap == null ? Collections.<Challenge,Answer>emptyMap() : Collections.unmodifiableMap(crMap);
+        return crMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(crMap);
     }
 
     public Map<Challenge,HelpdeskAnswer> getHelpdeskAnswers() {
-        return helpdeskCrMap == null ? Collections.<Challenge,HelpdeskAnswer>emptyMap() : Collections.unmodifiableMap(helpdeskCrMap);
+        return helpdeskCrMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(helpdeskCrMap);
     }
 }

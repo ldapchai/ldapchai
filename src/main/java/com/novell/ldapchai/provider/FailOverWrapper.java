@@ -40,10 +40,10 @@ import java.util.Map;
  * @see ChaiSetting#FAILOVER_ENABLE
  */
 class FailOverWrapper implements InvocationHandler {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(FailOverWrapper.class);
 
@@ -53,8 +53,6 @@ class FailOverWrapper implements InvocationHandler {
 
     private final FailOverSettings settings;
     private volatile boolean closed = false;
-
-// -------------------------- STATIC METHODS --------------------------
 
     static ChaiProviderImplementor forConfiguration(final ChaiConfiguration chaiConfig)
             throws ChaiUnavailableException
@@ -87,8 +85,6 @@ class FailOverWrapper implements InvocationHandler {
         } while ((System.currentTimeMillis() - startTime) < time);
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     private FailOverWrapper(final ChaiConfiguration chaiConfig)
             throws ChaiUnavailableException
     {
@@ -106,19 +102,14 @@ class FailOverWrapper implements InvocationHandler {
         }
 
         this.settings = new FailOverSettings(failOverHelper);
-        this.settings.maxRetries = settingMaxRetries;
-        this.settings.minFailBackTime = settingMinFailbackTime;
+        this.settings.setMaxRetries(settingMaxRetries);
+        this.settings.setMinFailBackTime(settingMinFailbackTime);
 
         rotationMachine = new RotationMachine(chaiConfig, settings);
 
         // call get current provider.  must be able to connect, else should not return a new instance.
         originalProvider = rotationMachine.getCurrentProvider();
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface InvocationHandler ---------------------
 
     public Object invoke(final Object proxy, final Method m, final Object[] args)
             throws Throwable
@@ -140,8 +131,6 @@ class FailOverWrapper implements InvocationHandler {
             return failOverInvoke(m, args);
         }
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     private void closeThis() {
         closed = true;
@@ -197,8 +186,6 @@ class FailOverWrapper implements InvocationHandler {
         throw new ChaiUnavailableException("unable to reach any configured server, maximum retries exceeded", ChaiError.COMMUNICATION);
     }
 
-
-// -------------------------- INNER CLASSES --------------------------
 
     /**
      * The rotatation machine manages which URL is currently active.  It does this by
@@ -485,7 +472,7 @@ class FailOverWrapper implements InvocationHandler {
 
         private int maxRetries = 3;
         private int minFailBackTime = 5 * 60 * 1000; // 5 minutes
-        private final int rotateDelay = 1000;
+        private static final int ROTATE_DELAY = 1000;
 
         private FailOverSettings(
                 final ChaiProviderImplementor failOverHelper
@@ -509,9 +496,17 @@ class FailOverWrapper implements InvocationHandler {
             return minFailBackTime;
         }
 
+        public void setMaxRetries(final int maxRetries) {
+            this.maxRetries = maxRetries;
+        }
+
+        public void setMinFailBackTime(final int minFailBackTime) {
+            this.minFailBackTime = minFailBackTime;
+        }
+
         public int getRotateDelay()
         {
-            return rotateDelay;
+            return ROTATE_DELAY;
         }
     }
 }

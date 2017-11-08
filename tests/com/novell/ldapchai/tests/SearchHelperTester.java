@@ -26,7 +26,6 @@ import junit.framework.TestCase;
 import java.util.LinkedHashMap;
 
 public class SearchHelperTester extends TestCase {
-// -------------------------- OTHER METHODS --------------------------
 
     public void testAndFilter()
             throws Exception

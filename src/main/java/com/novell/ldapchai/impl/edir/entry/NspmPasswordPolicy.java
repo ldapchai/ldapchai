@@ -32,11 +32,6 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
      */
     String getSourceDN();
 
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
-
     /**
      * Enumeration that describes the selected mode for password recovery.
      */
@@ -69,8 +64,6 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
             return null;
         }
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * All attributes used by the password policy.  Several "helper" values for each attribute are available, such as the ldap attribute name,

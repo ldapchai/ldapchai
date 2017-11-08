@@ -45,18 +45,16 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public final class ChaiCrFactory {
-    // ----------------------------- CONSTANTS ----------------------------
+
 
     /**
      * Constant used to indicate user supplied question
      */
     public static final String USER_SUPPLIED_QUESTION = "%user%";
 
-// ------------------------------ FIELDS ------------------------------
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiCrFactory.class);
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Create a new ResponseSet.  The generated ResponseSet will be suitable for writing to the directory.
@@ -242,11 +240,6 @@ public final class ChaiCrFactory {
             }
         }
     }
-
-
-
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     private ChaiCrFactory()
     {

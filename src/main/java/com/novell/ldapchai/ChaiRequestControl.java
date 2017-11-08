@@ -20,6 +20,7 @@
 package com.novell.ldapchai;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class ChaiRequestControl implements Serializable {
     private final String id;
@@ -34,7 +35,7 @@ public class ChaiRequestControl implements Serializable {
     {
         this.id = id;
         this.critical = critical;
-        this.value = value;
+        this.value = value == null ? null : Arrays.copyOf(value, value.length);
     }
 
     public String getId()
@@ -49,6 +50,6 @@ public class ChaiRequestControl implements Serializable {
 
     public byte[] getValue()
     {
-        return value;
+        return value == null ? null : Arrays.copyOf(value, value.length);
     }
 }

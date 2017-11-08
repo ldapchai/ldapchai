@@ -22,7 +22,7 @@ package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
@@ -31,7 +31,6 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiProvider;
-import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
@@ -62,14 +61,8 @@ import java.util.TimeZone;
  * @author Jason D. Rivard
  */
 public class EdirEntries {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(EdirEntries.class);
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Convert a Date to the Zulu String format.
@@ -174,13 +167,13 @@ public class EdirEntries {
         provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap());
 
         //Now build an ldapentry object to add attributes to it
-        final ChaiEntry theObject = ChaiFactory.createChaiEntry(entryDN.toString(), provider);
+        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry(entryDN.toString());
 
         //Add the description
         theObject.writeStringAttribute(ChaiConstant.ATTR_LDAP_DESCRIPTION, name);
 
         //Return the newly created group.
-        return ChaiFactory.createChaiGroup(entryDN.toString(), provider);
+        return provider.getEntryFactory().createChaiGroup(entryDN.toString());
     }
 
     /**
@@ -270,34 +263,7 @@ public class EdirEntries {
         provider.createEntry(userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes);
 
         //lets create a user object
-        return ChaiFactory.createChaiUser(userDN, provider);
-    }
-
-    /**
-     * Convert to an LDIF format.  Useful for debugging or other purposes
-     *
-     * @param theEntry A valid {@code ChaiEntry}
-     * @return A string containing a properly formated LDIF view of the entry.
-     * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
-     * @throws com.novell.ldapchai.exception.ChaiUnavailableException If the directory server(s) are unavailable
-     */
-    public static String entryToLDIF(final ChaiEntry theEntry)
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final StringBuilder sb = new StringBuilder();
-        sb.append("dn: ").append(theEntry.getEntryDN()).append("\n");
-
-        final Map<String, Map<String, List<String>>> results = theEntry.getChaiProvider().searchMultiValues(theEntry.getEntryDN(), "(objectClass=*)", null, ChaiProvider.SEARCH_SCOPE.BASE);
-        final Map<String, List<String>> props = results.get(theEntry.getEntryDN());
-
-        for (final String attrName : props.keySet()) {
-            final List<String> values = props.get(attrName);
-            for (final String value : values) {
-                sb.append(attrName).append(": ").append(value).append('\n');
-            }
-        }
-
-        return sb.toString();
+        return provider.getEntryFactory().createChaiUser(userDN);
     }
 
     private static ChaiEntry findPartitionRoot(final ChaiEntry theEntry)
@@ -393,7 +359,7 @@ public class EdirEntries {
      * </ul>
      * <hr/><blockquote><pre>
      *   ChaiUser theUser =                                                                     // create a new chai user.
-     *      ChaiFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
+     *      VendorFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
      *
      *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
      *
@@ -445,7 +411,7 @@ public class EdirEntries {
                 loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
                 loopConfig.setSetting(ChaiSetting.FAILOVER_CONNECT_RETRIES, "1");
 
-                loopProvider = ChaiProviderFactory.createProvider(loopConfig);
+                loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider(loopConfig);
 
                 if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, effectiveValue)) {
                     successCount++;
@@ -510,13 +476,10 @@ public class EdirEntries {
         group.addAttribute(ChaiConstant.ATTR_LDAP_EQUIVALENT_TO_ME, user.getEntryDN());
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     private EdirEntries()
     {
     }
 
-    // -------------------------- INNER CLASSES --------------------------
     private static final class UserPasswordPolicyReader {
         private static final Set<String> TRADITIONAL_PASSWORD_ATTRIBUTES;
         private static final SearchHelper NSPM_ENTRY_SEARCH_HELPER = new SearchHelper();
@@ -590,6 +553,7 @@ public class EdirEntries {
                 throws ChaiUnavailableException, ChaiOperationException
         {
             final boolean useNmasSetting = theUser.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
+            final ChaiEntryFactory chaiEntryFactory = theUser.getChaiProvider().getEntryFactory();
 
             if (useNmasSetting) {
                 final GetPwdPolicyInfoRequest request = new GetPwdPolicyInfoRequest();
@@ -599,7 +563,7 @@ public class EdirEntries {
                     final GetPwdPolicyInfoResponse polcyInfoResponse = (GetPwdPolicyInfoResponse) response;
                     final String policyDN = polcyInfoResponse.getPwdPolicyDNStr();
                     if (policyDN != null) {
-                        return ChaiFactory.createChaiEntry(policyDN, theUser.getChaiProvider());
+                        return chaiEntryFactory.createChaiEntry(policyDN);
                     }
                 }
                 return null;
@@ -608,7 +572,7 @@ public class EdirEntries {
                 {
                     final String policyDN = theUser.readStringAttribute("nspmPasswordPolicyDN");
                     if (policyDN != null && policyDN.length() > 0) {
-                        return ChaiFactory.createChaiEntry(policyDN, theUser.getChaiProvider());
+                        return chaiEntryFactory.createChaiEntry(policyDN);
                     }
                 }
 
@@ -619,7 +583,7 @@ public class EdirEntries {
                     if (parentObject != null) {
                         final String policyDN = parentObject.readStringAttribute("nspmPasswordPolicyDN");
                         if (policyDN != null && policyDN.length() > 0) {
-                            return ChaiFactory.createChaiEntry(policyDN, theUser.getChaiProvider());
+                            return chaiEntryFactory.createChaiEntry(policyDN);
                         }
                     }
                 }
@@ -631,7 +595,7 @@ public class EdirEntries {
                         if (partitonRoot != null) {
                             final String policyDN = partitonRoot.readStringAttribute("nspmPasswordPolicyDN");
                             if (policyDN != null && policyDN.length() > 0) {
-                                return ChaiFactory.createChaiEntry(policyDN, theUser.getChaiProvider());
+                                return chaiEntryFactory.createChaiEntry(policyDN);
                             }
                         }
                     }
@@ -639,13 +603,13 @@ public class EdirEntries {
 
                 // look at policy object
                 {
-                    final ChaiEntry securityContainer = ChaiFactory.createChaiEntry("cn=Security", theUser.getChaiProvider());
+                    final ChaiEntry securityContainer = chaiEntryFactory.createChaiEntry("cn=Security");
                     final String loginPolicyDN = securityContainer.readStringAttribute("sASLoginPolicyDN");
                     if (loginPolicyDN != null && loginPolicyDN.length() > 0) {
-                        final ChaiEntry loginPolicy = ChaiFactory.createChaiEntry(loginPolicyDN, theUser.getChaiProvider());
+                        final ChaiEntry loginPolicy = chaiEntryFactory.createChaiEntry(loginPolicyDN);
                         final String policyDN = loginPolicy.readStringAttribute("nspmPasswordPolicyDN");
                         if (policyDN != null && policyDN.length() > 0) {
-                            return ChaiFactory.createChaiEntry(policyDN, theUser.getChaiProvider());
+                            return chaiEntryFactory.createChaiEntry(policyDN);
                         }
                     }
                 }

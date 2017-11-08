@@ -39,7 +39,6 @@ import java.util.*;
 
 
 public class ChaiTester extends TestCase {
-// -------------------------- OTHER METHODS --------------------------
 
     protected void setUp()
             throws Exception

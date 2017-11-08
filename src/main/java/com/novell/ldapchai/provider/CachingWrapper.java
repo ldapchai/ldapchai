@@ -39,17 +39,15 @@ import java.util.WeakHashMap;
  * @author Jason D. Rivard
  */
 class CachingWrapper extends AbstractWrapper {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(CachingWrapper.class.getName());
 
     private ChaiProvider realProvider;
     private ChaiProvider memorizedProvider;
-
-// -------------------------- STATIC METHODS --------------------------
 
     static ChaiProviderImplementor forProvider(final ChaiProviderImplementor chaiProvider)
     {
@@ -64,8 +62,6 @@ class CachingWrapper extends AbstractWrapper {
                 new CachingWrapper(chaiProvider));
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     private CachingWrapper(final ChaiProvider providerImpl)
     {
         if (Proxy.isProxyClass(providerImpl.getClass()) && providerImpl instanceof CachingWrapper) {
@@ -79,11 +75,6 @@ class CachingWrapper extends AbstractWrapper {
         this.realProvider = providerImpl;
         this.memorizedProvider = (ChaiProviderImplementor) Memorizer.forObject(realProvider, setting_maxSize, setting_maxTime);
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface InvocationHandler ---------------------
 
     public Object invoke(
             final Object proxy,
@@ -106,22 +97,18 @@ class CachingWrapper extends AbstractWrapper {
         }
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     public void clearCache()
     {
         ((Memorizer) memorizedProvider).clearCache();
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     private static class Memorizer implements InvocationHandler {
         private static final ChaiLogger LOGGER = ChaiLogger.getLogger(Memorizer.class);
 
         private Object memorizedObject;
 
-        private Map<Method, Map<List<Object>, ValueWrapper>> hardCache = new HashMap<Method, Map<List<Object>, ValueWrapper>>();
-        private Map<Method, Map<List<Object>, WeakReference<ValueWrapper>>> weakCache = new HashMap<Method, Map<List<Object>, WeakReference<ValueWrapper>>>();
+        private Map<Method, Map<List<Object>, ValueWrapper>> hardCache = new HashMap<>();
+        private Map<Method, Map<List<Object>, WeakReference<ValueWrapper>>> weakCache = new HashMap<>();
         private LinkedList<ValueWrapper> valueStack = new LinkedList<ValueWrapper>();
 
         private final Object lock = new Object();

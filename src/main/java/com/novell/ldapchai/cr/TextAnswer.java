@@ -62,7 +62,7 @@ class TextAnswer implements Answer {
     static class TextAnswerFactory implements ImplementationFactory {
         public TextAnswer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
             final boolean caseInsensitive = answerConfiguration.caseInsensitive;
-            return new TextAnswer(answer,caseInsensitive);
+            return new TextAnswer(answer, caseInsensitive);
         }
 
         public Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
@@ -71,7 +71,7 @@ class TextAnswer implements Answer {
 
         public TextAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
             final String answerValue = element.getText();
-            return new TextAnswer(answerValue,caseInsensitive);
+            return new TextAnswer(answerValue, caseInsensitive);
         }
     }
 }

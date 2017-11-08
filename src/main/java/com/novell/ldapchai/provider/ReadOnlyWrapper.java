@@ -35,10 +35,10 @@ import java.lang.reflect.Proxy;
  * @see com.novell.ldapchai.provider.ChaiSetting#READONLY
  */
 class ReadOnlyWrapper implements InvocationHandler {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ReadOnlyWrapper.class.getName());
 
@@ -46,8 +46,6 @@ class ReadOnlyWrapper implements InvocationHandler {
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
      */
     private ChaiProviderImplementor realProvider;
-
-// -------------------------- STATIC METHODS --------------------------
 
     static ChaiProviderImplementor forProvider(final ChaiProviderImplementor chaiProvider)
     {
@@ -62,17 +60,10 @@ class ReadOnlyWrapper implements InvocationHandler {
                 new ReadOnlyWrapper(chaiProvider));
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     private ReadOnlyWrapper(final ChaiProviderImplementor realProvider)
     {
         this.realProvider = realProvider;
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface InvocationHandler ---------------------
 
     public Object invoke(final Object proxy, final Method method, final Object[] args)
             throws Throwable

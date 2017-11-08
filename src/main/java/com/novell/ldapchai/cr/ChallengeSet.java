@@ -30,7 +30,6 @@ import java.util.Locale;
  * @author Jason D. Rivard
  */
 public interface ChallengeSet extends Serializable {
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Helper method to return a filtered list of admin defined challenges.

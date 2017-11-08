@@ -29,17 +29,11 @@ package com.novell.ldapchai.exception;
  * @see ChaiError
  */
 public class ChaiOperationException extends ChaiException {
-// ------------------------------ FIELDS ------------------------------
-
-
-// -------------------------- STATIC METHODS --------------------------
 
     public static ChaiOperationException forErrorMessage(final String errorMessage)
     {
         return new ChaiOperationException(errorMessage, ChaiErrors.getErrorForMessage(errorMessage));
     }
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     public ChaiOperationException(final String message, final ChaiError errorCode)
     {

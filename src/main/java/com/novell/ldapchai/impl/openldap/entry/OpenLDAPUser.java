@@ -20,7 +20,6 @@
 package com.novell.ldapchai.impl.openldap.entry;
 
 import com.novell.ldapchai.ChaiConstant;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
@@ -49,7 +48,7 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
         final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER_OF);
         for (final String group : groups) {
-            returnGroups.add(ChaiFactory.createChaiGroup(group, this.getChaiProvider()));
+            returnGroups.add(chaiProvider.getEntryFactory().createChaiGroup(group));
         }
         return Collections.unmodifiableSet(returnGroups);
     }
@@ -94,7 +93,7 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         try {
-            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword));
+            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration()));
         } catch (javax.naming.NamingException e) {
             throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         } catch (ChaiOperationException e) {
@@ -107,7 +106,7 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         try {
-            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword));
+            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration()));
         } catch (javax.naming.NamingException e) {
             throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
         } catch (ChaiOperationException e) {

@@ -535,18 +535,23 @@ public enum ChaiSetting {
     OPENLDAP_LOCAL_PASSWORD_POLICY_URL("chai.openldap.passwordPolicy.url","file:/etc/openldap/check_password.conf", true, null),
 
     /**
-     * Use the jndi
+     * Use the jndi 'resolve-in-name-space' api for canonical LDAP DN's.
      * the class name for the {@link JNDIProviderImpl} class.
      **
      * @see com.novell.ldapchai.provider.JNDIProviderImpl, com.novell.ldapchai.provider.JLDAPProviderImpl
      */
     JNDI_RESOLVE_IN_NAMESPACE("chai.jndi.resolveInNamespace", "true", true, Validator.BOOLEAN_VALIDATOR),
 
+    /**
+     * Set the LDAP character encoding type to use during text/binary conversions.
+     * the class name for the {@link JNDIProviderImpl} class.
+     **
+     * @see com.novell.ldapchai.provider.JNDIProviderImpl, com.novell.ldapchai.provider.JLDAPProviderImpl
+     */
+    LDAP_CHARACTER_ENCODING("chai.ldap.characterEncoding", "UTF8", true, null),
+
     ;
 
-
-
-// ------------------------------ FIELDS ------------------------------
 
     private final String key;
     private final String defaultValue;
@@ -583,8 +588,6 @@ public enum ChaiSetting {
         this.visible = visible;
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     /**
      * Returns the default value for this setting.  If no other value is configured, then the
      * default value is used
@@ -611,8 +614,6 @@ public enum ChaiSetting {
         return this.visible;
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     /**
      * Validates the syntactical structure of the value.  Useful for pre-testing a value to see
      * if it meets requirements.
@@ -627,8 +628,6 @@ public enum ChaiSetting {
         }
         this.validator.validate(value);
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     private interface Validator extends Serializable {
         void validate(String value);

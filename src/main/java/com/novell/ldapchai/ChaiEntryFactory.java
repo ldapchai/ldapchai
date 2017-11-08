@@ -1,0 +1,169 @@
+/*
+ * LDAP Chai API
+ * Copyright (c) 2006-2010 Novell, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+package com.novell.ldapchai;
+
+import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.ad.entry.ADEntryFactory;
+import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389EntryFactory;
+import com.novell.ldapchai.impl.edir.entry.EdirEntryFactory;
+import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
+import com.novell.ldapchai.impl.openldap.entry.OpenLDAPEntryFactory;
+import com.novell.ldapchai.impl.oracleds.entry.OracleDSEntryFactory;
+import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.util.ChaiLogger;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Factory for {@link ChaiEntry} and its subclasses.  Instances are returned based
+ * on the supplied {@link ChaiProvider}'s settings and state.   In particular,
+ * {@link com.novell.ldapchai.provider.ChaiProvider#getDirectoryVendor()} is called, and
+ * an implementing class appropriate for the vendor type is used.
+ * </p>
+ * For clarity the "create"
+ * methods in this class create <i>instances</i> of {@code ChaiEntry}.  They do not
+ * actualy create a new entry in the ldap directory.
+ *
+ * {@code ChaiProvider} instances can be obtained using the
+ * {@link com.novell.ldapchai.provider.ChaiProviderFactory} factory.
+ *
+ * @author Jason D. Rivard
+ */
+public final class ChaiEntryFactory {
+
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(com.novell.ldapchai.ChaiEntryFactory.class);
+    private static final Map<ChaiProvider.DIRECTORY_VENDOR,VendorFactory> ENTRY_FACTORY_MAP;
+
+    private final ChaiProvider chaiProvider;
+
+    static {
+        final Map<ChaiProvider.DIRECTORY_VENDOR, VendorFactory> map = new HashMap<ChaiProvider.DIRECTORY_VENDOR,VendorFactory>();
+        map.put(ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY, new EdirEntryFactory());
+        map.put(ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY, new ADEntryFactory());
+        map.put(ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389, new DirectoryServer389EntryFactory());
+        map.put(ChaiProvider.DIRECTORY_VENDOR.GENERIC, new GenericEntryFactory());
+        map.put(ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP, new OpenLDAPEntryFactory());
+        map.put(ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS, new OracleDSEntryFactory());
+        ENTRY_FACTORY_MAP = Collections.unmodifiableMap(map);
+    }
+
+    /**
+     * Returns a {@code ChaiEntry} instance representing the supplied <i>entryDN</i>.
+     *
+     * @param entryDN  A valid ldap entry DN (Distinguished Name) of an entry
+     * @return A valid {@code ChaiEntry}
+     */
+    public ChaiEntry createChaiEntry(final String entryDN)
+            throws ChaiUnavailableException
+    {
+        final VendorFactory entryFactory = getChaiEntryFactory(getChaiProvider().getDirectoryVendor());
+        return entryFactory.createChaiEntry(entryDN, getChaiProvider());
+    }
+
+    /**
+     * Returns a {@code ChaiGroup} instance representing the supplied <i>groupDN</i>.
+     *
+     * @param groupDN  A valid ldap entry DN (Distinguished Name) of an entry
+     * @return A valid {@code ChaiGroup}
+     */
+    public ChaiGroup createChaiGroup(final String groupDN)
+            throws ChaiUnavailableException
+    {
+        final VendorFactory entryFactory = getChaiEntryFactory(getChaiProvider().getDirectoryVendor());
+        return entryFactory.createChaiGroup(groupDN, getChaiProvider());
+    }
+
+    /**
+     * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
+     *
+     * @param userDN   A valid ldap entry DN (Distinguished Name) of an entry
+     * @return A valid {@code ChaiUser}
+     */
+    public ChaiUser createChaiUser(final String userDN)
+            throws ChaiUnavailableException
+    {
+        final VendorFactory entryFactory = getChaiEntryFactory(getChaiProvider().getDirectoryVendor());
+        return entryFactory.createChaiUser(userDN, getChaiProvider());
+    }
+
+    /**
+     * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
+     *
+     * @return A valid {@code ChaiUser}
+     */
+    public ErrorMap getErrorMap()
+            throws ChaiUnavailableException
+    {
+        final VendorFactory entryFactory = getChaiEntryFactory(getChaiProvider().getDirectoryVendor());
+        return entryFactory.getErrorMap();
+    }
+
+    /**
+     * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
+     *
+     * @param vendor A valid and functioning {@code ChaiProvider}.  The {@code ChaiProvider}'s ldap
+     *                 connection will be used by the {@code ChaiGroup}.
+     * @return A valid {@code ChaiUser}
+     */
+    public static ErrorMap getErrorMap(final ChaiProvider.DIRECTORY_VENDOR vendor)
+    {
+        final VendorFactory entryFactory = getChaiEntryFactory(vendor);
+        return entryFactory.getErrorMap();
+    }
+
+
+    private static VendorFactory getChaiEntryFactory(final ChaiProvider.DIRECTORY_VENDOR vendor) {
+        final VendorFactory returnEntryFactory =  ENTRY_FACTORY_MAP.get(vendor);
+        if (returnEntryFactory == null) {
+            return ENTRY_FACTORY_MAP.get(ChaiProvider.DIRECTORY_VENDOR.GENERIC);
+        }
+        return returnEntryFactory;
+    }
+
+    private ChaiEntryFactory(final ChaiProvider chaiProvider)
+    {
+        this.chaiProvider = chaiProvider;
+    }
+
+    public static ChaiEntryFactory createChaiFactory(final ChaiProvider chaiProvider) {
+        return new ChaiEntryFactory(chaiProvider);
+    }
+
+
+    public interface VendorFactory {
+        ChaiUser createChaiUser(String entryDN, ChaiProvider provider);
+
+        ChaiGroup createChaiGroup(String entryDN, ChaiProvider provider);
+
+        ChaiEntry createChaiEntry(String entryDN, ChaiProvider provider);
+
+        ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor();
+
+        ErrorMap getErrorMap();
+    }
+
+    public ChaiProvider getChaiProvider() {
+        return chaiProvider;
+    }
+}
+

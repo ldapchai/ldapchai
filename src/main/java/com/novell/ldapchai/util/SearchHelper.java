@@ -39,23 +39,21 @@ import java.util.Set;
  *
  * @author Jason D. Rivard
  */
-public class SearchHelper implements Serializable, Cloneable {
-// ----------------------------- CONSTANTS ----------------------------
+public class SearchHelper implements Serializable {
+
 
     public static final String DEFAULT_FILTER = "(objectClass=*)";
     public static final ChaiProvider.SEARCH_SCOPE DEFAULT_SCOPE = ChaiProvider.SEARCH_SCOPE.SUBTREE;
     public static final int DEFAULT_TIMEOUT = 0;
     public static final int DEFAULT_MAX_RESULTS = 0;
 
-// ------------------------------ FIELDS ------------------------------
+
 
     private String filter = DEFAULT_FILTER;
     private ChaiProvider.SEARCH_SCOPE searchScope = DEFAULT_SCOPE;
     private Set<String> attributes = null;
     private int maxResults = DEFAULT_MAX_RESULTS;
     private int timeLimit = DEFAULT_TIMEOUT;
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     /**
      * Construct a default {@code SearchHelper} with default values for all parameters.
@@ -269,8 +267,6 @@ public class SearchHelper implements Serializable, Cloneable {
         this.setAttributes(attributes);
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     /**
      * Get the list of attributes that will be returned during a search.  Note that some
      * places that {@code SearchHelper} is used don't return attribute values at all, so
@@ -343,8 +339,6 @@ public class SearchHelper implements Serializable, Cloneable {
         this.timeLimit = timeLimit;
     }
 
-// ------------------------ CANONICAL METHODS ------------------------
-
     @Override
     public boolean equals(final Object o) {
         if (this == o) {
@@ -405,8 +399,6 @@ public class SearchHelper implements Serializable, Cloneable {
         return sb.toString();
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     public void returnNoAttributes()
     {
         attributes = Collections.emptySet();
@@ -449,8 +441,8 @@ public class SearchHelper implements Serializable, Cloneable {
         }
 
         final List<FilterSequence> filters = new ArrayList<FilterSequence>();
-        for (final String name : nameValuePairs.keySet()) {
-            filters.add(new FilterSequence(name, nameValuePairs.get(name), FilterSequence.MatchingRuleEnum.EQUALS));
+        for (final Map.Entry<String,String> entry : nameValuePairs.entrySet()) {
+            filters.add(new FilterSequence(entry.getKey(), entry.getValue(), FilterSequence.MatchingRuleEnum.EQUALS));
         }
         setFilterBind(filters, "&");
     }
@@ -608,8 +600,8 @@ public class SearchHelper implements Serializable, Cloneable {
         }
 
         final List<FilterSequence> filters = new ArrayList<FilterSequence>();
-        for (final String name : nameValuePairs.keySet()) {
-            filters.add(new FilterSequence(name, nameValuePairs.get(name), FilterSequence.MatchingRuleEnum.EQUALS));
+        for (final Map.Entry<String,String> entry : nameValuePairs.entrySet()) {
+            filters.add(new FilterSequence(entry.getKey(), entry.getValue(), FilterSequence.MatchingRuleEnum.EQUALS));
         }
         setFilterBind(filters, "|");
     }
@@ -633,8 +625,6 @@ public class SearchHelper implements Serializable, Cloneable {
         }
         setFilterOr(newMap);
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     static class FilterSequence {
         public enum MatchingRuleEnum {

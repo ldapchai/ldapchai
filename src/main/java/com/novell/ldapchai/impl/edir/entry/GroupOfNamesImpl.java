@@ -37,18 +37,10 @@ class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames {
         return GroupOfNames.OBJECT_CLASS_VALUE;
     }
 
-    // --------------------------- CONSTRUCTORS ---------------------------
-
     GroupOfNamesImpl(final String entryDN, final ChaiProvider chaiHelper)
     {
         super(entryDN, chaiHelper);
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChaiGroup ---------------------
-
 
     public final boolean isDynamic()
             throws ChaiUnavailableException, ChaiOperationException

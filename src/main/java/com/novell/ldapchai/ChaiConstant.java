@@ -45,7 +45,7 @@ import java.util.ResourceBundle;
  * @author Jason D. Rivard
  */
 public interface ChaiConstant {
-    // ----------------------------- CONSTANTS ----------------------------
+
 
     /**
      * Attribute name to define the Object Class
@@ -353,7 +353,7 @@ public interface ChaiConstant {
     String FILTER_OBJECTCLASS_ANY = "(" + ATTR_LDAP_OBJECTCLASS + "=" + "*" + ")";
 
 
-    // -------------------------- INNER CLASSES --------------------------
+
 }
 
 /**

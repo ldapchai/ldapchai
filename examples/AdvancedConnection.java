@@ -18,6 +18,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
@@ -39,7 +40,6 @@ import com.novell.ldapchai.provider.ChaiSetting;
  * in turn to create a ChaiUser.
  */
 public class AdvancedConnection {
-// --------------------------- main() method ---------------------------
 
     public static void main(final String[] args) {
         // connection parameters

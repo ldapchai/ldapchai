@@ -68,16 +68,10 @@ import java.util.StringTokenizer;
 
 
 public class NmasResponseSet extends AbstractResponseSet {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(NmasResponseSet.class.getName());
 
     private ChaiUser user;
-
-// -------------------------- STATIC METHODS --------------------------
 
     static List<Challenge> parseNmasPolicyXML(final String str, final Locale locale)
             throws IOException, JDOMException
@@ -283,8 +277,6 @@ public class NmasResponseSet extends AbstractResponseSet {
         return new ChaiChallengeSet(returnList, minRandom, null, guidValue);
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     NmasResponseSet(
             final Map<Challenge, String> crMap,
             final Locale locale,
@@ -299,11 +291,6 @@ public class NmasResponseSet extends AbstractResponseSet {
         this.user = user;
     }
 
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ResponseSet ---------------------
-
     public String stringValue()
             throws UnsupportedOperationException
     {
@@ -315,8 +302,6 @@ public class NmasResponseSet extends AbstractResponseSet {
         //@todo TODO
         throw new UnsupportedOperationException("NMAS Response testing not yet implemented");
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     boolean write()
             throws ChaiUnavailableException, ChaiOperationException
@@ -355,9 +340,10 @@ public class NmasResponseSet extends AbstractResponseSet {
         boolean success = true;
 
         //write responses
-        for (final Challenge loopChallenge : crMap.keySet()) {
+        for (final Map.Entry<Challenge, Answer> entry : crMap.entrySet()) {
+            final Challenge loopChallenge = entry.getKey();
             try {
-                final byte[] data = ((NmasAnswer)crMap.get(loopChallenge)).getAnswerText().getBytes("UTF8");
+                final byte[] data = ((NmasAnswer)entry.getValue()).getAnswerText().getBytes("UTF8");
                 final PutLoginSecretRequest request = new PutLoginSecretRequest();
                 request.setObjectDN(user.getEntryDN());
                 request.setData(data);
@@ -454,8 +440,6 @@ public class NmasResponseSet extends AbstractResponseSet {
     private static final String NMAS_XML_ATTR_MIN_LENGTH = "MinLength";
     private static final String NMAS_XML_ATTR_MAX_LENGTH = "MaxLength";
 
-// -------------------------- STATIC METHODS --------------------------
-
     static String csToNmasXML(final ChallengeSet cs, final String guidValue)
     {
         final Element rootElement = new Element(NMAS_XML_ROOTNODE);
@@ -499,9 +483,10 @@ public class NmasResponseSet extends AbstractResponseSet {
     }
 
     private static Map<Challenge,Answer> convertAnswerTextMap(final Map<Challenge,String> crMap) {
-        final Map<Challenge,Answer> returnMap = new LinkedHashMap<Challenge,Answer>();
-        for (final Challenge challenge : crMap.keySet()) {
-            final String answerText = crMap.get(challenge);
+        final Map<Challenge,Answer> returnMap = new LinkedHashMap<>();
+        for (final Map.Entry<Challenge, String> entry : crMap.entrySet()) {
+            final Challenge challenge = entry.getKey();
+            final String answerText = entry.getValue();
             returnMap.put(challenge,new NmasAnswer(answerText));
         }
         return returnMap;

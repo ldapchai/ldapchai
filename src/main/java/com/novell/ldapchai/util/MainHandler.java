@@ -30,16 +30,14 @@ import java.util.TreeSet;
  * is executed.
  */
 class MainHandler {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ResourceBundle BUILD_INFO_BUNDLE = ResourceBundle.getBundle("com.novell.ldapchai.BuildInformation");
     private static final String CHAI_VERSION = BUILD_INFO_BUNDLE.getString("chai.version");
     private static final String CHAI_WEBSITE = BUILD_INFO_BUNDLE.getString("chai.website");
-
-// --------------------------- main() method ---------------------------
 
     public static void main(final String[] args)
     {

@@ -22,14 +22,14 @@ package com.novell.ldapchai.provider;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
-import java.util.HashMap;
+import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Default implementation of {@link com.novell.ldapchai.provider.ProviderStatistics}.
@@ -38,23 +38,14 @@ import java.util.Map;
  * @see ChaiSetting#STATISTICS_ENABLE
  */
 class StatisticsWrapper implements InvocationHandler {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// ------------------------------ FIELDS ------------------------------
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(StatisticsWrapper.class.getName());
-
-    private static final StatsBean GLOBAL_STATS = new StatsBean();
-
 
     /**
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
      */
     private ChaiProviderImplementor realProvider;
-    private StatsBean statisticsProvider;
-
-// -------------------------- STATIC METHODS --------------------------
+    private final StatsBean statisticsProvider = new StatsBean();
 
     static ChaiProviderImplementor forProvider(final ChaiProviderImplementor chaiProvider)
     {
@@ -69,23 +60,20 @@ class StatisticsWrapper implements InvocationHandler {
                 new StatisticsWrapper(chaiProvider));
     }
 
-    public static ProviderStatistics getGlobalStatistics()
+    public ProviderStatistics getGlobalStatistics()
     {
-        return GLOBAL_STATS;
+        return getGlobalStatsBean();
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
+    private StatsBean getGlobalStatsBean() {
+        return realProvider.getProviderFactory().getStatsBean();
+    }
 
     private StatisticsWrapper(final ChaiProviderImplementor realProvider)
     {
         this.realProvider = realProvider;
-        statisticsProvider = new StatsBean();
     }
 
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface InvocationHandler ---------------------
 
     public Object invoke(final Object proxy, final Method method, final Object[] args)
             throws Throwable
@@ -99,22 +87,22 @@ class StatisticsWrapper implements InvocationHandler {
         }
 
         if (isLdap) {
-            statisticsProvider.operationCounter++;
-            GLOBAL_STATS.operationCounter++;
+            statisticsProvider.incrementStatistic(ProviderStatistics.IncrementerStatistic.OPERATION_COUNT);
+            getGlobalStatsBean().incrementStatistic(ProviderStatistics.IncrementerStatistic.OPERATION_COUNT);
 
             if (isModify) {
-                statisticsProvider.modifyCount++;
-                GLOBAL_STATS.modifyCount++;
+                statisticsProvider.incrementStatistic(ProviderStatistics.IncrementerStatistic.MODIFY_COUNT);
+                getGlobalStatsBean().incrementStatistic(ProviderStatistics.IncrementerStatistic.MODIFY_COUNT);
             } else if (isSearch) {
-                statisticsProvider.searchCount++;
-                GLOBAL_STATS.searchCount++;
+                statisticsProvider.incrementStatistic(ProviderStatistics.IncrementerStatistic.SEARCH_COUNT);
+                getGlobalStatsBean().incrementStatistic(ProviderStatistics.IncrementerStatistic.SEARCH_COUNT);
             } else {
-                statisticsProvider.readCount++;
-                GLOBAL_STATS.readCount++;
+                statisticsProvider.incrementStatistic(ProviderStatistics.IncrementerStatistic.READ_COUNT);
+                getGlobalStatsBean().incrementStatistic(ProviderStatistics.IncrementerStatistic.READ_COUNT);
             }
 
-            statisticsProvider.lastOperationBegin = System.currentTimeMillis();
-            GLOBAL_STATS.lastOperationBegin = System.currentTimeMillis();
+            statisticsProvider.markTimestampStatistic(ProviderStatistics.TimestampStatistic.LAST_OPERATION_BEGIN);
+            getGlobalStatsBean().markTimestampStatistic(ProviderStatistics.TimestampStatistic.LAST_OPERATION_BEGIN);
         }
 
         try {
@@ -123,64 +111,48 @@ class StatisticsWrapper implements InvocationHandler {
             final Throwable exceptionCause = e.getCause();
 
             if (exceptionCause instanceof ChaiUnavailableException) {
-                statisticsProvider.lastUnavailableException = System.currentTimeMillis();
-                GLOBAL_STATS.lastUnavailableException = System.currentTimeMillis();
+                statisticsProvider.markTimestampStatistic(ProviderStatistics.TimestampStatistic.LAST_UNAVAILABLE_EXCEPTION);
+                getGlobalStatsBean().markTimestampStatistic(ProviderStatistics.TimestampStatistic.LAST_UNAVAILABLE_EXCEPTION);
 
-                statisticsProvider.unavailableCounter++;
-                GLOBAL_STATS.unavailableCounter++;
+                statisticsProvider.incrementStatistic(ProviderStatistics.IncrementerStatistic.UNAVAILABLE_COUNT);
+                getGlobalStatsBean().incrementStatistic(ProviderStatistics.IncrementerStatistic.UNAVAILABLE_COUNT);
             }
 
             throw exceptionCause;
         } finally {
-            statisticsProvider.lastOperationFinish = System.currentTimeMillis();
-            GLOBAL_STATS.lastOperationFinish = System.currentTimeMillis();
+            statisticsProvider.markTimestampStatistic(ProviderStatistics.TimestampStatistic.LAST_OPERATION_FINISH);
+            getGlobalStatsBean().markTimestampStatistic(ProviderStatistics.TimestampStatistic.LAST_OPERATION_FINISH);
         }
     }
 
-// -------------------------- INNER CLASSES --------------------------
+    static class StatsBean implements ProviderStatistics {
 
-    static class StatsBean implements ProviderStatistics, Serializable {
-        private long readCount;
-        private long modifyCount;
-        private long searchCount;
-        private long operationCounter;
-        private long unavailableCounter;
-        private long lastOperationBegin;
-        private long lastOperationFinish;
-        private long lastUnavailableException;
+        private final Map<IncrementerStatistic, AtomicInteger> incrementorMap = new ConcurrentHashMap<>();
+        private final Map<TimestampStatistic, Instant> timestampMap = new ConcurrentHashMap<>();
 
-
-        public String getStatistic(final Statistic statistic)
-        {
-            switch (statistic) {
-                case LAST_OPERATION_BEGIN:
-                    return String.valueOf(lastOperationBegin);
-                case LAST_OPERATION_FINISH:
-                    return String.valueOf(lastOperationFinish);
-                case READ_COUNT:
-                    return String.valueOf(readCount);
-                case MODIFY_COUNT:
-                    return String.valueOf(modifyCount);
-                case SEARCH_COUNT:
-                    return String.valueOf(searchCount);
-                case OPERATION_COUNT:
-                    return String.valueOf(operationCounter);
-                case LAST_UNAVAILABLE_EXCEPTION:
-                    return String.valueOf(lastUnavailableException);
-                case UNAVAILABLE_COUNT:
-                    return String.valueOf(unavailableCounter);
-                default:
-                    return "";
+        StatsBean() {
+            for (final IncrementerStatistic statistic : IncrementerStatistic.values()) {
+                incrementorMap.put(statistic, new AtomicInteger(0));
+            }
+            for (final TimestampStatistic statistic : TimestampStatistic.values()) {
+                timestampMap.put(statistic, Instant.now());
             }
         }
 
-        public Map<Statistic, String> getStatistics()
-        {
-            final Map<Statistic, String> returnMap = new HashMap<Statistic, String>();
-            for (final Statistic statistic : Statistic.values()) {
-                returnMap.put(statistic, getStatistic(statistic));
-            }
-            return Collections.unmodifiableMap(returnMap);
+        public long getIncrementorStatistic(final IncrementerStatistic statistic) {
+            return incrementorMap.get(statistic).get();
+        }
+
+        public Instant getTimestampStatistic(final TimestampStatistic timestampStatistic) {
+            return timestampMap.get(timestampStatistic);
+        }
+
+        void incrementStatistic(final IncrementerStatistic incrementerStatistic) {
+            incrementorMap.get(incrementerStatistic).incrementAndGet();
+        }
+
+        void markTimestampStatistic(final TimestampStatistic timestampStatistic) {
+            timestampMap.put(timestampStatistic, Instant.now());
         }
     }
 }

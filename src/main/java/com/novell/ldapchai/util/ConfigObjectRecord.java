@@ -63,13 +63,9 @@ import java.util.StringTokenizer;
  * @author Jason D. Rivard
  */
 public class ConfigObjectRecord {
-// ----------------------------- CONSTANTS ----------------------------
 
-    // ------------------------- PUBLIC CONSTANTS -------------------------
     static final String EMPTY_RECORD_VALUE = ".";
     static final String RECORD_SEPERATOR = "#";
-
-// ------------------------------ FIELDS ------------------------------
 
     private String recordType;
     private String guid1;
@@ -78,8 +74,6 @@ public class ConfigObjectRecord {
 
     private String attr;
     private ChaiEntry objectEntry;
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Create a new config object record.  This will only create a java object representing the config
@@ -222,16 +216,12 @@ public class ConfigObjectRecord {
         }
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     /**
      * No argument private constructor
      */
     private ConfigObjectRecord()
     {
     }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
 
     /**
      * Return the GUID1 value for this {@code ConfigObjectRecord}
@@ -272,8 +262,6 @@ public class ConfigObjectRecord {
     {
         return recordType;
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Updates the payload both in the directory and in the object instance.  When updating the directory

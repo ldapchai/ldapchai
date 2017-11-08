@@ -59,7 +59,7 @@ public class OracleDSErrorMap implements ErrorMap {
     }
 
     enum OracleDSError {
-        NO_SUCH_ENTRY           (ChaiError.NO_SUCH_ENTRY,true, false, "error code 32"),
+        NO_SUCH_ENTRY           (ChaiError.NO_SUCH_ENTRY, true, false, "error code 32"),
         USER_INTRUDER_LOCK      (ChaiError.INTRUDER_LOCKOUT, true, false, "error code 19 - Exceed password retry limit. Account locked"),
         PASSWORD_TOO_EARLY      (ChaiError.PASSWORD_TOO_SOON, true, false, "error code 19 - within password minimum age"),
         INVALID_CREDENTIALS     (ChaiError.FAILED_AUTHENTICATION, true, false, "error code 49 - Invalid Credentials"),

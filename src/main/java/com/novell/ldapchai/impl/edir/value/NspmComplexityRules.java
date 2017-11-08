@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.impl.edir.value;
 
-import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.util.ChaiLogger;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -34,16 +34,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class nspmComplexityRules {
-// ------------------------------ FIELDS ------------------------------
+public class NspmComplexityRules {
+
     
-    public static final nspmComplexityRules MS_COMPLEXITY_POLICY;
+    public static final NspmComplexityRules MS_COMPLEXITY_POLICY;
     
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiFactory.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiEntryFactory.class);
 
     private List<Policy> policies = Collections.emptyList();
-
-// -------------------------- STATIC METHODS --------------------------
 
     static {
         final List<RuleSet> ruleSets = new ArrayList<RuleSet>();
@@ -66,19 +64,17 @@ public class nspmComplexityRules {
         final List<Policy> policyList = new ArrayList<Policy>();
         final Policy policy = new Policy(ruleSets);
         policyList.add(policy);
-        MS_COMPLEXITY_POLICY = new nspmComplexityRules(policyList);
+        MS_COMPLEXITY_POLICY = new NspmComplexityRules(policyList);
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
-    public nspmComplexityRules(final List<Policy> policies) {
+    public NspmComplexityRules(final List<Policy> policies) {
         if (policies == null) {
             throw new NullPointerException("policies may not be null");
         }
         this.policies = Collections.unmodifiableList(policies);
     }
 
-    public nspmComplexityRules(final String input) {
+    public NspmComplexityRules(final String input) {
         this.policies = readComplexityPoliciesFromXML(input);
     }
 
@@ -131,14 +127,10 @@ public class nspmComplexityRules {
          return returnList;
      }
 
-// ------------------------ CANONICAL METHODS ------------------------
-
     @Override
     public int hashCode() {
         return policies.hashCode();
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     public List<Policy> getComplexityPolicies() {
         return policies;
@@ -157,7 +149,7 @@ public class nspmComplexityRules {
             return false;
         }
 
-        final nspmComplexityRules that = (nspmComplexityRules) o;
+        final NspmComplexityRules that = (NspmComplexityRules) o;
 
         if (!policies.equals(that.policies)) {
             return false;
@@ -165,8 +157,6 @@ public class nspmComplexityRules {
 
         return true;
     }
-
-// -------------------------- ENUMERATIONS --------------------------
 
      public enum Rule {
          MinPwdLen,
@@ -192,8 +182,6 @@ public class nspmComplexityRules {
          LastCharSpecialDisallowed,
          ExtendedCharDisallowed,
      }
-
-// -------------------------- INNER CLASSES --------------------------
 
     public static class Policy {
          List<RuleSet> ruleSets;

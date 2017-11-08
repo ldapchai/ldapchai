@@ -43,7 +43,6 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public interface ChaiPasswordPolicy {
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Returns the value for the requested key.  If the {@code ChaiPasswordPolicy} does
@@ -80,8 +79,6 @@ public interface ChaiPasswordPolicy {
      * @return the backing {@code ChaiEntry} or {@code null} if no backing entry.
      */
     ChaiEntry getPolicyEntry();
-
-// -------------------------- ENUMERATIONS --------------------------
 
     /**
      * Return a {@link com.novell.ldapchai.util.PasswordRuleHelper} object for this

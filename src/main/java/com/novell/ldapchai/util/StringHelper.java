@@ -167,8 +167,8 @@ public class StringHelper {
         }
 
         final List<String> tempList = new ArrayList<String>();
-        for (final String key : map.keySet()) {
-            tempList.add(key + "=" + map.get(key));
+        for (final Map.Entry<String,String> entry : map.entrySet()) {
+            tempList.add(entry.getKey() + "=" + entry.getValue());
         }
 
         return stringCollectionToString(tempList, seperator);

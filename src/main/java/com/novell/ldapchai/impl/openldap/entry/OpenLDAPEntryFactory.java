@@ -20,14 +20,14 @@
 package com.novell.ldapchai.impl.openldap.entry;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class OpenLDAPEntryFactory implements ChaiFactory.ChaiEntryFactory {
+public class OpenLDAPEntryFactory implements ChaiEntryFactory.VendorFactory {
 
     private static ErrorMap errorMap;
 

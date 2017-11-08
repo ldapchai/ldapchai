@@ -38,10 +38,10 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public class TcpProxy {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final int TIMING_LOOP = 10;
 
@@ -60,8 +60,6 @@ public class TcpProxy {
     private int proxyCount = 0;
     private volatile int connectionCounter = 0;
 
-// -------------------------- STATIC METHODS --------------------------
-
     public static boolean isDoOutput()
     {
         return doOutput;
@@ -71,8 +69,6 @@ public class TcpProxy {
     {
         TcpProxy.doOutput = doOutput;
     }
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     public TcpProxy(final int listenPort, final InetSocketAddress destinationInfo)
     {
@@ -86,8 +82,6 @@ public class TcpProxy {
         this.destinationInfo = destinationInfo;
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     public InetSocketAddress getDestinationInfo()
     {
         return destinationInfo;
@@ -98,16 +92,12 @@ public class TcpProxy {
         return listenInfo;
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     private void output(final CharSequence str)
     {
         if (doOutput) {
             System.out.println("TcpProxy[" + proxyCount + "]: " + str);
         }
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     private class ServerThread implements Runnable {
         private ServerSocket serverSocket;
@@ -235,8 +225,6 @@ public class TcpProxy {
             }
         }
     }
-
-// --------------------------- main() method ---------------------------
 
     public static void main(final String[] args)
             throws IOException

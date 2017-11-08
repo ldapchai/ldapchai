@@ -19,7 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
@@ -35,6 +34,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -48,10 +48,6 @@ import java.util.concurrent.locks.ReentrantLock;
  * @see com.novell.ldapchai.provider.ChaiSetting#WATCHDOG_CHECK_FREQUENCY
  */
 class WatchdogWrapper implements InvocationHandler {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
 
     private enum STATUS {
         ACTIVE,
@@ -59,7 +55,7 @@ class WatchdogWrapper implements InvocationHandler {
         CLOSED,
     }
 
-// ------------------------------ FIELDS ------------------------------
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(WatchdogWrapper.class);
 
@@ -80,7 +76,7 @@ class WatchdogWrapper implements InvocationHandler {
     /**
      * number of outsanding ldap operations.  If the value is non-zero, then the provider is considered "in-use"
      */
-    private volatile int outstandingOperations = 0;
+    private final AtomicInteger outstandingOperations = new AtomicInteger(0);
 
     /**
      * last time an ldap operation was initiated
@@ -96,8 +92,6 @@ class WatchdogWrapper implements InvocationHandler {
      * current wdStatus of this WatchdogWrapper
      */
     private volatile STATUS wdStatus = STATUS.ACTIVE;
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.
@@ -128,7 +122,7 @@ class WatchdogWrapper implements InvocationHandler {
                 new WatchdogWrapper(chaiProvider));
     }
 
-    // --------------------------- CONSTRUCTORS ---------------------------
+
 
     private WatchdogWrapper(
             final ChaiProviderImplementor realProvider
@@ -161,7 +155,7 @@ class WatchdogWrapper implements InvocationHandler {
         boolean userPwExpired;
         try {
             final String bindUserDN = realProvider.getChaiConfiguration().getSetting(ChaiSetting.BIND_DN);
-            final ChaiUser bindUser = ChaiFactory.createChaiUser(bindUserDN, realProvider);
+            final ChaiUser bindUser = realProvider.getEntryFactory().createChaiUser(bindUserDN);
             userPwExpired = bindUser.isPasswordExpired();
         } catch (ChaiException e) {
             LOGGER.error("unexpected error attempting to read user password expiration value during watchdog initialization, will assume expiration, error: " + e.getMessage());
@@ -183,11 +177,6 @@ class WatchdogWrapper implements InvocationHandler {
         super.finalize();
         WATCHDOG_MANAGER.deRegisterInstance(this);  //safegaurd, this should be done in #handleClient
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface InvocationHandler ---------------------
 
     public Object invoke(
             final Object proxy,
@@ -216,7 +205,7 @@ class WatchdogWrapper implements InvocationHandler {
 
         final Object returnObject;
         try {
-            outstandingOperations++;
+            outstandingOperations.incrementAndGet();
             lastBeginTimestamp = System.currentTimeMillis();
 
             if (wdStatus == STATUS.IDLE) {
@@ -235,24 +224,22 @@ class WatchdogWrapper implements InvocationHandler {
                 throw new IllegalStateException(e.getMessage(),e);
             }
         } finally {
-            outstandingOperations--;
+            outstandingOperations.decrementAndGet();
             lastFinishTimestamp = System.currentTimeMillis();
         }
 
 
-        if ("setPassword".equals(method.getName()) || "setPassword".equals(method.getName())) {
+        if ("setPassword".equals(method.getName())) {
             checkForPwExpiration();
         }
 
         return returnObject;
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     private synchronized void checkStatus()
     {
         if (wdStatus == STATUS.ACTIVE) {  // if current wdStatus us normal, then check to see if timed out
-            if (outstandingOperations > 0) { // check for operation timeout if we have outstanding
+            if (outstandingOperations.get() > 0) { // check for operation timeout if we have outstanding
                 final long operationDuration = System.currentTimeMillis() - lastBeginTimestamp;
                 if (operationDuration > setting_operationTimeout) {
                     handleOperationTimeout();
@@ -341,7 +328,7 @@ class WatchdogWrapper implements InvocationHandler {
         }
 
         try {
-            realProvider = ChaiProviderFactory.createProvider(originalProviderConfig);
+            realProvider = realProvider.getProviderFactory().newProvider(originalProviderConfig);
         } catch (Exception e) {
             final StringBuilder sb = new StringBuilder();
             sb.append("error reopening ldap connection for ");
@@ -356,8 +343,6 @@ class WatchdogWrapper implements InvocationHandler {
         wdStatus = STATUS.ACTIVE;
         WATCHDOG_MANAGER.registerInstance(this);
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     private static class WatchdogManager {
         private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
@@ -426,9 +411,7 @@ class WatchdogWrapper implements InvocationHandler {
             public void run()
             {
                 final Collection<WatchdogWrapper> copyCollection = new HashSet<WatchdogWrapper>();
-                synchronized (activeWrappers) {
-                    copyCollection.addAll(activeWrappers.keySet());
-                }
+                copyCollection.addAll(activeWrappers.keySet());
 
                 for (final WatchdogWrapper wdWrapper : copyCollection) {
                     try {

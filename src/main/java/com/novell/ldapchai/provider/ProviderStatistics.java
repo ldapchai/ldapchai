@@ -20,7 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.time.Instant;
 
 /**
  * Tracks the statistics for a {@link ChaiProvider}.  For a list of available statistics, see {@link com.novell.ldapchai.provider.ProviderStatistics.Statistic}.
@@ -29,15 +29,11 @@ import java.util.Map;
  * @see com.novell.ldapchai.provider.ChaiSetting#STATISTICS_ENABLE
  */
 public interface ProviderStatistics extends Serializable {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
 
     /**
      * Enumeration of available statistics.
      */
-    enum Statistic {
+    enum IncrementerStatistic {
         /**
          * Number of read operations
          */
@@ -58,10 +54,13 @@ public interface ProviderStatistics extends Serializable {
         OPERATION_COUNT,
 
         /**
-         * Total number of ldap unavailabe exceptions thrown
+         * Total number of ldap unavailable exceptions thrown
          */
         UNAVAILABLE_COUNT,
 
+    }
+
+    enum TimestampStatistic {
         /**
          * The last time (in ms seconds epoch) a ldap operation was initiated.
          */
@@ -78,7 +77,6 @@ public interface ProviderStatistics extends Serializable {
         LAST_UNAVAILABLE_EXCEPTION,
     }
 
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Get an individual statistic.
@@ -86,12 +84,8 @@ public interface ProviderStatistics extends Serializable {
      * @param statistic requested statistc
      * @return the string value of the statistic, typically a number or timestamp.
      */
-    String getStatistic(Statistic statistic);
+    long getIncrementorStatistic(IncrementerStatistic statistic);
 
-    /**
-     * Get all of the available statistics in a convenient map.
-     *
-     * @return An unmodifiable map of statistic values.
-     */
-    Map<Statistic, String> getStatistics();
+    Instant getTimestampStatistic(TimestampStatistic statistic);
+
 }

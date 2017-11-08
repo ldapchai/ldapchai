@@ -28,7 +28,7 @@ import java.io.Serializable;
  *
  */
 public class ChaiChallenge implements Challenge, Serializable {
-// ------------------------------ FIELDS ------------------------------
+
 
     private boolean adminDefined;
     private boolean required;
@@ -41,8 +41,6 @@ public class ChaiChallenge implements Challenge, Serializable {
     private boolean enforceWordlist;
 
     private boolean locked;
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     public ChaiChallenge(
             final boolean required,
@@ -62,8 +60,6 @@ public class ChaiChallenge implements Challenge, Serializable {
         this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer < 0 ? 0 : maxQuestionCharsInAnswer;
         this.enforceWordlist = enforceWordlist;
     }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
 
     public final String getChallengeText()
     {
@@ -115,8 +111,6 @@ public class ChaiChallenge implements Challenge, Serializable {
     public boolean isEnforceWordlist() {
         return enforceWordlist;
     }
-
-    // ------------------------ CANONICAL METHODS ------------------------
 
     /**
      * Tests for equality of Challenges.  Challenges are equal when the following elements of a challenge are equal:
@@ -186,11 +180,6 @@ public class ChaiChallenge implements Challenge, Serializable {
     {
         return "Challenge: " + new Gson().toJson(asChallengeBean());
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface Challenge ---------------------
 
     public void lock()
     {

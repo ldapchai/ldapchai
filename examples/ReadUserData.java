@@ -34,7 +34,6 @@ import java.util.Map;
  * Read some user data out of the directory and print to stdout.
  */
 public class ReadUserData {
-// --------------------------- main() method ---------------------------
 
     public static void main(final String[] args) {
         String ldapURL =      "ldap://ldaphost:389";

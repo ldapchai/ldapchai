@@ -20,7 +20,6 @@
 package com.novell.ldapchai.impl;
 
 import com.novell.ldapchai.ChaiConstant;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
@@ -62,7 +61,7 @@ public abstract class AbstractChaiGroup extends AbstractChaiEntry implements Cha
 
         for (final String userDN : memberDNs) {
             // Create the ChaiUserImpl object and add it to the ArrayList.
-            returnSet.add(ChaiFactory.createChaiUser(userDN, this.getChaiProvider()));
+            returnSet.add(getChaiProvider().getEntryFactory().createChaiUser(userDN));
         }
         return Collections.unmodifiableSet(returnSet);
     }

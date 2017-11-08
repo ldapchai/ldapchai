@@ -21,18 +21,19 @@ package com.novell.ldapchai.impl;
 
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
 import net.iharder.Base64;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -51,10 +52,6 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public abstract class AbstractChaiEntry implements ChaiEntry {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// -------------------------- ENUMERATIONS --------------------------
 
     private enum networkAddressType {
         IPv4(9);
@@ -82,12 +79,11 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         }
     }
 
-// ------------------------------ FIELDS ------------------------------
+
 
     protected static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractChaiEntry.class);
-    // ------------------------- PUBLIC CONSTANTS -------------------------
     /**
-     * Stores the original dn, used in the constuctor.
+     * Stores the original dn, used in the constructor.
      */
     protected String entryDN;
 
@@ -95,8 +91,6 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
      * Attribute to store the LDAP Provider.
      */
     protected ChaiProvider chaiProvider;
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     /**
      * Standard constructor
@@ -110,8 +104,6 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         this.entryDN = entryDN == null ? "" : entryDN;
     }
 
-// --------------------- GETTER / SETTER METHODS ---------------------
-
     public final ChaiProvider getChaiProvider()
     {
         return this.chaiProvider;
@@ -121,8 +113,6 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     {
         return this.entryDN;
     }
-
-// ------------------------ CANONICAL METHODS ------------------------
 
     public boolean equals(final Object o)
     {
@@ -167,11 +157,6 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         return sb.toString();
     }
 
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChaiEntry ---------------------
-
     public final void addAttribute(final String attributeName, final String attributeValue)
         throws ChaiOperationException, ChaiUnavailableException
     {
@@ -205,11 +190,17 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
     public final Set<ChaiEntry> getChildObjects()
         throws ChaiUnavailableException, ChaiOperationException
     {
-        final Set<ChaiEntry> returnSet = new HashSet<ChaiEntry>();
+        final Set<ChaiEntry> returnSet = new HashSet<>();
         final String filter = "(" + ChaiConstant.ATTR_LDAP_OBJECTCLASS + "=*)";
-        final Map<String, Map<String,String>> results = this.getChaiProvider().search(this.getEntryDN(), filter, Collections.<String>emptySet(), ChaiProvider.SEARCH_SCOPE.ONE);
+        final Map<String, Map<String,String>> results = this.getChaiProvider().search(
+                this.getEntryDN(),
+                filter,
+                Collections.emptySet(),
+                ChaiProvider.SEARCH_SCOPE.ONE
+        );
+
         for (final String dn : results.keySet()) {
-            returnSet.add(ChaiFactory.createChaiEntry(dn, this.getChaiProvider()));
+            returnSet.add(getChaiProvider().getEntryFactory().createChaiEntry(dn));
         }
         return returnSet;
     }
@@ -221,7 +212,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         if (parentDNString == null) {
             return null;
         }
-        return ChaiFactory.createChaiEntry(parentDNString,getChaiProvider());
+        return getChaiProvider().getEntryFactory().createChaiEntry(parentDNString);
     }
 
     private static String getParentDNString(final String inputDN) {
@@ -311,12 +302,13 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         throws ChaiUnavailableException, ChaiOperationException
     {
         final byte[][] values = this.readMultiByteAttribute(attributeName);
-        final List<InetAddress> returnValues = new ArrayList<InetAddress>();
+        final List<InetAddress> returnValues = new ArrayList<>();
+        final String characterEncoding = chaiProvider.getChaiConfiguration().getSetting(ChaiSetting.LDAP_CHARACTER_ENCODING);
 
         for (final byte[] value : values) {
-            final String strValue = new String(value);
+            final String strValue = new String(value, Charset.forName(characterEncoding));
             final int sepPos = strValue.indexOf('#');
-            final int typeInt = Integer.valueOf(strValue.substring(0, sepPos));
+            final int typeInt = Integer.parseInt(strValue.substring(0, sepPos));
             final networkAddressType type = networkAddressType.forIdentifier(typeInt);
             switch (type) {
                 case IPv4:
@@ -378,7 +370,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry {
         final Set<ChaiEntry> resultSet = new HashSet<ChaiEntry>();
         final Map<String, Map<String,String>> results = chaiProvider.search(this.getEntryDN(), searchHelper.getFilter(), searchHelper.getAttributes(), searchHelper.getSearchScope());
         for (final String dn : results.keySet()) {
-            resultSet.add(ChaiFactory.createChaiEntry(dn, this.getChaiProvider()));
+            resultSet.add(getChaiProvider().getEntryFactory().createChaiEntry(dn));
         }
         return resultSet;
     }

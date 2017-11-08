@@ -36,14 +36,8 @@ import java.net.URI;
 /**
  */
 public class FailOverTester extends TestCase {
-// ----------------------------- CONSTANTS ----------------------------
-
-
-// ------------------------------ FIELDS ------------------------------
 
     private static final int basePort = 5000;
-
-// -------------------------- OTHER METHODS --------------------------
 
     public void testMultiServerFailover()
             throws Exception

@@ -38,10 +38,10 @@ import org.junit.Assert;
 import java.util.*;
 
 public class TestHelper {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     static int testContainerCounter = 0;
 
@@ -54,8 +54,6 @@ public class TestHelper {
     static int testBulkIterations = Integer.valueOf(ResourceBundle.getBundle("com.novell.ldapchai.tests.TestParameters").getString("testBulkIterations"));
 
     private static ChaiProvider cachedProvider;
-
-// -------------------------- STATIC METHODS --------------------------
 
     public static void cleanUp(final ChaiEntry object)
             throws ChaiUnavailableException

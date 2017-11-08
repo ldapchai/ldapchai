@@ -27,15 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class PasswordPolicyTester extends TestCase {
-// ----------------------------- CONSTANTS ----------------------------
 
-
-// ------------------------------ FIELDS ------------------------------
-
-
-// -------------------------- STATIC METHODS --------------------------
-
-// -------------------------- OTHER METHODS --------------------------
 
     protected void setUp()
             throws Exception

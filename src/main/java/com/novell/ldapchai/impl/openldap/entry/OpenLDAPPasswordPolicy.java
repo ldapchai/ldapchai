@@ -42,10 +42,6 @@ import java.util.Set;
 
 public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswordPolicy {
 
-    // -------------------------- ENUMERATIONS --------------------------
-
-    // -------------------------- OTHER METHODS --------------------------
-
     /**
      * All attributes used by the password policy. Several "helper" values for
      * each attribute are available, such as the ldap attribute name, and
@@ -332,7 +328,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
         if (entryValues != null && entryValues.containsKey(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT)) {
             try {
-                final int historyCount = Integer.valueOf(entryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT));
+                final int historyCount = Integer.parseInt(entryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT));
                 if (historyCount > 0) {
                     returnMap.put(ChaiPasswordRule.UniqueRequired.getKey(), "true");
                 }

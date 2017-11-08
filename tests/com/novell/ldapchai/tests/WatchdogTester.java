@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class WatchdogTester extends TestCase {
-// -------------------------- OTHER METHODS --------------------------
 
     protected void setUp()
             throws Exception

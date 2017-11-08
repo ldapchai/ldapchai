@@ -29,10 +29,6 @@ package com.novell.ldapchai.exception;
  * @see ChaiError
  */
 public class ChaiUnavailableException extends ChaiException {
-// ------------------------------ FIELDS ------------------------------
-
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Generate a new {@code ChaiUnavailableException} based on the supplied
@@ -47,8 +43,6 @@ public class ChaiUnavailableException extends ChaiException {
     {
         return new ChaiUnavailableException(errorMessage, ChaiErrors.getErrorForMessage(errorMessage));
     }
-
-// --------------------------- CONSTRUCTORS ---------------------------
 
     public ChaiUnavailableException(final String message, final ChaiError errorCode)
     {

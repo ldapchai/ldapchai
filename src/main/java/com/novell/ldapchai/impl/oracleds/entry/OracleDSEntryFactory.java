@@ -19,11 +19,11 @@
 
 package com.novell.ldapchai.impl.oracleds.entry;
 
-import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class OracleDSEntryFactory implements ChaiFactory.ChaiEntryFactory {
+public class OracleDSEntryFactory implements ChaiEntryFactory.VendorFactory {
 
     private static ErrorMap errorMap;
 

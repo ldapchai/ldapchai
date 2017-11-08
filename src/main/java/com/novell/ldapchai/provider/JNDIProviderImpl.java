@@ -85,7 +85,7 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderImplementor {
-// ----------------------------- CONSTANTS ----------------------------
+
 
     /**
      * The default initial pool size to create when communicating with an individual server. *
@@ -102,16 +102,13 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
      */
     public static final int DEFAULT_MAXIMUM_POOL_SIZE = 50;
 
-// ------------------------------ FIELDS ------------------------------
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(JNDIProviderImpl.class);
 
     private Boolean cachedPagingEnableSupport = null;
     private LdapContext jndiConnection;
     private SocketFactory socketFactory;
-
-
-// -------------------------- STATIC METHODS --------------------------
 
     private static LdapContext generateNewJndiContext(final Hashtable environment)
             throws ChaiOperationException, ChaiUnavailableException
@@ -200,18 +197,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return result;
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     JNDIProviderImpl()
     {
         super();
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChaiProvider ---------------------
-
 
     public void close()
     {
@@ -236,7 +225,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.compareStringAttribute(entryDN, attributeName, value);
+        getInputValidator().compareStringAttribute(entryDN, attributeName, value);
 
         final byte[] ba;
         try {
@@ -274,7 +263,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     public final void createEntry(final String entryDN, final String baseObjectClass, final Map<String,String> stringAttributes)
             throws ChaiUnavailableException, ChaiOperationException
     {
-        INPUT_VALIDATOR.createEntry(entryDN, baseObjectClass, stringAttributes);
+        getInputValidator().createEntry(entryDN, baseObjectClass, stringAttributes);
         this.createEntry(entryDN, Collections.singleton(baseObjectClass), stringAttributes);
     }
 
@@ -284,7 +273,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiOperationException, ChaiUnavailableException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.createEntry(entryDN, baseObjectClasses, stringAttributes);
+        getInputValidator().createEntry(entryDN, baseObjectClasses, stringAttributes);
 
         final Attributes attrs = new BasicAttributes();
 
@@ -296,8 +285,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         attrs.put(objectClassAttr);
 
         //Add each of the attributes required.
-        for (final String key : stringAttributes.keySet()) {
-            attrs.put(key, stringAttributes.get(key));
+        for (final Map.Entry<String,String> entry : stringAttributes.entrySet()) {
+            attrs.put(entry.getKey(), entry.getValue());
         }
 
         // Create the object.
@@ -315,7 +304,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.deleteEntry(entryDN);
+        getInputValidator().deleteEntry(entryDN);
 
         final LdapContext ldapConnection = getLdapConnection();
         try {
@@ -331,7 +320,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.deleteStringAttributeValue(entryDN, attributeName, attributeValue);
+        getInputValidator().deleteStringAttributeValue(entryDN, attributeName, attributeValue);
 
         // Create a BasicAttribute for the object.
         final BasicAttribute attributeToReplace = new BasicAttribute(attributeName, attributeValue);
@@ -359,7 +348,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     {
         activityPreCheck();
 
-        INPUT_VALIDATOR.extendedOperation(request);
+        getInputValidator().extendedOperation(request);
 
         preCheckExtendedOperation(request);
 
@@ -389,9 +378,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.readMultiByteAttribute(entryDN, attributeName);
+        getInputValidator().readMultiByteAttribute(entryDN, attributeName);
 
-        final List<Byte[]> returnValues = new ArrayList<Byte[]>();
+        final List<Byte[]> returnValues = new ArrayList<>();
         final String jndiBinarySetting = "java.naming.ldap.attributes.binary";
         NamingEnumeration<?> namingEnum = null;
 
@@ -433,7 +422,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 if (namingEnum != null) {
                     namingEnum.close();
                 }
-            } catch (Exception e) {
+            } catch (NamingException e) {
                 //doesnt matter
             }
         }
@@ -444,7 +433,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.readMultiStringAttribute(entryDN, attributeName);
+        getInputValidator().readMultiStringAttribute(entryDN, attributeName);
 
         final Set<String> attributeValues = new HashSet<String>();
         NamingEnumeration namingEnum = null;
@@ -474,7 +463,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 if (namingEnum != null) {
                     namingEnum.close();
                 }
-            } catch (Exception e) {
+            } catch (NamingException e) {
                 // nothing to do
             }
         }
@@ -485,7 +474,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.readStringAttribute(entryDN, attributeName);
+        getInputValidator().readStringAttribute(entryDN, attributeName);
 
         return readStringAttributes(entryDN, Collections.singleton(attributeName)).get(attributeName);
     }
@@ -495,7 +484,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.readStringAttributes(entryDN, attributes);
+        getInputValidator().readStringAttributes(entryDN, attributes);
 
         // Allocate a return object
         final Map<String,String> returnObj = new LinkedHashMap<String,String>();
@@ -553,7 +542,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.replaceStringAttribute(entryDN, attributeName, oldValue, newValue);
+        getInputValidator().replaceStringAttribute(entryDN, attributeName, oldValue, newValue);
 
         // Create the ModificationItem
         final ModificationItem[] mods = new ModificationItem[2];
@@ -580,7 +569,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.search(baseDN, searchHelper);
+        getInputValidator().search(baseDN, searchHelper);
 
         // perform search
         final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, false);
@@ -588,12 +577,14 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         // convert to <String, Properties> return set.
         if (results != null) {
-            final Map<String, Map<String, String>> returnMap = new HashMap<String, Map<String, String>>(results.size());
-            for (final String entryDN : results.keySet()) {
-                final Map<String, List<String>> attributeMap = results.get(entryDN);
-                final Map<String, String> newProps = new LinkedHashMap<String, String>();
-                for (final String attrName : attributeMap.keySet()) {
-                    final List<String> values = attributeMap.get(attrName);
+            final Map<String, Map<String, String>> returnMap = new HashMap<>(results.size());
+            for (final Map.Entry<String, Map<String, List<String>>> resultEntry : results.entrySet()) {
+                final String entryDN = resultEntry.getKey();
+                final Map<String, List<String>> attributeMap = resultEntry.getValue();
+                final Map<String, String> newProps = new LinkedHashMap<>();
+                for (final Map.Entry<String, List<String>> attributeEntry : attributeMap.entrySet()) {
+                    final String attrName = attributeEntry.getKey();
+                    final List<String> values = attributeEntry.getValue();
                     newProps.put(attrName, values.get(0));
                 }
                 returnMap.put(entryDN, Collections.unmodifiableMap(newProps));
@@ -609,7 +600,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.search(baseDN, filter, attributes, searchScope);
+        getInputValidator().search(baseDN, filter, attributes, searchScope);
 
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setFilter(filter);
@@ -623,7 +614,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.searchMultiValues(baseDN, searchHelper);
+        getInputValidator().searchMultiValues(baseDN, searchHelper);
         final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, true);
         return searchEngine.getResults();
     }
@@ -632,7 +623,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.searchMultiValues(baseDN, filter, attributes, searchScope);
+        getInputValidator().searchMultiValues(baseDN, filter, attributes, searchScope);
 
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setFilter(filter);
@@ -666,7 +657,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.writeBinaryAttribute(entryDN, attributeName, values, overwrite);
+        getInputValidator().writeBinaryAttribute(entryDN, attributeName, values, overwrite);
 
         final String jndiBinarySetting = "java.naming.ldap.attributes.binary";
 
@@ -718,7 +709,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.replaceBinaryAttribute(entryDN, attributeName, oldValue, newValue);
+        getInputValidator().replaceBinaryAttribute(entryDN, attributeName, oldValue, newValue);
 
         final String jndiBinarySetting = "java.naming.ldap.attributes.binary";
 
@@ -764,7 +755,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.writeStringAttribute(entryDN, attributeName, values, overwrite);
+        getInputValidator().writeStringAttribute(entryDN, attributeName, values, overwrite);
 
 
         // Create the ModificationItem
@@ -812,16 +803,16 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        INPUT_VALIDATOR.writeStringAttributes(entryDN, attributeValueProps, overwrite);
+        getInputValidator().writeStringAttributes(entryDN, attributeValueProps, overwrite);
 
         // Determine the modification type, if replace, only replace on the first attribute, the rest just get added.
         final int modType = overwrite ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
 
         // Create the ModificationItem
         final List<ModificationItem> modificationItems = new ArrayList<ModificationItem>();
-        for (final String attrName : attributeValueProps.keySet()) {
+        for (final Map.Entry<String,String> entry : attributeValueProps.entrySet()) {
             // Create a BasicAttribute for the object.
-            final BasicAttribute attributeToReplace = new BasicAttribute(attrName, attributeValueProps.get(attrName));
+            final BasicAttribute attributeToReplace = new BasicAttribute(entry.getKey(), entry.getValue());
 
             // Populate the ModificationItem object with the flag & the attribute to replace.
             modificationItems.add(new ModificationItem(modType, attributeToReplace));
@@ -840,8 +831,6 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             convertNamingException(e);
         }
     }
-
-// --------------------- Interface ChaiProviderImplementor ---------------------
 
     /**
      * Return the current underlying {@link javax.naming.ldap.LdapContext} for this connection.  This
@@ -882,12 +871,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         super.init(chaiConfig);
     }
 
-// -------------------------- OTHER METHODS --------------------------
-
     private synchronized Hashtable generateJndiEnvironment(final String ldapURL)
     {
         // Populate the hashtable with the attributes to connect to eDirectory.
-        final Hashtable<String, String> env = new Hashtable<String, String>();
+        final Hashtable<String, String> env = new Hashtable<>();
 
         // add in basic connection info
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -956,9 +943,12 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         // mix in default environment settings
         if (chaiConfig.getImplementationConfiguration() != null && chaiConfig.getImplementationConfiguration() instanceof Map) {
             final Map defaultEnvironment = (Map) chaiConfig.getImplementationConfiguration();
-            for (final Object key : defaultEnvironment.keySet()) {
-                if (key instanceof String && defaultEnvironment.get(key) instanceof String) {
-                    env.put((String) key, (String) defaultEnvironment.get(key));
+
+            for (final Map.Entry entry : (Set<Map.Entry>) defaultEnvironment.entrySet()) {
+                final Object key = entry.getKey();
+                final Object value = entry.getValue();
+                if (key instanceof String && value instanceof String) {
+                    env.put((String) key, (String) value);
                 }
             }
         }
@@ -1198,27 +1188,28 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiOperationException, ChaiUnavailableException
     {
         // important safety tip: naming exceptions sometimes come with null messages....
-        String errorMsg = e.getClass().getName();
+        final StringBuilder errorMsg = new StringBuilder();
+        errorMsg.append(e.getClass().getName());
         if (e.getMessage() != null) {
-            errorMsg += ": " + e.getMessage();
+            errorMsg.append(": ").append(e.getMessage());
         }
 
         Throwable cause = e.getCause();
         int safetyCounter = 0;
         while (cause != null && safetyCounter < 10) {
             safetyCounter++;
-            errorMsg += ", cause:" + cause.getClass().getName();
+            errorMsg.append(", cause:").append(cause.getClass().getName());
             if (cause.getMessage() != null) {
-                errorMsg += ": " + cause.getMessage();
+                errorMsg.append(": ").append(cause.getMessage());
             }
             cause = cause.getCause();
         }
 
         if (errorIsRetryable(e)) {
-            throw new ChaiUnavailableException(errorMsg, ChaiError.COMMUNICATION, false, false);
+            throw new ChaiUnavailableException(errorMsg.toString(), ChaiError.COMMUNICATION, false, false);
         }
 
-        throw ChaiOperationException.forErrorMessage(errorMsg);
+        throw ChaiOperationException.forErrorMessage(errorMsg.toString());
     }
 
 

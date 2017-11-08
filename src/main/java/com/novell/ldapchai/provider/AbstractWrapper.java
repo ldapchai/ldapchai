@@ -28,15 +28,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 abstract class AbstractWrapper implements InvocationHandler {
-// ----------------------------- CONSTANTS ----------------------------
 
 
-// ------------------------------ FIELDS ------------------------------
+
+
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractWrapper.class);
     protected ChaiProviderImplementor realProvider;
-
-// -------------------------- STATIC METHODS --------------------------
 
     /**
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.

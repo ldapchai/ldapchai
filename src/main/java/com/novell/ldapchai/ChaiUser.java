@@ -36,7 +36,7 @@ import java.util.Set;
  * @author Jason D. Rivard
  */
 public interface ChaiUser extends ChaiEntry {
-// ----------------------------- CONSTANTS ----------------------------
+
 
     /**
      * Convenience LDAP attribute definition
@@ -132,8 +132,6 @@ public interface ChaiUser extends ChaiEntry {
      * Convenience LDAP attribute definition
      */
     String ATTR_WORKFORCEID = ChaiConstant.ATTR_LDAP_WORFORCE_ID;
-
-// -------------------------- OTHER METHODS --------------------------
 
     /**
      * Make this user a member of the specified group.  This method takes care of all four attribute assignments

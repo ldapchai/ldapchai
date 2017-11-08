@@ -30,7 +30,6 @@ import com.novell.ldapchai.exception.ChaiException;
  * Make a simple connection using one of the quick methods for generating a ChaiProvider.
  */
 public class SimpleConnection {
-// --------------------------- main() method ---------------------------
 
     public static void main(final String[] args) throws ChaiException {
         // create a provider using the quick chai factory

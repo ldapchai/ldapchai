@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ChaiConfigTester extends TestCase {
-// -------------------------- OTHER METHODS --------------------------
 
     public void testUniqueSettingKeys()
             throws Exception

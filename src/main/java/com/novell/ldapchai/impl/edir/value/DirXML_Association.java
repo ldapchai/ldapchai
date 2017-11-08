@@ -39,14 +39,11 @@ import java.util.StringTokenizer;
  * @author Jason D. Rivard
  */
 public class DirXML_Association implements Serializable, Comparable {
-// ----------------------------- CONSTANTS ----------------------------
 
     /**
      * ASN value of the <i>DirXML-Association</i> attribute.
      */
     public static final String ASN_VALUE = "2.16.840.1.113719.1.14.4.1.4";
-
-// -------------------------- ENUMERATIONS --------------------------
 
     /**
      * State of the association, stored as an integer.
@@ -104,15 +101,13 @@ public class DirXML_Association implements Serializable, Comparable {
         }
     }
 
-// ------------------------------ FIELDS ------------------------------
+
 
     private static final String SEPERATOR = "#";
 
     private String driverDN;
     private State state;
     private String value;
-
-// -------------------------- STATIC METHODS --------------------------
 
     public static DirXML_Association forStoredValue(final String storedValue)
     {
@@ -134,8 +129,6 @@ public class DirXML_Association implements Serializable, Comparable {
         return returnSet;
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
-
     private DirXML_Association(final String storedValue)
     {
         if (storedValue == null || storedValue.length() < 1) {
@@ -149,7 +142,7 @@ public class DirXML_Association implements Serializable, Comparable {
 
             {
                 final String stateString = st.nextToken();
-                final int stateNumber = Integer.valueOf(stateString);
+                final int stateNumber = Integer.parseInt(stateString);
                 this.state = State.forIntValue(stateNumber);
             }
 
@@ -173,8 +166,6 @@ public class DirXML_Association implements Serializable, Comparable {
             this.value = value;
         }
     }
-
-// --------------------- GETTER / SETTER METHODS ---------------------
 
     /**
      * DN of the driver the assoication is referring to
@@ -206,8 +197,6 @@ public class DirXML_Association implements Serializable, Comparable {
         return value;
     }
 
-// ------------------------ CANONICAL METHODS ------------------------
-
     /**
      * Output the value of the association, in ldap format.  The results
      * are suitable for writing to ldap.
@@ -224,11 +213,6 @@ public class DirXML_Association implements Serializable, Comparable {
         sb.append(this.getValue());
         return sb.toString();
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface Comparable ---------------------
 
     /**
      * Sorts {@code DirXML_Association} values based on the string ordering of the

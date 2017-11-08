@@ -27,14 +27,11 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
 class Uint32Charset extends Charset {
-// --------------------------- CONSTRUCTORS ---------------------------
 
     Uint32Charset()
     {
         super("unit32", null);
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     public boolean contains(final Charset cs)
     {
@@ -50,8 +47,6 @@ class Uint32Charset extends Charset {
     {
         throw new UnsupportedOperationException();
     }
-
-// -------------------------- INNER CLASSES --------------------------
 
     static class Uint32CharsetDecoder extends CharsetDecoder {
         Uint32CharsetDecoder(final Charset cs)

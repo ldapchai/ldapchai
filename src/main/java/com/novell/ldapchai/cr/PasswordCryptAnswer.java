@@ -81,9 +81,9 @@ class PasswordCryptAnswer implements Answer {
         return answerBean;
     }
 
-    static class PasswordCryptAnswerFactory implements ImplementationFactory{
+    static class PasswordCryptAnswerFactory implements ImplementationFactory {
         public PasswordCryptAnswer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
-            return new PasswordCryptAnswer(answerConfiguration,answer);
+            return new PasswordCryptAnswer(answerConfiguration, answer);
         }
 
         public PasswordCryptAnswer fromAnswerBean(final AnswerBean answerBean, final String challengeText) {
@@ -99,7 +99,7 @@ class PasswordCryptAnswer implements Answer {
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException("unknown content format specified in xml format value: '" + formatStr + "'");
             }
-            return new PasswordCryptAnswer(answerValue,caseInsensitive,formatType);
+            return new PasswordCryptAnswer(answerValue, caseInsensitive, formatType);
         }
     }
 }

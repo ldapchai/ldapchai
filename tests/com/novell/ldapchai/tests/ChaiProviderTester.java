@@ -32,11 +32,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ChaiProviderTester extends TestCase {
-// ------------------------------ FIELDS ------------------------------
+
 
     final private String testAttribute = "roomNumber";  //generally unused standard CaseIgnoreString attr
-
-// -------------------------- OTHER METHODS --------------------------
 
     protected void setUp()
             throws Exception

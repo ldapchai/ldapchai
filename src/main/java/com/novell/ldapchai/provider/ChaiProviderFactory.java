@@ -19,7 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiErrors;
@@ -79,28 +78,24 @@ import java.util.Properties;
  * @author Jason D. Rivard
  */
 public final class ChaiProviderFactory {
-// ----------------------------- CONSTANTS ----------------------------
 
-
-// ------------------------------ FIELDS ------------------------------
-
-    /**
-     * Log4j logger
-     */
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiProviderFactory.class.getName());
 
-// -------------------------- STATIC METHODS --------------------------
+    private static ChaiProviderFactory SINGLETON = new ChaiProviderFactory();
+
+    private final StatisticsWrapper.StatsBean GLOBAL_STATS = new StatisticsWrapper.StatsBean();
+
 
     /**
-     * Maintains the global chai provider statistics.  All {@code com.novell.ldapchai.provider.ChaiProvider} instaces
+     * Maintains the global chai provider statistics.  All {@code com.novell.ldapchai.provider.ChaiProvider} instances
      * that have their {@link ChaiSetting#STATISTICS_ENABLE} set to <i>true</i> will register statistics in
      * this global tracker.
      *
      * @return a ProviderStatistics instance containing global statistics for the Chai API
      */
-    public static ProviderStatistics getChaiStatistics()
+    public ProviderStatistics getGlobalStatistics()
     {
-        return StatisticsWrapper.getGlobalStatistics();
+        return GLOBAL_STATS;
     }
 
     /**
@@ -114,11 +109,26 @@ public final class ChaiProviderFactory {
      * @throws ChaiUnavailableException If the directory server(s) are not reachable.
      * @see com.novell.ldapchai.ChaiFactory#quickProvider(String,String,String)
      */
+    @Deprecated
     public static ChaiUser quickProvider(final String ldapURL, final String bindDN, final String password)
             throws ChaiUnavailableException
     {
         final ChaiProvider provider = createProvider(ldapURL, bindDN, password);
-        return ChaiFactory.createChaiUser(bindDN, provider);
+        return provider.getEntryFactory().createChaiUser(bindDN);
+    }
+
+    @Deprecated
+    public static ChaiProvider createProvider(final String ldapURL, final String bindDN, final String password)
+            throws ChaiUnavailableException
+    {
+        return SINGLETON.newProvider(ldapURL, bindDN, password);
+    }
+
+    @Deprecated
+    public static ChaiProvider createProvider(final ChaiConfiguration chaiConfiguration)
+            throws ChaiUnavailableException
+    {
+        return SINGLETON.newProvider(chaiConfiguration);
     }
 
     /**
@@ -130,7 +140,7 @@ public final class ChaiProviderFactory {
      * @return A ChaiProvider with an active connection to the ldap directory
      * @throws ChaiUnavailableException If the directory server(s) are not reachable.
      */
-    public static ChaiProvider createProvider(final String ldapURL, final String bindDN, final String password)
+    public ChaiProvider newProvider(final String ldapURL, final String bindDN, final String password)
             throws ChaiUnavailableException
     {
         final ChaiConfiguration chaiConfig = new ChaiConfiguration();
@@ -141,7 +151,7 @@ public final class ChaiProviderFactory {
         chaiConfig.setSetting(ChaiSetting.BIND_DN, bindDN);
         chaiConfig.setSetting(ChaiSetting.BIND_PASSWORD, password);
         chaiConfig.setSetting(ChaiSetting.PROVIDER_IMPLEMENTATION, JNDIProviderImpl.class.getName());
-        return createProvider(chaiConfig);
+        return newProvider(chaiConfig);
     }
 
     /**
@@ -154,7 +164,7 @@ public final class ChaiProviderFactory {
      * @return A functioning ChaiProvider generated according to <i>chaiConfiguration</i>
      * @throws ChaiUnavailableException If the directory server(s) are not reachable.
      */
-    public static ChaiProvider createProvider(final ChaiConfiguration chaiConfiguration)
+    public ChaiProvider newProvider(final ChaiConfiguration chaiConfiguration)
             throws ChaiUnavailableException
     {
         chaiConfiguration.lock();
@@ -280,13 +290,15 @@ public final class ChaiProviderFactory {
         }
     }
 
-// --------------------------- CONSTRUCTORS ---------------------------
 
     private ChaiProviderFactory()
     {
     }
 
-// -------------------------- INNER CLASSES --------------------------
+    public static ChaiProviderFactory newProviderFactory() {
+        return new ChaiProviderFactory();
+    }
+
 
     private static class SynchronizedProvider implements InvocationHandler {
         private final ChaiProvider realProvider;
@@ -318,6 +330,10 @@ public final class ChaiProviderFactory {
                 throw e.getCause();
             }
         }
+    }
+
+    StatisticsWrapper.StatsBean getStatsBean() {
+        return GLOBAL_STATS;
     }
 }
 

@@ -20,7 +20,6 @@
 package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.AbstractResponseSet;
@@ -71,7 +70,7 @@ public class NmasCrFactory {
         }
 
         final List<Challenge> challenges = new ArrayList<Challenge>();
-        final ChaiEntry csSetEntry = ChaiFactory.createChaiEntry(challengeSetDN, provider);
+        final ChaiEntry csSetEntry = provider.getEntryFactory().createChaiEntry(challengeSetDN);
 
         final Map<String,String> allValues = csSetEntry.readStringAttributes(Collections.<String>emptySet());
 

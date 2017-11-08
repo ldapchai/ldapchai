@@ -20,13 +20,13 @@
 package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiFactory;
+import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.ad.ADErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class ADEntryFactory implements ChaiFactory.ChaiEntryFactory {
+public class ADEntryFactory implements ChaiEntryFactory.VendorFactory {
 
     private static ErrorMap errorMap;
 

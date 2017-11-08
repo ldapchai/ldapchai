@@ -35,17 +35,10 @@ class NcpServerImpl extends TopImpl implements NcpServer {
         return NcpServer.OBJECT_CLASS_VALUE;
     }
 
-    // --------------------------- CONSTRUCTORS ---------------------------
-
     NcpServerImpl(final String entryDN, final ChaiProvider chaiProvider)
     {
         super(entryDN, chaiProvider);
     }
-
-// ------------------------ INTERFACE METHODS ------------------------
-
-
-// --------------------- Interface ChaiNcpServer ---------------------
 
     public Set<URI> getLdapAddresses()
             throws ChaiUnavailableException, ChaiOperationException
@@ -66,8 +59,6 @@ class NcpServerImpl extends TopImpl implements NcpServer {
 
         return addresses;
     }
-
-// -------------------------- OTHER METHODS --------------------------
 
     private Set<String> getNetworkAddressAttrValue()
             throws ChaiUnavailableException, ChaiOperationException

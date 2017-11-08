@@ -19,10 +19,14 @@
 
 package com.novell.ldapchai.impl.openldap.entry;
 
+import com.novell.ldapchai.provider.ChaiConfiguration;
+import com.novell.ldapchai.provider.ChaiSetting;
+
 import javax.naming.SizeLimitExceededException;
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
 import java.io.Serializable;
+import java.nio.charset.Charset;
 
 /**
  * A class conforming to the ExtendedRequest that implements the
@@ -34,6 +38,9 @@ import java.io.Serializable;
 public class OpenLDAPModifyPasswordRequest
     implements ExtendedRequest, Serializable
 {
+
+    private final ChaiConfiguration chaiConfiguration;
+
     /**
      * Creates a new <code>OpenLDAPUser</code> instance.
      *
@@ -43,9 +50,11 @@ public class OpenLDAPModifyPasswordRequest
      * @exception javax.naming.SizeLimitExceededException when the dn or password
      *            is too long
      */
-    public OpenLDAPModifyPasswordRequest(final String dn, final String password)
+    public OpenLDAPModifyPasswordRequest(final String dn, final String password, final ChaiConfiguration chaiConfiguration)
         throws NullPointerException, SizeLimitExceededException
     {
+        this.chaiConfiguration = chaiConfiguration;
+
         if (dn == null)
         {
             throw new NullPointerException("dn cannot be null");
@@ -111,8 +120,9 @@ public class OpenLDAPModifyPasswordRequest
      */
     public byte[] getEncodedValue()
     {
-        final byte[] password = mPassword.getBytes();
-        final byte[] dn = mDn.getBytes();
+        final String characterEncoding = this.chaiConfiguration.getSetting(ChaiSetting.LDAP_CHARACTER_ENCODING);
+        final byte[] password = mPassword.getBytes(Charset.forName(characterEncoding));
+        final byte[] dn = mDn.getBytes(Charset.forName(characterEncoding));
 
         // Sequence tag (1) + sequence length (1) + dn tag (1) +
         // dn length (1) + dn (variable) + password tag (1) +

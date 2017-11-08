@@ -34,7 +34,6 @@ import java.util.Map;
  * Create a new user in the ldap directory.
  */
 public class CreateUser {
-// --------------------------- main() method ---------------------------
 
     public static void main(final String[] args) {
         String ldapURL =      "ldap://ldaphost:389";
@@ -55,7 +54,7 @@ public class CreateUser {
         String createClass = "inetOrgPerson";
 
         // create a Properties to set the initial attribute values for the new user.
-        Map<String,String> createAttributes = new HashMap<String, String>();
+        Map<String,String> createAttributes = new HashMap<>();
         createAttributes.put("givenName","George");
         createAttributes.put("sn","Washingon");
         createAttributes.put("title","President");

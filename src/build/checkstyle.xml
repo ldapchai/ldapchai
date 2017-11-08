@@ -32,7 +32,7 @@
 <module name="Checker">
 
     <module name="SuppressionFilter">
-        <property name="file" value="./checkstyle-suppression.xml"/>
+        <property name="file" value="${basedir}/src/build/checkstyle-suppression.xml"/>
     </module>
 
     <!-- Checks that each Java package has a Javadoc file used for commenting. -->
@@ -180,7 +180,7 @@
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
         <module name="ImportControl">
-            <property name="file" value="import-control.xml"/>
+            <property name="file" value="${basedir}/src/build/import-control.xml"/>
         </module>
 
 
