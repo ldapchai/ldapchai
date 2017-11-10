@@ -51,10 +51,12 @@ public class ChaiConfiguration implements Serializable {
 
     private static final Properties DEFAULT_SETTINGS = new Properties();
 
+    private static final long serialVersionUID = 1L;
+
     private Serializable implementationConfiguration;
     private transient volatile boolean locked;
     private Properties settings = new Properties(DEFAULT_SETTINGS);
-    private X509TrustManager[] trustManager = null;
+    private transient X509TrustManager[] trustManager = null;
 
     static {
         for (final ChaiSetting s : ChaiSetting.values()) {

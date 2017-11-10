@@ -108,9 +108,10 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
 
     @Override
-    public void init(final ChaiConfiguration chaiConfig) throws ChaiUnavailableException {
+    public void init(final ChaiConfiguration chaiConfig, final ChaiProviderFactory providerFactory)
+            throws ChaiUnavailableException {
         this.chaiConfig = chaiConfig;
-        super.init(chaiConfig);
+        super.init(chaiConfig, providerFactory);
 
         // grab the first URL from the list.
         currentLdapUrl = chaiConfig.bindURLsAsList().get(0);

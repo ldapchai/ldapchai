@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
  *
  * @author Jason D. Rivard
  */
-public class DirXML_Association implements Serializable, Comparable {
+public class DirXML_Association implements Serializable {
 
     /**
      * ASN value of the <i>DirXML-Association</i> attribute.
@@ -212,20 +212,5 @@ public class DirXML_Association implements Serializable, Comparable {
         sb.append('#');
         sb.append(this.getValue());
         return sb.toString();
-    }
-
-    /**
-     * Sorts {@code DirXML_Association} values based on the string ordering of the
-     * DN of the driver.
-     *
-     * @param o another {@code DirXML_Association} instance
-     * @return -1 if less, 0 if equal, +1 if greater.
-     */
-    public int compareTo(final Object o)
-    {
-        if (o instanceof DirXML_Association) {
-            return this.getDriverDN().compareTo(((DirXML_Association) o).getDriverDN());
-        }
-        throw new IllegalArgumentException("object must be of type " + this.getClass().getName());
     }
 }

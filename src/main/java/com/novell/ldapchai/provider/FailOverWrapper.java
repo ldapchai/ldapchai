@@ -24,14 +24,14 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Failover provider.
@@ -40,10 +40,6 @@ import java.util.Map;
  * @see ChaiSetting#FAILOVER_ENABLE
  */
 class FailOverWrapper implements InvocationHandler {
-
-
-
-
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(FailOverWrapper.class);
 
@@ -54,7 +50,7 @@ class FailOverWrapper implements InvocationHandler {
     private final FailOverSettings settings;
     private volatile boolean closed = false;
 
-    static ChaiProviderImplementor forConfiguration(final ChaiConfiguration chaiConfig)
+    static ChaiProviderImplementor forConfiguration(final ChaiProviderFactory providerFactory, final ChaiConfiguration chaiConfig)
             throws ChaiUnavailableException
     {
         final Class[] interfaces = new Class[]{ChaiProviderImplementor.class};
@@ -62,7 +58,7 @@ class FailOverWrapper implements InvocationHandler {
         final Object newProxy = Proxy.newProxyInstance(
                 chaiConfig.getClass().getClassLoader(),
                 interfaces,
-                new FailOverWrapper(chaiConfig));
+                new FailOverWrapper(providerFactory, chaiConfig));
 
         return (ChaiProviderImplementor) newProxy;
     }
@@ -85,7 +81,7 @@ class FailOverWrapper implements InvocationHandler {
         } while ((System.currentTimeMillis() - startTime) < time);
     }
 
-    private FailOverWrapper(final ChaiConfiguration chaiConfig)
+    private FailOverWrapper(final ChaiProviderFactory chaiProviderFactory, final ChaiConfiguration chaiConfig)
             throws ChaiUnavailableException
     {
         final int settingMaxRetries = Integer.parseInt(chaiConfig.getSetting(ChaiSetting.FAILOVER_CONNECT_RETRIES));
@@ -94,7 +90,7 @@ class FailOverWrapper implements InvocationHandler {
 
         final ChaiProviderImplementor failOverHelper;
         try {
-            failOverHelper = ChaiProviderFactory.createConcreateProvider(chaiConfig, false);
+            failOverHelper = ChaiProviderFactory.createConcreteProvider(chaiProviderFactory, chaiConfig, false);
         } catch (Exception e) {
             throw new ChaiUnavailableException(
                     "unable to create a required concrete provider for the failover wrapper",
@@ -105,7 +101,7 @@ class FailOverWrapper implements InvocationHandler {
         this.settings.setMaxRetries(settingMaxRetries);
         this.settings.setMinFailBackTime(settingMinFailbackTime);
 
-        rotationMachine = new RotationMachine(chaiConfig, settings);
+        rotationMachine = new RotationMachine(chaiProviderFactory, chaiConfig, settings);
 
         // call get current provider.  must be able to connect, else should not return a new instance.
         originalProvider = rotationMachine.getCurrentProvider();
@@ -217,39 +213,41 @@ class FailOverWrapper implements InvocationHandler {
      * Despite the last known good cache, every rotation machine maintains an unrelated state.  The cache
      * is only used for setting the initial slot used when a new rotation machine is created.
      */
-    private static class RotationMachine implements Serializable {
-        private enum FAILSTATE {
+    private static class RotationMachine {
+        private enum FailState {
             NEW, OKAY, SEEKING, FAILED
         }
 
         private long lastFailureTime = System.currentTimeMillis();
 
-        private final List<ProviderSlot> proividerSlots = new ArrayList<ProviderSlot>();
-        private volatile int activeSlot = 0;
+        private final List<ProviderSlot> providerSlots = new CopyOnWriteArrayList<>();
+        private final AtomicInteger activeSlot = new AtomicInteger(0);
         private final FailOverSettings settings;
+        private final ChaiProviderFactory providerFactory;
         private final ChaiConfiguration originalConfiguration;
 
         private final int urlListHashCode;
 
-        private static final Map<Integer,Integer> LAST_KNOWN_GOOD_CACHE = new LinkedHashMap<Integer,Integer>();
+        private static final Map<Integer,Integer> LAST_KNOWN_GOOD_CACHE = new ConcurrentHashMap<>();
         private static final int MAX_SIZE_LNG_CACHE = 50;
         private static long lngLastPopulateTime = System.currentTimeMillis();
 
         private Exception lastConnectionException;
 
-        private volatile FAILSTATE failState = FAILSTATE.NEW;
+        private volatile FailState failState = FailState.NEW;
 
-        RotationMachine(final ChaiConfiguration chaiConfig, final FailOverSettings settings)
+        RotationMachine(final ChaiProviderFactory chaiProviderFactory, final ChaiConfiguration chaiConfig, final FailOverSettings settings)
                 throws ChaiUnavailableException
         {
             urlListHashCode = chaiConfig.bindURLsAsList().hashCode();
             this.settings = settings;
+            this.providerFactory = chaiProviderFactory;
             this.originalConfiguration = chaiConfig;
             configureInitialState(chaiConfig);
         }
 
         private void setActiveSlot(final int activeSlot) {
-            this.activeSlot = activeSlot;
+            this.activeSlot.set(activeSlot);
 
             if (activeSlot != 0) {
                 if (originalConfiguration.getBooleanSetting(ChaiSetting.FAILOVER_USE_LAST_KNOWN_GOOD_HINT)) {
@@ -270,7 +268,7 @@ class FailOverWrapper implements InvocationHandler {
             for (final String loopUrl : chaiConfig.bindURLsAsList()) {
                 final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfig);
                 loopConfig.setSetting(ChaiSetting.BIND_URLS, loopUrl);
-                proividerSlots.add(new ProviderSlot(loopConfig, loopUrl));
+                providerSlots.add(new ProviderSlot(loopConfig, loopUrl));
             }
 
             if (originalConfiguration.getBooleanSetting(ChaiSetting.FAILOVER_USE_LAST_KNOWN_GOOD_HINT)) {
@@ -281,42 +279,42 @@ class FailOverWrapper implements InvocationHandler {
                 }
 
                 if (LAST_KNOWN_GOOD_CACHE.containsKey(urlListHashCode)) {
-                    activeSlot = LAST_KNOWN_GOOD_CACHE.get(urlListHashCode);
-                    LOGGER.debug("using slot #" + activeSlot + " (" + proividerSlots.get(
-                            activeSlot).getUrl() + ") as initial bind URL due to Last Known Good cache");
+                    activeSlot.set(LAST_KNOWN_GOOD_CACHE.get(urlListHashCode));
+                    LOGGER.debug("using slot #" + activeSlot.get() + " (" + providerSlots.get(
+                            activeSlot.get()).getUrl() + ") as initial bind URL due to Last Known Good cache");
                 }
             }
         }
 
-        public synchronized ChaiProvider getCurrentProvider()
+        synchronized ChaiProvider getCurrentProvider()
                 throws ChaiUnavailableException
         {
             failbackCheck();
 
             ChaiUnavailableException lastException = null;
-            if (failState == FAILSTATE.NEW) {
+            if (failState == FailState.NEW) {
                 try {
-                    makeNewProvider(activeSlot);
-                    failState = FAILSTATE.OKAY;
+                    makeNewProvider(activeSlot.get());
+                    failState = FailState.OKAY;
                 } catch (ChaiUnavailableException e) {
                     lastException = e;
                     if (settings.errorIsRetryable(e)) {
-                        failState = FAILSTATE.FAILED;
+                        failState = FailState.FAILED;
                     } else {
                         throw e;
                     }
                 }
             }
 
-            if (failState == FAILSTATE.OKAY) {
-                return proividerSlots.get(activeSlot).getProvider();
+            if (failState == FailState.OKAY) {
+                return providerSlots.get(activeSlot.get()).getProvider();
             }
 
-            if (failState == FAILSTATE.FAILED) {
+            if (failState == FailState.FAILED) {
                 currentServerIsBroken(lastException);
 
-                if (failState == FAILSTATE.OKAY) {
-                    return proividerSlots.get(activeSlot).getProvider();
+                if (failState == FailState.OKAY) {
+                    return providerSlots.get(activeSlot.get()).getProvider();
                 }
             }
 
@@ -329,15 +327,15 @@ class FailOverWrapper implements InvocationHandler {
             throw new ChaiUnavailableException(errorMsg.toString(), ChaiError.COMMUNICATION);
         }
 
-        public synchronized void reportBrokenProvider(final ChaiProvider provider, final Exception e)
+        synchronized void reportBrokenProvider(final ChaiProvider provider, final Exception e)
         {
             //no point doing anything if state is already reported as broken.
-            if (failState != FAILSTATE.OKAY) {
+            if (failState != FailState.OKAY) {
                 return;
             }
 
             //make sure the reported provider is the one thats actually currently active, otherwise ignore the report
-            final ChaiProvider presumedCurrentProvider = proividerSlots.get(activeSlot).getProvider();
+            final ChaiProvider presumedCurrentProvider = providerSlots.get(activeSlot.get()).getProvider();
             if (presumedCurrentProvider != null && presumedCurrentProvider.equals(provider)) {
                 currentServerIsBroken(e);
             }
@@ -345,10 +343,10 @@ class FailOverWrapper implements InvocationHandler {
 
         private synchronized void failbackCheck()
         {
-            if (failState == FAILSTATE.OKAY && activeSlot != 0) {
+            if (failState == FailState.OKAY && activeSlot.get() != 0) {
                 final long msSinceLastFailure = System.currentTimeMillis() - lastFailureTime;
                 if (msSinceLastFailure > settings.getMinFailBackTime()) {
-                    failState = FAILSTATE.NEW;
+                    failState = FailState.NEW;
                     setActiveSlot(0);
                 }
             }
@@ -356,38 +354,38 @@ class FailOverWrapper implements InvocationHandler {
 
         private synchronized void currentServerIsBroken(final Exception errorCause)
         {
-            if (proividerSlots.size() > 1) {
-                LOGGER.warn("current server " + proividerSlots.get(activeSlot).getUrl()
+            if (providerSlots.size() > 1) {
+                LOGGER.warn("current server " + providerSlots.get(activeSlot.get()).getUrl()
                         + " has failed, failing over to next server in list"
                         + ((errorCause != null) ? ", last error: " + errorCause.getMessage() : ""));
             } else {
-                LOGGER.warn("unable to reach ldap server " + proividerSlots.get(activeSlot).getUrl()
+                LOGGER.warn("unable to reach ldap server " + providerSlots.get(activeSlot.get()).getUrl()
                         + ((errorCause != null) ? ", last error: " + errorCause.getMessage() : ""));
             }
             lastFailureTime = System.currentTimeMillis();
             boolean success = false;
 
             try {
-                failState = FAILSTATE.SEEKING;
+                failState = FailState.SEEKING;
 
-                final int maxRetries = proividerSlots.size();
+                final int maxRetries = providerSlots.size();
                 int retryCounter = 0;
                 while (!success && retryCounter < maxRetries) {
 
-                    if (activeSlot + 1 > proividerSlots.size() - 1) {
+                    if (activeSlot.get() + 1 > providerSlots.size() - 1) {
                         setActiveSlot(0);
                         pause(settings.getRotateDelay());
                     } else {
-                        setActiveSlot(++activeSlot);
+                        setActiveSlot(activeSlot.get() + 1);
                     }
 
 
-                    if (proividerSlots.size() > 1) {
-                        LOGGER.info("failing over to " + proividerSlots.get(activeSlot).getUrl());
+                    if (providerSlots.size() > 1) {
+                        LOGGER.info("failing over to " + providerSlots.get(activeSlot.get()).getUrl());
                     }
 
                     try {
-                        makeNewProvider(activeSlot);
+                        makeNewProvider(activeSlot.get());
                         success = true;
                     } catch (ChaiUnavailableException e) {
                         lastConnectionException = e;
@@ -401,7 +399,7 @@ class FailOverWrapper implements InvocationHandler {
                     retryCounter++;
                 }
             } finally {
-                failState = success ? FAILSTATE.OKAY : FAILSTATE.FAILED;
+                failState = success ? FailState.OKAY : FailState.FAILED;
             }
         }
 
@@ -411,9 +409,12 @@ class FailOverWrapper implements InvocationHandler {
             destoryAllConnections();
 
             //create a new connection
-            final ProviderSlot slot = proividerSlots.get(forSlot);
+            final ProviderSlot slot = providerSlots.get(forSlot);
             try {
-                final ChaiProviderImplementor newProvider = ChaiProviderFactory.createConcreateProvider(slot.getConfig(), true);
+                final ChaiProviderImplementor newProvider = ChaiProviderFactory.createConcreteProvider(
+                        providerFactory,
+                        slot.getConfig(),
+                        true);
                 slot.setProvider(newProvider);
             } catch (ChaiUnavailableException e) {
                 throw e;
@@ -426,7 +427,7 @@ class FailOverWrapper implements InvocationHandler {
 
         public void destoryAllConnections()
         {
-            for (final ProviderSlot loopSlot : proividerSlots) {
+            for (final ProviderSlot loopSlot : providerSlots) {
                 final ChaiProvider loopProvider = loopSlot.getProvider();
                 if (loopProvider != null) {
                     loopProvider.close();

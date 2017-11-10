@@ -80,7 +80,7 @@ public interface ChaiProviderImplementor extends ChaiProvider {
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    if the instance has already been initialized.
      */
-    void init(ChaiConfiguration chaiConfig)
+    void init(ChaiConfiguration chaiConfig, ChaiProviderFactory providerFactory)
         throws ChaiUnavailableException, IllegalStateException;
 
     /**

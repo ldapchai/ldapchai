@@ -99,6 +99,7 @@ class CachingWrapper extends AbstractWrapper {
 
     public void clearCache()
     {
+        assert (memorizedProvider instanceof Memorizer);
         ((Memorizer) memorizedProvider).clearCache();
     }
 
@@ -247,7 +248,7 @@ class CachingWrapper extends AbstractWrapper {
             }
         }
 
-        class ValueWrapper {
+        static class ValueWrapper {
             private long timestamp;
 
             private Method method;

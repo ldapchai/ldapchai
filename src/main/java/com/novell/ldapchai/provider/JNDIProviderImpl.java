@@ -57,6 +57,8 @@ import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,22 +88,20 @@ import java.util.Set;
  */
 public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderImplementor {
 
-
     /**
      * The default initial pool size to create when communicating with an individual server. *
      */
-    public static final int DEFAULT_INITIAL_POOL_SIZE = 1;
+    private static final int DEFAULT_INITIAL_POOL_SIZE = 1;
 
     /**
      * The default preferred pool size to create when communicating with an individual server. *
      */
-    public static final int DEFAULT_PREFERRED_POOL_SIZE = 10;
+    private static final int DEFAULT_PREFERRED_POOL_SIZE = 10;
 
     /**
      * The default maximum pool size to create when communicating with an individual server. *
      */
-    public static final int DEFAULT_MAXIMUM_POOL_SIZE = 50;
-
+    private static final int DEFAULT_MAXIMUM_POOL_SIZE = 50;
 
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(JNDIProviderImpl.class);
@@ -404,7 +404,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 }
             }
 
-            // Return the list as a set of primimtives.
+            // Return the list as a set of primitives.
             final byte[][] returnArray = new byte[returnValues.size()][];
             for (int i = 0; i < returnValues.size(); i++) {
                 returnArray[i] = toPrimitive(returnValues.get(i));
@@ -423,7 +423,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     namingEnum.close();
                 }
             } catch (NamingException e) {
-                //doesnt matter
+                LOGGER.trace("unexpected error closing naming exception: " + e.getMessage());
             }
         }
     }
@@ -435,7 +435,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         activityPreCheck();
         getInputValidator().readMultiStringAttribute(entryDN, attributeName);
 
-        final Set<String> attributeValues = new HashSet<String>();
+        final Set<String> attributeValues = new HashSet<>();
         NamingEnumeration namingEnum = null;
 
         try {
@@ -464,7 +464,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     namingEnum.close();
                 }
             } catch (NamingException e) {
-                // nothing to do
+                LOGGER.trace("unexpected error closing naming exception: " + e.getMessage());
             }
         }
     }
@@ -487,7 +487,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         getInputValidator().readStringAttributes(entryDN, attributes);
 
         // Allocate a return object
-        final Map<String,String> returnObj = new LinkedHashMap<String,String>();
+        final Map<String,String> returnObj = new LinkedHashMap<>();
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
@@ -856,7 +856,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return this.getChaiConfiguration().bindURLsAsList().get(0);
     }
 
-    public void init(final ChaiConfiguration chaiConfig)
+    public void init(final ChaiConfiguration chaiConfig, final ChaiProviderFactory providerFactory)
             throws ChaiUnavailableException, IllegalStateException
     {
         this.chaiConfig = chaiConfig;
@@ -868,10 +868,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throw new ChaiUnavailableException("bind failed (" + e.getMessage() + ")", e.getErrorCode());
         }
 
-        super.init(chaiConfig);
+        super.init(chaiConfig, providerFactory);
     }
 
-    private synchronized Hashtable generateJndiEnvironment(final String ldapURL)
+    private Hashtable generateJndiEnvironment(final String ldapURL)
     {
         // Populate the hashtable with the attributes to connect to eDirectory.
         final Hashtable<String, String> env = new Hashtable<>();
@@ -902,7 +902,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             env.put("com.sun.jndi.ldap.read.timeout", chaiConfig.getSetting(ChaiSetting.LDAP_READ_TIMEOUT));
         }
 
-        //set alias dereferencing
+        //set alias de-referencing
         env.put("java.naming.ldap.derefAliases", chaiConfig.getSetting(ChaiSetting.LDAP_DEREFENCE_ALIAS));
 
         //set referrals
@@ -913,7 +913,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         final boolean isSecureLdapURL = (URI.create(ldapURL)).getScheme().equalsIgnoreCase("ldaps");
 
         //setup blind SSL socket factory
-        final boolean promiscuousMode = Boolean.valueOf(chaiConfig.getSetting(ChaiSetting.PROMISCUOUS_SSL));
+        final boolean promiscuousMode = chaiConfig.getBooleanSetting(ChaiSetting.PROMISCUOUS_SSL);
         if (isSecureLdapURL) {
             if (promiscuousMode) {
                 try {
@@ -922,7 +922,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     socketFactory = sc.getSocketFactory();
                     ThreadLocalSocketFactory.set(socketFactory);
                     env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
-                } catch (Exception e) {
+                } catch (NoSuchAlgorithmException | KeyManagementException e) {
                     LOGGER.error("error configuring promiscuous socket factory");
                 }
 
@@ -934,8 +934,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     ThreadLocalSocketFactory.set(socketFactory);
 
                     env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
-                } catch (Exception e) {
-                    LOGGER.error("error configuring promiscuous socket factory");
+                } catch (NoSuchAlgorithmException | KeyManagementException e) {
+                    LOGGER.error("error configuring socket factory from configured trust manager");
                 }
             }
         }

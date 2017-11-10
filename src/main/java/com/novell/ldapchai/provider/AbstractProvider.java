@@ -50,9 +50,10 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractProvider.class.getName());
 
     protected ChaiConfiguration chaiConfig;
+    private ChaiProviderFactory providerFactory;
     protected volatile ConnectionState state = ConnectionState.NEW;
 
-    private Map<String,Object> providerProperties = new HashMap<String,Object>();
+    private Map<String,Object> providerProperties = new HashMap<>();
     private DIRECTORY_VENDOR cachedDirectoryVendor;
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger(0);
@@ -104,15 +105,12 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return providerProperties;
     }
 
-
-
     AbstractProvider()
     {
-        {  // populate the extended for 
-            final Map<String, Exception> cacheFailureMap = new HashMap<String,Exception>();
+        {  // populate the extended for
+            final Map<String, Exception> cacheFailureMap = new HashMap<>();
             getProviderProperties().put(EXTENDED_FAILURE_CACHE_KEY, cacheFailureMap);
         }
-
     }
 
     /**
@@ -153,9 +151,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return state;
     }
 
-
-
-    public void init(final ChaiConfiguration chaiConfiguration)
+    public void init(final ChaiConfiguration chaiConfiguration, final ChaiProviderFactory providerFactory)
             throws ChaiUnavailableException
     {
         if (state == ConnectionState.OPEN) {
@@ -164,6 +160,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         if (state == ConnectionState.CLOSED) {
             throw new IllegalStateException("instance has been closed");
         }
+        this.providerFactory = providerFactory;
         this.chaiConfig = chaiConfiguration;
         state = ConnectionState.OPEN;
     }
@@ -575,11 +572,11 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     }
 
     public ChaiProviderFactory getProviderFactory() {
-        return null;
+        return this.providerFactory;
     }
 
     public ChaiEntryFactory getEntryFactory() {
-        return null;
+        return ChaiEntryFactory.createChaiFactory(this);
     }
 
     protected ChaiProviderInputValidator getInputValidator() {

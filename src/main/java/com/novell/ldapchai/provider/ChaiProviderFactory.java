@@ -174,7 +174,7 @@ public final class ChaiProviderFactory {
             final boolean enableFailover = "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.FAILOVER_ENABLE));
 
             if (enableFailover) {
-                providerImpl = FailOverWrapper.forConfiguration(chaiConfiguration);
+                providerImpl = FailOverWrapper.forConfiguration(this, chaiConfiguration);
             } else {
                 if (LOGGER.isTraceEnabled()) {
                     final StringBuilder sb = new StringBuilder();
@@ -185,7 +185,7 @@ public final class ChaiProviderFactory {
                     LOGGER.trace(sb.toString());
                 }
 
-                providerImpl = createConcreateProvider(chaiConfiguration, true);
+                providerImpl = createConcreteProvider(this, chaiConfiguration, true);
             }
         } catch (Exception e) {
             final String errorMsg = "unable to create connection: " + e.getClass().getName() + ":" + e.getMessage();
@@ -202,7 +202,8 @@ public final class ChaiProviderFactory {
         return providerImpl;
     }
 
-    static ChaiProviderImplementor createConcreateProvider(
+    static ChaiProviderImplementor createConcreteProvider(
+            final ChaiProviderFactory providerFactory,
             final ChaiConfiguration chaiConfiguration,
             final boolean initialize
     )
@@ -223,7 +224,7 @@ public final class ChaiProviderFactory {
         providerImpl = (ChaiProviderImplementor) impl;
 
         if (initialize) {
-            providerImpl.init(chaiConfiguration);
+            providerImpl.init(chaiConfiguration, providerFactory);
         }
 
         return providerImpl;

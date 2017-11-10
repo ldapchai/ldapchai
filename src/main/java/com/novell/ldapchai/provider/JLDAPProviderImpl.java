@@ -85,15 +85,15 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
     {
         //@todo stub to be used for nmas c/r, this should be more robust.
         final JLDAPProviderImpl newImpl = new JLDAPProviderImpl();
-        newImpl.init(chaiConfig);
+        newImpl.init(chaiConfig, null);
         newImpl.ldapConnection = ldapConnection;
         return newImpl;
     }
 
-    public void init(final ChaiConfiguration chaiConfig)
+    public void init(final ChaiConfiguration chaiConfig, final ChaiProviderFactory providerFactory)
             throws ChaiUnavailableException, IllegalStateException
     {
-        super.init(chaiConfig);
+        super.init(chaiConfig, providerFactory);
         try {
             // grab the first URL from the list.
             final URI ldapURL = URI.create(chaiConfig.bindURLsAsList().get(0));
@@ -324,7 +324,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         activityPreCheck();
         getInputValidator().readStringAttributes(entryDN, attributes);
 
-        final Map<String,String> returnProps = new LinkedHashMap<String, String>();
+        final Map<String,String> returnProps = new LinkedHashMap<>();
         try {
             final LDAPEntry entry = ldapConnection.read(entryDN, attributes.toArray(new String[attributes.size()]));
 
@@ -349,13 +349,9 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
 
         final LDAPModification[] modifications;
 
-        if (oldValue == null) {
-            modifications = new LDAPModification[]{new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(attributeName, newValue))};
-        } else {
-            modifications = new LDAPModification[2];
-            modifications[0] = new LDAPModification(LDAPModification.DELETE, new LDAPAttribute(attributeName, oldValue));
-            modifications[1] = new LDAPModification(LDAPModification.ADD, new LDAPAttribute(attributeName, newValue));
-        }
+        modifications = new LDAPModification[2];
+        modifications[0] = new LDAPModification(LDAPModification.DELETE, new LDAPAttribute(attributeName, oldValue));
+        modifications[1] = new LDAPModification(LDAPModification.ADD, new LDAPAttribute(attributeName, newValue));
 
         try {
             ldapConnection.modify(entryDN, modifications);
@@ -485,13 +481,9 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
 
         final LDAPModification[] modifications;
 
-        if (oldValue == null) {
-            modifications = new LDAPModification[]{new LDAPModification(LDAPModification.REPLACE, new LDAPAttribute(attribute, newValue))};
-        } else {
-            modifications = new LDAPModification[2];
-            modifications[0] = new LDAPModification(LDAPModification.DELETE, new LDAPAttribute(attribute, oldValue));
-            modifications[1] = new LDAPModification(LDAPModification.ADD, new LDAPAttribute(attribute, newValue));
-        }
+        modifications = new LDAPModification[2];
+        modifications[0] = new LDAPModification(LDAPModification.DELETE, new LDAPAttribute(attribute, oldValue));
+        modifications[1] = new LDAPModification(LDAPModification.ADD, new LDAPAttribute(attribute, newValue));
 
         try {
             ldapConnection.modify(entryDN, modifications);
@@ -578,13 +570,13 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
     {
         activityPreCheck();
 
-         // make a copy so if it changes somewhere else we won't be affected.
+        // make a copy so if it changes somewhere else we won't be affected.
         final SearchHelper effectiveSearchHelper = new SearchHelper(searchHelper);
 
         // replace a null dn with an empty string
         final String effectiveBaseDN = baseDN != null
-            ? baseDN
-            : "";
+                ? baseDN
+                : "";
 
 
         final int ldapScope;
