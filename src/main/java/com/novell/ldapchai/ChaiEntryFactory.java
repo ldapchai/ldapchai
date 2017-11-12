@@ -21,18 +21,11 @@ package com.novell.ldapchai;
 
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.impl.ad.entry.ADEntryFactory;
-import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389EntryFactory;
-import com.novell.ldapchai.impl.edir.entry.EdirEntryFactory;
-import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
-import com.novell.ldapchai.impl.openldap.entry.OpenLDAPEntryFactory;
-import com.novell.ldapchai.impl.oracleds.entry.OracleDSEntryFactory;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Factory for {@link ChaiEntry} and its subclasses.  Instances are returned based
@@ -53,21 +46,8 @@ public final class ChaiEntryFactory
 {
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( com.novell.ldapchai.ChaiEntryFactory.class );
-    private static final Map<ChaiProvider.DIRECTORY_VENDOR, VendorFactory> ENTRY_FACTORY_MAP;
 
     private final ChaiProvider chaiProvider;
-
-    static
-    {
-        final Map<ChaiProvider.DIRECTORY_VENDOR, VendorFactory> map = new LinkedHashMap<>();
-        map.put( ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY, new EdirEntryFactory() );
-        map.put( ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY, new ADEntryFactory() );
-        map.put( ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389, new DirectoryServer389EntryFactory() );
-        map.put( ChaiProvider.DIRECTORY_VENDOR.GENERIC, new GenericEntryFactory() );
-        map.put( ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP, new OpenLDAPEntryFactory() );
-        map.put( ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS, new OracleDSEntryFactory() );
-        ENTRY_FACTORY_MAP = Collections.unmodifiableMap( map );
-    }
 
     /**
      * Returns a {@code ChaiEntry} instance representing the supplied <i>entryDN</i>.
@@ -78,7 +58,7 @@ public final class ChaiEntryFactory
     public ChaiEntry createChaiEntry( final String entryDN )
             throws ChaiUnavailableException
     {
-        final VendorFactory entryFactory = getChaiEntryFactory( getChaiProvider().getDirectoryVendor() );
+        final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
         return entryFactory.createChaiEntry( entryDN, getChaiProvider() );
     }
 
@@ -91,7 +71,7 @@ public final class ChaiEntryFactory
     public ChaiGroup createChaiGroup( final String groupDN )
             throws ChaiUnavailableException
     {
-        final VendorFactory entryFactory = getChaiEntryFactory( getChaiProvider().getDirectoryVendor() );
+        final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
         return entryFactory.createChaiGroup( groupDN, getChaiProvider() );
     }
 
@@ -104,7 +84,7 @@ public final class ChaiEntryFactory
     public ChaiUser createChaiUser( final String userDN )
             throws ChaiUnavailableException
     {
-        final VendorFactory entryFactory = getChaiEntryFactory( getChaiProvider().getDirectoryVendor() );
+        final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
         return entryFactory.createChaiUser( userDN, getChaiProvider() );
     }
 
@@ -116,7 +96,7 @@ public final class ChaiEntryFactory
     public ErrorMap getErrorMap()
             throws ChaiUnavailableException
     {
-        final VendorFactory entryFactory = getChaiEntryFactory( getChaiProvider().getDirectoryVendor() );
+        final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
         return entryFactory.getErrorMap();
     }
 
@@ -127,22 +107,13 @@ public final class ChaiEntryFactory
      *               connection will be used by the {@code ChaiGroup}.
      * @return A valid {@code ChaiUser}
      */
-    public static ErrorMap getErrorMap( final ChaiProvider.DIRECTORY_VENDOR vendor )
+    public ErrorMap getErrorMap( final DirectoryVendor vendor )
+            throws ChaiUnavailableException
     {
-        final VendorFactory entryFactory = getChaiEntryFactory( vendor );
+        final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
         return entryFactory.getErrorMap();
     }
 
-
-    private static VendorFactory getChaiEntryFactory( final ChaiProvider.DIRECTORY_VENDOR vendor )
-    {
-        final VendorFactory returnEntryFactory = ENTRY_FACTORY_MAP.get( vendor );
-        if ( returnEntryFactory == null )
-        {
-            return ENTRY_FACTORY_MAP.get( ChaiProvider.DIRECTORY_VENDOR.GENERIC );
-        }
-        return returnEntryFactory;
-    }
 
     private ChaiEntryFactory( final ChaiProvider chaiProvider )
     {
@@ -154,19 +125,6 @@ public final class ChaiEntryFactory
         return new ChaiEntryFactory( chaiProvider );
     }
 
-
-    public interface VendorFactory
-    {
-        ChaiUser createChaiUser( String entryDN, ChaiProvider provider );
-
-        ChaiGroup createChaiGroup( String entryDN, ChaiProvider provider );
-
-        ChaiEntry createChaiEntry( String entryDN, ChaiProvider provider );
-
-        ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor();
-
-        ErrorMap getErrorMap();
-    }
 
     public ChaiProvider getChaiProvider()
     {

@@ -32,6 +32,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
 import com.novell.ldapchai.util.SearchHelper;
@@ -245,7 +246,7 @@ public class EdirEntries
             }
             filter.append( "(" ).append( ChaiConstant.ATTR_LDAP_COMMON_NAME ).append( "=" ).append( uniqueCN ).append( ")" );
 
-            final Map<String, Map<String, String>> results = provider.search( containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE );
+            final Map<String, Map<String, String>> results = provider.search( containerDN, filter.toString(), null, SearchScope.ONE );
             if ( results.size() == 0 )
             {
                 // No object found!
@@ -546,7 +547,7 @@ public class EdirEntries
             }
 
             {
-                NSPM_ENTRY_SEARCH_HELPER.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+                NSPM_ENTRY_SEARCH_HELPER.setSearchScope( SearchScope.BASE );
                 NSPM_ENTRY_SEARCH_HELPER.setAttributes( nspmPasswordAttributes );
             }
         }

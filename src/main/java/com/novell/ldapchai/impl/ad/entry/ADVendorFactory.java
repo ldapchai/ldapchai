@@ -20,16 +20,23 @@
 package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.ad.ADErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
-public class ADEntryFactory implements ChaiEntryFactory.VendorFactory
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class ADVendorFactory implements VendorFactory
 {
+    private static final String ROOT_DSE_ATTRIBUTE_NAMING_CONTEXT = "rootDomainNamingContext";
 
-    private static ErrorMap errorMap;
+    private static final ErrorMap ERROR_MAP = new ADErrorMap();
 
     public User createChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
@@ -46,17 +53,36 @@ public class ADEntryFactory implements ChaiEntryFactory.VendorFactory
         return new TopImpl( entryDN, provider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    public DirectoryVendor getDirectoryVendor()
     {
-        return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
+        return DirectoryVendor.ACTIVE_DIRECTORY;
     }
 
     public ErrorMap getErrorMap()
     {
-        if ( errorMap == null )
+        return ERROR_MAP;
+    }
+
+    @Override
+    public Set<String> interestedDseAttributes()
+    {
+        return Collections.singleton( ROOT_DSE_ATTRIBUTE_NAMING_CONTEXT );
+    }
+
+    @Override
+    public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
+    {
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_NAMING_CONTEXT ) )
         {
-            errorMap = new ADErrorMap();
+            for ( final String namingContext : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_NAMING_CONTEXT ) )
+            {
+                if ( namingContext.contains( "DC=" ) )
+                {
+                    return true;
+                }
+            }
         }
-        return errorMap;
+
+        return false;
     }
 }

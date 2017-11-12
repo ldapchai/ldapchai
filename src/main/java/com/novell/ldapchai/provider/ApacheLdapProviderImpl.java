@@ -36,7 +36,6 @@ import org.apache.directory.api.ldap.model.message.ResultCodeEnum;
 import org.apache.directory.api.ldap.model.message.ResultResponse;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.api.ldap.model.message.SearchRequestImpl;
-import org.apache.directory.api.ldap.model.message.SearchScope;
 import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
@@ -221,7 +220,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
 
     @Override
-    public DIRECTORY_VENDOR getDirectoryVendor()
+    public DirectoryVendor getDirectoryVendor()
             throws ChaiUnavailableException
     {
         return super.getDirectoryVendor();
@@ -496,7 +495,12 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     {
         try
         {
-            final EntryCursor entries = connection.search( entryDN, ChaiConstant.FILTER_OBJECTCLASS_ANY, SearchScope.OBJECT, attribute );
+            final EntryCursor entries = connection.search(
+                    entryDN,
+                    ChaiConstant.FILTER_OBJECTCLASS_ANY,
+                    org.apache.directory.api.ldap.model.message.SearchScope.OBJECT,
+                    attribute
+            );
             final Entry entry = entries.iterator().next();
             final List<Value> returnSet = new ArrayList<>();
             final Attribute attr = entry.get( attribute );
@@ -529,7 +533,12 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
         try
         {
-            final EntryCursor entries = connection.search( entryDN, ChaiConstant.FILTER_OBJECTCLASS_ANY, SearchScope.OBJECT, attribute );
+            final EntryCursor entries = connection.search(
+                    entryDN,
+                    ChaiConstant.FILTER_OBJECTCLASS_ANY,
+                    org.apache.directory.api.ldap.model.message.SearchScope.OBJECT,
+                    attribute
+            );
             final Entry entry = entries.iterator().next();
             final Attribute attr = entry.get( attribute );
             return attr == null ? null : attr.getString();
@@ -549,10 +558,15 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
         try
         {
-            final EntryCursor entries = connection.search( entryDN, ChaiConstant.FILTER_OBJECTCLASS_ANY, SearchScope.OBJECT, attributes.toArray( new String[attributes.size()] ) );
+            final EntryCursor entries = connection.search(
+                    entryDN,
+                    ChaiConstant.FILTER_OBJECTCLASS_ANY,
+                    org.apache.directory.api.ldap.model.message.SearchScope.OBJECT,
+                    attributes.toArray( new String[attributes.size()] )
+            );
             final Entry entry = entries.iterator().next();
             final Collection<Attribute> attrs = entry.getAttributes();
-            final Map<String, String> returnMap = new LinkedHashMap<String, String>();
+            final Map<String, String> returnMap = new LinkedHashMap<>();
             for ( final Attribute attr : attrs )
             {
                 final String name = attr.getId();
@@ -630,7 +644,12 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return Collections.unmodifiableMap( returnObj );
     }
 
-    public Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
+    public Map<String, Map<String, String>> search(
+            final String baseDN,
+            final String filter,
+            final Set<String> attributes,
+            final SearchScope searchScope
+    )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         activityPreCheck();
@@ -653,7 +672,12 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return searchImpl( baseDN, searchHelper, true );
     }
 
-    public Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
+    public Map<String, Map<String, List<String>>> searchMultiValues(
+            final String baseDN,
+            final String filter,
+            final Set<String> attributes,
+            final SearchScope searchScope
+    )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         activityPreCheck();
@@ -849,18 +873,18 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
-    private static SearchScope figureSearchScope( final ChaiProvider.SEARCH_SCOPE searchScope )
+    private static org.apache.directory.api.ldap.model.message.SearchScope figureSearchScope( final SearchScope searchScope )
     {
         switch ( searchScope )
         {
             case BASE:
-                return SearchScope.OBJECT;
+                return org.apache.directory.api.ldap.model.message.SearchScope.OBJECT;
 
             case ONE:
-                return SearchScope.ONELEVEL;
+                return org.apache.directory.api.ldap.model.message.SearchScope.ONELEVEL;
 
             case SUBTREE:
-                return SearchScope.SUBTREE;
+                return org.apache.directory.api.ldap.model.message.SearchScope.SUBTREE;
 
             default:
                 throw new IllegalArgumentException( "unknown SearchScope type" );

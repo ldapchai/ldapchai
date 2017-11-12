@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.util;
 
-import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.SearchScope;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,13 +44,13 @@ public class SearchHelper implements Serializable
 
 
     public static final String DEFAULT_FILTER = "(objectClass=*)";
-    public static final ChaiProvider.SEARCH_SCOPE DEFAULT_SCOPE = ChaiProvider.SEARCH_SCOPE.SUBTREE;
+    public static final SearchScope DEFAULT_SCOPE = SearchScope.SUBTREE;
     public static final int DEFAULT_TIMEOUT = 0;
     public static final int DEFAULT_MAX_RESULTS = 0;
 
 
     private String filter = DEFAULT_FILTER;
-    private ChaiProvider.SEARCH_SCOPE searchScope = DEFAULT_SCOPE;
+    private SearchScope searchScope = DEFAULT_SCOPE;
     private Set<String> attributes = null;
     private int maxResults = DEFAULT_MAX_RESULTS;
     private int timeLimit = DEFAULT_TIMEOUT;
@@ -98,7 +98,7 @@ public class SearchHelper implements Serializable
      *
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public SearchHelper( final ChaiProvider.SEARCH_SCOPE searchScope )
+    public SearchHelper( final SearchScope searchScope )
     {
         this.setSearchScope( searchScope );
     }
@@ -142,7 +142,7 @@ public class SearchHelper implements Serializable
      * @param filter      A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope )
+    public SearchHelper( final String filter, final SearchScope searchScope )
     {
         this.setFilter( filter );
         this.setSearchScope( searchScope );
@@ -204,7 +204,7 @@ public class SearchHelper implements Serializable
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper( final String[] attributes, final ChaiProvider.SEARCH_SCOPE searchScope )
+    public SearchHelper( final String[] attributes, final SearchScope searchScope )
     {
         this.setSearchScope( searchScope );
         this.setAttributes( attributes );
@@ -217,7 +217,7 @@ public class SearchHelper implements Serializable
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper( final Set<String> attributes, final ChaiProvider.SEARCH_SCOPE searchScope )
+    public SearchHelper( final Set<String> attributes, final SearchScope searchScope )
     {
         this.setSearchScope( searchScope );
         this.setAttributes( attributes );
@@ -231,7 +231,7 @@ public class SearchHelper implements Serializable
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final String[] attributes )
+    public SearchHelper( final String filter, final SearchScope searchScope, final String[] attributes )
     {
         this.setFilter( filter );
         this.setSearchScope( searchScope );
@@ -246,7 +246,7 @@ public class SearchHelper implements Serializable
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final Set<String> attributes )
+    public SearchHelper( final String filter, final SearchScope searchScope, final Set<String> attributes )
     {
         this.setFilter( filter );
         this.setSearchScope( searchScope );
@@ -261,7 +261,7 @@ public class SearchHelper implements Serializable
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of comma or space seperated attributes
      */
-    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final String attributes )
+    public SearchHelper( final String filter, final SearchScope searchScope, final String attributes )
     {
         this.setFilter( filter );
         this.setSearchScope( searchScope );
@@ -315,7 +315,7 @@ public class SearchHelper implements Serializable
      *
      * @return A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public ChaiProvider.SEARCH_SCOPE getSearchScope()
+    public SearchScope getSearchScope()
     {
         return searchScope;
     }
@@ -325,7 +325,7 @@ public class SearchHelper implements Serializable
      *
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public void setSearchScope( final ChaiProvider.SEARCH_SCOPE searchScope )
+    public void setSearchScope( final SearchScope searchScope )
     {
         this.searchScope = searchScope;
     }

@@ -434,7 +434,7 @@ public enum ChaiSetting
      * return the configured value regardless of the actual directory type when {@link ChaiProvider#getDirectoryVendor()}
      * is called.
      * <p>
-     * The value must exactly match a known value for {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR}.
+     * The value must exactly match a known value for {@link DirectoryVendor}.
      * <p>
      * <i>Default: </i><b>(blank)</b>
      * <p>
@@ -452,7 +452,7 @@ public enum ChaiSetting
                 return;
             }
 
-            for ( final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values() )
+            for ( final DirectoryVendor vendor : DirectoryVendor.values() )
             {
                 if ( vendor.toString().equals( value ) )
                 {

@@ -19,18 +19,25 @@
 
 package com.novell.ldapchai.impl.openldap.entry;
 
+import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
-public class OpenLDAPEntryFactory implements ChaiEntryFactory.VendorFactory
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class OpenLDAPVendorFactory implements VendorFactory
 {
 
-    private static ErrorMap errorMap;
+    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
     public ChaiUser createChaiUser( final String entryDN, final ChaiProvider provider )
     {
@@ -47,17 +54,37 @@ public class OpenLDAPEntryFactory implements ChaiEntryFactory.VendorFactory
         return new OpenLDAPEntry( entryDN, provider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    public DirectoryVendor getDirectoryVendor()
     {
-        return ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP;
+        return DirectoryVendor.OPEN_LDAP;
     }
 
     public ErrorMap getErrorMap()
     {
-        if ( errorMap == null )
+        return ERROR_MAP;
+    }
+
+    @Override
+    public Set<String> interestedDseAttributes()
+    {
+        return Collections.singleton( ChaiConstant.ATTR_LDAP_OBJECTCLASS );
+    }
+
+    @Override
+    public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
+    {
+        final String objectClassAttribute = ChaiConstant.ATTR_LDAP_OBJECTCLASS;
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( objectClassAttribute ) )
         {
-            errorMap = new EdirErrorMap();
+            for ( final String objectClassVaue : rootDseAttributeValues.get( objectClassAttribute ) )
+            {
+                if ( objectClassVaue.contains( "OpenLDAProotDSE" ) )
+                {
+                    return true;
+                }
+            }
         }
-        return errorMap;
+
+        return false;
     }
 }

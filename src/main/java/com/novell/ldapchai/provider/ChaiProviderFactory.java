@@ -31,6 +31,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 
 
@@ -84,8 +86,7 @@ public final class ChaiProviderFactory
 
     private static final ChaiProviderFactory SINGLETON = new ChaiProviderFactory();
 
-    private final StatisticsWrapper.StatsBean globalStats = new StatisticsWrapper.StatsBean();
-
+    private final CentralService centralService = new CentralService();
 
     /**
      * Maintains the global chai provider statistics.  All {@code com.novell.ldapchai.provider.ChaiProvider} instances
@@ -96,7 +97,7 @@ public final class ChaiProviderFactory
      */
     public ProviderStatistics getGlobalStatistics()
     {
-        return globalStats;
+        return getCentralService().getStatsBean();
     }
 
     /**
@@ -370,9 +371,32 @@ public final class ChaiProviderFactory
         }
     }
 
-    StatisticsWrapper.StatsBean getStatsBean()
+    CentralService getCentralService()
     {
-        return globalStats;
+        return centralService;
+    }
+
+
+    static class CentralService
+    {
+        private final StatisticsWrapper.StatsBean globalStats = new StatisticsWrapper.StatsBean();
+
+        private final Map<ChaiConfiguration, DirectoryVendor> vendorCacheMap = new LinkedHashMap<>();
+
+        void addVendorCache( final ChaiConfiguration chaiConfiguration, final DirectoryVendor vendor )
+        {
+            vendorCacheMap.put( chaiConfiguration, vendor );
+        }
+
+        DirectoryVendor getVendorCache( final ChaiConfiguration chaiConfiguration )
+        {
+            return vendorCacheMap.get( chaiConfiguration );
+        }
+
+        StatisticsWrapper.StatsBean getStatsBean()
+        {
+            return globalStats;
+        }
     }
 }
 

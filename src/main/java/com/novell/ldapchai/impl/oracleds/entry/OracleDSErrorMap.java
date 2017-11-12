@@ -21,13 +21,13 @@ package com.novell.ldapchai.impl.oracleds.entry;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
 public class OracleDSErrorMap implements ErrorMap
 {
-    public ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor()
+    public DirectoryVendor forDirectoryVendor()
     {
-        return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
+        return DirectoryVendor.ORACLE_DS;
     }
 
     public ChaiError errorForMessage( final String message )

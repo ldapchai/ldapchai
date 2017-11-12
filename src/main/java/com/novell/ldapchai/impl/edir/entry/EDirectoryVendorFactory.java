@@ -20,22 +20,29 @@
 package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.ChaiEntryFactory;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Factory for creating instances of all Novell eDirectory objects when {@link com.novell.ldapchai.provider.ChaiProvider#getDirectoryVendor()}
- * returns {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR#NOVELL_EDIRECTORY}.
+ * returns {@link DirectoryVendor#EDIRECTORY}.
  * }
  * In most cases, this factory should not
  * be used directly.  Instead, use {@link ChaiFactory}.
  */
-public class EdirEntryFactory implements ChaiEntryFactory.VendorFactory
+public class EDirectoryVendorFactory implements VendorFactory
 {
+    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
 
-    private static ErrorMap errorMap;
+    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
     public InetOrgPerson createChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
@@ -52,17 +59,36 @@ public class EdirEntryFactory implements ChaiEntryFactory.VendorFactory
         return new ChaiEntryImpl( userDN, chaiProvider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    public DirectoryVendor getDirectoryVendor()
     {
-        return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
+        return DirectoryVendor.EDIRECTORY;
     }
 
     public ErrorMap getErrorMap()
     {
-        if ( errorMap == null )
+        return ERROR_MAP;
+    }
+
+    @Override
+    public Set<String> interestedDseAttributes()
+    {
+        return Collections.singleton( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION );
+    }
+
+    @Override
+    public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
+    {
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
         {
-            errorMap = new EdirErrorMap();
+            for ( final String vendorVersionValue : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
+            {
+                if ( vendorVersionValue.contains( "eDirectory" ) )
+                {
+                    return true;
+                }
+            }
         }
-        return errorMap;
+
+        return false;
     }
 }

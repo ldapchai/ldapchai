@@ -22,6 +22,7 @@ package com.novell.ldapchai;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.SearchHelper;
 
 import java.net.InetAddress;
@@ -365,7 +366,7 @@ public interface ChaiEntry
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
      * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
-    Set<ChaiEntry> search( String filter, ChaiProvider.SEARCH_SCOPE searchScope )
+    Set<ChaiEntry> search( String filter, SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**

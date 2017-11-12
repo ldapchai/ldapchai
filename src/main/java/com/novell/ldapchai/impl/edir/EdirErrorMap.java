@@ -21,14 +21,14 @@ package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
 public class EdirErrorMap implements ErrorMap
 {
 
-    public ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor()
+    public DirectoryVendor forDirectoryVendor()
     {
-        return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
+        return DirectoryVendor.EDIRECTORY;
     }
 
     public ChaiError errorForMessage( final String message )

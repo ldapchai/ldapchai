@@ -69,7 +69,7 @@ class StatisticsWrapper implements InvocationHandler
 
     private StatsBean getGlobalStatsBean()
     {
-        return realProvider.getProviderFactory().getStatsBean();
+        return realProvider.getProviderFactory().getCentralService().getStatsBean();
     }
 
     private StatisticsWrapper( final ChaiProviderImplementor realProvider )

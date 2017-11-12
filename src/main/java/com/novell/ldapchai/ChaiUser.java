@@ -22,6 +22,7 @@ package com.novell.ldapchai;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.util.Date;
 import java.util.Set;
@@ -446,7 +447,7 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Attempts to read the modification timestamp of the user's password.  Depending on the {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR},
+     * Attempts to read the modification timestamp of the user's password.  Depending on the {@link DirectoryVendor},
      * the implementation may or may not be able to reliably read this value.
      *
      * @return Date of the user's last password modification time, or null if unable to read.

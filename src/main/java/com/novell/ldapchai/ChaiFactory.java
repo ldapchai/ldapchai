@@ -4,6 +4,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
 @Deprecated
 public class ChaiFactory
@@ -92,8 +93,8 @@ public class ChaiFactory
      * @return A valid {@code ChaiUser}
      */
     @Deprecated
-    public static ErrorMap getErrorMap( final ChaiProvider.DIRECTORY_VENDOR vendor )
+    public static ErrorMap getErrorMap( final DirectoryVendor vendor )
     {
-        return ChaiEntryFactory.getErrorMap( vendor );
+        return vendor.getVendorFactory().getErrorMap();
     }
 }

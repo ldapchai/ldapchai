@@ -26,6 +26,7 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.value.NspmComplexityRules;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
 import com.novell.ldapchai.util.SearchHelper;
@@ -89,7 +90,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         //read all attribute values from entry.
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setFilter( SearchHelper.DEFAULT_FILTER );
-        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        searchHelper.setSearchScope( SearchScope.BASE );
         searchHelper.setAttributes( LDAP_PASSWORD_ATTRIBUTES );
 
         final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues( getEntryDN(), searchHelper );

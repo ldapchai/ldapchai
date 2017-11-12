@@ -27,6 +27,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
 import net.iharder.Base64;
@@ -201,7 +202,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
                 this.getEntryDN(),
                 filter,
                 Collections.emptySet(),
-                ChaiProvider.SEARCH_SCOPE.ONE
+                SearchScope.ONE
         );
 
         for ( final String dn : results.keySet() )
@@ -276,7 +277,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
     {
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.returnNoAttributes();
-        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        searchHelper.setSearchScope( SearchScope.BASE );
         searchHelper.setFilter( SearchHelper.DEFAULT_FILTER );
 
         final Map<String, Map<String, String>> results = this.getChaiProvider().search( this.getEntryDN(), searchHelper );
@@ -406,7 +407,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return resultSet;
     }
 
-    public final Set<ChaiEntry> search( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope )
+    public final Set<ChaiEntry> search( final String filter, final SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.search( new SearchHelper( filter, searchScope ) );

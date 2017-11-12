@@ -46,7 +46,7 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
     public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
+        final Set<ChaiGroup> returnGroups = new HashSet<>();
         final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
         for ( final String group : groups )
         {

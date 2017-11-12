@@ -55,7 +55,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     protected volatile ConnectionState state = ConnectionState.NEW;
 
     private Map<String, Object> providerProperties = new HashMap<>();
-    private DIRECTORY_VENDOR cachedDirectoryVendor;
+    private DirectoryVendor cachedDirectoryVendor;
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
     private int counter = ID_COUNTER.getAndIncrement();
@@ -421,7 +421,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
-        public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final ChaiProvider.SEARCH_SCOPE searchScope )
+        public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
         {
             if ( baseDN == null )
             {
@@ -454,7 +454,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         public final Map<String, Map<String, List<String>>> searchMultiValues(
                 final String baseDN, final String filter,
                 final Set<String> attributes,
-                final ChaiProvider.SEARCH_SCOPE searchScope
+                final SearchScope searchScope
         )
         {
             if ( baseDN == null )
@@ -547,7 +547,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
-        public DIRECTORY_VENDOR getDirectoryVendor()
+        public DirectoryVendor getDirectoryVendor()
                 throws ChaiUnavailableException
         {
             return null;
@@ -628,16 +628,24 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
     }
 
-    public DIRECTORY_VENDOR getDirectoryVendor()
+    public DirectoryVendor getDirectoryVendor()
             throws ChaiUnavailableException
     {
         if ( cachedDirectoryVendor == null )
         {
+            {
+                final DirectoryVendor centralCachedVendor = getProviderFactory().getCentralService().getVendorCache( this.chaiConfig );
+                if ( centralCachedVendor != null )
+                {
+                    return centralCachedVendor;
+                }
+            }
+
 
             final String defaultVendor = this.getChaiConfiguration().getSetting( ChaiSetting.DEFAULT_VENDOR );
             if ( defaultVendor != null )
             {
-                for ( final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values() )
+                for ( final DirectoryVendor vendor : DirectoryVendor.values() )
                 {
                     if ( vendor.toString().equals( defaultVendor ) )
                     {
@@ -651,11 +659,12 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             {
                 final ChaiEntry rootDseEntry = ChaiUtility.getRootDSE( this );
                 cachedDirectoryVendor = ChaiUtility.determineDirectoryVendor( rootDseEntry );
+                getProviderFactory().getCentralService().addVendorCache( this.chaiConfig, cachedDirectoryVendor );
             }
             catch ( ChaiOperationException e )
             {
                 LOGGER.warn( "error while attempting to determine directory vendor: " + e.getMessage() );
-                cachedDirectoryVendor = DIRECTORY_VENDOR.GENERIC;
+                cachedDirectoryVendor = DirectoryVendor.GENERIC;
             }
         }
 

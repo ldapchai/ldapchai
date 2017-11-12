@@ -19,14 +19,21 @@
 
 package com.novell.ldapchai.impl.oracleds.entry;
 
-import com.novell.ldapchai.ChaiEntryFactory;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
-public class OracleDSEntryFactory implements ChaiEntryFactory.VendorFactory
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+public class OracleDSVendorFactory implements VendorFactory
 {
+    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
 
-    private static ErrorMap errorMap;
+    private static final ErrorMap ERROR_MAP = new OracleDSErrorMap();
 
     public InetOrgPerson createChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
@@ -43,17 +50,37 @@ public class OracleDSEntryFactory implements ChaiEntryFactory.VendorFactory
         return new OracleDSEntry( userDN, chaiProvider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    public DirectoryVendor getDirectoryVendor()
     {
-        return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
+        return DirectoryVendor.ORACLE_DS;
     }
 
     public ErrorMap getErrorMap()
     {
-        if ( errorMap == null )
+        return ERROR_MAP;
+    }
+
+
+    @Override
+    public Set<String> interestedDseAttributes()
+    {
+        return Collections.singleton( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION );
+    }
+
+    @Override
+    public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
+    {
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
         {
-            errorMap = new OracleDSErrorMap();
+            for ( final String vendorVersionValue : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
+            {
+                if ( vendorVersionValue.contains( "Sun-Directory-Server" ) || vendorVersionValue.contains( "Oracle-Directory-Server" ) )
+                {
+                    return true;
+                }
+            }
         }
-        return errorMap;
+
+        return false;
     }
 }

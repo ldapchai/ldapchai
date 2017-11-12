@@ -19,11 +19,8 @@
 
 package com.novell.ldapchai.exception;
 
-import com.novell.ldapchai.ChaiEntryFactory;
-import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Static methods useful for error handling.
@@ -31,24 +28,15 @@ import java.util.Map;
 public final class ChaiErrors
 {
 
-    private static final Map<ChaiProvider.DIRECTORY_VENDOR, ErrorMap> ERROR_MAPS = new LinkedHashMap<>();
-
-    static
-    {
-        for ( final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values() )
-        {
-            ERROR_MAPS.put( vendor, ChaiEntryFactory.getErrorMap( vendor ) );
-        }
-    }
-
     private ChaiErrors()
     {
     }
 
-    public static ChaiError getErrorForMessage( final String message )
+    public static ChaiError getErrorForMessage ( final String message )
     {
-        for ( final ErrorMap errorMap : ERROR_MAPS.values() )
+        for ( final DirectoryVendor vendor : DirectoryVendor.values() )
         {
+            final ErrorMap errorMap = vendor.getVendorFactory().getErrorMap();
             final ChaiError errorCode = errorMap.errorForMessage( message );
             if ( errorCode != null && errorCode != ChaiError.UNKNOWN )
             {
@@ -64,10 +52,11 @@ public final class ChaiErrors
      *
      * @return true if the error is defined as being related to authentication.
      */
-    static boolean isAuthenticationRelated( final String message )
+    static boolean isAuthenticationRelated ( final String message )
     {
-        for ( final ErrorMap errorMap : ERROR_MAPS.values() )
+        for ( final DirectoryVendor vendor : DirectoryVendor.values() )
         {
+            final ErrorMap errorMap = vendor.getVendorFactory().getErrorMap();
             if ( errorMap.isAuthenticationRelated( message ) )
             {
                 return true;
@@ -89,10 +78,11 @@ public final class ChaiErrors
      *
      * @return true if the error is defined as permanent
      */
-    static boolean isPermanent( final String message )
+    static boolean isPermanent ( final String message )
     {
-        for ( final ErrorMap errorMap : ERROR_MAPS.values() )
+        for ( final DirectoryVendor vendor : DirectoryVendor.values() )
         {
+            final ErrorMap errorMap = vendor.getVendorFactory().getErrorMap();
             if ( !errorMap.isPermanent( message ) )
             {
                 return false;
@@ -101,5 +91,4 @@ public final class ChaiErrors
 
         return true;
     }
-
 }

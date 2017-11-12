@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.generic.entry;
+package com.novell.ldapchai.impl.directoryServer389.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
@@ -28,29 +28,33 @@ import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class GenericEntryFactory implements VendorFactory
+public class DirectoryServer389VendorFactory implements VendorFactory
 {
+    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_NAME = "vendorName";
+    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
 
-    private static ErrorMap errorMap;
+    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
     public ChaiUser createChaiUser( final String entryDN, final ChaiProvider provider )
     {
-        return new GenericChaiUser( entryDN, provider );
+        return new DirectoryServer389User( entryDN, provider );
     }
 
     public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
     {
-        return new GenericChaiGroup( entryDN, provider );
+        return new DirectoryServer389Group( entryDN, provider );
     }
 
     public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
     {
-        return new GenericChaiEntry( entryDN, provider );
+        return new DirectoryServer389Entry( entryDN, provider );
     }
 
     public DirectoryVendor getDirectoryVendor()
@@ -60,22 +64,43 @@ public class GenericEntryFactory implements VendorFactory
 
     public ErrorMap getErrorMap()
     {
-        if ( errorMap == null )
-        {
-            errorMap = new EdirErrorMap();
-        }
-        return errorMap;
+        return ERROR_MAP;
     }
 
     @Override
     public Set<String> interestedDseAttributes()
     {
-        return Collections.emptySet();
+        return Collections.unmodifiableSet( new HashSet<>( Arrays.asList(
+                ROOT_DSE_ATTRIBUTE_VENDOR_NAME,
+                ROOT_DSE_ATTRIBUTE_VENDOR_VERSION
+        ) ) );
     }
 
     @Override
     public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
     {
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
+        {
+            for ( final String vendorName : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
+            {
+                if ( vendorName.contains( "389 Project" ) )
+                {
+                    return true;
+                }
+            }
+        }
+
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
+        {
+            for ( final String vendorName : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
+            {
+                if ( vendorName.contains( "389-Directory" ) )
+                {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 }

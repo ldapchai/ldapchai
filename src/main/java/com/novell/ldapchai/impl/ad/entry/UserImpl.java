@@ -34,6 +34,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
 import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
@@ -441,7 +442,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         final String disabledUserSearchFilter = "(useraccountcontrol:1.2.840.113556.1.4.803:=2)";
         final SearchHelper searchHelper = new SearchHelper();
         searchHelper.setFilter( disabledUserSearchFilter );
-        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        searchHelper.setSearchScope( SearchScope.BASE );
         final Map<String, Map<String, String>> results = this.getChaiProvider().search( this.getEntryDN(), searchHelper );
         for ( final String resultDN : results.keySet() )
         {

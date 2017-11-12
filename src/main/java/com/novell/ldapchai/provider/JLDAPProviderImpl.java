@@ -439,7 +439,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
     }
 
     @ChaiProviderImplementor.LdapOperation
-    public Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
+    public Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         activityPreCheck();
@@ -470,7 +470,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
             final String baseDN,
             final String filter,
             final Set<String> attributes,
-            final SEARCH_SCOPE searchScope )
+            final SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         activityPreCheck();

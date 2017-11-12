@@ -31,15 +31,19 @@ import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.provider.DirectoryVendor;
+import com.novell.ldapchai.provider.SearchScope;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
@@ -153,7 +157,7 @@ public class ChaiUtility
             }
             filter.append( "(" ).append( ChaiConstant.ATTR_LDAP_COMMON_NAME ).append( "=" ).append( uniqueCN ).append( ")" );
 
-            final Map<String, Map<String, String>> results = provider.search( containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE );
+            final Map<String, Map<String, String>> results = provider.search( containerDN, filter.toString(), null, SearchScope.ONE );
             if ( results.size() == 0 )
             {
                 // No object found!
@@ -212,7 +216,7 @@ public class ChaiUtility
                 theEntry.getEntryDN(),
                 "(objectClass=*)",
                 null,
-                ChaiProvider.SEARCH_SCOPE.BASE
+                SearchScope.BASE
         );
         final Map<String, List<String>> props = results.get( theEntry.getEntryDN() );
 
@@ -429,113 +433,39 @@ public class ChaiUtility
      * Determines the vendor of a the ldap directory by reading RootDSE attributes
      *
      * @param rootDSE A valid entry
-     * @return the proper directory vendor, or {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR#GENERIC} if the vendor can not be determined.
+     * @return the proper directory vendor, or {@link DirectoryVendor#GENERIC} if the vendor can not be determined.
      * @throws ChaiUnavailableException If the directory is unreachable
      * @throws ChaiOperationException   If there is an error reading values from the Root DSE entry
      */
-    public static ChaiProvider.DIRECTORY_VENDOR determineDirectoryVendor( final ChaiEntry rootDSE )
+    public static DirectoryVendor determineDirectoryVendor( final ChaiEntry rootDSE )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String[] interestingAttributes = {
-                "vendorVersion",
-                "vendorName",
-                "rootDomainNamingContext",
-                "objectClass",
-        };
+        final Set<String> interestedAttributes = new HashSet<>();
+        for ( final DirectoryVendor directoryVendor : DirectoryVendor.values() )
+        {
+            interestedAttributes.addAll( directoryVendor.getVendorFactory().interestedDseAttributes() );
+        }
 
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setAttributes( interestingAttributes );
+        searchHelper.setAttributes( interestedAttributes.toArray( new String[interestedAttributes.size()] ) );
         searchHelper.setFilter( "(objectClass=*)" );
         searchHelper.setMaxResults( 1 );
-        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        searchHelper.setSearchScope( SearchScope.BASE );
 
         final Map<String, Map<String, List<String>>> results = rootDSE.getChaiProvider().searchMultiValues( "", searchHelper );
-
-        if ( results != null && results.size() == 1 )
+        if ( results != null && !results.isEmpty() )
         {
-            final Map<String, List<String>> rootDseSearchResults = results.get( "" );
-            if ( rootDseSearchResults != null )
+            final Map<String, List<String>> rootDseSearchResults = results.values().iterator().next();
+            for ( final DirectoryVendor directoryVendor : DirectoryVendor.values() )
             {
-                final List<String> vendorVersions = rootDseSearchResults.get( "vendorVersion" ) == null
-                        ? Collections.emptyList()
-                        : rootDseSearchResults.get( "vendorVersion" );
-                final List<String> vendorNames = rootDseSearchResults.get( "vendorName" ) == null
-                        ? Collections.emptyList()
-                        : rootDseSearchResults.get( "vendorName" );
-                final List<String> rootDomainNamingContexts = rootDseSearchResults.get( "rootDomainNamingContext" ) == null
-                        ? Collections.emptyList()
-                        : rootDseSearchResults.get( "rootDomainNamingContext" );
-                final List<String> objectClasses = rootDseSearchResults.get( "objectClass" ) == null
-                        ? Collections.emptyList()
-                        : rootDseSearchResults.get( "objectClass" );
-
+                if ( directoryVendor.getVendorFactory().detectVendorFromRootDSEData( rootDseSearchResults ) )
                 {
-                    // try to detect Novell eDirectory
-                    for ( final String vendorVersionValue : vendorVersions )
-                    {
-                        if ( vendorVersionValue.contains( "eDirectory" ) )
-                        {
-                            return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
-                        }
-                    }
-                }
-
-                {
-                    // try to detect ms-active directory
-                    for ( final String rootDomainNamingContextValue : rootDomainNamingContexts )
-                    {
-                        if ( rootDomainNamingContextValue.contains( "DC=" ) )
-                        {
-                            return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
-                        }
-                    }
-                }
-
-
-                {
-                    // try to detect oracle ds
-                    for ( final String vendorVersion : vendorVersions )
-                    {
-                        if ( vendorVersion.contains( "Sun-Directory-Server" ) || vendorVersion.contains( "Oracle-Directory-Server" ) )
-                        {
-                            return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
-                        }
-                    }
-                }
-
-
-                {
-                    // try to detect 389 Directory
-                    for ( final String vendorNamesValue : vendorNames )
-                    {
-                        if ( vendorNamesValue.contains( "389 Project" ) )
-                        {
-                            return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
-                        }
-                    }
-                    for ( final String vendorVersionsValue : vendorVersions )
-                    {
-                        if ( vendorVersionsValue.contains( "389-Directory" ) )
-                        {
-                            return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
-                        }
-                    }
-                }
-
-                {
-                    // try to detect openLDAP
-                    for ( final String objectClassValue : objectClasses )
-                    {
-                        if ( objectClassValue.contains( "OpenLDAProotDSE" ) )
-                        {
-                            return ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP;
-                        }
-                    }
+                    return directoryVendor;
                 }
             }
         }
 
-        return ChaiProvider.DIRECTORY_VENDOR.GENERIC;
+        return DirectoryVendor.GENERIC;
     }
 
     public static ChaiEntry getRootDSE( final ChaiProvider provider )

@@ -19,11 +19,11 @@
 
 package com.novell.ldapchai.exception;
 
-import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.DirectoryVendor;
 
 public interface ErrorMap
 {
-    ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor();
+    DirectoryVendor forDirectoryVendor();
 
     ChaiError errorForMessage( String message );
 

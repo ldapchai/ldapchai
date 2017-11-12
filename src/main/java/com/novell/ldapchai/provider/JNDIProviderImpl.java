@@ -705,7 +705,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     }
 
     @LdapOperation
-    public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
+    public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
@@ -728,7 +728,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return searchEngine.getResults();
     }
 
-    public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
+    public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();

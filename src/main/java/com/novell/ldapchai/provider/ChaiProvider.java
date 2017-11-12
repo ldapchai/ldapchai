@@ -67,55 +67,6 @@ public interface ChaiProvider
 {
 
     /**
-     * LDAP search scope of BASE, ONE or SUBTREE.
-     */
-    @SuppressWarnings( "checkstyle:TypeName" )
-    enum SEARCH_SCOPE
-    {
-        /**
-         * Search the container below the specified context, but not any children of the
-         */
-        ONE( javax.naming.directory.SearchControls.ONELEVEL_SCOPE ),
-        /**
-         * Search the specified object, but not any descendants
-         */
-        BASE( javax.naming.directory.SearchControls.OBJECT_SCOPE ),
-
-        /**
-         * Search the descendants below the specified context, and all lower descendants
-         */
-        SUBTREE( javax.naming.directory.SearchControls.SUBTREE_SCOPE );
-
-        private final int jndiScopeInt;
-
-        SEARCH_SCOPE( final int jndiScopeInt )
-        {
-            this.jndiScopeInt = jndiScopeInt;
-        }
-
-        /**
-         * Get the JNDI equivalent constant.
-         *
-         * @return the equivalent JNDI {@link javax.naming.directory.SearchControls} scope constant.
-         */
-        public int getJndiScopeInt()
-        {
-            return jndiScopeInt;
-        }
-    }
-
-    @SuppressWarnings( "checkstyle:TypeName" )
-    enum DIRECTORY_VENDOR
-    {
-        GENERIC,
-        NOVELL_EDIRECTORY,
-        OPEN_LDAP,
-        DIRECTORY_SERVER_389,
-        ORACLE_DS,
-        MICROSOFT_ACTIVE_DIRECTORY,
-    }
-
-    /**
      * Close the connection to ldap.  All other operational methods (those that are marked with
      * {@code com.novell.ldapchai.provider.ChaiProviderImplementor.LdapOperation})
      * should throw an exception if called after this method.
@@ -352,7 +303,7 @@ public interface ChaiProvider
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    Map<String, Map<String, String>> search( String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope )
+    Map<String, Map<String, String>> search( String baseDN, String filter, Set<String> attributes, SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -394,7 +345,7 @@ public interface ChaiProvider
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    Map<String, Map<String, List<String>>> searchMultiValues( String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope )
+    Map<String, Map<String, List<String>>> searchMultiValues( String baseDN, String filter, Set<String> attributes, SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -474,7 +425,7 @@ public interface ChaiProvider
      * @see com.novell.ldapchai.provider.ChaiSetting#DEFAULT_VENDOR
      */
     @ChaiProviderImplementor.LdapOperation
-    DIRECTORY_VENDOR getDirectoryVendor()
+    DirectoryVendor getDirectoryVendor()
             throws ChaiUnavailableException;
 
     /**
