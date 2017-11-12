@@ -29,22 +29,23 @@ import java.util.ResourceBundle;
  * Constants used by the Chai API. In general, it is encouraged to use the
  * constants defined here for attribute names instead of arbitrary strings. For
  * example: <h3>Discouraged</h3>
- * 
+ * <p>
  * <pre>
  * chaiUser.readStringAttribute(&quot;givenName&quot;);
  * </pre>
- * 
+ * <p>
  * <h3>Recommended</h3>
- * 
+ * <p>
  * <pre>
  * chaiUser.readStringAttribute(ChaiConstant.ATTR_LDAP_GIVEN_NAME);
  * </pre>
- *
+ * <p>
  * See the Constant Field Definitions for a list of actual values.
  *
  * @author Jason D. Rivard
  */
-public interface ChaiConstant {
+public interface ChaiConstant
+{
 
 
     /**
@@ -346,12 +347,11 @@ public interface ChaiConstant {
 
     String OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP = "dynamicGroupAux";
 
-    Map<String, String> CHAI_API_BUILD_PROPERTIES = ChaiConstant_BuildPropertiesPopulator.BUILD_PROPERTIES;
+    Map<String, String> CHAI_API_BUILD_PROPERTIES = ChaiConstantBuildPropertiesPopulator.BUILD_PROPERTIES;
 
-    String CHAI_API_VERSION = CHAI_API_BUILD_PROPERTIES.get("chai.version");
+    String CHAI_API_VERSION = CHAI_API_BUILD_PROPERTIES.get( "chai.version" );
 
     String FILTER_OBJECTCLASS_ANY = "(" + ATTR_LDAP_OBJECTCLASS + "=" + "*" + ")";
-
 
 
 }
@@ -360,17 +360,20 @@ public interface ChaiConstant {
  * Added as a second class in the {@code ChaiConstant} .java file to hide the
  * implementation from public javadocs.
  */
-@SuppressWarnings("checkstyle:OneTopLevelClass")
-abstract class ChaiConstant_BuildPropertiesPopulator {
+@SuppressWarnings( "checkstyle:OneTopLevelClass" )
+abstract class ChaiConstantBuildPropertiesPopulator
+{
     static final Map<String, String> BUILD_PROPERTIES;
 
-    static {
-        final ResourceBundle theBundle = ResourceBundle.getBundle("com.novell.ldapchai.BuildInformation");
-        final Map<String, String> theProps = new HashMap<String, String>();
-        for (Enumeration<String> keyEnum = theBundle.getKeys(); keyEnum.hasMoreElements(); ) {
+    static
+    {
+        final ResourceBundle theBundle = ResourceBundle.getBundle( "com.novell.ldapchai.BuildInformation" );
+        final Map<String, String> theProps = new HashMap<>();
+        for ( Enumeration<String> keyEnum = theBundle.getKeys(); keyEnum.hasMoreElements(); )
+        {
             final String key = keyEnum.nextElement();
-            theProps.put(key, theBundle.getString(key));
+            theProps.put( key, theBundle.getString( key ) );
         }
-        BUILD_PROPERTIES = Collections.unmodifiableMap(theProps);
+        BUILD_PROPERTIES = Collections.unmodifiableMap( theProps );
     }
 }

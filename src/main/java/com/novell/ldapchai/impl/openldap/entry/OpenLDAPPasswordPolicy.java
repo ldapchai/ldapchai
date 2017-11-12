@@ -40,59 +40,61 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
-public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswordPolicy {
+public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswordPolicy
+{
 
     /**
      * All attributes used by the password policy. Several "helper" values for
      * each attribute are available, such as the ldap attribute name, and
      * default values.
      */
-    enum Attribute {
+    enum Attribute
+    {
 
         /**
          * Minimum total length of the password.
          */
         MIN_LENGTH(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LENGTH,
-            "0",
-            ChaiPasswordRule.MinimumLength),
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LENGTH,
+                "0",
+                ChaiPasswordRule.MinimumLength ),
 
         /**
          * Minimum number of upper case characters in the password.
          */
         MIN_UPPER(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_UPPER_CHARACTERS,
-            "0",
-            ChaiPasswordRule.MinimumUpperCase),
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_UPPER_CHARACTERS,
+                "0",
+                ChaiPasswordRule.MinimumUpperCase ),
 
         /**
          * Minimim total length of the password.
          */
         MIN_LOWER(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LOWER_CHARACTERS,
-            "0",
-            ChaiPasswordRule.MinimumLowerCase),
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_LOWER_CHARACTERS,
+                "0",
+                ChaiPasswordRule.MinimumLowerCase ),
 
         /**
          * Minimum number of times a numeric character may appear in the password.
          */
         MIN_NUMERIC(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS,
-            "0",
-            ChaiPasswordRule.MinimumNumeric),
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS,
+                "0",
+                ChaiPasswordRule.MinimumNumeric ),
 
         /**
          * Minimum number of times a special (non-alphanumeric) character may appear in the password.
          */
         MIN_SPECIAL(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS,
-            "0",
-            ChaiPasswordRule.MinimumSpecial),
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS,
+                "0",
+                ChaiPasswordRule.MinimumSpecial ),
 
         /**
          * If the password must be unique when compared to previously used
@@ -100,20 +102,20 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * Chai API.
          */
         PASSWORD_HISTORY_COUNT(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT,
-            "0",
-            null),
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT,
+                "0",
+                null ),
 
         /**
          * The time interval between required password changes (true/false).
          * This rule is not directly enforced by the Chai API.
          */
         EXPIRATION_INTERVAL(
-            TYPE.MAX,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_AGE,
-            "0",
-            ChaiPasswordRule.ExpirationInterval),
+                TYPE.MAX,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MAX_PASSWORD_AGE,
+                "0",
+                ChaiPasswordRule.ExpirationInterval ),
 
         /**
          * Minimum lifetime of the user's password. Once set, the user will not
@@ -121,17 +123,18 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * passed. Value is in seconds.
          */
         MIN_LIFETIME(
-            TYPE.MIN,
-            ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_PASSWORD_AGE,
-            "0",
-            ChaiPasswordRule.MinimumLifetime);
+                TYPE.MIN,
+                ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_MIN_PASSWORD_AGE,
+                "0",
+                ChaiPasswordRule.MinimumLifetime );
 
         private final TYPE type;
         private final String ldapAttr;
         private final String defaultValue;
         private final ChaiPasswordRule ruleName;
 
-        Attribute(final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName) {
+        Attribute( final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName )
+        {
             this.type = type;
             this.ldapAttr = ldapAttr;
             this.defaultValue = defaultValue;
@@ -143,7 +146,8 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          *
          * @return A string value useful for debugging.
          */
-        public ChaiPasswordRule getRuleName() {
+        public ChaiPasswordRule getRuleName()
+        {
             return ruleName;
         }
 
@@ -152,9 +156,10 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * attribute's values.
          *
          * @return An enumeration indicating the type of value to be expected
-         *         when working with this attributes values.
+         * when working with this attributes values.
          */
-        public TYPE getType() {
+        public TYPE getType()
+        {
             return type;
         }
 
@@ -166,10 +171,11 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * , but this is not guaranteed
          *
          * @return A String useful for managing a map of
-         *         {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute}
-         *         values.
+         * {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute}
+         * values.
          */
-        public String getKey() {
+        public String getKey()
+        {
             return ldapAttr;
         }
 
@@ -181,7 +187,8 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          *
          * @return An ldap attribute name
          */
-        public String getLdapAttribute() {
+        public String getLdapAttribute()
+        {
             return ldapAttr;
         }
 
@@ -192,7 +199,8 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          *
          * @return The String value of the default value
          */
-        public String getDefaultValue() {
+        public String getDefaultValue()
+        {
             return defaultValue;
         }
 
@@ -200,7 +208,8 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
          * An enumeration indicating what type of setting is expected for this
          * attribute's value.
          */
-        public enum TYPE {
+        public enum TYPE
+        {
             /**
              * An integer representing a maximum limit of a value
              */
@@ -219,13 +228,17 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             OTHER
         }
 
-        public static Attribute attributeForRule(final ChaiPasswordRule rule) {
-            if (rule == null) {
+        public static Attribute attributeForRule( final ChaiPasswordRule rule )
+        {
+            if ( rule == null )
+            {
                 return null;
             }
 
-            for (final Attribute attr : Attribute.values()) {
-                if (rule.equals(attr.getRuleName())) {
+            for ( final Attribute attr : Attribute.values() )
+            {
+                if ( rule.equals( attr.getRuleName() ) )
+                {
                     return attr;
                 }
             }
@@ -236,63 +249,80 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
     static final Set<String> LDAP_PASSWORD_ATTRIBUTES;
 
-    static {
+    static
+    {
         final Set<String> ldapPasswordAttributes = new HashSet<String>();
-        ldapPasswordAttributes.add(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY);
-        for (final Attribute attribute : Attribute.values()) {
-            ldapPasswordAttributes.add(attribute.getLdapAttribute());
+        ldapPasswordAttributes.add( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY );
+        for ( final Attribute attribute : Attribute.values() )
+        {
+            ldapPasswordAttributes.add( attribute.getLdapAttribute() );
         }
-        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet(ldapPasswordAttributes);
+        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet( ldapPasswordAttributes );
     }
 
     private final Map<String, String> ruleMap = new HashMap<String, String>();
     private final Map<String, String> allEntryValues = new HashMap<String, String>();
     private final ChaiProvider provider;
 
-    public OpenLDAPPasswordPolicy(final String entryDN, final ChaiProvider chaiProvider) throws ChaiUnavailableException,
-        ChaiOperationException {
-        super(entryDN, chaiProvider);
+    public OpenLDAPPasswordPolicy( final String entryDN, final ChaiProvider chaiProvider )
+            throws ChaiUnavailableException,
+            ChaiOperationException
+    {
+        super( entryDN, chaiProvider );
 
         // read all attribute values from entry.
-        allEntryValues.putAll(readStringAttributes(LDAP_PASSWORD_ATTRIBUTES));
-        LOGGER.trace("allEntryValues = " + allEntryValues);
-        final String pwdCheckQuality = allEntryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY);
-        LOGGER.debug("pwdCheckQuality = " + pwdCheckQuality);
-        if (pwdCheckQuality != null && ("1".equals(pwdCheckQuality) || "2".equals(pwdCheckQuality))) {
-            allEntryValues.putAll(readCheckPasswordAttributes());
+        allEntryValues.putAll( readStringAttributes( LDAP_PASSWORD_ATTRIBUTES ) );
+        LOGGER.trace( "allEntryValues = " + allEntryValues );
+        final String pwdCheckQuality = allEntryValues.get( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY );
+        LOGGER.debug( "pwdCheckQuality = " + pwdCheckQuality );
+        if ( pwdCheckQuality != null && ( "1".equals( pwdCheckQuality ) || "2".equals( pwdCheckQuality ) ) )
+        {
+            allEntryValues.putAll( readCheckPasswordAttributes() );
         }
-        LOGGER.trace("allEntryValues = " + allEntryValues);
-        ruleMap.putAll(createRuleMapUsingAttributeValues(allEntryValues));
-        LOGGER.trace("ruleMap = " + ruleMap);
+        LOGGER.trace( "allEntryValues = " + allEntryValues );
+        ruleMap.putAll( createRuleMapUsingAttributeValues( allEntryValues ) );
+        LOGGER.trace( "ruleMap = " + ruleMap );
 
         this.provider = chaiProvider;
     }
 
-    private Map<String, String> readCheckPasswordAttributes() {
-        final String policyFileUrl = this.chaiProvider.getChaiConfiguration().getSetting(ChaiSetting.OPENLDAP_LOCAL_PASSWORD_POLICY_URL);
-        if (policyFileUrl == null || policyFileUrl.length() < 1) {
+    private Map<String, String> readCheckPasswordAttributes()
+    {
+        final String policyFileUrl = this.chaiProvider.getChaiConfiguration().getSetting( ChaiSetting.OPENLDAP_LOCAL_PASSWORD_POLICY_URL );
+        if ( policyFileUrl == null || policyFileUrl.length() < 1 )
+        {
             return Collections.emptyMap();
         }
 
         InputStream inputStream = null;
-        try {
-            final URL url = new URL(policyFileUrl);
+        try
+        {
+            final URL url = new URL( policyFileUrl );
             inputStream = url.openStream();
             final Properties properties = new Properties();
-            properties.load(inputStream);
+            properties.load( inputStream );
 
-            final Map<String,String> returnMap = new HashMap<String, String>();
-            for (final Object key : properties.keySet()) {
-                returnMap.put((String)key, properties.getProperty((String)key));
+            final Map<String, String> returnMap = new HashMap<>();
+            for ( final Object key : properties.keySet() )
+            {
+                returnMap.put( ( String ) key, properties.getProperty( ( String ) key ) );
             }
             return returnMap;
-        } catch (IOException e) {
-            LOGGER.debug("unable to read openldap password policy configuration attributes from " + policyFileUrl + ", error=" + e.getMessage());
-        } finally {
-            if (inputStream != null) {
-                try {
+        }
+        catch ( IOException e )
+        {
+            LOGGER.debug( "unable to read openldap password policy configuration attributes from " + policyFileUrl + ", error=" + e.getMessage() );
+        }
+        finally
+        {
+            if ( inputStream != null )
+            {
+                try
+                {
                     inputStream.close();
-                } catch (IOException e) {
+                }
+                catch ( IOException e )
+                {
                     // ignore
                 }
             }
@@ -301,71 +331,88 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
         return Collections.emptyMap();
     }
 
-    private static Map<String, String> createRuleMapUsingAttributeValues(final Map<String, String> entryValues) {
+    private static Map<String, String> createRuleMapUsingAttributeValues( final Map<String, String> entryValues )
+    {
         final Map<String, String> returnMap = new HashMap<String, String>();
 
         // defaults for OpenLDAP policy
-        returnMap.put(ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf(true));
-        returnMap.put(ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf(true));
-        returnMap.put(ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf(true));
+        returnMap.put( ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf( true ) );
+        returnMap.put( ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf( true ) );
+        returnMap.put( ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf( true ) );
 
         // convert the standard attributes to chai rules
-        for (final ChaiPasswordRule rule : ChaiPasswordRule.values()) {
-            final Attribute attribute = Attribute.attributeForRule(rule);
-            if (attribute != null) {
-                returnMap.put(rule.getKey(), attribute.getDefaultValue());
+        for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
+        {
+            final Attribute attribute = Attribute.attributeForRule( rule );
+            if ( attribute != null )
+            {
+                returnMap.put( rule.getKey(), attribute.getDefaultValue() );
                 final String attributeName = attribute.getLdapAttribute();
-                LOGGER.trace("attributeName = " + attributeName);
-                if (attributeName != null && entryValues != null && entryValues.containsKey(attributeName)) {
-                    returnMap.put(rule.getKey(), entryValues.get(attributeName));
+                LOGGER.trace( "attributeName = " + attributeName );
+                if ( attributeName != null && entryValues != null && entryValues.containsKey( attributeName ) )
+                {
+                    returnMap.put( rule.getKey(), entryValues.get( attributeName ) );
                 }
             }
 
-            if (!returnMap.containsKey(rule.getKey())) {
-                returnMap.put(rule.getKey(), rule.getDefaultValue());
+            if ( !returnMap.containsKey( rule.getKey() ) )
+            {
+                returnMap.put( rule.getKey(), rule.getDefaultValue() );
             }
         }
 
-        if (entryValues != null && entryValues.containsKey(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT)) {
-            try {
-                final int historyCount = Integer.parseInt(entryValues.get(ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT));
-                if (historyCount > 0) {
-                    returnMap.put(ChaiPasswordRule.UniqueRequired.getKey(), "true");
+        if ( entryValues != null && entryValues.containsKey( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT ) )
+        {
+            try
+            {
+                final int historyCount = Integer.parseInt( entryValues.get( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT ) );
+                if ( historyCount > 0 )
+                {
+                    returnMap.put( ChaiPasswordRule.UniqueRequired.getKey(), "true" );
                 }
-            } catch (Exception e) {
-                LOGGER.error("error while parsing " + ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT + " value: "
-                    + e.getMessage());
+            }
+            catch ( Exception e )
+            {
+                LOGGER.error( "error while parsing " + ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT + " value: "
+                        + e.getMessage() );
             }
         }
 
         return returnMap;
     }
 
-    public String getValue(final String key) {
-        return ruleMap.get(key);
+    public String getValue( final String key )
+    {
+        return ruleMap.get( key );
     }
 
-    public String getValue(final ChaiPasswordRule rule) {
-        return ruleMap.get(rule.getKey());
+    public String getValue( final ChaiPasswordRule rule )
+    {
+        return ruleMap.get( rule.getKey() );
     }
 
-    public Set<String> getKeys() {
-        return Collections.unmodifiableSet(ruleMap.keySet());
+    public Set<String> getKeys()
+    {
+        return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
-    public ChaiEntry getPolicyEntry() {
+    public ChaiEntry getPolicyEntry()
+    {
         return this;
     }
 
-    public PasswordRuleHelper getRuleHelper() {
-        return new GenericRuleHelper(this);
+    public PasswordRuleHelper getRuleHelper()
+    {
+        return new GenericRuleHelper( this );
     }
 
-    public String getLdapObjectClassName() {
+    public String getLdapObjectClassName()
+    {
         return "pwdPolicy";
     }
 
-    public String getSourceDN() {
+    public String getSourceDN()
+    {
         return this.getEntryDN();
     }
 }

@@ -21,7 +21,8 @@ package com.novell.ldapchai.cr.bean;
 
 import java.io.Serializable;
 
-public class ChallengeBean implements Serializable {
+public class ChallengeBean implements Serializable
+{
     public String challengeText;
     public int minLength;
     public int maxLength;
@@ -29,70 +30,86 @@ public class ChallengeBean implements Serializable {
     public boolean required;
     public int maxQuestionCharsInAnswer;
     public boolean enforceWordlist;
-    
+
     public AnswerBean answer;
 
-    public String getChallengeText() {
+    public String getChallengeText()
+    {
         return challengeText;
     }
 
-    public void setChallengeText(final String challengeText) {
+    public void setChallengeText( final String challengeText )
+    {
         this.challengeText = challengeText;
     }
 
-    public int getMinLength() {
+    public int getMinLength()
+    {
         return minLength;
     }
 
-    public void setMinLength(final int minLength) {
+    public void setMinLength( final int minLength )
+    {
         this.minLength = minLength;
     }
 
-    public int getMaxLength() {
+    public int getMaxLength()
+    {
         return maxLength;
     }
 
-    public void setMaxLength(final int maxLength) {
+    public void setMaxLength( final int maxLength )
+    {
         this.maxLength = maxLength;
     }
 
-    public boolean isAdminDefined() {
+    public boolean isAdminDefined()
+    {
         return adminDefined;
     }
 
-    public void setAdminDefined(final boolean adminDefined) {
+    public void setAdminDefined( final boolean adminDefined )
+    {
         this.adminDefined = adminDefined;
     }
 
-    public boolean isRequired() {
+    public boolean isRequired()
+    {
         return required;
     }
 
-    public void setRequired(final boolean required) {
+    public void setRequired( final boolean required )
+    {
         this.required = required;
     }
 
-    public int getMaxQuestionCharsInAnswer() {
+    public int getMaxQuestionCharsInAnswer()
+    {
         return maxQuestionCharsInAnswer;
     }
 
-    public void setMaxQuestionCharsInAnswer(final int maxQuestionCharsInAnswer) {
+    public void setMaxQuestionCharsInAnswer( final int maxQuestionCharsInAnswer )
+    {
         this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer;
     }
 
-    public boolean isEnforceWordlist() {
+    public boolean isEnforceWordlist()
+    {
         return enforceWordlist;
     }
 
-    public void setEnforceWordlist(final boolean enforceWordlist) {
+    public void setEnforceWordlist( final boolean enforceWordlist )
+    {
         this.enforceWordlist = enforceWordlist;
     }
 
-    public AnswerBean getAnswer() {
+    public AnswerBean getAnswer()
+    {
         return answer;
     }
 
-    public void setAnswer(final AnswerBean answer) {
+    public void setAnswer( final AnswerBean answer )
+    {
         this.answer = answer;
     }
 }

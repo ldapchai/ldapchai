@@ -31,16 +31,18 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Date;
 
-public class InetOrgPerson extends AbstractChaiUser implements ChaiUser {
-    public InetOrgPerson(final String entryDN, final ChaiProvider chaiProvider) {
-        super(entryDN, chaiProvider);
+public class InetOrgPerson extends AbstractChaiUser implements ChaiUser
+{
+    public InetOrgPerson( final String entryDN, final ChaiProvider chaiProvider )
+    {
+        super( entryDN, chaiProvider );
     }
 
     @Override
     public Date readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readDateAttribute("pwdLastAuthTime");
+        return this.readDateAttribute( "pwdLastAuthTime" );
     }
 
 
@@ -48,7 +50,7 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser {
     public Date readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        return this.readDateAttribute("passwordExpirationTime");
+        return this.readDateAttribute( "passwordExpirationTime" );
     }
 
     @Override
@@ -57,28 +59,34 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser {
     {
         final Date passwordExpiration = this.readPasswordExpirationDate();
         return passwordExpiration != null
-                && new Date().after(passwordExpiration)
-                || readBooleanAttribute("pwdReset");
+                && new Date().after( passwordExpiration )
+                || readBooleanAttribute( "pwdReset" );
     }
 
-    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+    public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            writeStringAttribute( ATTR_PASSWORD, newPassword );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
         }
     }
 
-    public void changePassword(final String oldPassword, final String newPassword)
+    public void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            replaceAttribute(ATTR_PASSWORD, oldPassword, newPassword);
-        } catch (ChaiOperationException e) {
-            final ChaiError error = ChaiErrors.getErrorForMessage(e.getMessage());
-            throw new ChaiPasswordPolicyException(e.getMessage(), error);
+        try
+        {
+            replaceAttribute( ATTR_PASSWORD, oldPassword, newPassword );
+        }
+        catch ( ChaiOperationException e )
+        {
+            final ChaiError error = ChaiErrors.getErrorForMessage( e.getMessage() );
+            throw new ChaiPasswordPolicyException( e.getMessage(), error );
         }
     }
 
@@ -87,40 +95,43 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser {
     public Date readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readDateAttribute("pwdChangedTime");
+        return this.readDateAttribute( "pwdChangedTime" );
     }
 
     @Override
-    public Date readDateAttribute(final String attributeName)
+    public Date readDateAttribute( final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String value = readStringAttribute(attributeName);
-        return value != null ? OracleDSEntries.convertZuluToDate(value) : null;
+        final String value = readStringAttribute( attributeName );
+        return value != null
+                ? OracleDSEntries.convertZuluToDate( value )
+                : null;
     }
 
     @Override
-    public void writeDateAttribute(final String attributeName, final Date date)
+    public void writeDateAttribute( final String attributeName, final Date date )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        if (date == null) {
+        if ( date == null )
+        {
             return;
         }
 
-        final String dateString = OracleDSEntries.convertDateToZulu(date);
-        writeStringAttribute(attributeName, dateString);
+        final String dateString = OracleDSEntries.convertDateToZulu( date );
+        writeStringAttribute( attributeName, dateString );
     }
 
     @Override
     public ChaiPasswordPolicy getPasswordPolicy()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        return OracleDSEntries.readPasswordPolicy(this);
+        return OracleDSEntries.readPasswordPolicy( this );
     }
 
     @Override
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute("passwordExpirationTime", "19800101010101Z");
+        this.writeStringAttribute( "passwordExpirationTime", "19800101010101Z" );
     }
 }

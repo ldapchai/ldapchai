@@ -47,7 +47,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
-class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser {
+class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser
+{
 
     private static final String PW_EXPIRATION_ZULU_TIMESTAMP = "19800101010101Z";
 
@@ -56,43 +57,49 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return InetOrgPerson.OBJECT_CLASS_VALUE;
     }
 
-    InetOrgPersonImpl(final String userDN, final ChaiProvider chaiProvider)
+    InetOrgPersonImpl( final String userDN, final ChaiProvider chaiProvider )
     {
-        super(userDN, chaiProvider);
+        super( userDN, chaiProvider );
     }
 
     public ChaiPasswordPolicy getPasswordPolicy()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        return EdirEntries.readPasswordPolicy(this);
+        return EdirEntries.readPasswordPolicy( this );
     }
 
 
-    public boolean testPasswordPolicy(final String password)
+    public boolean testPasswordPolicy( final String password )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
-        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
-        if (!useNmasSetting) {
+        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.EDIRECTORY_ENABLE_NMAS );
+        if ( !useNmasSetting )
+        {
             return true;
         }
 
         final PwdPolicyCheckRequest request = new PwdPolicyCheckRequest();
-        request.setData(password);
-        request.setObjectDN(this.getEntryDN());
+        request.setData( password );
+        request.setObjectDN( this.getEntryDN() );
         final ExtendedResponse response;
-        try {
-            response = getChaiProvider().extendedOperation(request);
-        } catch (ChaiOperationException e) {
-            LOGGER.debug("unexpected error while checking [nmas] password policy: " + e.getMessage());
+        try
+        {
+            response = getChaiProvider().extendedOperation( request );
+        }
+        catch ( ChaiOperationException e )
+        {
+            LOGGER.debug( "unexpected error while checking [nmas] password policy: " + e.getMessage() );
             return true;
         }
-        if (response != null) {
-            final PwdPolicyCheckResponse setResponse = (PwdPolicyCheckResponse) response;
+        if ( response != null )
+        {
+            final PwdPolicyCheckResponse setResponse = ( PwdPolicyCheckResponse ) response;
             final int responseCode = setResponse.getNmasRetCode();
-            if (responseCode != 0) {
-                LOGGER.debug("nmas response code returned from server while testing nmas password: " + responseCode);
+            if ( responseCode != 0 )
+            {
+                LOGGER.debug( "nmas response code returned from server while testing nmas password: " + responseCode );
                 final String errorString = "nmas error " + responseCode;
-                throw new ChaiPasswordPolicyException(errorString, ChaiErrors.getErrorForMessage(errorString));
+                throw new ChaiPasswordPolicyException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
             }
         }
         return true;
@@ -102,98 +109,118 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             throws ChaiOperationException, ChaiUnavailableException
     {
         String writeAttribute = "";
-        try {
+        try
+        {
             writeAttribute = ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER;
-            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER, "FALSE");
+            this.writeStringAttribute( ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER, "FALSE" );
             writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS;
-            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS, "0");
+            this.writeStringAttribute( ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS, "0" );
             writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME;
-            this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, PW_EXPIRATION_ZULU_TIMESTAMP);
+            this.writeStringAttribute( ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME, PW_EXPIRATION_ZULU_TIMESTAMP );
 
-            final String limit = this.readStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT);
-            if (limit != null) {
+            final String limit = this.readStringAttribute( ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT );
+            if ( limit != null )
+            {
                 writeAttribute = ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING;
-                this.writeStringAttribute(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING, limit);
+                this.writeStringAttribute( ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING, limit );
             }
-        } catch (ChaiOperationException e) {
+        }
+        catch ( ChaiOperationException e )
+        {
             final String errorMsg = "error writing to " + writeAttribute + ": " + e.getMessage();
-            final ChaiOperationException newException = new ChaiOperationException(errorMsg,e.getErrorCode());
-            newException.initCause(e);
+            final ChaiOperationException newException = new ChaiOperationException( errorMsg, e.getErrorCode() );
+            newException.initCause( e );
             throw newException;
         }
     }
 
-    public final void addGroupMembership(final ChaiGroup theGroup)
+    public final void addGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        EdirEntries.writeGroupMembership(this, theGroup);
+        EdirEntries.writeGroupMembership( this, theGroup );
     }
 
-    public void removeGroupMembership(final ChaiGroup theGroup)
+    public void removeGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        EdirEntries.removeGroupMembership(this, theGroup);
+        EdirEntries.removeGroupMembership( this, theGroup );
     }
 
     public final String readPassword()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
-        if (!useNmasSetting) {
-            throw new UnsupportedOperationException("readPassword() is not supported when ChaiSetting.EDIRECTORY_ENABLE_NMAS is false");
+        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.EDIRECTORY_ENABLE_NMAS );
+        if ( !useNmasSetting )
+        {
+            throw new UnsupportedOperationException( "readPassword() is not supported when ChaiSetting.EDIRECTORY_ENABLE_NMAS is false" );
         }
 
-        final GetPwdRequest request = new GetPwdRequest("", this.getEntryDN());
+        final GetPwdRequest request = new GetPwdRequest( "", this.getEntryDN() );
         final ExtendedResponse response;
-        response = getChaiProvider().extendedOperation(request);
-        if (response != null) {
-            final GetPwdResponse getResponse = (GetPwdResponse) response;
+        response = getChaiProvider().extendedOperation( request );
+        if ( response != null )
+        {
+            final GetPwdResponse getResponse = ( GetPwdResponse ) response;
             final int responseCode = getResponse.getNmasRetCode();
-            switch(responseCode) {
-            case 0:         /* Success */
-               return getResponse.getPwdStr();
+            switch ( responseCode )
+            {
+                // Success
+                case 0:
+                    return getResponse.getPwdStr();
 
-            case (-16049): /* NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND */
-                LOGGER.debug("readPassword() reports: NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND " + responseCode);
-                throw new ChaiOperationException("object has no password attribute: error " + responseCode, ChaiError.NO_SUCH_ATTRIBUTE);
+                // NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND
+                case ( -16049 ):
+                    LOGGER.debug( "readPassword() reports: NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND " + responseCode );
+                    throw new ChaiOperationException( "object has no password attribute: error " + responseCode, ChaiError.NO_SUCH_ATTRIBUTE );
 
-            default:
-                LOGGER.debug("error testing nmas password: " + responseCode);
-                throw new ChaiOperationException("error reading nmas password: error " + responseCode, ChaiError.UNKNOWN);
+                default:
+                    LOGGER.debug( "error testing nmas password: " + responseCode );
+                    throw new ChaiOperationException( "error reading nmas password: error " + responseCode, ChaiError.UNKNOWN );
             }
         }
 
-        LOGGER.debug("unknown error retreiving password (null response)");
-        throw new ChaiOperationException("unknown error retreiving password (null response)", ChaiError.UNKNOWN);
+        LOGGER.debug( "unknown error retreiving password (null response)" );
+        throw new ChaiOperationException( "unknown error retreiving password (null response)", ChaiError.UNKNOWN );
     }
 
-    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+    public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
-        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
-        if (!useNmasSetting) {
-            try {
-                writeStringAttribute(ATTR_PASSWORD, newPassword);
-            } catch (ChaiOperationException e) {
-                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.EDIRECTORY_ENABLE_NMAS );
+        if ( !useNmasSetting )
+        {
+            try
+            {
+                writeStringAttribute( ATTR_PASSWORD, newPassword );
             }
-        } else {
+            catch ( ChaiOperationException e )
+            {
+                throw new ChaiPasswordPolicyException( e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
+            }
+        }
+        else
+        {
             final SetPwdRequest request = new SetPwdRequest();
-            request.setData(newPassword);
-            request.setObjectDN(this.getEntryDN());
+            request.setData( newPassword );
+            request.setObjectDN( this.getEntryDN() );
             final ExtendedResponse response;
-            try {
-                response = getChaiProvider().extendedOperation(request);
-            } catch (ChaiOperationException e) {
-                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+            try
+            {
+                response = getChaiProvider().extendedOperation( request );
             }
-            if (response != null) {
-                final SetPwdResponse setResponse = (SetPwdResponse) response;
+            catch ( ChaiOperationException e )
+            {
+                throw new ChaiPasswordPolicyException( e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
+            }
+            if ( response != null )
+            {
+                final SetPwdResponse setResponse = ( SetPwdResponse ) response;
                 final int responseCode = setResponse.getNmasRetCode();
-                if (responseCode != 0) {
-                    LOGGER.debug("error setting nmas password: " + responseCode);
+                if ( responseCode != 0 )
+                {
+                    LOGGER.debug( "error setting nmas password: " + responseCode );
                     final String errorString = "nmas error " + responseCode;
-                    throw new ChaiPasswordPolicyException(errorString, ChaiErrors.getErrorForMessage(errorString));
+                    throw new ChaiPasswordPolicyException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
                 }
             }
         }
@@ -208,23 +235,26 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
                 ATTR_PASSWORD_EXPIRE_TIME,
         };
 
-        final Map<String,String> userAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
+        final Map<String, String> userAttrs = readStringAttributes( new HashSet<>( Arrays.asList( attrsToRead ) ) );
 
         //check the limits and see if they are different, if they are different, then we're expired for sure.
-        final int limit = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT),0);
-        final int remaining = StringHelper.convertStrToInt(userAttrs.get(ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING),0);
-        if (remaining != limit) {
-            LOGGER.debug("user " + this.getEntryDN() + " has " + remaining + " grace logins remaining, marking as expired");
+        final int limit = StringHelper.convertStrToInt( userAttrs.get( ChaiConstant.ATTR_LDAP_LOGIN_GRACE_LIMIT ), 0 );
+        final int remaining = StringHelper.convertStrToInt( userAttrs.get( ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING ), 0 );
+        if ( remaining != limit )
+        {
+            LOGGER.debug( "user " + this.getEntryDN() + " has " + remaining + " grace logins remaining, marking as expired" );
             return true;
         }
 
         //check the time
-        final String petExpireString = userAttrs.get(ATTR_PASSWORD_EXPIRE_TIME);
-        if (petExpireString != null && petExpireString.length() > 0) {
-            final Date expireDate = EdirEntries.convertZuluToDate(petExpireString);
+        final String petExpireString = userAttrs.get( ATTR_PASSWORD_EXPIRE_TIME );
+        if ( petExpireString != null && petExpireString.length() > 0 )
+        {
+            final Date expireDate = EdirEntries.convertZuluToDate( petExpireString );
             final long diff = expireDate.getTime() - System.currentTimeMillis();
-            if (diff <= 0) {
-                LOGGER.debug("user " + getEntryDN() + " password expired " + diff + " seconds ago (" + expireDate + ", marking as expired");
+            if ( diff <= 0 )
+            {
+                LOGGER.debug( "user " + getEntryDN() + " password expired " + diff + " seconds ago (" + expireDate + ", marking as expired" );
                 return true;
             }
         }
@@ -235,37 +265,48 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public final Date readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readDateAttribute(ATTR_LAST_LOGIN);
+        return this.readDateAttribute( ATTR_LAST_LOGIN );
     }
 
-    public final void changePassword(final String oldPassword, final String newPassword)
+    public final void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
-        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
-        if (!useNmasSetting) {
-            try {
-                replaceAttribute(ATTR_PASSWORD, oldPassword, newPassword);
-            } catch (ChaiOperationException e) {
-                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+        final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.EDIRECTORY_ENABLE_NMAS );
+        if ( !useNmasSetting )
+        {
+            try
+            {
+                replaceAttribute( ATTR_PASSWORD, oldPassword, newPassword );
             }
-        } else {
+            catch ( ChaiOperationException e )
+            {
+                throw new ChaiPasswordPolicyException( e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
+            }
+        }
+        else
+        {
             final ChangePwdRequest request = new ChangePwdRequest();
-            request.setNewPwd(newPassword);
-            request.setObjectDN(this.getEntryDN());
-            request.setOldPwd(oldPassword);
+            request.setNewPwd( newPassword );
+            request.setObjectDN( this.getEntryDN() );
+            request.setOldPwd( oldPassword );
             final ExtendedResponse response;
-            try {
-                response = getChaiProvider().extendedOperation(request);
-            } catch (ChaiOperationException e) {
-                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+            try
+            {
+                response = getChaiProvider().extendedOperation( request );
             }
-            if (response != null) {
-                final ChangePwdResponse changeResponse = (ChangePwdResponse) response;
+            catch ( ChaiOperationException e )
+            {
+                throw new ChaiPasswordPolicyException( e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
+            }
+            if ( response != null )
+            {
+                final ChangePwdResponse changeResponse = ( ChangePwdResponse ) response;
                 final int responseCode = changeResponse.getNmasRetCode();
-                if (responseCode != 0) {
-                    LOGGER.debug("error changing nmas password: " + responseCode);
+                if ( responseCode != 0 )
+                {
+                    LOGGER.debug( "error changing nmas password: " + responseCode );
                     final String errorString = "nmas error " + responseCode;
-                    throw new ChaiPasswordPolicyException(errorString, ChaiErrors.getErrorForMessage(errorString));
+                    throw new ChaiPasswordPolicyException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
                 }
             }
         }
@@ -274,19 +315,23 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, PW_EXPIRATION_ZULU_TIMESTAMP);
+        this.writeStringAttribute( ATTR_PASSWORD_EXPIRE_TIME, PW_EXPIRATION_ZULU_TIMESTAMP );
     }
 
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return readBooleanAttribute("lockedByIntruder");
+        return readBooleanAttribute( "lockedByIntruder" );
     }
 
-    public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
-        Date returnDate = readDateAttribute(ATTR_PASSWORD_EXPIRE_TIME);
-        if (returnDate == null) {
-            if (isPasswordExpired()) {
+    public Date readPasswordExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        Date returnDate = readDateAttribute( ATTR_PASSWORD_EXPIRE_TIME );
+        if ( returnDate == null )
+        {
+            if ( isPasswordExpired() )
+            {
                 returnDate = new Date();
             }
         }
@@ -297,19 +342,25 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     public String readGUID()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return EdirEntries.readGuid(this);
+        return EdirEntries.readGuid( this );
     }
 
-    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
-        return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
+    public boolean isAccountEnabled()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return !readBooleanAttribute( ATTR_LOGIN_DISABLED );
     }
 
-    public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
-        return this.readDateAttribute("pwdChangedTime");
+    public Date readPasswordModificationDate()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return this.readDateAttribute( "pwdChangedTime" );
     }
 
     @Override
-    public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
-        return readDateAttribute("loginExpirationTime");
+    public Date readAccountExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return readDateAttribute( "loginExpirationTime" );
     }
 }

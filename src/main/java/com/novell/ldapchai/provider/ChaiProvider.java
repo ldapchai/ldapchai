@@ -34,58 +34,61 @@ import java.util.Set;
 /**
  * {@code ChaiProvider} is the foundation interface for the LDAP Chai API.  {@code ChaiProvider} provides
  * methods to access an ldap directory.
- *
+ * <p>
  * Use the {@link ChaiProviderFactory} factory to obtain a {@code ChaiProvider} instance.
- *
+ * <p>
  * {@code ChaiProvider}s can be used directly for raw ldap access. However, it is generally desirable to use the
  * {@link com.novell.ldapchai.ChaiEntry} wrappers instead.  Using a {@code ChaiProvider} requires the caller
  * to keep track of ldap distinguished names (DN) and be aware of context and other ldap concepts.
- *
+ * <p>
  * It is helpful to think of a {@code ChaiProvider} as a logical connection to the ldap server.
  * Implementations may provide some type of pooling, or an instance of {@code ChaiProvider} may actually
  * represent a single physical connection to the server.
- *
+ * <p>
  * {@code ChaiProvider} does not support any notion of asynchronous or non-blocking requests.  Every method call
  * will block until a result or error is returned from the server, or some other type of Exception
- * occurs.  
- *
+ * occurs.
+ * <p>
  * The underlying implementations of this interface may use a variety of strategies for actually reaching the ldap directory,
  * including the standard JNDI interface {@link javax.naming.directory} , and Novell's JLDAP API.  Different implementations may or may not provide support
  * for server fail-over or other failure recovery.
- *
+ * <p>
  * {@code ChaiProvider} implementations are <i>not</i> guarenteed to be thread safe by LDAP Chai.  Individual implementations
  * may provide thread safety.  Check with the implementation before sharing an {@code ChaiProvider} instance accross multiple
  * threads.  For a guaranteed thread safe ChaiProvider, use {@link com.novell.ldapchai.provider.ChaiProviderFactory#synchronizedProvider(ChaiProvider)}.
- *
+ * <p>
  * To prevent leaks the {@link #close()} method should be called when a {@code ChaiProvider} instance is no longer
  * used.  Once closed, any operation annotated with {@link com.novell.ldapchai.provider.ChaiProviderImplementor.LdapOperation}  will throw an {@link IllegalStateException}.
  *
  * @author Jason D. Rivard                                                          b
  * @see com.novell.ldapchai.ChaiEntry
  */
-public interface ChaiProvider {
+public interface ChaiProvider
+{
 
     /**
      * LDAP search scope of BASE, ONE or SUBTREE.
      */
-    enum SEARCH_SCOPE {
+    @SuppressWarnings( "checkstyle:TypeName" )
+    enum SEARCH_SCOPE
+    {
         /**
          * Search the container below the specified context, but not any children of the
          */
-        ONE(javax.naming.directory.SearchControls.ONELEVEL_SCOPE),
+        ONE( javax.naming.directory.SearchControls.ONELEVEL_SCOPE ),
         /**
          * Search the specified object, but not any descendants
          */
-        BASE(javax.naming.directory.SearchControls.OBJECT_SCOPE),
+        BASE( javax.naming.directory.SearchControls.OBJECT_SCOPE ),
 
         /**
          * Search the descendants below the specified context, and all lower descendants
          */
-        SUBTREE(javax.naming.directory.SearchControls.SUBTREE_SCOPE);
+        SUBTREE( javax.naming.directory.SearchControls.SUBTREE_SCOPE );
 
         private final int jndiScopeInt;
 
-        SEARCH_SCOPE(final int jndiScopeInt)
+        SEARCH_SCOPE( final int jndiScopeInt )
         {
             this.jndiScopeInt = jndiScopeInt;
         }
@@ -101,7 +104,9 @@ public interface ChaiProvider {
         }
     }
 
-    enum DIRECTORY_VENDOR {
+    @SuppressWarnings( "checkstyle:TypeName" )
+    enum DIRECTORY_VENDOR
+    {
         GENERIC,
         NOVELL_EDIRECTORY,
         OPEN_LDAP,
@@ -122,9 +127,9 @@ public interface ChaiProvider {
      * of this method will actually perform an COMPARE operation, as opposed to doing a java .equals()
      * style compare.
      *
-     * @param entryDN   A valid entryDN
+     * @param entryDN       A valid entryDN
      * @param attributeName The attribute of the object DN to do the comparison to.
-     * @param value     The value to compare against the value in the directory
+     * @param value         The value to compare against the value in the directory
      * @return true if the value comparison is true, false otherwise
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
@@ -132,7 +137,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#compareStringAttribute(String, String)
      */
     @ChaiProviderImplementor.LdapOperation
-    boolean compareStringAttribute(String entryDN, String attributeName, String value)
+    boolean compareStringAttribute( String entryDN, String attributeName, String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -147,22 +152,22 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void createEntry(String entryDN, String baseObjectClass, Map<String,String> stringAttributes)
+    void createEntry( String entryDN, String baseObjectClass, Map<String, String> stringAttributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
      * Create a new entry in the directory
      *
-     * @param entryDN          A valid entryDN
+     * @param entryDN           A valid entryDN
      * @param baseObjectClasses The base classes of the entry (objectClass)
-     * @param stringAttributes a Map object containing
+     * @param stringAttributes  a Map object containing
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void createEntry(String entryDN, Set<String> baseObjectClasses, Map<String,String> stringAttributes)
+    void createEntry( String entryDN, Set<String> baseObjectClasses, Map<String, String> stringAttributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -175,15 +180,15 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void deleteEntry(String entryDN)
+    void deleteEntry( String entryDN )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
      * Delete the string values of the specifed objects attributes.
      *
-     * @param entryDN   A valid entryDN
+     * @param entryDN       A valid entryDN
      * @param attributeName A valid attribute of the entryDN
-     * @param value     The value to delete
+     * @param value         The value to delete
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
@@ -191,7 +196,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void deleteStringAttributeValue(String entryDN, String attributeName, String value)
+    void deleteStringAttributeValue( String entryDN, String attributeName, String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -207,7 +212,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    ExtendedResponse extendedOperation(ExtendedRequest request)
+    ExtendedResponse extendedOperation( ExtendedRequest request )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -235,14 +240,14 @@ public interface ChaiProvider {
      * @param entryDN   A valid object
      * @param attribute A valid attribute on the object.
      * @return A byte array where the first dimension is each ldap value, and the second diminsion
-     *         is the actual byte values.
+     * is the actual byte values.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
      * @see com.novell.ldapchai.ChaiEntry#readMultiByteAttribute(String)
      */
     @ChaiProviderImplementor.LdapOperation
-    byte[][] readMultiByteAttribute(String entryDN, String attribute)
+    byte[][] readMultiByteAttribute( String entryDN, String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -257,7 +262,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readMultiStringAttribute(String)
      */
     @ChaiProviderImplementor.LdapOperation
-    Set<String> readMultiStringAttribute(String entryDN, String attribute)
+    Set<String> readMultiStringAttribute( String entryDN, String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -273,7 +278,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readStringAttribute(String)
      */
     @ChaiProviderImplementor.LdapOperation
-    String readStringAttribute(String entryDN, String attribute)
+    String readStringAttribute( String entryDN, String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -290,7 +295,7 @@ public interface ChaiProvider {
      * @see com.novell.ldapchai.ChaiEntry#readStringAttributes(java.util.Set<java.lang.String>)
      */
     @ChaiProviderImplementor.LdapOperation
-    Map<String,String> readStringAttributes(String entryDN, Set<String> attributes)
+    Map<String, String> readStringAttributes( String entryDN, Set<String> attributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -307,7 +312,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void replaceStringAttribute(String entryDN, String attributeName, String oldValue, String newValue)
+    void replaceStringAttribute( String entryDN, String attributeName, String oldValue, String newValue )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -318,7 +323,7 @@ public interface ChaiProvider {
      * @param baseDN       A valid object DN for the top of the search, or an empty string if the whole ldap namespace is to be searched
      * @param searchHelper A Chai searchHelper
      * @return A Map containing strings of entryDNs as keys, and values of Properties objects.  Within each properties object the key
-     *         is a specified attribute name and its associated value.
+     * is a specified attribute name and its associated value.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
@@ -326,7 +331,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    Map<String, Map<String,String>> search(String baseDN, SearchHelper searchHelper)
+    Map<String, Map<String, String>> search( String baseDN, SearchHelper searchHelper )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -339,7 +344,7 @@ public interface ChaiProvider {
      * @param attributes  An array containing the desired attributes to be returned.  Set to null for all attributes, set to an empty String[] for no attributes
      * @param searchScope Scope of the search
      * @return A Map containing strings of entryDNs as keys, and values of Map objects.  Within each map object the key
-     *         is a specified attribute name and its associated value.
+     * is a specified attribute name and its associated value.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
@@ -347,7 +352,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    Map<String, Map<String,String>> search(String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope)
+    Map<String, Map<String, String>> search( String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
 
@@ -357,7 +362,9 @@ public interface ChaiProvider {
      *
      * @param baseDN       A valid entryDN
      * @param searchHelper A Chai searchHelper
-     * @return A map containing Strings of DNs for keys, and a Map for values.  The value map itself contains attribute name Strings as keys, and a List of values for each attribute.
+     * @return A map containing Strings of DNs for keys, and a Map for values.
+     * The value map itself contains attribute name Strings as keys,
+     * and a List of values for each attribute.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
@@ -365,7 +372,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, SearchHelper searchHelper)
+    Map<String, Map<String, List<String>>> searchMultiValues( String baseDN, SearchHelper searchHelper )
             throws ChaiUnavailableException, ChaiOperationException;
 
 
@@ -377,7 +384,9 @@ public interface ChaiProvider {
      * @param filter      Search filter
      * @param attributes  attribugtes to return.  Null indicates all values, An empty array will return no values.
      * @param searchScope The LDAP scope of the search
-     * @return A map containing Strings of DNs for keys, and a Map for values.  The value map itself contains attribute name Strings as keys, and a List of values for each attribute.
+     * @return A map containing Strings of DNs for keys, and a Map for values.
+     * The value map itself contains attribute name Strings as keys,
+     * and a List of values for each attribute.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
@@ -385,7 +394,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.SearchOperation
-    Map<String, Map<String, List<String>>> searchMultiValues(String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope)
+    Map<String, Map<String, List<String>>> searchMultiValues( String baseDN, String filter, Set<String> attributes, SEARCH_SCOPE searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
@@ -402,7 +411,7 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void writeBinaryAttribute(String entryDN, String attributeName, byte[][] values, boolean overwrite)
+    void writeBinaryAttribute( String entryDN, String attributeName, byte[][] values, boolean overwrite )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
@@ -420,16 +429,16 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void writeBinaryAttribute(String entryDN, String attributeName, byte[][] values, boolean overwrite, ChaiRequestControl[] controls)
+    void writeBinaryAttribute( String entryDN, String attributeName, byte[][] values, boolean overwrite, ChaiRequestControl[] controls )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
      * Write the string values to the specified object's specified attribute.
      *
-     * @param entryDN   A valid entryDN
+     * @param entryDN       A valid entryDN
      * @param attributeName A valid attribute of the entryDN
-     * @param values    An array of values to add
-     * @param overwrite Overwrite existing values
+     * @param values        An array of values to add
+     * @param overwrite     Overwrite existing values
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
@@ -437,32 +446,32 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void writeStringAttribute(String entryDN, String attributeName, Set<String> values, boolean overwrite)
+    void writeStringAttribute( String entryDN, String attributeName, Set<String> values, boolean overwrite )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
      * Write multiple string values to the specified object's specified attributes.
      *
-     * @param entryDN   A valid entryDN
+     * @param entryDN             A valid entryDN
      * @param attributeValueProps A map of attribute names and values
-     * @param overwrite Overwrite existing values
+     * @param overwrite           Overwrite existing values
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void writeStringAttributes(String entryDN, Map<String,String> attributeValueProps, boolean overwrite)
+    void writeStringAttributes( String entryDN, Map<String, String> attributeValueProps, boolean overwrite )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**
      * Discovers and returns the Chai API's interpretation of the vendor of the configured directory.
      * {@code ChaiProvider} implementations will typically cache this value for the life of the instance.
-     *  
+     *
      * @return The Chai API's interpretation of the vendor of the configured directory.
+     * @throws ChaiUnavailableException If no directory servers are reachable
      * @see com.novell.ldapchai.util.ChaiUtility#determineDirectoryVendor(com.novell.ldapchai.ChaiEntry)
      * @see com.novell.ldapchai.provider.ChaiSetting#DEFAULT_VENDOR
-     * @throws ChaiUnavailableException If no directory servers are reachable
      */
     @ChaiProviderImplementor.LdapOperation
     DIRECTORY_VENDOR getDirectoryVendor()
@@ -481,17 +490,19 @@ public interface ChaiProvider {
      */
     @ChaiProviderImplementor.LdapOperation
     @ChaiProviderImplementor.ModifyOperation
-    void replaceBinaryAttribute(String entryDN, String attributeName, byte[] oldValue, byte[] newValue)
+    void replaceBinaryAttribute( String entryDN, String attributeName, byte[] oldValue, byte[] newValue )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
      * Indicates if the provider has a current, active connection to the ldap directory.
+     *
      * @return true if the connection has a valid, active connection to the ldap directory.
      */
     boolean isConnected();
 
     /**
      * Return the factory that produced this {@code ChaiProvider} instance.
+     *
      * @return
      */
     ChaiProviderFactory getProviderFactory();

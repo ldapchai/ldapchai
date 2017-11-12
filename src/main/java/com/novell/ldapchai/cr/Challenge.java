@@ -25,14 +25,15 @@ import java.io.Serializable;
 
 /**
  * Challenge data object, containing all the properties defined by a challenge.
- *
+ * <p>
  * Instances of {@code Challenge} can be generated using {@link ChaiCrFactory}.
- *
+ * <p>
  * {@code Challenge}s are mutable until they are locked.  Once locked, setters will throw an illegal state exception.
  *
  * @author Jason D. Rivard
  */
-public interface Challenge extends Serializable {
+public interface Challenge extends Serializable
+{
 
     /**
      * Get the text of the {@code Challenge} question.  Depending on the origin and type of the
@@ -61,7 +62,7 @@ public interface Challenge extends Serializable {
      * by the user.
      *
      * @return true if the question is defined by the administrator, false if defined
-     *         by the user.
+     * by the user.
      */
     boolean isAdminDefined();
 
@@ -93,11 +94,11 @@ public interface Challenge extends Serializable {
      * @throws IllegalArgumentException if the challenge is admin defined
      * @throws IllegalStateException    if the challenge is locked
      */
-    void setChallengeText(String challengeText);
-    
+    void setChallengeText( String challengeText );
+
     ChallengeBean asChallengeBean();
-    
+
     int getMaxQuestionCharsInAnswer();
-    
+
     boolean isEnforceWordlist();
 }

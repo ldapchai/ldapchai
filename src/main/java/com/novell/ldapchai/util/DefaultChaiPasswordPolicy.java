@@ -33,66 +33,82 @@ import java.util.Set;
  *
  * @author Jason D. Rivard
  */
-public class DefaultChaiPasswordPolicy implements ChaiPasswordPolicy {
+public class DefaultChaiPasswordPolicy implements ChaiPasswordPolicy
+{
 
     private final Map<String, String> rules = makeDefaultRuleMap();
 
-    private static Map<String, String> makeDefaultRuleMap() {
+    private static Map<String, String> makeDefaultRuleMap()
+    {
         final Map<String, String> rules = new HashMap<String, String>();
 
-        for (final ChaiPasswordRule rule : ChaiPasswordRule.values() ) {
-            rules.put(rule.getKey(), rule.getDefaultValue());
+        for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
+        {
+            rules.put( rule.getKey(), rule.getDefaultValue() );
         }
 
         return rules;
     }
 
-    public DefaultChaiPasswordPolicy() {
+    public DefaultChaiPasswordPolicy()
+    {
     }
 
-    public String getValue(final String key) {
-        return rules.get(key);
+    public String getValue( final String key )
+    {
+        return rules.get( key );
     }
 
-    public String getValue(final ChaiPasswordRule rule) {
-        return rules.get(rule.getKey());
+    public String getValue( final ChaiPasswordRule rule )
+    {
+        return rules.get( rule.getKey() );
     }
 
-    public Set<String> getKeys() {
-        return Collections.unmodifiableSet(rules.keySet());
+    public Set<String> getKeys()
+    {
+        return Collections.unmodifiableSet( rules.keySet() );
     }
 
-    public PasswordRuleHelper getRuleHelper() {
-        return new GenericRuleHelper(this);
+    public PasswordRuleHelper getRuleHelper()
+    {
+        return new GenericRuleHelper( this );
     }
 
-    public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicy(final Map<String, String> rules) {
+    public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicy( final Map<String, String> rules )
+    {
         final com.novell.ldapchai.util.DefaultChaiPasswordPolicy newPolicy = new com.novell.ldapchai.util.DefaultChaiPasswordPolicy();
-        if (rules != null) {
-            newPolicy.rules.putAll(rules);
+        if ( rules != null )
+        {
+            newPolicy.rules.putAll( rules );
         }
         return newPolicy;
     }
 
-    public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicyByRule(final Map<ChaiPasswordRule, String> rules) {
+    public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicyByRule( final Map<ChaiPasswordRule, String> rules )
+    {
         final com.novell.ldapchai.util.DefaultChaiPasswordPolicy newPolicy = new com.novell.ldapchai.util.DefaultChaiPasswordPolicy();
-        if (rules != null) {
-            for (final Map.Entry<ChaiPasswordRule,String> entry : rules.entrySet()) {
-                newPolicy.rules.put(entry.getKey().getKey(), entry.getValue());
+        if ( rules != null )
+        {
+            for ( final Map.Entry<ChaiPasswordRule, String> entry : rules.entrySet() )
+            {
+                newPolicy.rules.put( entry.getKey().getKey(), entry.getValue() );
             }
         }
         return newPolicy;
     }
 
-    public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicy() {
+    public static com.novell.ldapchai.util.DefaultChaiPasswordPolicy createDefaultChaiPasswordPolicy()
+    {
         return new com.novell.ldapchai.util.DefaultChaiPasswordPolicy();
     }
 
-    public String toString() {
-        return ChaiUtility.passwordPolicyToString(this);
+    public String toString()
+    {
+        return ChaiUtility.passwordPolicyToString( this );
     }
 
-    public ChaiEntry getPolicyEntry() {
+    public ChaiEntry getPolicyEntry()
+    {
         return null;
     }
 }

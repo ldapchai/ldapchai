@@ -25,12 +25,13 @@ package com.novell.ldapchai.exception;
  *
  * @author Jason D. Rivard
  */
-public class ChaiPasswordPolicyException extends ChaiOperationException {
+public class ChaiPasswordPolicyException extends ChaiOperationException
+{
 
 
-
-    public ChaiPasswordPolicyException(final String message, final ChaiError errorCode) {
-        super(message, errorCode);
+    public ChaiPasswordPolicyException( final String message, final ChaiError errorCode )
+    {
+        super( message, errorCode );
     }
 
 }

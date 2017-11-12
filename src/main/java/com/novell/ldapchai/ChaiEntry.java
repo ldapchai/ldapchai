@@ -34,26 +34,27 @@ import java.util.Set;
  * {@code ChaiEntry} instances represent ldap entries.  Most other {@code Chai*} interfaces in this package inherit from
  * {@code ChaiEntry}. Each instance wraps a ldap distinguished name (DN) value that it then uses for all subsequent operations.  Methods are
  * provided to easily access or modify attributes of the entry, as well as to find related objects.  Clients can consume
- * {@code ChaiEntry} instances as if they were beans baacked by some persistant store.
- *
+ * {@code ChaiEntry} instances as if they were beans backed by some persistent store.
+ * <p>
  * This interface is extended by several sub-interfaces that provide added functionality for specific
  * entry types such as users and groups.
- *
+ * <p>
  * This interface and its sub-interfaces are intended to be the primary interface that callers to the
  * LDAP Chai API reference in their code.
- *
+ * <p>
  * Instances of ChaiEntry can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
  */
 
-public interface ChaiEntry {
+public interface ChaiEntry
+{
 
     /**
      * Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
      * supplied value will be set.
-     *
+     * <p>
      * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
      * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
@@ -62,14 +63,14 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void addAttribute(String attributeName, String attributeValue)
+    void addAttribute( String attributeName, String attributeValue )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
      * supplied value will be set.</p>
-     *
+     * <p>
      * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
      * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
      *
@@ -78,14 +79,14 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void addAttribute(String attributeName, Set<String> attributeValues)
+    void addAttribute( String attributeName, Set<String> attributeValues )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
      * supplied value will be set.</p>
-     *
+     * <p>
      * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
      * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.</p>
      *
@@ -94,7 +95,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void addAttribute(String attributeName, String... attributeValues)
+    void addAttribute( String attributeName, String... attributeValues )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -106,9 +107,9 @@ public interface ChaiEntry {
      * @return true if the value exists in the ldap directory
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#compareStringAttribute(String,String,String)
+     * @see com.novell.ldapchai.provider.ChaiProvider#compareStringAttribute(String, String, String)
      */
-    boolean compareStringAttribute(String attributeName, String attributeValue)
+    boolean compareStringAttribute( String attributeName, String attributeValue )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
@@ -118,9 +119,9 @@ public interface ChaiEntry {
      * @param attributeValue A particular value to delete, or null for all values
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#deleteStringAttributeValue(String,String,String)
+     * @see com.novell.ldapchai.provider.ChaiProvider#deleteStringAttributeValue(String, String, String)
      */
-    void deleteAttribute(String attributeName, String attributeValue)
+    void deleteAttribute( String attributeName, String attributeValue )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -165,7 +166,7 @@ public interface ChaiEntry {
     boolean isValid();
 
     /**
-     * A convience method for reading boolean values from the ldap directory.  Note that ldap booleans actually
+     * A convince method for reading boolean values from the ldap directory.  Note that ldap booleans actually
      * have three states: true, false and does not exist.  This method uses the general convention that does not
      * exist is treated as false.
      *
@@ -174,7 +175,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    boolean readBooleanAttribute(String attributeName)
+    boolean readBooleanAttribute( String attributeName )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -183,9 +184,9 @@ public interface ChaiEntry {
      * as defined by the LDAP server.  The returned value may differ from {@link ChaiEntry#getEntryDN()}
      * in terms of case, spacing, or other syntax differences, however they should resolve to the
      * same entry by the ldap server.
-     *
+     * <p>
      * Canonical values are particularly useful when storing in a collection, as you
-     * can gaurentee that two
+     * can guarantee that two entries are the same by comparing the literal string value of the DN.
      *
      * @return The canonical DN of the object, as returned by the LDAP server
      * @throws ChaiOperationException   If there is an error during the operation
@@ -194,27 +195,27 @@ public interface ChaiEntry {
     String readCanonicalDN()
             throws ChaiOperationException, ChaiUnavailableException;
 
-   /**
-    * Read an attribute with timestamp value.  Automatically converts the timestamp to a {@code Date} object.
-    * If there are any problems with the conversion, null is returned.
-    *
-    * @param attributeName Name of the attribute to read.  Date must be in Zulu string format.
-    * @return A valid {@code Date} object, or null if a date can not be determined.
-    * @throws ChaiOperationException   If there is an error during the operation
-    * @throws ChaiUnavailableException If the directory server(s) are unavailable
-    */
-    Date readDateAttribute(String attributeName)
+    /**
+     * Read an attribute with timestamp value.  Automatically converts the timestamp to a {@code Date} object.
+     * If there are any problems with the conversion, null is returned.
+     *
+     * @param attributeName Name of the attribute to read.  Date must be in Zulu string format.
+     * @return A valid {@code Date} object, or null if a date can not be determined.
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     */
+    Date readDateAttribute( String attributeName )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * A convience method for reading int values.
+     * A convince method for reading int values.
      *
      * @param attributeName The name of the attribute.
      * @return int value of attribute, or zero if it does not exist or is not numeric
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    int readIntAttribute(String attributeName)
+    int readIntAttribute( String attributeName )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -222,20 +223,20 @@ public interface ChaiEntry {
      * Useful only for ldap attributes using binary syntax type.
      *
      * @param attributeName A valid attribute on the object.
-     * @return A byte array where the first dimension is each ldap value, and the second diminsion
-     *         is the actual byte values.
+     * @return A byte array where the first dimension is each ldap value, and the second dimension
+     * is the actual byte values.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
-     * @see com.novell.ldapchai.provider.ChaiProvider#readMultiByteAttribute(String,String)
+     * @see com.novell.ldapchai.provider.ChaiProvider#readMultiByteAttribute(String, String)
      */
-    byte[][] readMultiByteAttribute(String attributeName)
+    byte[][] readMultiByteAttribute( String attributeName )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Retreives an attribute value from the LDAP entry represented by the
      * instance of this class.  If the attribute syntax is not a string, the value will be
      * converted to a string.
-     *
+     * <p>
      * Callers of this method should use the values specified in the {@link ChaiConstant} class
      * when possible.
      *
@@ -244,7 +245,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    Set<String> readMultiStringAttribute(String attributeName)
+    Set<String> readMultiStringAttribute( String attributeName )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -256,7 +257,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    List<InetAddress> readNetAddressAttribute(String attributeName)
+    List<InetAddress> readNetAddressAttribute( String attributeName )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
@@ -270,11 +271,11 @@ public interface ChaiEntry {
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Retreives an attribute value from the LDAP entry represented by the
+     * Retrieves an attribute value from the LDAP entry represented by the
      * instance of this class.  If the attribute has multiple values then only a single value
      * is returned.  If the attribute does not have a string syntax, the value will be converted
      * to a string.
-     *
+     * <p>
      * Callers of this method should use the values specified in the {@link ChaiConstant} class
      * when possible.
      *
@@ -282,16 +283,16 @@ public interface ChaiEntry {
      * @return Value of the attributeName attribute
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#readStringAttribute(String,String)
+     * @see com.novell.ldapchai.provider.ChaiProvider#readStringAttribute(String, String)
      */
-    String readStringAttribute(String attributeName)
+    String readStringAttribute( String attributeName )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Read an array of specified attributes.  If any of the attributes has multiple values, only the first value
      * returned by the directory is returned.  If the attribute does not have a string syntax, the value will be converted
      * to a string.
-     *
+     * <p>
      * Callers of this method are encouraged to use the values specified in {@link ChaiConstant} when possible for attribute names.
      *
      * @param attributes Valid  attributes on the object.
@@ -301,7 +302,7 @@ public interface ChaiEntry {
      * @see #readStringAttribute(String)
      * @see com.novell.ldapchai.provider.ChaiProvider#readStringAttributes(String, java.util.Set)
      */
-    Map<String,String> readStringAttributes(Set<String> attributes)
+    Map<String, String> readStringAttributes( Set<String> attributes )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -314,9 +315,9 @@ public interface ChaiEntry {
      * @param newValue      The new value
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#replaceStringAttribute(String,String,String,String)
+     * @see com.novell.ldapchai.provider.ChaiProvider#replaceStringAttribute(String, String, String, String)
      */
-    void replaceAttribute(String attributeName, String oldValue, String newValue)
+    void replaceAttribute( String attributeName, String oldValue, String newValue )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -330,14 +331,14 @@ public interface ChaiEntry {
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
      * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
-    Set<ChaiEntry> search(String filter)
+    Set<ChaiEntry> search( String filter )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Perform an ldap search using this entry as the search root.  A {@link com.novell.ldapchai.util.SearchHelper} is required
      * and its values are used to perform the search.  The result is a collection of {@code ChaiEntry} instances that
      * can then be further minipulated.
-     *
+     * <p>
      * Note, although the {@code SearchHelper} can specify return attributes, the attributes are not requested using
      * this search method.  Instead, the result ChaiEntries can be used to read attribute values.
      *
@@ -348,7 +349,7 @@ public interface ChaiEntry {
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
      * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
-    Set<ChaiEntry> search(SearchHelper searchHelper)
+    Set<ChaiEntry> search( SearchHelper searchHelper )
             throws ChaiOperationException, ChaiUnavailableException;
 
 
@@ -364,7 +365,7 @@ public interface ChaiEntry {
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
      * @see com.novell.ldapchai.provider.ChaiProvider#searchMultiValues(String, com.novell.ldapchai.util.SearchHelper)
      */
-    Set<ChaiEntry> search(String filter, ChaiProvider.SEARCH_SCOPE searchScope)
+    Set<ChaiEntry> search( String filter, ChaiProvider.SEARCH_SCOPE searchScope )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -375,7 +376,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeStringAttribute(String attributeName, String attributeValue)
+    void writeStringAttribute( String attributeName, String attributeValue )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -386,7 +387,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeStringAttribute(String attributeName, Set<String> attributeValues)
+    void writeStringAttribute( String attributeName, Set<String> attributeValues )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -396,19 +397,19 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeDateAttribute(String attributeName, Date date)
+    void writeDateAttribute( String attributeName, Date date )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Removes all existing values, if any, and sets the new value.
      *
-     * @param attributeValueProps  Name of the attributes and values to set on the entry.  Any existing values will
-     * be replaced.
+     * @param attributeValueProps Name of the attributes and values to set on the entry.  Any existing values will
+     *                            be replaced.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see com.novell.ldapchai.provider.ChaiProvider#writeStringAttributes(String, java.util.Map, boolean)
      */
-    void writeStringAttributes(Map<String,String> attributeValueProps)
+    void writeStringAttributes( Map<String, String> attributeValueProps )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -419,7 +420,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeStringAttribute(String attributeName, String... attributeValues)
+    void writeStringAttribute( String attributeName, String... attributeValues )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -430,7 +431,7 @@ public interface ChaiEntry {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeBinaryAttribute(String attributeName, byte[]... attributeValues)
+    void writeBinaryAttribute( String attributeName, byte[]... attributeValues )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -443,23 +444,22 @@ public interface ChaiEntry {
      * @param newValue      The new value
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @see com.novell.ldapchai.provider.ChaiProvider#replaceStringAttribute(String,String,String,String)
+     * @see com.novell.ldapchai.provider.ChaiProvider#replaceStringAttribute(String, String, String, String)
      */
-    void replaceBinaryAttribute(String attributeName, byte[] oldValue, byte[] newValue)
+    void replaceBinaryAttribute( String attributeName, byte[] oldValue, byte[] newValue )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Read a GUID (Globally Unique Identifier) from the entry.  Chai will attempt to use vendor-specific
      * attributes for the entry.  Many vendor implementations store GUID values as binary, or octet-length
      * syntax so this method will automatically convert to a string format of some type, typically a hex or base64 string.
-     *
+     * <p>
      * Thus, the value returned by this method can be assumed to be unique per entry and reliably read across
      * time, however the value may not be easily reversable to the original vendor format.
      *
      * @return Value of the entry's vendor-specific GUID format in some type of string format, or null if not available
-     *
-     * @throws ChaiOperationException   If there is an error during the operation
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     * @throws ChaiOperationException        If there is an error during the operation
+     * @throws ChaiUnavailableException      If the directory server(s) are unavailable
      * @throws UnsupportedOperationException If the vendor implementation does not have a GUID
      */
     String readGUID()

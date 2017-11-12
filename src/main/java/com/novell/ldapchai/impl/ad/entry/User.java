@@ -21,7 +21,8 @@ package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiUser;
 
-interface User extends Organizational_Person, ChaiUser {
+interface User extends OrganizationalPerson, ChaiUser
+{
     /**
      * Convenience LDAP attribute definition
      */

@@ -26,12 +26,13 @@ import java.util.Set;
 
 /**
  * Represents an ldap group entry.
- *
+ * <p>
  * Instances of ChaiGroup can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
  */
-public interface ChaiGroup extends ChaiEntry {
+public interface ChaiGroup extends ChaiEntry
+{
 
 
     /**
@@ -53,7 +54,7 @@ public interface ChaiGroup extends ChaiEntry {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see ChaiUser#addGroupMembership(ChaiGroup)
      */
-    void addMember(ChaiUser theUser)
+    void addMember( ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
@@ -86,7 +87,7 @@ public interface ChaiGroup extends ChaiEntry {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see ChaiUser#removeGroupMembership(ChaiGroup)
      */
-    void removeMember(ChaiUser theUser)
+    void removeMember( ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException;
 }
 

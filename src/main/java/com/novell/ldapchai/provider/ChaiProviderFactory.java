@@ -38,20 +38,20 @@ import java.util.Properties;
  * Static factory methods for obtaining an {@code ChaiProvider}.  {@code ChaiProvider} instances can be
  * used directly, but they are more commonly used to obtain an {@link com.novell.ldapchai.ChaiEntry}
  * instance.
- *
+ * <p>
  * Access to "wrapped" {@code ChaiProvider}s are also availble, including wrappers for caching
  * or synchronization.
- *
+ * <p>
  * If there are no specific requirements for how to establish a connection, the
  * "quick" factory method can be used to get a Provider with just one line of code:
- *
+ * <p>
  * <hr/><blockquote><pre>
  *   ChaiProvider provider = ChaiProviderFactory.createProvider("ldap://host:port","cn=admin,o=org","password");
  * </pre></blockquote><hr/>
- *
+ * <p>
  * If a more control is required, allocate a {@code ChaiConfiguration} first, and then
  * use this factory to generate a provider:
- *
+ * <p>
  * <hr/><blockquote><pre>
  *   // setup connecton variables
  *   final String bindUsername = "cn=admin,o=org";
@@ -60,30 +60,31 @@ import java.util.Properties;
  *   serverURLs.add("ldap://server1:port");
  *   serverURLs.add("ldaps://server2:port");
  *   serverURLs.add("ldap://server3");
- *
+ * <p>
  *   // allocate a new configuration
  *   ChaiConfiguration chaiConfig = new ChaiConfiguration(
  *            serverURLs,
  *            bindUsername,
  *            bindPassword);
- *
+ * <p>
  *   // set any desired settings.
  *   chaiConfig.setSettings(ChaiConfiguration.SETTING_LDAP_TIMEOUT,"9000");
  *   chaiConfig.setSettings(ChaiConfiguration.SETTING_PROMISCUOUS_SSL,"true");
- *
+ * <p>
  *   // generate the new provider
  *   ChaiProvider provider = ChaiProviderFactory.createProvider(chaiConfig);
  * </pre></blockquote><hr/>
  *
  * @author Jason D. Rivard
  */
-public final class ChaiProviderFactory {
+public final class ChaiProviderFactory
+{
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiProviderFactory.class.getName());
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiProviderFactory.class.getName() );
 
-    private static ChaiProviderFactory SINGLETON = new ChaiProviderFactory();
+    private static final ChaiProviderFactory SINGLETON = new ChaiProviderFactory();
 
-    private final StatisticsWrapper.StatsBean GLOBAL_STATS = new StatisticsWrapper.StatsBean();
+    private final StatisticsWrapper.StatsBean globalStats = new StatisticsWrapper.StatsBean();
 
 
     /**
@@ -95,7 +96,7 @@ public final class ChaiProviderFactory {
      */
     public ProviderStatistics getGlobalStatistics()
     {
-        return GLOBAL_STATS;
+        return globalStats;
     }
 
     /**
@@ -107,28 +108,28 @@ public final class ChaiProviderFactory {
      * @param ldapURL  ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i> (multiple addresses can be specified by comma seperating)
      * @return A {@code ChaiUser} instance of the bindDN with an underlying ChaiProvider connected using the supplied parameters.
      * @throws ChaiUnavailableException If the directory server(s) are not reachable.
-     * @see com.novell.ldapchai.ChaiFactory#quickProvider(String,String,String)
+     * @see com.novell.ldapchai.ChaiFactory#quickProvider(String, String, String)
      */
     @Deprecated
-    public static ChaiUser quickProvider(final String ldapURL, final String bindDN, final String password)
+    public static ChaiUser quickProvider( final String ldapURL, final String bindDN, final String password )
             throws ChaiUnavailableException
     {
-        final ChaiProvider provider = createProvider(ldapURL, bindDN, password);
-        return provider.getEntryFactory().createChaiUser(bindDN);
+        final ChaiProvider provider = createProvider( ldapURL, bindDN, password );
+        return provider.getEntryFactory().createChaiUser( bindDN );
     }
 
     @Deprecated
-    public static ChaiProvider createProvider(final String ldapURL, final String bindDN, final String password)
+    public static ChaiProvider createProvider( final String ldapURL, final String bindDN, final String password )
             throws ChaiUnavailableException
     {
-        return SINGLETON.newProvider(ldapURL, bindDN, password);
+        return SINGLETON.newProvider( ldapURL, bindDN, password );
     }
 
     @Deprecated
-    public static ChaiProvider createProvider(final ChaiConfiguration chaiConfiguration)
+    public static ChaiProvider createProvider( final ChaiConfiguration chaiConfiguration )
             throws ChaiUnavailableException
     {
-        return SINGLETON.newProvider(chaiConfiguration);
+        return SINGLETON.newProvider( chaiConfiguration );
     }
 
     /**
@@ -140,64 +141,74 @@ public final class ChaiProviderFactory {
      * @return A ChaiProvider with an active connection to the ldap directory
      * @throws ChaiUnavailableException If the directory server(s) are not reachable.
      */
-    public ChaiProvider newProvider(final String ldapURL, final String bindDN, final String password)
+    public ChaiProvider newProvider( final String ldapURL, final String bindDN, final String password )
             throws ChaiUnavailableException
     {
         final ChaiConfiguration chaiConfig = new ChaiConfiguration();
         final Properties settings = ChaiConfiguration.getDefaultSettings();
-        settings.putAll(System.getProperties());
-        chaiConfig.setSettings(settings);
-        chaiConfig.setSetting(ChaiSetting.BIND_URLS, ldapURL);
-        chaiConfig.setSetting(ChaiSetting.BIND_DN, bindDN);
-        chaiConfig.setSetting(ChaiSetting.BIND_PASSWORD, password);
-        chaiConfig.setSetting(ChaiSetting.PROVIDER_IMPLEMENTATION, JNDIProviderImpl.class.getName());
-        return newProvider(chaiConfig);
+        settings.putAll( System.getProperties() );
+        chaiConfig.setSettings( settings );
+        chaiConfig.setSetting( ChaiSetting.BIND_URLS, ldapURL );
+        chaiConfig.setSetting( ChaiSetting.BIND_DN, bindDN );
+        chaiConfig.setSetting( ChaiSetting.BIND_PASSWORD, password );
+        chaiConfig.setSetting( ChaiSetting.PROVIDER_IMPLEMENTATION, JNDIProviderImpl.class.getName() );
+        return newProvider( chaiConfig );
     }
 
     /**
      * Create a {@code ChaiProvider} using the specified <i>chaiConfiguration</i>.  A ChaiProvider will be created
      * according to the implementation class and configuration settings contained within the configuration.
-     *
+     * <p>
      * All other factory methods are simply convenience wrappers around this method.
      *
      * @param chaiConfiguration A completed, lockable configuration
      * @return A functioning ChaiProvider generated according to <i>chaiConfiguration</i>
      * @throws ChaiUnavailableException If the directory server(s) are not reachable.
      */
-    public ChaiProvider newProvider(final ChaiConfiguration chaiConfiguration)
+    public ChaiProvider newProvider( final ChaiConfiguration chaiConfiguration )
             throws ChaiUnavailableException
     {
         chaiConfiguration.lock();
 
         ChaiProviderImplementor providerImpl;
-        try {
-            final boolean enableFailover = "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.FAILOVER_ENABLE));
+        try
+        {
+            final boolean enableFailover = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.FAILOVER_ENABLE ) );
 
-            if (enableFailover) {
-                providerImpl = FailOverWrapper.forConfiguration(this, chaiConfiguration);
-            } else {
-                if (LOGGER.isTraceEnabled()) {
+            if ( enableFailover )
+            {
+                providerImpl = FailOverWrapper.forConfiguration( this, chaiConfiguration );
+            }
+            else
+            {
+                if ( LOGGER.isTraceEnabled() )
+                {
                     final StringBuilder sb = new StringBuilder();
-                    sb.append("creating new jndi ldap connection to ");
-                    sb.append(chaiConfiguration.getSetting(ChaiSetting.BIND_URLS));
-                    sb.append(" as ");
-                    sb.append(chaiConfiguration.getSetting(ChaiSetting.BIND_DN));
-                    LOGGER.trace(sb.toString());
+                    sb.append( "creating new jndi ldap connection to " );
+                    sb.append( chaiConfiguration.getSetting( ChaiSetting.BIND_URLS ) );
+                    sb.append( " as " );
+                    sb.append( chaiConfiguration.getSetting( ChaiSetting.BIND_DN ) );
+                    LOGGER.trace( sb.toString() );
                 }
 
-                providerImpl = createConcreteProvider(this, chaiConfiguration, true);
+                providerImpl = createConcreteProvider( this, chaiConfiguration, true );
             }
-        } catch (Exception e) {
+        }
+        catch ( Exception e )
+        {
             final String errorMsg = "unable to create connection: " + e.getClass().getName() + ":" + e.getMessage();
-            if (e instanceof ChaiException || e instanceof IOException) {
-                LOGGER.debug(errorMsg);
-            } else {
-                LOGGER.debug(errorMsg, e);
+            if ( e instanceof ChaiException || e instanceof IOException )
+            {
+                LOGGER.debug( errorMsg );
             }
-            throw new ChaiUnavailableException("unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+            else
+            {
+                LOGGER.debug( errorMsg, e );
+            }
+            throw new ChaiUnavailableException( "unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
         }
 
-        providerImpl = addProviderWrappers(providerImpl);
+        providerImpl = addProviderWrappers( providerImpl );
 
         return providerImpl;
     }
@@ -209,61 +220,75 @@ public final class ChaiProviderFactory {
     )
             throws Exception
     {
-        final String className = chaiConfiguration.getSetting(ChaiSetting.PROVIDER_IMPLEMENTATION);
+        final String className = chaiConfiguration.getSetting( ChaiSetting.PROVIDER_IMPLEMENTATION );
 
         final ChaiProviderImplementor providerImpl;
 
-        final Class providerClass = Class.forName(className);
+        final Class providerClass = Class.forName( className );
         final Object impl = providerClass.newInstance();
-        if (!(impl instanceof ChaiProvider)) {
-            throw new ChaiUnavailableException("unable to create new ChaiProvider, " + className + " is not instance of " + ChaiProvider.class.getName(), ChaiError.UNKNOWN);
+        if ( !( impl instanceof ChaiProvider ) )
+        {
+            final String msg = "unable to create new ChaiProvider, "
+                    + className + " is not instance of "
+                    + ChaiProvider.class.getName();
+            throw new ChaiUnavailableException( msg, ChaiError.UNKNOWN );
         }
-        if (!(impl instanceof ChaiProviderImplementor)) {
-            throw new ChaiUnavailableException("unable to create new ChaiProvider, " + className + " is not instance of " + ChaiProviderImplementor.class.getName(), ChaiError.UNKNOWN);
+        if ( !( impl instanceof ChaiProviderImplementor ) )
+        {
+            final String msg = "unable to create new ChaiProvider, "
+                    + className + " is not instance of "
+                    + ChaiProviderImplementor.class.getName();
+            throw new ChaiUnavailableException( msg, ChaiError.UNKNOWN );
         }
-        providerImpl = (ChaiProviderImplementor) impl;
+        providerImpl = ( ChaiProviderImplementor ) impl;
 
-        if (initialize) {
-            providerImpl.init(chaiConfiguration, providerFactory);
+        if ( initialize )
+        {
+            providerImpl.init( chaiConfiguration, providerFactory );
         }
 
         return providerImpl;
     }
 
-    static ChaiProviderImplementor addProviderWrappers(final ChaiProviderImplementor providerImpl)
+    static ChaiProviderImplementor addProviderWrappers( final ChaiProviderImplementor providerImpl )
     {
         final ChaiConfiguration chaiConfiguration = providerImpl.getChaiConfiguration();
 
-        final boolean enableReadOnly =      "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.READONLY));
-        final boolean enableWatchdog =      "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.WATCHDOG_ENABLE));
-        final boolean enableWireTrace =     "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.WIRETRACE_ENABLE));
-        final boolean enableStatistics =    "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.STATISTICS_ENABLE));
-        final boolean enableCaching =       "true".equalsIgnoreCase(chaiConfiguration.getSetting(ChaiSetting.CACHE_ENABLE));
+        final boolean enableReadOnly = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.READONLY ) );
+        final boolean enableWatchdog = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.WATCHDOG_ENABLE ) );
+        final boolean enableWireTrace = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.WIRETRACE_ENABLE ) );
+        final boolean enableStatistics = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.STATISTICS_ENABLE ) );
+        final boolean enableCaching = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.CACHE_ENABLE ) );
 
         ChaiProviderImplementor outputProvider = providerImpl;
-        if (enableReadOnly && !(outputProvider instanceof ReadOnlyWrapper)) {
-            LOGGER.trace("adding ReadOnlyWrapper to provider instance");
-            outputProvider = ReadOnlyWrapper.forProvider(outputProvider);
+        if ( enableReadOnly && !( outputProvider instanceof ReadOnlyWrapper ) )
+        {
+            LOGGER.trace( "adding ReadOnlyWrapper to provider instance" );
+            outputProvider = ReadOnlyWrapper.forProvider( outputProvider );
         }
 
-        if (enableWatchdog && !(outputProvider instanceof WatchdogWrapper)) {
-            LOGGER.trace("adding WatchdogWrapper to provider instance");
-            outputProvider = WatchdogWrapper.forProvider(outputProvider);
+        if ( enableWatchdog && !( outputProvider instanceof WatchdogWrapper ) )
+        {
+            LOGGER.trace( "adding WatchdogWrapper to provider instance" );
+            outputProvider = WatchdogWrapper.forProvider( outputProvider );
         }
 
-        if (enableWireTrace && !(outputProvider instanceof WireTraceWrapper)) {
-            LOGGER.trace("adding WireTraceWrapper to provider instance");
-            outputProvider = WireTraceWrapper.forProvider(outputProvider);
+        if ( enableWireTrace && !( outputProvider instanceof WireTraceWrapper ) )
+        {
+            LOGGER.trace( "adding WireTraceWrapper to provider instance" );
+            outputProvider = WireTraceWrapper.forProvider( outputProvider );
         }
 
-        if (enableStatistics && !(outputProvider instanceof StatisticsWrapper)) {
-            LOGGER.trace("adding StatisticsWrapper to provider instance");
-            outputProvider = StatisticsWrapper.forProvider(outputProvider);
+        if ( enableStatistics && !( outputProvider instanceof StatisticsWrapper ) )
+        {
+            LOGGER.trace( "adding StatisticsWrapper to provider instance" );
+            outputProvider = StatisticsWrapper.forProvider( outputProvider );
         }
 
-        if (enableCaching && !(outputProvider instanceof CachingWrapper)) {
-            LOGGER.trace("adding CachingWrapper to provider instance");
-            outputProvider = CachingWrapper.forProvider(outputProvider);
+        if ( enableCaching && !( outputProvider instanceof CachingWrapper ) )
+        {
+            LOGGER.trace( "adding CachingWrapper to provider instance" );
+            outputProvider = CachingWrapper.forProvider( outputProvider );
         }
 
         return outputProvider;
@@ -272,22 +297,25 @@ public final class ChaiProviderFactory {
     /**
      * Returns a thread-safe "wrapped" {@code ChaiProvider}.  All ldap operations will be forced through a single
      * lock and then sent to the backing provider.
-     *
+     * <p>
      * Note that depending on the ldap server and the configured timeouts, calling methods on a synchronized
      * provider may result in significant blocking delays.
      *
      * @param theProvider The provider to be "wrapped" in a synchronized provider.
      * @return A synchronized view of the specified provider
      */
-    public static ChaiProvider synchronizedProvider(final ChaiProvider theProvider)
+    public static ChaiProvider synchronizedProvider( final ChaiProvider theProvider )
     {
-        if (theProvider instanceof SynchronizedProvider) {
+        if ( theProvider instanceof SynchronizedProvider )
+        {
             return theProvider;
-        } else {
-            return (ChaiProvider) Proxy.newProxyInstance(
+        }
+        else
+        {
+            return ( ChaiProvider ) Proxy.newProxyInstance(
                     theProvider.getClass().getClassLoader(),
                     theProvider.getClass().getInterfaces(),
-                    new SynchronizedProvider(theProvider));
+                    new SynchronizedProvider( theProvider ) );
         }
     }
 
@@ -296,45 +324,55 @@ public final class ChaiProviderFactory {
     {
     }
 
-    public static ChaiProviderFactory newProviderFactory() {
+    public static ChaiProviderFactory newProviderFactory()
+    {
         return new ChaiProviderFactory();
     }
 
 
-    private static class SynchronizedProvider implements InvocationHandler {
+    private static class SynchronizedProvider implements InvocationHandler
+    {
         private final ChaiProvider realProvider;
         private final Object lock = new Object();
 
-        SynchronizedProvider(final ChaiProvider realProvider)
+        SynchronizedProvider( final ChaiProvider realProvider )
         {
             this.realProvider = realProvider;
         }
 
-        public Object invoke(final Object proxy, final Method method, final Object[] args)
+        public Object invoke( final Object proxy, final Method method, final Object[] args )
                 throws Throwable
         {
-            if (method.getAnnotation(ChaiProviderImplementor.LdapOperation.class) != null) {
-                synchronized (lock) {
-                    return doInvocation(method, args);
+            if ( method.getAnnotation( ChaiProviderImplementor.LdapOperation.class ) != null )
+            {
+                synchronized ( lock )
+                {
+                    return doInvocation( method, args );
                 }
-            } else {
-                return doInvocation(method, args);
+            }
+            else
+            {
+                return doInvocation( method, args );
             }
         }
 
-        public Object doInvocation(final Method method, final Object[] args)
+        public Object doInvocation( final Method method, final Object[] args )
                 throws Throwable
         {
-            try {
-                return method.invoke(realProvider, args);
-            } catch (InvocationTargetException e) {
+            try
+            {
+                return method.invoke( realProvider, args );
+            }
+            catch ( InvocationTargetException e )
+            {
                 throw e.getCause();
             }
         }
     }
 
-    StatisticsWrapper.StatsBean getStatsBean() {
-        return GLOBAL_STATS;
+    StatisticsWrapper.StatsBean getStatsBean()
+    {
+        return globalStats;
     }
 }
 

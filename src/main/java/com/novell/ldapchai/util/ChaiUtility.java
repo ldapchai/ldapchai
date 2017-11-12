@@ -43,19 +43,17 @@ import java.util.Random;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
- *
+ * <p>
  * Generally, consumers of the LDAP Chai API should avoid calling these methods directly.  Where possible,
  * use the {@link com.novell.ldapchai.ChaiEntry} wrappers instead.
  *
  * @author Jason D. Rivard
  */
-public class ChaiUtility {
+public class ChaiUtility
+{
 
 
-
-
-
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiUtility.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiUtility.class );
 
     /**
      * Creates a new group entry in the ldap directory.  A new "groupOfNames" object is created.
@@ -68,30 +66,30 @@ public class ChaiUtility {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static ChaiGroup createGroup(final String parentDN, final String name, final ChaiProvider provider)
+    public static ChaiGroup createGroup( final String parentDN, final String name, final ChaiProvider provider )
             throws ChaiOperationException, ChaiUnavailableException
     {
         //Get a good CN for it
-        final String objectCN = findUniqueName(name, parentDN, provider);
+        final String objectCN = findUniqueName( name, parentDN, provider );
 
         //Concantonate the entryDN
         final StringBuilder entryDN = new StringBuilder();
-        entryDN.append("cn=");
-        entryDN.append(objectCN);
-        entryDN.append(',');
-        entryDN.append(parentDN);
+        entryDN.append( "cn=" );
+        entryDN.append( objectCN );
+        entryDN.append( ',' );
+        entryDN.append( parentDN );
 
         //First create the base group.
-        provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap());
+        provider.createEntry( entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap() );
 
         //Now build an ldapentry object to add attributes to it
-        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry(entryDN.toString());
+        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry( entryDN.toString() );
 
         //Add the description
-        theObject.writeStringAttribute(ChaiConstant.ATTR_LDAP_DESCRIPTION, name);
+        theObject.writeStringAttribute( ChaiConstant.ATTR_LDAP_DESCRIPTION, name );
 
         //Return the newly created group.
-        return provider.getEntryFactory().createChaiGroup(entryDN.toString());
+        return provider.getEntryFactory().createChaiGroup( entryDN.toString() );
     }
 
     /**
@@ -104,27 +102,30 @@ public class ChaiUtility {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static String findUniqueName(final String baseName, final String containerDN, final ChaiProvider provider)
+    public static String findUniqueName( final String baseName, final String containerDN, final ChaiProvider provider )
             throws ChaiOperationException, ChaiUnavailableException
     {
         char ch;
         final StringBuilder cnStripped = new StringBuilder();
 
-        final String effectiveBasename = (baseName == null)
-            ? ""
-            : baseName;
+        final String effectiveBasename = ( baseName == null )
+                ? ""
+                : baseName;
 
         // First boil down the root name. Preserve only the alpha-numerics.
-        for (int i = 0; i < effectiveBasename.length(); i++) {
-            ch = effectiveBasename.charAt(i);
-            if (Character.isLetterOrDigit(ch)) {
-                cnStripped.append(ch);
+        for ( int i = 0; i < effectiveBasename.length(); i++ )
+        {
+            ch = effectiveBasename.charAt( i );
+            if ( Character.isLetterOrDigit( ch ) )
+            {
+                cnStripped.append( ch );
             }
         }
 
-        if (cnStripped.length() == 0) {
+        if ( cnStripped.length() == 0 )
+        {
             // Generate a random seed to runServer with, how about the current date
-            cnStripped.append(System.currentTimeMillis());
+            cnStripped.append( System.currentTimeMillis() );
         }
 
         // Now we have a base name, let's runServer testing it...
@@ -134,25 +135,34 @@ public class ChaiUtility {
         final Random randomNumber = new Random();
 
         String stringCounter = null;
-        int counter = randomNumber.nextInt() % 1000; // Start with a random 3 digit number
-        while (true) {
-            // Initialize the String Buffer and Unique DN.
-            filter = new StringBuilder(64);
 
-            if (stringCounter != null) {
-                uniqueCN = cnStripped.append(stringCounter).toString();
-            } else {
+        // Start with a random 3 digit number
+        int counter = randomNumber.nextInt() % 1000;
+        while ( true )
+        {
+            // Initialize the String Buffer and Unique DN.
+            filter = new StringBuilder( 64 );
+
+            if ( stringCounter != null )
+            {
+                uniqueCN = cnStripped.append( stringCounter ).toString();
+            }
+            else
+            {
                 uniqueCN = cnStripped.toString();
             }
-            filter.append("(").append(ChaiConstant.ATTR_LDAP_COMMON_NAME).append("=").append(uniqueCN).append(")");
+            filter.append( "(" ).append( ChaiConstant.ATTR_LDAP_COMMON_NAME ).append( "=" ).append( uniqueCN ).append( ")" );
 
-            final Map<String, Map<String,String>> results = provider.search(containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE);
-            if (results.size() == 0) {
+            final Map<String, Map<String, String>> results = provider.search( containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE );
+            if ( results.size() == 0 )
+            {
                 // No object found!
                 break;
-            } else {
+            }
+            else
+            {
                 // Increment it every time
-                stringCounter = Integer.toString(counter++);
+                stringCounter = Integer.toString( counter++ );
             }
         }
 
@@ -171,17 +181,17 @@ public class ChaiUtility {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static ChaiUser createUser(final String userDN, final String sn, final ChaiProvider provider)
+    public static ChaiUser createUser( final String userDN, final String sn, final ChaiProvider provider )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Map<String,String> createAttributes = new HashMap<String, String>();
+        final Map<String, String> createAttributes = new HashMap<>();
 
-        createAttributes.put(ChaiConstant.ATTR_LDAP_SURNAME, sn);
+        createAttributes.put( ChaiConstant.ATTR_LDAP_SURNAME, sn );
 
-        provider.createEntry(userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes);
+        provider.createEntry( userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes );
 
         //lets create a user object
-        return provider.getEntryFactory().createChaiUser(userDN);
+        return provider.getEntryFactory().createChaiUser( userDN );
     }
 
     /**
@@ -192,20 +202,27 @@ public class ChaiUtility {
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static String entryToLDIF(final ChaiEntry theEntry)
+    public static String entryToLDIF( final ChaiEntry theEntry )
             throws ChaiUnavailableException, ChaiOperationException
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("dn: ").append(theEntry.getEntryDN()).append("\n");
+        sb.append( "dn: " ).append( theEntry.getEntryDN() ).append( "\n" );
 
-        final Map<String, Map<String, List<String>>> results = theEntry.getChaiProvider().searchMultiValues(theEntry.getEntryDN(), "(objectClass=*)", null, ChaiProvider.SEARCH_SCOPE.BASE);
-        final Map<String, List<String>> props = results.get(theEntry.getEntryDN());
+        final Map<String, Map<String, List<String>>> results = theEntry.getChaiProvider().searchMultiValues(
+                theEntry.getEntryDN(),
+                "(objectClass=*)",
+                null,
+                ChaiProvider.SEARCH_SCOPE.BASE
+        );
+        final Map<String, List<String>> props = results.get( theEntry.getEntryDN() );
 
-        for (final Map.Entry<String,List<String>> entry : props.entrySet()) {
+        for ( final Map.Entry<String, List<String>> entry : props.entrySet() )
+        {
             final String attrName = entry.getKey();
             final List<String> values = entry.getValue();
-            for (final String value : values) {
-                sb.append(attrName).append(": ").append(value).append('\n');
+            for ( final String value : values )
+            {
+                sb.append( attrName ).append( ": " ).append( value ).append( '\n' );
             }
         }
 
@@ -215,7 +232,7 @@ public class ChaiUtility {
     /**
      * Test the replication of an attribute.  It is left to the implementation to determine the means and criteria for
      * this operation.  Typically this method would be used just after a write operation in some type of time delayed loop.
-     *
+     * <p>
      * Typical implementations will do the following:
      * <ul>
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#readStringAttribute(String)} to read a value</li>
@@ -223,14 +240,14 @@ public class ChaiUtility {
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#compareStringAttribute(String, String)} to to each server directly</li>
      * <li>return true if each server contacted has the same value, false if not</li>
      * </ul>
-     *
+     * <p>
      * Target servers that are unreachable or return errors are ignored, and do not influence the results. It is entirely
      * possible that no matter how many times this method is called, false will always be returned, so the caller should
      * take care not to repeat a test indefinitly.
-     *
+     * <p>
      * This operation is potentially expensive, as it may establish new LDAP level connections to each target server each
      * time it is invoked.
-     *
+     * <p>
      * The following sample shows how this method might be used.  There are a few important attributes of the sample:
      * <ul>
      * <li>Multiple ldap servers are specified</li>
@@ -240,12 +257,12 @@ public class ChaiUtility {
      * <hr/><blockquote><pre>
      *   ChaiUser theUser =                                                                     // create a new chai user.
      *      VendorFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
-     *
+     * <p>
      *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
-     *
+     * <p>
      *   final int maximumWaitTime = 120 * 1000;                                                // maximum time to wait for replication
      *   final int pauseTime = 3 * 1000;                                                        // time between iterations
-     *
+     * <p>
      *   final long startTime = System.currentTimeMillis();                                     // timestamp of beginning of wait
      *   boolean replicated = false;
      *   while (System.currentTimeMillis() - startTime < maximumWaitTime) {                     // loop until
@@ -266,63 +283,78 @@ public class ChaiUtility {
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @throws IllegalStateException    If the underlying connection is not in an available state
      */
-    public static boolean testAttributeReplication(final ChaiEntry chaiEntry, final String attribute, final String value)
+    public static boolean testAttributeReplication( final ChaiEntry chaiEntry, final String attribute, final String value )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final String effectiveValue = (value == null || value.length() < 1)
-            ? chaiEntry.readStringAttribute(attribute)
-            : value;
+        final String effectiveValue = ( value == null || value.length() < 1 )
+                ? chaiEntry.readStringAttribute( attribute )
+                : value;
 
 
-        if (effectiveValue == null) {
-            throw ChaiOperationException.forErrorMessage("unreadable to read test attribute from primary ChaiProvider");
+        if ( effectiveValue == null )
+        {
+            throw ChaiOperationException.forErrorMessage( "unreadable to read test attribute from primary ChaiProvider" );
         }
 
         final ChaiConfiguration chaiConfiguration = chaiEntry.getChaiProvider().getChaiConfiguration();
 
         final List<String> ldapURLs = chaiConfiguration.bindURLsAsList();
 
-        LOGGER.trace("testAttributeReplication, will test the following ldap urls: " + ldapURLs);
+        LOGGER.trace( "testAttributeReplication, will test the following ldap urls: " + ldapURLs );
 
         int testCount = 0;
         int successCount = 0;
 
         final Collection<ChaiConfiguration> perReplicaProviders = splitConfigurationPerReplica(
                 chaiEntry.getChaiProvider().getChaiConfiguration(),
-                Collections.singletonMap(ChaiSetting.FAILOVER_CONNECT_RETRIES, "1")
+                Collections.singletonMap( ChaiSetting.FAILOVER_CONNECT_RETRIES, "1" )
         );
 
-        for (final ChaiConfiguration loopConfiguration : perReplicaProviders) {
+        for ( final ChaiConfiguration loopConfiguration : perReplicaProviders )
+        {
             ChaiProvider loopProvider = null;
-            try {
-                loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider(loopConfiguration);
-                if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, effectiveValue)) {
+            try
+            {
+                loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider( loopConfiguration );
+                if ( loopProvider.compareStringAttribute( chaiEntry.getEntryDN(), attribute, effectiveValue ) )
+                {
                     successCount++;
                 }
 
                 testCount++;
-            } catch (ChaiUnavailableException e) {
+            }
+            catch ( ChaiUnavailableException e )
+            {
                 //disregard
-            } catch (ChaiOperationException e) {
+            }
+            catch ( ChaiOperationException e )
+            {
                 //disregard
-            } finally {
-                try {
-                    if (loopProvider != null) {
+            }
+            finally
+            {
+                try
+                {
+                    if ( loopProvider != null )
+                    {
                         loopProvider.close();
                     }
-                } catch (Exception e) {
+                }
+                catch ( Exception e )
+                {
                     //already closed, whatever.
                 }
             }
         }
 
-        if (LOGGER.isDebugEnabled()) {
+        if ( LOGGER.isDebugEnabled() )
+        {
             final StringBuilder debugMsg = new StringBuilder();
-            debugMsg.append("testAttributeReplication for ").append(chaiEntry).append(":").append(attribute);
-            debugMsg.append(" ").append(testCount).append(" up,");
-            debugMsg.append(" ").append(ldapURLs.size() - testCount).append(" down,");
-            debugMsg.append(" ").append(successCount).append(" in sync");
-            LOGGER.debug(debugMsg);
+            debugMsg.append( "testAttributeReplication for " ).append( chaiEntry ).append( ":" ).append( attribute );
+            debugMsg.append( " " ).append( testCount ).append( " up," );
+            debugMsg.append( " " ).append( ldapURLs.size() - testCount ).append( " down," );
+            debugMsg.append( " " ).append( successCount ).append( " in sync" );
+            LOGGER.debug( debugMsg );
         }
 
         return testCount > 0 && testCount == successCount;
@@ -330,22 +362,26 @@ public class ChaiUtility {
 
     public static Collection<ChaiConfiguration> splitConfigurationPerReplica(
             final ChaiConfiguration chaiConfiguration,
-            final Map<ChaiSetting,String> additionalSettings
-    ) {
-        final Collection<ChaiConfiguration> returnProviders = new ArrayList<ChaiConfiguration>();
+            final Map<ChaiSetting, String> additionalSettings
+    )
+    {
+        final Collection<ChaiConfiguration> returnProviders = new ArrayList<>();
 
         final List<String> ldapURLs = chaiConfiguration.bindURLsAsList();
 
-        for (final String loopURL : ldapURLs) {
-            final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfiguration);
-            loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
-            if (additionalSettings != null) {
-                for (final Map.Entry<ChaiSetting,String> entry : additionalSettings.entrySet()) {
+        for ( final String loopURL : ldapURLs )
+        {
+            final ChaiConfiguration loopConfig = new ChaiConfiguration( chaiConfiguration );
+            loopConfig.setSetting( ChaiSetting.BIND_URLS, loopURL );
+            if ( additionalSettings != null )
+            {
+                for ( final Map.Entry<ChaiSetting, String> entry : additionalSettings.entrySet() )
+                {
                     final String value = entry.getValue();
-                    loopConfig.setSetting(entry.getKey(), value);
+                    loopConfig.setSetting( entry.getKey(), value );
                 }
             }
-            returnProviders.add(loopConfig);
+            returnProviders.add( loopConfig );
         }
 
         return returnProviders;
@@ -356,28 +392,34 @@ public class ChaiUtility {
     {
     }
 
-    public static String passwordPolicyToString(final ChaiPasswordPolicy policy) {
-        if (policy == null) {
-            throw new NullPointerException("null ChaiPasswordPolicy can not be converted to string");
+    public static String passwordPolicyToString( final ChaiPasswordPolicy policy )
+    {
+        if ( policy == null )
+        {
+            throw new NullPointerException( "null ChaiPasswordPolicy can not be converted to string" );
         }
 
         final StringBuilder sb = new StringBuilder();
 
-        sb.append("ChaiPasswordPolicy: ");
+        sb.append( "ChaiPasswordPolicy: " );
 
-        if (!policy.getKeys().isEmpty()) {
-            sb.append("{");
-            for (final String key : policy.getKeys()) {
-                final ChaiPasswordRule rule = ChaiPasswordRule.forKey(key);
-                sb.append(rule == null ? key : rule);
-                sb.append("=");
-                sb.append(policy.getValue(key));
-                sb.append(", ");
+        if ( !policy.getKeys().isEmpty() )
+        {
+            sb.append( "{" );
+            for ( final String key : policy.getKeys() )
+            {
+                final ChaiPasswordRule rule = ChaiPasswordRule.forKey( key );
+                sb.append( rule == null ? key : rule );
+                sb.append( "=" );
+                sb.append( policy.getValue( key ) );
+                sb.append( ", " );
             }
-            sb.delete(sb.length() - 2,sb.length());
-            sb.append("}");
-        } else {
-            sb.append("[empty]");
+            sb.delete( sb.length() - 2, sb.length() );
+            sb.append( "}" );
+        }
+        else
+        {
+            sb.append( "[empty]" );
         }
 
         return sb.toString();
@@ -385,12 +427,13 @@ public class ChaiUtility {
 
     /**
      * Determines the vendor of a the ldap directory by reading RootDSE attributes
-     * @param rootDSE A valid entry  
+     *
+     * @param rootDSE A valid entry
      * @return the proper directory vendor, or {@link com.novell.ldapchai.provider.ChaiProvider.DIRECTORY_VENDOR#GENERIC} if the vendor can not be determined.
      * @throws ChaiUnavailableException If the directory is unreachable
-     * @throws ChaiOperationException If there is an error reading values from the Root DSE entry
+     * @throws ChaiOperationException   If there is an error reading values from the Root DSE entry
      */
-    public static ChaiProvider.DIRECTORY_VENDOR determineDirectoryVendor(final ChaiEntry rootDSE)
+    public static ChaiProvider.DIRECTORY_VENDOR determineDirectoryVendor( final ChaiEntry rootDSE )
             throws ChaiUnavailableException, ChaiOperationException
     {
         final String[] interestingAttributes = {
@@ -401,63 +444,90 @@ public class ChaiUtility {
         };
 
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setAttributes(interestingAttributes);
-        searchHelper.setFilter("(objectClass=*)");
-        searchHelper.setMaxResults(1);
-        searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
+        searchHelper.setAttributes( interestingAttributes );
+        searchHelper.setFilter( "(objectClass=*)" );
+        searchHelper.setMaxResults( 1 );
+        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
 
-        final Map<String,Map<String,List<String>>> results = rootDSE.getChaiProvider().searchMultiValues("",searchHelper);
+        final Map<String, Map<String, List<String>>> results = rootDSE.getChaiProvider().searchMultiValues( "", searchHelper );
 
-        if (results != null && results.size() == 1) {
-            final Map<String,List<String>> rootDseSearchResults = results.get("");
-            if (rootDseSearchResults != null) {
-                final List<String> vendorVersions = rootDseSearchResults.get("vendorVersion") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("vendorVersion");
-                final List<String> vendorNames = rootDseSearchResults.get("vendorName") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("vendorName");
-                final List<String> rootDomainNamingContexts = rootDseSearchResults.get("rootDomainNamingContext") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("rootDomainNamingContext");
-                final List<String> objectClasses = rootDseSearchResults.get("objectClass") == null ? Collections.<String>emptyList() : rootDseSearchResults.get("objectClass");
+        if ( results != null && results.size() == 1 )
+        {
+            final Map<String, List<String>> rootDseSearchResults = results.get( "" );
+            if ( rootDseSearchResults != null )
+            {
+                final List<String> vendorVersions = rootDseSearchResults.get( "vendorVersion" ) == null
+                        ? Collections.emptyList()
+                        : rootDseSearchResults.get( "vendorVersion" );
+                final List<String> vendorNames = rootDseSearchResults.get( "vendorName" ) == null
+                        ? Collections.emptyList()
+                        : rootDseSearchResults.get( "vendorName" );
+                final List<String> rootDomainNamingContexts = rootDseSearchResults.get( "rootDomainNamingContext" ) == null
+                        ? Collections.emptyList()
+                        : rootDseSearchResults.get( "rootDomainNamingContext" );
+                final List<String> objectClasses = rootDseSearchResults.get( "objectClass" ) == null
+                        ? Collections.emptyList()
+                        : rootDseSearchResults.get( "objectClass" );
 
-                { // try to detect Novell eDirectory
-                    for (final String vendorVersionValue : vendorVersions) {
-                        if (vendorVersionValue.contains("eDirectory")) {
+                {
+                    // try to detect Novell eDirectory
+                    for ( final String vendorVersionValue : vendorVersions )
+                    {
+                        if ( vendorVersionValue.contains( "eDirectory" ) )
+                        {
                             return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
                         }
                     }
                 }
 
-                { // try to detect ms-active directory
-                    for (final String rootDomainNamingContextValue : rootDomainNamingContexts) {
-                        if (rootDomainNamingContextValue.contains("DC=")) {
+                {
+                    // try to detect ms-active directory
+                    for ( final String rootDomainNamingContextValue : rootDomainNamingContexts )
+                    {
+                        if ( rootDomainNamingContextValue.contains( "DC=" ) )
+                        {
                             return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
                         }
                     }
                 }
 
 
-                { // try to detect oracle ds
-                    for (final String vendorVersion : vendorVersions) {
-                        if (vendorVersion.contains("Sun-Directory-Server") || vendorVersion.contains("Oracle-Directory-Server")) {
+                {
+                    // try to detect oracle ds
+                    for ( final String vendorVersion : vendorVersions )
+                    {
+                        if ( vendorVersion.contains( "Sun-Directory-Server" ) || vendorVersion.contains( "Oracle-Directory-Server" ) )
+                        {
                             return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
                         }
                     }
                 }
 
 
-                { // try to detect 389 Directory
-                    for (final String vendorNamesValue : vendorNames) {
-                        if (vendorNamesValue.contains("389 Project")) {
+                {
+                    // try to detect 389 Directory
+                    for ( final String vendorNamesValue : vendorNames )
+                    {
+                        if ( vendorNamesValue.contains( "389 Project" ) )
+                        {
                             return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
                         }
                     }
-                    for (final String vendorVersionsValue : vendorVersions) {
-                        if (vendorVersionsValue.contains("389-Directory")) {
+                    for ( final String vendorVersionsValue : vendorVersions )
+                    {
+                        if ( vendorVersionsValue.contains( "389-Directory" ) )
+                        {
                             return ChaiProvider.DIRECTORY_VENDOR.DIRECTORY_SERVER_389;
                         }
                     }
                 }
 
-                { // try to detect openLDAP
-                    for (final String objectClassValue : objectClasses) {
-                        if (objectClassValue.contains("OpenLDAProotDSE")) {
+                {
+                    // try to detect openLDAP
+                    for ( final String objectClassValue : objectClasses )
+                    {
+                        if ( objectClassValue.contains( "OpenLDAProotDSE" ) )
+                        {
                             return ChaiProvider.DIRECTORY_VENDOR.OPEN_LDAP;
                         }
                     }
@@ -468,34 +538,36 @@ public class ChaiUtility {
         return ChaiProvider.DIRECTORY_VENDOR.GENERIC;
     }
 
-    public static ChaiEntry getRootDSE(final ChaiProvider provider)
+    public static ChaiEntry getRootDSE( final ChaiProvider provider )
             throws ChaiUnavailableException
     {
-        final ChaiConfiguration rootDSEChaiConfig = new ChaiConfiguration(provider.getChaiConfiguration());
-        final String ldapUrls = rootDSEChaiConfig.getSetting(ChaiSetting.BIND_URLS);
-        final String[] splitUrls = ldapUrls.split(ChaiConfiguration.LDAP_URL_SEPERATOR_REGEX_PATTERN);
+        final ChaiConfiguration rootDSEChaiConfig = new ChaiConfiguration( provider.getChaiConfiguration() );
+        final String ldapUrls = rootDSEChaiConfig.getSetting( ChaiSetting.BIND_URLS );
+        final String[] splitUrls = ldapUrls.split( ChaiConfiguration.LDAP_URL_SEPARATOR_REGEX_PATTERN );
         final StringBuilder newUrlConfig = new StringBuilder();
 
         boolean currentURLsHavePath = false;
-        for (final String splitUrl : splitUrls) {
-            final URI uri = URI.create(splitUrl);
+        for ( final String splitUrl : splitUrls )
+        {
+            final URI uri = URI.create( splitUrl );
             final String newURI = uri.getScheme() + "://" + uri.getHost() + ":" + uri.getPort();
-            newUrlConfig.append(newURI);
-            if (uri.getPath() != null && uri.getPath().length() > 0) {
+            newUrlConfig.append( newURI );
+            if ( uri.getPath() != null && uri.getPath().length() > 0 )
+            {
                 currentURLsHavePath = true;
             }
 
-            newUrlConfig.append(",");
+            newUrlConfig.append( "," );
         }
 
-        rootDSEChaiConfig.setSetting(ChaiSetting.BIND_URLS,newUrlConfig.toString());
+        rootDSEChaiConfig.setSetting( ChaiSetting.BIND_URLS, newUrlConfig.toString() );
         final ChaiProvider rootDseProvider = currentURLsHavePath
-                ? provider.getProviderFactory().newProvider(rootDSEChaiConfig)
+                ? provider.getProviderFactory().newProvider( rootDSEChaiConfig )
                 : provider;
 
         // can not call the VendorFactory here, because VendorFactory in turn calls this method to get the
         // directory vendor.  Instead, we will go directly to the Generic VendorFactory
         final GenericEntryFactory genericEntryFactory = new GenericEntryFactory();
-        return genericEntryFactory.createChaiEntry("",rootDseProvider);
+        return genericEntryFactory.createChaiEntry( "", rootDseProvider );
     }
 }

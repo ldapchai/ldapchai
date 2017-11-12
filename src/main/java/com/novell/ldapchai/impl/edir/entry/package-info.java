@@ -20,4 +20,5 @@
 /**
  * Helper classes for reading and manipulating Novell eDirectory specific entries.
  */
+
 package com.novell.ldapchai.impl.edir.entry;

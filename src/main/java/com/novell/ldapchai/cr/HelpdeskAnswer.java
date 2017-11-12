@@ -19,6 +19,7 @@
 
 package com.novell.ldapchai.cr;
 
-public interface HelpdeskAnswer extends Answer {
+public interface HelpdeskAnswer extends Answer
+{
     String answerText();
 }

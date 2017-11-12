@@ -26,21 +26,22 @@ import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 
-class Uint32Charset extends Charset {
+class Uint32Charset extends Charset
+{
 
     Uint32Charset()
     {
-        super("unit32", null);
+        super( "unit32", null );
     }
 
-    public boolean contains(final Charset cs)
+    public boolean contains( final Charset cs )
     {
         return cs.getClass() == this.getClass();
     }
 
     public CharsetDecoder newDecoder()
     {
-        return new Uint32CharsetDecoder(this);
+        return new Uint32CharsetDecoder( this );
     }
 
     public CharsetEncoder newEncoder()
@@ -48,18 +49,21 @@ class Uint32Charset extends Charset {
         throw new UnsupportedOperationException();
     }
 
-    static class Uint32CharsetDecoder extends CharsetDecoder {
-        Uint32CharsetDecoder(final Charset cs)
+    static class Uint32CharsetDecoder extends CharsetDecoder
+    {
+        Uint32CharsetDecoder( final Charset cs )
         {
-            super(cs, 0.5f, 1);
+            super( cs, 0.5f, 1 );
         }
 
-        protected CoderResult decodeLoop(final ByteBuffer in, final CharBuffer out)
+        protected CoderResult decodeLoop( final ByteBuffer in, final CharBuffer out )
         {
-            for (int i = 0; in.hasRemaining(); i++) {
+            for ( int i = 0; in.hasRemaining(); i++ )
+            {
                 final byte b = in.get();
-                if (i % 2 == 0) {
-                    out.append((char) b);
+                if ( i % 2 == 0 )
+                {
+                    out.append( ( char ) b );
                 }
             }
             return null;

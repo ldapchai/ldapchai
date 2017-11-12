@@ -7,14 +7,17 @@ import org.jdom2.Element;
 
 import java.security.SecureRandom;
 
-class PasswordCryptAnswer implements Answer {
+class PasswordCryptAnswer implements Answer
+{
     private final String answerHash;
     private final boolean caseInsensitive;
     private final FormatType formatType;
 
-    private PasswordCryptAnswer(final String answerHash, final boolean caseInsensitive, final FormatType formatType) {
-        if (answerHash == null || answerHash.length() < 1) {
-            throw new IllegalArgumentException("missing answer text");
+    private PasswordCryptAnswer( final String answerHash, final boolean caseInsensitive, final FormatType formatType )
+    {
+        if ( answerHash == null || answerHash.length() < 1 )
+        {
+            throw new IllegalArgumentException( "missing answer text" );
         }
 
         this.answerHash = answerHash;
@@ -22,84 +25,99 @@ class PasswordCryptAnswer implements Answer {
         this.formatType = formatType;
     }
 
-    private PasswordCryptAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
-        if (answer == null || answer.length() < 1) {
-            throw new IllegalArgumentException("missing answerHash text");
+    private PasswordCryptAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+    {
+        if ( answer == null || answer.length() < 1 )
+        {
+            throw new IllegalArgumentException( "missing answerHash text" );
         }
 
         this.caseInsensitive = answerConfiguration.isCaseInsensitive();
         this.formatType = answerConfiguration.formatType;
         final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
-        switch (formatType) {
+        switch ( formatType )
+        {
             case BCRYPT:
                 final int bcryptRounds = 10;
                 final byte[] salt = new byte[16];
-                (new SecureRandom()).nextBytes(salt);
-                answerHash = OpenBSDBCrypt.generate(casedAnswer.toCharArray(), salt, bcryptRounds);
+                ( new SecureRandom() ).nextBytes( salt );
+                answerHash = OpenBSDBCrypt.generate( casedAnswer.toCharArray(), salt, bcryptRounds );
                 break;
 
             case SCRYPT:
-                answerHash = SCryptUtil.scrypt(casedAnswer);
+                answerHash = SCryptUtil.scrypt( casedAnswer );
                 break;
 
             default:
-                throw new IllegalArgumentException("can't test answer for unknown format " + formatType.toString());
+                throw new IllegalArgumentException( "can't test answer for unknown format " + formatType.toString() );
         }
     }
 
-    public Element toXml() {
-        final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
-        answerElement.setText(answerHash);
-        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString());
+    public Element toXml()
+    {
+        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        answerElement.setText( answerHash );
+        answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString() );
         return answerElement;
     }
 
-    public boolean testAnswer(final String testResponse) {
-        if (testResponse == null) {
+    public boolean testAnswer( final String testResponse )
+    {
+        if ( testResponse == null )
+        {
             return false;
         }
 
         final String casedAnswer = caseInsensitive ? testResponse.toLowerCase() : testResponse;
-        switch (formatType) {
+        switch ( formatType )
+        {
             case BCRYPT:
-                return OpenBSDBCrypt.checkPassword(answerHash, casedAnswer.toCharArray());
+                return OpenBSDBCrypt.checkPassword( answerHash, casedAnswer.toCharArray() );
 
             case SCRYPT:
-                return SCryptUtil.check(casedAnswer, answerHash);
+                return SCryptUtil.check( casedAnswer, answerHash );
 
             default:
-                throw new IllegalArgumentException("can't test answer for unknown format " + formatType.toString());
+                throw new IllegalArgumentException( "can't test answer for unknown format " + formatType.toString() );
         }
     }
 
-    public AnswerBean asAnswerBean() {
+    public AnswerBean asAnswerBean()
+    {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(formatType);
-        answerBean.setAnswerHash(answerHash);
-        answerBean.setCaseInsensitive(caseInsensitive);
-        answerBean.setHashCount(-1);
+        answerBean.setType( formatType );
+        answerBean.setAnswerHash( answerHash );
+        answerBean.setCaseInsensitive( caseInsensitive );
+        answerBean.setHashCount( -1 );
         return answerBean;
     }
 
-    static class PasswordCryptAnswerFactory implements ImplementationFactory {
-        public PasswordCryptAnswer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
-            return new PasswordCryptAnswer(answerConfiguration, answer);
+    static class PasswordCryptAnswerFactory implements ImplementationFactory
+    {
+        public PasswordCryptAnswer newAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+        {
+            return new PasswordCryptAnswer( answerConfiguration, answer );
         }
 
-        public PasswordCryptAnswer fromAnswerBean(final AnswerBean answerBean, final String challengeText) {
-            return new PasswordCryptAnswer(answerBean.getAnswerHash(), answerBean.isCaseInsensitive(), answerBean.getType());
+        public PasswordCryptAnswer fromAnswerBean( final AnswerBean answerBean, final String challengeText )
+        {
+            return new PasswordCryptAnswer( answerBean.getAnswerHash(), answerBean.isCaseInsensitive(), answerBean.getType() );
         }
 
-        public PasswordCryptAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+        public PasswordCryptAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        {
             final String answerValue = element.getText();
-            final String formatStr = element.getAttributeValue(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT);
+            final String formatStr = element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
             final FormatType formatType;
-            try {
-                formatType = FormatType.valueOf(formatStr);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("unknown content format specified in xml format value: '" + formatStr + "'");
+            try
+            {
+                formatType = FormatType.valueOf( formatStr );
             }
-            return new PasswordCryptAnswer(answerValue, caseInsensitive, formatType);
+            catch ( IllegalArgumentException e )
+            {
+                throw new IllegalArgumentException( "unknown content format specified in xml format value: '" + formatStr + "'" );
+            }
+            return new PasswordCryptAnswer( answerValue, caseInsensitive, formatType );
         }
     }
 }

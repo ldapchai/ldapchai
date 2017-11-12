@@ -27,7 +27,8 @@ import java.io.Serializable;
 /**
  *
  */
-public class ChaiChallenge implements Challenge, Serializable {
+public class ChaiChallenge implements Challenge, Serializable
+{
 
 
     private boolean adminDefined;
@@ -36,7 +37,7 @@ public class ChaiChallenge implements Challenge, Serializable {
 
     private int minLength;
     private int maxLength;
-    
+
     private int maxQuestionCharsInAnswer;
     private boolean enforceWordlist;
 
@@ -66,14 +67,16 @@ public class ChaiChallenge implements Challenge, Serializable {
         return challengeText;
     }
 
-    public void setChallengeText(final String challengeText)
+    public void setChallengeText( final String challengeText )
     {
-        if (isLocked()) {
-            throw new IllegalStateException("challenge is locked, modification not permitted");
+        if ( isLocked() )
+        {
+            throw new IllegalStateException( "challenge is locked, modification not permitted" );
         }
 
-        if (isAdminDefined()) {
-            throw new IllegalArgumentException("challenge is admin defined, challengeText not modifiyable");
+        if ( isAdminDefined() )
+        {
+            throw new IllegalArgumentException( "challenge is admin defined, challengeText not modifiyable" );
         }
 
         this.challengeText = challengeText;
@@ -104,57 +107,67 @@ public class ChaiChallenge implements Challenge, Serializable {
         return required;
     }
 
-    public int getMaxQuestionCharsInAnswer() {
+    public int getMaxQuestionCharsInAnswer()
+    {
         return maxQuestionCharsInAnswer;
     }
 
-    public boolean isEnforceWordlist() {
+    public boolean isEnforceWordlist()
+    {
         return enforceWordlist;
     }
 
     /**
      * Tests for equality of Challenges.  Challenges are equal when the following elements of a challenge are equal:
      * <ul>
-     *   <li>admin defined</li>
-     *   <li>maximum length</li>
-     *   <li>minimum length</li>
-     *   <li>required</li>
-     *   <li>challenge text if admin defined is true</li>
+     * <li>admin defined</li>
+     * <li>maximum length</li>
+     * <li>minimum length</li>
+     * <li>required</li>
+     * <li>challenge text if admin defined is true</li>
      * </ul>
      * Specifically, the response text is not used to test equality.
      *
      * @param o another {@link com.novell.ldapchai.cr.Challenge} object
      * @return true if the objects are the same.
      */
-    public boolean equals(final Object o)
+    public boolean equals( final Object o )
     {
-        if (this == o) {
+        if ( this == o )
+        {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ( o == null || getClass() != o.getClass() )
+        {
             return false;
         }
 
-        final ChaiChallenge challenge = (ChaiChallenge) o;
+        final ChaiChallenge challenge = ( ChaiChallenge ) o;
 
-        if (adminDefined != challenge.adminDefined) {
+        if ( adminDefined != challenge.adminDefined )
+        {
             return false;
         }
 
-        if (maxLength != challenge.maxLength) {
+        if ( maxLength != challenge.maxLength )
+        {
             return false;
         }
 
-        if (minLength != challenge.minLength) {
+        if ( minLength != challenge.minLength )
+        {
             return false;
         }
 
-        if (required != challenge.required) {
+        if ( required != challenge.required )
+        {
             return false;
         }
 
-        if (adminDefined) {
-            if (challengeText != null ? !challengeText.equals(challenge.challengeText) : challenge.challengeText != null) {
+        if ( adminDefined )
+        {
+            if ( challengeText != null ? !challengeText.equals( challenge.challengeText ) : challenge.challengeText != null )
+            {
                 return false;
             }
         }
@@ -164,13 +177,12 @@ public class ChaiChallenge implements Challenge, Serializable {
     }
 
 
-
     public int hashCode()
     {
         int result;
-        result = (adminDefined ? 1 : 0);
-        result = 31 * result + (required ? 1 : 0);
-        result = 31 * result + (challengeText != null ? challengeText.hashCode() : 0);
+        result = ( adminDefined ? 1 : 0 );
+        result = 31 * result + ( required ? 1 : 0 );
+        result = 31 * result + ( challengeText != null ? challengeText.hashCode() : 0 );
         result = 31 * result + minLength;
         result = 31 * result + maxLength;
         return result;
@@ -178,7 +190,7 @@ public class ChaiChallenge implements Challenge, Serializable {
 
     public String toString()
     {
-        return "Challenge: " + new Gson().toJson(asChallengeBean());
+        return "Challenge: " + new Gson().toJson( asChallengeBean() );
     }
 
     public void lock()
@@ -186,19 +198,21 @@ public class ChaiChallenge implements Challenge, Serializable {
         locked = true;
     }
 
-    public ChallengeBean asChallengeBean() {
+    public ChallengeBean asChallengeBean()
+    {
         final ChallengeBean challengeBean = new ChallengeBean();
-        challengeBean.setAdminDefined(adminDefined);
-        challengeBean.setRequired(required);
-        challengeBean.setChallengeText(challengeText);
-        challengeBean.setMaxLength(maxLength);
-        challengeBean.setMinLength(minLength);
-        challengeBean.setMaxQuestionCharsInAnswer(maxQuestionCharsInAnswer);
-        challengeBean.setEnforceWordlist(enforceWordlist);
+        challengeBean.setAdminDefined( adminDefined );
+        challengeBean.setRequired( required );
+        challengeBean.setChallengeText( challengeText );
+        challengeBean.setMaxLength( maxLength );
+        challengeBean.setMinLength( minLength );
+        challengeBean.setMaxQuestionCharsInAnswer( maxQuestionCharsInAnswer );
+        challengeBean.setEnforceWordlist( enforceWordlist );
         return challengeBean;
     }
 
-    public static Challenge fromChallengeBean(final ChallengeBean challengeBean) {
+    public static Challenge fromChallengeBean( final ChallengeBean challengeBean )
+    {
         return new ChaiChallenge(
                 challengeBean.isRequired(),
                 challengeBean.getChallengeText(),
@@ -207,7 +221,7 @@ public class ChaiChallenge implements Challenge, Serializable {
                 challengeBean.isAdminDefined(),
                 challengeBean.getMaxQuestionCharsInAnswer(),
                 challengeBean.isEnforceWordlist()
-                
+
         );
     }
 }

@@ -28,56 +28,72 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Date;
 
-class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
-    DirectoryServer389User(final String userDN, final ChaiProvider chaiProvider) {
-        super(userDN, chaiProvider);
+class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
+{
+    DirectoryServer389User( final String userDN, final ChaiProvider chaiProvider )
+    {
+        super( userDN, chaiProvider );
     }
 
     @Override
-    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+    public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            writeStringAttribute( ATTR_PASSWORD, newPassword );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
         }
     }
 
     @Override
-    public void changePassword(final String oldPassword, final String newPassword) throws
+    public void changePassword( final String oldPassword, final String newPassword )
+            throws
             ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            writeStringAttribute( ATTR_PASSWORD, newPassword );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
         }
     }
 
     @Override
-    public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
-        return readDateAttribute(ATTR_PASSWORD_EXPIRE_TIME);
+    public Date readPasswordExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return readDateAttribute( ATTR_PASSWORD_EXPIRE_TIME );
     }
 
     @Override
-    public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
+    public boolean isPasswordExpired()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         final Date expireDate = readPasswordExpirationDate();
 
-        return expireDate == null ? false : expireDate.before(new Date());
+        return expireDate == null ? false : expireDate.before( new Date() );
 
     }
 
     @Override
-    public void unlockPassword() throws ChaiOperationException, ChaiUnavailableException {
-        this.writeStringAttribute("passwordRetryCount", "0");
-        
+    public void unlockPassword()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        this.writeStringAttribute( "passwordRetryCount", "0" );
+
         // Only attempt to remove the attribute if it already
         // exists to avoid exceptions trying to remove a
         // non-existent attribute
-        final Date unlockDate = readDateAttribute("accountUnlockTime");
-        if (unlockDate != null) {
-           this.deleteAttribute("accountUnlockTime", null);
+        final Date unlockDate = readDateAttribute( "accountUnlockTime" );
+        if ( unlockDate != null )
+        {
+            this.deleteAttribute( "accountUnlockTime", null );
         }
     }
 
@@ -85,17 +101,18 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser {
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Date unlockDate = readDateAttribute("accountUnlockTime");
-        if (unlockDate == null) {
+        final Date unlockDate = readDateAttribute( "accountUnlockTime" );
+        if ( unlockDate == null )
+        {
             return false;
         }
 
-        return unlockDate.after(new Date());
+        return unlockDate.after( new Date() );
     }
 
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ATTR_PASSWORD_EXPIRE_TIME, "19800101010101Z");
+        this.writeStringAttribute( ATTR_PASSWORD_EXPIRE_TIME, "19800101010101Z" );
     }
 }

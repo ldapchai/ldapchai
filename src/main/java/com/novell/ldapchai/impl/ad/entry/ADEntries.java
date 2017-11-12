@@ -29,18 +29,21 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-public class ADEntries {
+public class ADEntries
+{
 
     static final long AD_EPOCH_OFFSET_MS;
 
-    static {
-        final Calendar msEpochCalender = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+    static
+    {
+        final Calendar msEpochCalender = new GregorianCalendar( TimeZone.getTimeZone( "UTC" ) );
         msEpochCalender.clear();
-        msEpochCalender.set(1601, 0, 1, 0, 0);
+        msEpochCalender.set( 1601, 0, 1, 0, 0 );
         AD_EPOCH_OFFSET_MS = msEpochCalender.getTime().getTime();
     }
 
-    private ADEntries() {
+    private ADEntries()
+    {
     }
 
     /**
@@ -50,54 +53,65 @@ public class ADEntries {
      * @param date The Date to be converted
      * @return A string formated such as "199412161032Z".
      */
-    public static String convertDateToWinEpoch(final Date date)
+    public static String convertDateToWinEpoch( final Date date )
     {
-        if (date == null) {
-            throw new NullPointerException("date must be non-null");
+        if ( date == null )
+        {
+            throw new NullPointerException( "date must be non-null" );
         }
 
         final long inputAsMs = date.getTime();
         final long inputAsADMs = inputAsMs - AD_EPOCH_OFFSET_MS;
         final long inputAsADNs = inputAsADMs * 10000;
 
-        return String.valueOf(inputAsADNs);
+        return String.valueOf( inputAsADNs );
     }
 
-    public static Date convertWinEpochToDate(final String dateString)
+    public static Date convertWinEpochToDate( final String dateString )
     {
-        if (dateString == null) {
+        if ( dateString == null )
+        {
             return null;
         }
 
-        final long timestampAsNs = Long.parseLong(dateString);
-        if (timestampAsNs <= 0) {
+        final long timestampAsNs = Long.parseLong( dateString );
+        if ( timestampAsNs <= 0 )
+        {
             return null;
         }
 
         final long timestampAsMs = timestampAsNs / 10000;
         final long timestampAsJavaMs = timestampAsMs + AD_EPOCH_OFFSET_MS;
 
-        if (timestampAsJavaMs >= 910692730085477L) {  //magic future date timestamp that also means no date. (long)
+        //magic future date timestamp that also means no date. (long)
+        if ( timestampAsJavaMs >= 910692730085477L )
+        {
             return null;
         }
 
-        return new Date(timestampAsJavaMs);
+        return new Date( timestampAsJavaMs );
     }
 
-    static Date readDateAttribute(final ChaiEntry chaiEntry, final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
-        final String attrValue = chaiEntry.readStringAttribute(attributeName);
-        return attrValue == null ? null : ADEntries.convertWinEpochToDate(attrValue);
+    static Date readDateAttribute( final ChaiEntry chaiEntry, final String attributeName )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        final String attrValue = chaiEntry.readStringAttribute( attributeName );
+        return attrValue == null ? null : ADEntries.convertWinEpochToDate( attrValue );
     }
 
-    static void writeDateAttribute(final ChaiEntry chaiEntry, final String attributeName, final Date date) throws ChaiUnavailableException, ChaiOperationException {
-        final String attrValue = convertDateToWinEpoch(date);
-        chaiEntry.writeStringAttribute(attributeName, attrValue);
+    static void writeDateAttribute( final ChaiEntry chaiEntry, final String attributeName, final Date date )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        final String attrValue = convertDateToWinEpoch( date );
+        chaiEntry.writeStringAttribute( attributeName, attrValue );
     }
 
 
-    static String readGUID(final ChaiEntry entry) throws ChaiOperationException, ChaiUnavailableException {
-        final byte[] st = entry.getChaiProvider().readMultiByteAttribute(entry.getEntryDN(),"objectGUID")[0];
-        final BigInteger bigInt = new BigInteger(1,st);
-        return bigInt.toString(16);
-   }
+    static String readGUID( final ChaiEntry entry )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final byte[] st = entry.getChaiProvider().readMultiByteAttribute( entry.getEntryDN(), "objectGUID" )[0];
+        final BigInteger bigInt = new BigInteger( 1, st );
+        return bigInt.toString( 16 );
+    }
 }

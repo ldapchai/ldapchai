@@ -22,4 +22,5 @@
  *
  * @author Jason D. Rivard
  */
+
 package com.novell.ldapchai.exception;

@@ -29,7 +29,8 @@ import java.util.Locale;
  *
  * @author Jason D. Rivard
  */
-public interface ChallengeSet extends Serializable {
+public interface ChallengeSet extends Serializable
+{
 
     /**
      * Helper method to return a filtered list of admin defined challenges.
@@ -89,7 +90,7 @@ public interface ChallengeSet extends Serializable {
 
     /**
      * Computes the minimum number of responses that would satisfy this policy.
-     *
+     * <p>
      * Generally, this would be {@link #getMinRandomRequired()} + {@link #getRequiredChallenges()}{@code .size()};
      *
      * @return minimum number of responses that would satisfy this policy.
@@ -112,6 +113,7 @@ public interface ChallengeSet extends Serializable {
     /**
      * Get the identifier for this challenge set.  The value or existance of the identifier is defined by the
      * immplenetation
+     *
      * @return the value of the implementor
      */
     String getIdentifier();

@@ -24,17 +24,18 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-abstract class TopImpl extends AbstractChaiEntry implements Top {
-    
-    protected TopImpl(final String entryDN, final ChaiProvider chaiProvider)
+abstract class TopImpl extends AbstractChaiEntry implements Top
+{
+
+    protected TopImpl( final String entryDN, final ChaiProvider chaiProvider )
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
     }
 
     @Override
     public String readGUID()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return EdirEntries.readGuid(this);
+        return EdirEntries.readGuid( this );
     }
 }

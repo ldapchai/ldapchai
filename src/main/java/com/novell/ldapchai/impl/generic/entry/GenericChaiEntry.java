@@ -23,8 +23,10 @@ import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-class GenericChaiEntry extends AbstractChaiEntry implements ChaiEntry {
-    GenericChaiEntry(final String entryDN, final ChaiProvider chaiProvider) {
-        super(entryDN, chaiProvider);
+class GenericChaiEntry extends AbstractChaiEntry implements ChaiEntry
+{
+    GenericChaiEntry( final String entryDN, final ChaiProvider chaiProvider )
+    {
+        super( entryDN, chaiProvider );
     }
 }

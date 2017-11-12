@@ -72,21 +72,22 @@ import java.util.Set;
 /**
  * Default {@code ChaiProvider} implementation; wraps the standard JNDI ldap API.  Runs in a standard Java SE 1.5 (or greater) environment.  Supports
  * fail-over to multiple servers.  It does not however, support load balancing.
- *
+ * <p>
  * This implementation will use the list of servers in the {@code ChaiConfiguration} in order, meaning that
  * all requests will go the the first server in the configured list as long as it is available.  If that server fails it
  * will go to the next in the list until it finds an available server.  Afterwords it will periodicaly retry the servers
  * at the top of the list to see if they have returned to life.
- *
+ * <p>
  * Instances can be obtained using {@link com.novell.ldapchai.provider.ChaiProviderFactory}.
- *
+ * <p>
  * During initialization, {@link com.novell.ldapchai.provider.ChaiConfiguration#getImplementationConfiguration()} is called, and if a Hashtable is
  * found, the settings within are applied during the construction of the underlying {@link javax.naming.ldap.LdapContext}
  * instance(s) used by {@code JNDIProviderImpl}.
  *
  * @author Jason D. Rivard
  */
-public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderImplementor {
+public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderImplementor
+{
 
     /**
      * The default initial pool size to create when communicating with an individual server. *
@@ -104,68 +105,79 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     private static final int DEFAULT_MAXIMUM_POOL_SIZE = 50;
 
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(JNDIProviderImpl.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( JNDIProviderImpl.class );
 
     private Boolean cachedPagingEnableSupport = null;
     private LdapContext jndiConnection;
     private SocketFactory socketFactory;
 
-    private static LdapContext generateNewJndiContext(final Hashtable environment)
+    private static LdapContext generateNewJndiContext( final Hashtable environment )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final String url = String.valueOf(environment.get(Context.PROVIDER_URL));
-        final String bindDN = String.valueOf(environment.get(Context.SECURITY_PRINCIPAL));
+        final String url = String.valueOf( environment.get( Context.PROVIDER_URL ) );
+        final String bindDN = String.valueOf( environment.get( Context.SECURITY_PRINCIPAL ) );
 
-        try {
+        try
+        {
             final long startTime = System.currentTimeMillis();
             final LdapContext newDirContext;
-            newDirContext = new InitialLdapContext(environment, null);
-            LOGGER.trace("bind successful as " + bindDN + " (" + (System.currentTimeMillis() - startTime) + "ms)");
+            newDirContext = new InitialLdapContext( environment, null );
+            LOGGER.trace( "bind successful as " + bindDN + " (" + ( System.currentTimeMillis() - startTime ) + "ms)" );
             return newDirContext;
-        } catch (NamingException e) {
+        }
+        catch ( NamingException e )
+        {
             final StringBuilder logMsg = new StringBuilder();
-            logMsg.append("unable to bind to ");
-            logMsg.append(url);
-            logMsg.append(" as ");
-            logMsg.append(bindDN);
-            logMsg.append(" reason: ");
-            if (e instanceof CommunicationException) {
-                logMsg.append("CommunicationException (").append(e.getMessage());
+            logMsg.append( "unable to bind to " );
+            logMsg.append( url );
+            logMsg.append( " as " );
+            logMsg.append( bindDN );
+            logMsg.append( " reason: " );
+            if ( e instanceof CommunicationException )
+            {
+                logMsg.append( "CommunicationException (" ).append( e.getMessage() );
                 final Throwable rootCause = e.getRootCause();
-                if (rootCause != null) {
-                    logMsg.append("; ").append(rootCause.getMessage());
+                if ( rootCause != null )
+                {
+                    logMsg.append( "; " ).append( rootCause.getMessage() );
                 }
-                logMsg.append(")");
-                throw new ChaiUnavailableException(logMsg.toString(), ChaiError.COMMUNICATION, false, true);
-            } else {
-                logMsg.append(e.getMessage());
+                logMsg.append( ")" );
+                throw new ChaiUnavailableException( logMsg.toString(), ChaiError.COMMUNICATION, false, true );
+            }
+            else
+            {
+                logMsg.append( e.getMessage() );
 
                 //check for bad password or intruder detection
-                throw ChaiUnavailableException.forErrorMessage(logMsg.toString());
+                throw ChaiUnavailableException.forErrorMessage( logMsg.toString() );
             }
         }
     }
 
     /**
      * <p>Converts an array of primitive bytes to objects.</p>
-     *
+     * <p>
      * <p>This method returns <code>null</code> for a <code>null</code> input array.</p>
-     *
+     * <p>
      * <p>From Jakarta Commons project</p>
      *
      * @param array a <code>byte</code> array
      * @return a <code>Byte</code> array, <code>null</code> if null array input
      */
-    private static Byte[] toObject(final byte[] array)
+    private static Byte[] toObject( final byte[] array )
     {
-        if (array == null) {
+        if ( array == null )
+        {
             return null;
-        } else if (array.length == 0) {
+        }
+        else if ( array.length == 0 )
+        {
             return new Byte[0];
         }
         final Byte[] result = new Byte[array.length];
         int counter = 0;
-        while (counter < array.length) {
+        while ( counter < array.length )
+        {
             result[counter] = array[counter];
             counter++;
         }
@@ -174,24 +186,28 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     /**
      * <p>Converts an array of object Bytes to primitives.</p>
-     *
+     * <p>
      * <p>This method returns <code>null</code> for a <code>null</code> input array.</p>
-     *
+     * <p>
      * <p>From Jakarta Commons project</p>
      *
      * @param array a <code>Byte</code> array, may be <code>null</code>
      * @return a <code>byte</code> array, <code>null</code> if null array input
      * @throws NullPointerException if array content is <code>null</code>
      */
-    private static byte[] toPrimitive(final Byte[] array)
+    private static byte[] toPrimitive( final Byte[] array )
     {
-        if (array == null) {
+        if ( array == null )
+        {
             return null;
-        } else if (array.length == 0) {
+        }
+        else if ( array.length == 0 )
+        {
             return new byte[0];
         }
         final byte[] result = new byte[array.length];
-        for (int i = 0; i < array.length; i++) {
+        for ( int i = 0; i < array.length; i++ )
+        {
             result[i] = array[i];
         }
         return result;
@@ -205,53 +221,78 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     public void close()
     {
         super.close();
-        if (jndiConnection != null) {
-            try {
+        if ( jndiConnection != null )
+        {
+            try
+            {
                 jndiConnection.close();
-            } catch (Exception e) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.warn("unexpected error during jndi connection close " + e.getMessage(), e);
-                } else {
-                    LOGGER.warn("unexpected error during jndi connection close " + e.getMessage());
+            }
+            catch ( Exception e )
+            {
+                if ( LOGGER.isTraceEnabled() )
+                {
+                    LOGGER.warn( "unexpected error during jndi connection close " + e.getMessage(), e );
                 }
-            } finally {
+                else
+                {
+                    LOGGER.warn( "unexpected error during jndi connection close " + e.getMessage() );
+                }
+            }
+            finally
+            {
                 jndiConnection = null;
             }
         }
     }
 
     @LdapOperation
-    public final boolean compareStringAttribute(final String entryDN, final String attributeName, final String value)
+    public final boolean compareStringAttribute( final String entryDN, final String attributeName, final String value )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().compareStringAttribute(entryDN, attributeName, value);
+        getInputValidator().compareStringAttribute( entryDN, attributeName, value );
 
         final byte[] ba;
-        try {
-            ba = value.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new UnsupportedOperationException(e);
+        try
+        {
+            ba = value.getBytes( "UTF-8" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new UnsupportedOperationException( e );
         }
 
         // Set up the search controls
         final SearchControls ctls = new SearchControls();
-        ctls.setReturningAttributes(new String[0]);       // Return no attrs
-        ctls.setSearchScope(SearchControls.OBJECT_SCOPE); // Search object only
+
+        // Return no attrs
+        ctls.setReturningAttributes( new String[0] );
+
+        // Search object only
+        ctls.setSearchScope( SearchControls.OBJECT_SCOPE );
 
         final LdapContext ldapConnection = getLdapConnection();
         NamingEnumeration<SearchResult> answer = null;
         boolean result = false;
-        try {
-            answer = ldapConnection.search(addJndiEscape(entryDN), "(" + attributeName + "={0})", new Object[]{ba}, ctls);
+        try
+        {
+            answer = ldapConnection.search( addJndiEscape( entryDN ), "(" + attributeName + "={0})", new Object[] {ba}, ctls );
             result = answer.hasMore();
-        } catch (NamingException e) {
-            convertNamingException(e);
-        } finally {
-            if (answer != null) {
-                try {
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
+        }
+        finally
+        {
+            if ( answer != null )
+            {
+                try
+                {
                     answer.close();
-                } catch (Exception e) { /* action not required */ }
+                }
+                catch ( Exception e )
+                { /* action not required */ }
             }
         }
 
@@ -260,106 +301,123 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @LdapOperation
     @ModifyOperation
-    public final void createEntry(final String entryDN, final String baseObjectClass, final Map<String,String> stringAttributes)
+    public final void createEntry( final String entryDN, final String baseObjectClass, final Map<String, String> stringAttributes )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        getInputValidator().createEntry(entryDN, baseObjectClass, stringAttributes);
-        this.createEntry(entryDN, Collections.singleton(baseObjectClass), stringAttributes);
+        getInputValidator().createEntry( entryDN, baseObjectClass, stringAttributes );
+        this.createEntry( entryDN, Collections.singleton( baseObjectClass ), stringAttributes );
     }
 
     @LdapOperation
     @ModifyOperation
-    public final void createEntry(final String entryDN, final Set<String> baseObjectClasses, final Map<String,String> stringAttributes)
+    public final void createEntry( final String entryDN, final Set<String> baseObjectClasses, final Map<String, String> stringAttributes )
             throws ChaiOperationException, ChaiUnavailableException
     {
         activityPreCheck();
-        getInputValidator().createEntry(entryDN, baseObjectClasses, stringAttributes);
+        getInputValidator().createEntry( entryDN, baseObjectClasses, stringAttributes );
 
         final Attributes attrs = new BasicAttributes();
 
         //Put in the base object class an attribute
-        final BasicAttribute objectClassAttr = new BasicAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS);
-        for (final String loopClass : baseObjectClasses) {
-            objectClassAttr.add(loopClass);
+        final BasicAttribute objectClassAttr = new BasicAttribute( ChaiConstant.ATTR_LDAP_OBJECTCLASS );
+        for ( final String loopClass : baseObjectClasses )
+        {
+            objectClassAttr.add( loopClass );
         }
-        attrs.put(objectClassAttr);
+        attrs.put( objectClassAttr );
 
         //Add each of the attributes required.
-        for (final Map.Entry<String,String> entry : stringAttributes.entrySet()) {
-            attrs.put(entry.getKey(), entry.getValue());
+        for ( final Map.Entry<String, String> entry : stringAttributes.entrySet() )
+        {
+            attrs.put( entry.getKey(), entry.getValue() );
         }
 
         // Create the object.
         final DirContext ldapConnection = getLdapConnection();
-        try {
-            ldapConnection.createSubcontext(addJndiEscape(entryDN), attrs);
-        } catch (NamingException e) {
-            convertNamingException(e);
+        try
+        {
+            ldapConnection.createSubcontext( addJndiEscape( entryDN ), attrs );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
         }
     }
 
     @LdapOperation
     @ModifyOperation
-    public final void deleteEntry(final String entryDN)
+    public final void deleteEntry( final String entryDN )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().deleteEntry(entryDN);
+        getInputValidator().deleteEntry( entryDN );
 
         final LdapContext ldapConnection = getLdapConnection();
-        try {
-            ldapConnection.destroySubcontext(addJndiEscape(entryDN));
-        } catch (NamingException e) {
-            convertNamingException(e);
+        try
+        {
+            ldapConnection.destroySubcontext( addJndiEscape( entryDN ) );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
         }
     }
 
     @LdapOperation
     @ModifyOperation
-    public final void deleteStringAttributeValue(final String entryDN, final String attributeName, final String attributeValue)
+    public final void deleteStringAttributeValue( final String entryDN, final String attributeName, final String attributeValue )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().deleteStringAttributeValue(entryDN, attributeName, attributeValue);
+        getInputValidator().deleteStringAttributeValue( entryDN, attributeName, attributeValue );
 
         // Create a BasicAttribute for the object.
-        final BasicAttribute attributeToReplace = new BasicAttribute(attributeName, attributeValue);
+        final BasicAttribute attributeToReplace = new BasicAttribute( attributeName, attributeValue );
 
         // Create the ModificationItem
         final ModificationItem[] modificationItem = new ModificationItem[1];
 
         // Populate the ModificationItem object with the flag & the attribute to replace.
-        modificationItem[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, attributeToReplace);
+        modificationItem[0] = new ModificationItem( DirContext.REMOVE_ATTRIBUTE, attributeToReplace );
 
         // Modify the Attributes.
         final LdapContext ldapConnection = getLdapConnection();
-        try {
-            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
-        } catch (NamingException e) {
-            convertNamingException(e);
+        try
+        {
+            ldapConnection.modifyAttributes( addJndiEscape( entryDN ), modificationItem );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
         }
     }
 
     @LdapOperation
     @ModifyOperation
-    public final ExtendedResponse extendedOperation(final ExtendedRequest request)
+    public final ExtendedResponse extendedOperation( final ExtendedRequest request )
             throws ChaiUnavailableException, ChaiOperationException
 
     {
         activityPreCheck();
 
-        getInputValidator().extendedOperation(request);
+        getInputValidator().extendedOperation( request );
 
-        preCheckExtendedOperation(request);
+        preCheckExtendedOperation( request );
 
         final LdapContext ldapConnection = getLdapConnection();
-        try {
-            return ldapConnection.extendedOperation(request);
-        } catch (NamingException e) {
-            cacheExtendedOperationException(request, e);
-            convertNamingException(e); // guarenteed to throw ChaiException
+        try
+        {
+            return ldapConnection.extendedOperation( request );
         }
-        return null;  // can't actually be reached
+        catch ( NamingException e )
+        {
+            cacheExtendedOperationException( request, e );
+
+            // guaranteedb to throw ChaiException
+            convertNamingException( e );
+        }
+
+        return null;
     }
 
 
@@ -374,11 +432,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     }
 
     @LdapOperation
-    public final byte[][] readMultiByteAttribute(final String entryDN, final String attributeName)
+    public final byte[][] readMultiByteAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().readMultiByteAttribute(entryDN, attributeName);
+        getInputValidator().readMultiByteAttribute( entryDN, attributeName );
 
         final List<Byte[]> returnValues = new ArrayList<>();
         final String jndiBinarySetting = "java.naming.ldap.attributes.binary";
@@ -387,107 +445,133 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         // Get only the Attribute that is passed in.
         final String[] attributesArray = {attributeName};
 
-        try {
-            final LdapContext ldapConnection = (LdapContext)getLdapConnection().lookup("");
+        try
+        {
+            final LdapContext ldapConnection = ( LdapContext ) getLdapConnection().lookup( "" );
 
             // inform jndi the attribute is binary.
-            ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
+            ldapConnection.addToEnvironment( jndiBinarySetting, attributeName );
 
             // Get the Enumeration of attribute values.
-            namingEnum = ldapConnection.getAttributes(addJndiEscape(entryDN), attributesArray).get(attributeName).getAll();
-            while (namingEnum.hasMore()) {
+            namingEnum = ldapConnection.getAttributes( addJndiEscape( entryDN ), attributesArray ).get( attributeName ).getAll();
+            while ( namingEnum.hasMore() )
+            {
                 final Object value = namingEnum.next();
 
-                if (value instanceof byte[]) {
-                    final Byte[] objectValue = toObject((byte[])value);
-                    returnValues.add(objectValue);
+                if ( value instanceof byte[] )
+                {
+                    final Byte[] objectValue = toObject( ( byte[] ) value );
+                    returnValues.add( objectValue );
                 }
             }
 
             // Return the list as a set of primitives.
             final byte[][] returnArray = new byte[returnValues.size()][];
-            for (int i = 0; i < returnValues.size(); i++) {
-                returnArray[i] = toPrimitive(returnValues.get(i));
+            for ( int i = 0; i < returnValues.size(); i++ )
+            {
+                returnArray[i] = toPrimitive( returnValues.get( i ) );
             }
 
             return returnArray;
-        } catch (NullPointerException e) {
+        }
+        catch ( NullPointerException e )
+        {
             return new byte[0][0];
-        } catch (NamingException e) {
-            convertNamingException(e);
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
             return null;
-        } finally {
+        }
+        finally
+        {
             // close the enumeration
-            try {
-                if (namingEnum != null) {
+            try
+            {
+                if ( namingEnum != null )
+                {
                     namingEnum.close();
                 }
-            } catch (NamingException e) {
-                LOGGER.trace("unexpected error closing naming exception: " + e.getMessage());
+            }
+            catch ( NamingException e )
+            {
+                LOGGER.trace( "unexpected error closing naming exception: " + e.getMessage() );
             }
         }
     }
 
     @LdapOperation
-    public final Set<String> readMultiStringAttribute(final String entryDN, final String attributeName)
+    public final Set<String> readMultiStringAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().readMultiStringAttribute(entryDN, attributeName);
+        getInputValidator().readMultiStringAttribute( entryDN, attributeName );
 
         final Set<String> attributeValues = new HashSet<>();
         NamingEnumeration namingEnum = null;
 
-        try {
+        try
+        {
             // Get only the Attribute that is passed in.
             final String[] attributesArray = {attributeName};
 
             // Get the Enumeration of attribute values.
             final LdapContext ldapConnection = getLdapConnection();
 
-            namingEnum = ldapConnection.getAttributes(addJndiEscape(entryDN), attributesArray).get(attributeName).getAll();
-            while (namingEnum.hasMore()) {
-                attributeValues.add(namingEnum.next().toString());
+            namingEnum = ldapConnection.getAttributes( addJndiEscape( entryDN ), attributesArray ).get( attributeName ).getAll();
+            while ( namingEnum.hasMore() )
+            {
+                attributeValues.add( namingEnum.next().toString() );
             }
 
             // Return the list as an array.
             return attributeValues;
-        } catch (NullPointerException e) {
+        }
+        catch ( NullPointerException e )
+        {
             // to be consistent with nps impl.
             return Collections.emptySet();
-        } catch (NamingException e) {
-            convertNamingException(e);
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
             return null;
-        } finally {
-            try {
-                if (namingEnum != null) {
+        }
+        finally
+        {
+            try
+            {
+                if ( namingEnum != null )
+                {
                     namingEnum.close();
                 }
-            } catch (NamingException e) {
-                LOGGER.trace("unexpected error closing naming exception: " + e.getMessage());
+            }
+            catch ( NamingException e )
+            {
+                LOGGER.trace( "unexpected error closing naming exception: " + e.getMessage() );
             }
         }
     }
 
     @LdapOperation
-    public final String readStringAttribute(final String entryDN, final String attributeName)
+    public final String readStringAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().readStringAttribute(entryDN, attributeName);
+        getInputValidator().readStringAttribute( entryDN, attributeName );
 
-        return readStringAttributes(entryDN, Collections.singleton(attributeName)).get(attributeName);
+        return readStringAttributes( entryDN, Collections.singleton( attributeName ) ).get( attributeName );
     }
 
     @LdapOperation
-    public final Map<String,String> readStringAttributes(final String entryDN, final Set<String> attributes)
+    public final Map<String, String> readStringAttributes( final String entryDN, final Set<String> attributes )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().readStringAttributes(entryDN, attributes);
+        getInputValidator().readStringAttributes( entryDN, attributes );
 
         // Allocate a return object
-        final Map<String,String> returnObj = new LinkedHashMap<>();
+        final Map<String, String> returnObj = new LinkedHashMap<>();
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
@@ -497,38 +581,55 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         NamingEnumeration attrEnumeration = null;
 
-        try {
-            if (attributes == null || attributes.isEmpty()) {
-                returnedAttribs = ldapConnection.getAttributes(addJndiEscape(entryDN), null);
+        try
+        {
+            if ( attributes == null || attributes.isEmpty() )
+            {
+                returnedAttribs = ldapConnection.getAttributes( addJndiEscape( entryDN ), null );
                 attrEnumeration = returnedAttribs.getAll();
-                while (attrEnumeration.hasMoreElements()) {
-                    final Attribute attribute = (Attribute) attrEnumeration.nextElement();
+                while ( attrEnumeration.hasMoreElements() )
+                {
+                    final Attribute attribute = ( Attribute ) attrEnumeration.nextElement();
 
                     // Put an entry in the map, if there are no values insert null, otherwise, insert the first value
-                    if (attribute != null) {
-                        returnObj.put(attribute.getID(), attribute.get().toString());
-                    }
-                }
-            } else { // Loop through each requested attribute
-                returnedAttribs = ldapConnection.getAttributes(addJndiEscape(entryDN), attributes.toArray(new String[attributes.size()]));
-                for (final String loopAttr : attributes) {
-                    // Ask JNDI for the attribute (which actually includes all the values)
-                    final Attribute attribute = returnedAttribs.get(loopAttr);
-
-                    // Put an entry in the map, if there are no values insert null, otherwise, insert the first value
-                    if (attribute != null) {
-                        returnObj.put(loopAttr, attribute.get().toString());
+                    if ( attribute != null )
+                    {
+                        returnObj.put( attribute.getID(), attribute.get().toString() );
                     }
                 }
             }
-        } catch (NamingException e) {
-            convertNamingException(e);
+            else
+            {
+                // Loop through each requested attribute
+                returnedAttribs = ldapConnection.getAttributes( addJndiEscape( entryDN ), attributes.toArray( new String[attributes.size()] ) );
+                for ( final String loopAttr : attributes )
+                {
+                    // Ask JNDI for the attribute (which actually includes all the values)
+                    final Attribute attribute = returnedAttribs.get( loopAttr );
+
+                    // Put an entry in the map, if there are no values insert null, otherwise, insert the first value
+                    if ( attribute != null )
+                    {
+                        returnObj.put( loopAttr, attribute.get().toString() );
+                    }
+                }
+            }
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
             return null;
-        } finally {
-            if (attrEnumeration != null) {
-                try {
+        }
+        finally
+        {
+            if ( attrEnumeration != null )
+            {
+                try
+                {
                     attrEnumeration.close();
-                } catch (NamingException e) {
+                }
+                catch ( NamingException e )
+                {
                     // nothing to do
                 }
             }
@@ -538,99 +639,107 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @LdapOperation
     @ModifyOperation
-    public final void replaceStringAttribute(final String entryDN, final String attributeName, final String oldValue, final String newValue)
+    public final void replaceStringAttribute( final String entryDN, final String attributeName, final String oldValue, final String newValue )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().replaceStringAttribute(entryDN, attributeName, oldValue, newValue);
+        getInputValidator().replaceStringAttribute( entryDN, attributeName, oldValue, newValue );
 
         // Create the ModificationItem
         final ModificationItem[] mods = new ModificationItem[2];
 
         // Mark the flag to remover the existing attribute.
-        mods[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE, new BasicAttribute(attributeName, oldValue));
+        mods[0] = new ModificationItem( DirContext.REMOVE_ATTRIBUTE, new BasicAttribute( attributeName, oldValue ) );
 
         // Mark the flag to add the new attribute
-        mods[1] = new ModificationItem(DirContext.ADD_ATTRIBUTE, new BasicAttribute(attributeName, newValue));
+        mods[1] = new ModificationItem( DirContext.ADD_ATTRIBUTE, new BasicAttribute( attributeName, newValue ) );
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
 
         // Modify the Attributes.
-        try {
-            ldapConnection.modifyAttributes(addJndiEscape(entryDN), mods);
-        } catch (NamingException e) {
-            convertNamingException(e);
+        try
+        {
+            ldapConnection.modifyAttributes( addJndiEscape( entryDN ), mods );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
         }
     }
 
     @LdapOperation
-    public final Map<String, Map<String,String>> search(final String baseDN, final SearchHelper searchHelper)
+    public final Map<String, Map<String, String>> search( final String baseDN, final SearchHelper searchHelper )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().search(baseDN, searchHelper);
+        getInputValidator().search( baseDN, searchHelper );
 
         // perform search
-        final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, false);
+        final SearchEngine searchEngine = new SearchEngine( chaiConfig, baseDN, searchHelper, false );
         final Map<String, Map<String, List<String>>> results = searchEngine.getResults();
 
         // convert to <String, Properties> return set.
-        if (results != null) {
-            final Map<String, Map<String, String>> returnMap = new HashMap<>(results.size());
-            for (final Map.Entry<String, Map<String, List<String>>> resultEntry : results.entrySet()) {
+        if ( results != null )
+        {
+            final Map<String, Map<String, String>> returnMap = new HashMap<>( results.size() );
+            for ( final Map.Entry<String, Map<String, List<String>>> resultEntry : results.entrySet() )
+            {
                 final String entryDN = resultEntry.getKey();
                 final Map<String, List<String>> attributeMap = resultEntry.getValue();
                 final Map<String, String> newProps = new LinkedHashMap<>();
-                for (final Map.Entry<String, List<String>> attributeEntry : attributeMap.entrySet()) {
+                for ( final Map.Entry<String, List<String>> attributeEntry : attributeMap.entrySet() )
+                {
                     final String attrName = attributeEntry.getKey();
                     final List<String> values = attributeEntry.getValue();
-                    newProps.put(attrName, values.get(0));
+                    newProps.put( attrName, values.get( 0 ) );
                 }
-                returnMap.put(entryDN, Collections.unmodifiableMap(newProps));
+                returnMap.put( entryDN, Collections.unmodifiableMap( newProps ) );
             }
-            return Collections.unmodifiableMap(returnMap);
-        } else {
+            return Collections.unmodifiableMap( returnMap );
+        }
+        else
+        {
             return Collections.emptyMap();
         }
     }
 
     @LdapOperation
-    public final Map<String, Map<String,String>> search(final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope)
+    public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().search(baseDN, filter, attributes, searchScope);
+        getInputValidator().search( baseDN, filter, attributes, searchScope );
 
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setFilter(filter);
-        searchHelper.setAttributes(attributes);
-        searchHelper.setSearchScope(searchScope);
+        searchHelper.setFilter( filter );
+        searchHelper.setAttributes( attributes );
+        searchHelper.setSearchScope( searchScope );
 
-        return this.search(baseDN, searchHelper);
+        return this.search( baseDN, searchHelper );
     }
 
-    public final Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final SearchHelper searchHelper)
+    public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final SearchHelper searchHelper )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().searchMultiValues(baseDN, searchHelper);
-        final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, true);
+        getInputValidator().searchMultiValues( baseDN, searchHelper );
+        final SearchEngine searchEngine = new SearchEngine( chaiConfig, baseDN, searchHelper, true );
         return searchEngine.getResults();
     }
 
-    public final Map<String, Map<String, List<String>>> searchMultiValues(final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope)
+    public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final String filter, final Set<String> attributes, final SEARCH_SCOPE searchScope )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().searchMultiValues(baseDN, filter, attributes, searchScope);
+        getInputValidator().searchMultiValues( baseDN, filter, attributes, searchScope );
 
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setFilter(filter);
-        searchHelper.setAttributes(attributes);
-        searchHelper.setSearchScope(searchScope);
+        searchHelper.setFilter( filter );
+        searchHelper.setAttributes( attributes );
+        searchHelper.setSearchScope( searchScope );
 
-        final SearchEngine searchEngine = new SearchEngine(chaiConfig, baseDN, searchHelper, true);
+        final SearchEngine searchEngine = new SearchEngine( chaiConfig, baseDN, searchHelper, true );
         return searchEngine.getResults();
     }
 
@@ -644,7 +753,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        writeBinaryAttribute(entryDN, attributeName, values, overwrite, null);
+        writeBinaryAttribute( entryDN, attributeName, values, overwrite, null );
     }
 
     public final void writeBinaryAttribute(
@@ -657,42 +766,52 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().writeBinaryAttribute(entryDN, attributeName, values, overwrite);
+        getInputValidator().writeBinaryAttribute( entryDN, attributeName, values, overwrite );
 
         final String jndiBinarySetting = "java.naming.ldap.attributes.binary";
 
         // Create the ModificationItem
         final ModificationItem[] modificationItem = new ModificationItem[values.length];
-        for (int i = 0; i < values.length; i++) {
+        for ( int i = 0; i < values.length; i++ )
+        {
             // Create a BasicAttribute for the object.
-            final BasicAttribute attributeToReplace = new BasicAttribute(attributeName, values[i]);
+            final BasicAttribute attributeToReplace = new BasicAttribute( attributeName, values[i] );
 
             // Determine the modification type, if replace, only replace on the first attribute, the rest just get added.
-            final int modType = (i == 0 && overwrite) ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
+            final int modType = ( i == 0 && overwrite ) ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
 
             // Populate the ModificationItem object with the flag & the attribute to replace.
-            modificationItem[i] = new ModificationItem(modType, attributeToReplace);
+            modificationItem[i] = new ModificationItem( modType, attributeToReplace );
         }
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
 
         // Modify the Attributes.
-        try {
-            if (controls != null && controls.length > 0) {
-                ldapConnection.setRequestControls(convertControls(controls));
+        try
+        {
+            if ( controls != null && controls.length > 0 )
+            {
+                ldapConnection.setRequestControls( convertControls( controls ) );
             }
 
-            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
+            ldapConnection.modifyAttributes( addJndiEscape( entryDN ), modificationItem );
             // inform jndi the attribute is binary.
-            ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
-        } catch (NamingException e) {
-            convertNamingException(e);
-        } finally {
+            ldapConnection.addToEnvironment( jndiBinarySetting, attributeName );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
+        }
+        finally
+        {
             // clean up jndi environment
-            try {
-                ldapConnection.removeFromEnvironment(jndiBinarySetting);
-            } catch (Exception e) {
+            try
+            {
+                ldapConnection.removeFromEnvironment( jndiBinarySetting );
+            }
+            catch ( Exception e )
+            {
                 //doesnt matter
             }
         }
@@ -709,7 +828,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().replaceBinaryAttribute(entryDN, attributeName, oldValue, newValue);
+        getInputValidator().replaceBinaryAttribute( entryDN, attributeName, oldValue, newValue );
 
         final String jndiBinarySetting = "java.naming.ldap.attributes.binary";
 
@@ -717,33 +836,41 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         final ModificationItem[] modificationItem = new ModificationItem[2];
         {
             // Create a BasicAttribute for the old value.
-            final BasicAttribute oldValueOperation = new BasicAttribute(attributeName, oldValue);
+            final BasicAttribute oldValueOperation = new BasicAttribute( attributeName, oldValue );
 
             // Populate the ModificationItem array with the removal of the old value.
-            modificationItem[0] = new ModificationItem(DirContext.REMOVE_ATTRIBUTE , oldValueOperation);
+            modificationItem[0] = new ModificationItem( DirContext.REMOVE_ATTRIBUTE, oldValueOperation );
 
             // Create a BasicAttribute for the new value.
-            final BasicAttribute newValueOperation = new BasicAttribute(attributeName, newValue);
+            final BasicAttribute newValueOperation = new BasicAttribute( attributeName, newValue );
 
             // Populate the ModificationItem array with the removal of the old value.
-            modificationItem[1] = new ModificationItem(DirContext.ADD_ATTRIBUTE , newValueOperation);
+            modificationItem[1] = new ModificationItem( DirContext.ADD_ATTRIBUTE, newValueOperation );
         }
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
 
         // Modify the Attributes.
-        try {
-            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
+        try
+        {
+            ldapConnection.modifyAttributes( addJndiEscape( entryDN ), modificationItem );
             // inform jndi the attribute is binary.
-            ldapConnection.addToEnvironment(jndiBinarySetting, attributeName);
-        } catch (NamingException e) {
-            convertNamingException(e);
-        } finally {
+            ldapConnection.addToEnvironment( jndiBinarySetting, attributeName );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
+        }
+        finally
+        {
             // clean up jndi environment
-            try {
-                ldapConnection.removeFromEnvironment(jndiBinarySetting);
-            } catch (Exception e) {
+            try
+            {
+                ldapConnection.removeFromEnvironment( jndiBinarySetting );
+            }
+            catch ( Exception e )
+            {
                 //doesnt matter
             }
         }
@@ -751,26 +878,27 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @LdapOperation
     @ModifyOperation
-    public final void writeStringAttribute(final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite)
+    public final void writeStringAttribute( final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().writeStringAttribute(entryDN, attributeName, values, overwrite);
+        getInputValidator().writeStringAttribute( entryDN, attributeName, values, overwrite );
 
 
         // Create the ModificationItem
         final ModificationItem[] modificationItem = new ModificationItem[values.size()];
 
         int loopCounter = 0;
-        for (final String value : values) {
+        for ( final String value : values )
+        {
             // Create a BasicAttribute for the object.
-            final BasicAttribute attributeToReplace = new BasicAttribute(attributeName, value);
+            final BasicAttribute attributeToReplace = new BasicAttribute( attributeName, value );
 
             // Determine the modification type, if replace, only replace on the first attribute, the rest just get added.
-            final int modType = (loopCounter == 0 && overwrite) ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
+            final int modType = ( loopCounter == 0 && overwrite ) ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
 
             // Populate the ModificationItem object with the flag & the attribute to replace.
-            modificationItem[loopCounter] = new ModificationItem(modType, attributeToReplace);
+            modificationItem[loopCounter] = new ModificationItem( modType, attributeToReplace );
             loopCounter++;
         }
 
@@ -778,57 +906,64 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         final LdapContext ldapConnection = getLdapConnection();
 
         // Modify the Attributes.
-        try {
-            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItem);
-        } catch (NamingException e) {
-            LOGGER.trace("error during write of attribute '" + attributeName + "', error: " + e.getMessage());
-            convertNamingException(e);
+        try
+        {
+            ldapConnection.modifyAttributes( addJndiEscape( entryDN ), modificationItem );
+        }
+        catch ( NamingException e )
+        {
+            LOGGER.trace( "error during write of attribute '" + attributeName + "', error: " + e.getMessage() );
+            convertNamingException( e );
         }
     }
 
     @LdapOperation
     @ModifyOperation
-    public final void writeStringAttributes(final String entryDN, final Map<String,String> attributeValueProps, final boolean overwrite)
+    public final void writeStringAttributes( final String entryDN, final Map<String, String> attributeValueProps, final boolean overwrite )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        writeStringAttributes(entryDN, attributeValueProps, overwrite, null);
+        writeStringAttributes( entryDN, attributeValueProps, overwrite, null );
     }
 
     public final void writeStringAttributes(
             final String entryDN,
-            final Map<String,String> attributeValueProps,
+            final Map<String, String> attributeValueProps,
             final boolean overwrite,
             final BasicControl[] controls
     )
             throws ChaiUnavailableException, ChaiOperationException
     {
         activityPreCheck();
-        getInputValidator().writeStringAttributes(entryDN, attributeValueProps, overwrite);
+        getInputValidator().writeStringAttributes( entryDN, attributeValueProps, overwrite );
 
         // Determine the modification type, if replace, only replace on the first attribute, the rest just get added.
         final int modType = overwrite ? DirContext.REPLACE_ATTRIBUTE : DirContext.ADD_ATTRIBUTE;
 
         // Create the ModificationItem
-        final List<ModificationItem> modificationItems = new ArrayList<ModificationItem>();
-        for (final Map.Entry<String,String> entry : attributeValueProps.entrySet()) {
+        final List<ModificationItem> modificationItems = new ArrayList<>();
+        for ( final Map.Entry<String, String> entry : attributeValueProps.entrySet() )
+        {
             // Create a BasicAttribute for the object.
-            final BasicAttribute attributeToReplace = new BasicAttribute(entry.getKey(), entry.getValue());
+            final BasicAttribute attributeToReplace = new BasicAttribute( entry.getKey(), entry.getValue() );
 
             // Populate the ModificationItem object with the flag & the attribute to replace.
-            modificationItems.add(new ModificationItem(modType, attributeToReplace));
+            modificationItems.add( new ModificationItem( modType, attributeToReplace ) );
         }
 
         // convert to array
-        final ModificationItem[] modificationItemArray = modificationItems.toArray(new ModificationItem[modificationItems.size()]);
+        final ModificationItem[] modificationItemArray = modificationItems.toArray( new ModificationItem[modificationItems.size()] );
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
 
         // Modify the Attributes.
-        try {
-            ldapConnection.modifyAttributes(addJndiEscape(entryDN), modificationItemArray);
-        } catch (NamingException e) {
-            convertNamingException(e);
+        try
+        {
+            ldapConnection.modifyAttributes( addJndiEscape( entryDN ), modificationItemArray );
+        }
+        catch ( NamingException e )
+        {
+            convertNamingException( e );
         }
     }
 
@@ -842,8 +977,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
      * in an undefined state.
      *
      * @return the underlying {@code LdapContext} used by this {@code JNDIProviderImpl}.
-     * @throws com.novell.ldapchai.exception.ChaiUnavailableException
-     *          if no valid {@code LdapContext} is currently allocated.
+     * @throws com.novell.ldapchai.exception.ChaiUnavailableException if no valid {@code LdapContext} is currently allocated.
      */
     public Object getConnectionObject()
             throws Exception
@@ -853,102 +987,121 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     public String getCurrentConnectionURL()
     {
-        return this.getChaiConfiguration().bindURLsAsList().get(0);
+        return this.getChaiConfiguration().bindURLsAsList().get( 0 );
     }
 
-    public void init(final ChaiConfiguration chaiConfig, final ChaiProviderFactory providerFactory)
+    public void init( final ChaiConfiguration chaiConfig, final ChaiProviderFactory providerFactory )
             throws ChaiUnavailableException, IllegalStateException
     {
         this.chaiConfig = chaiConfig;
-        final String connectionURL = chaiConfig.bindURLsAsList().get(0);
-        final Hashtable env = generateJndiEnvironment(connectionURL);
-        try {
-            jndiConnection = generateNewJndiContext(env);
-        } catch (ChaiOperationException e) {
-            throw new ChaiUnavailableException("bind failed (" + e.getMessage() + ")", e.getErrorCode());
+        final String connectionURL = chaiConfig.bindURLsAsList().get( 0 );
+        final Hashtable env = generateJndiEnvironment( connectionURL );
+        try
+        {
+            jndiConnection = generateNewJndiContext( env );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw new ChaiUnavailableException( "bind failed (" + e.getMessage() + ")", e.getErrorCode() );
         }
 
-        super.init(chaiConfig, providerFactory);
+        super.init( chaiConfig, providerFactory );
     }
 
-    private Hashtable generateJndiEnvironment(final String ldapURL)
+    private Hashtable generateJndiEnvironment( final String ldapURL )
     {
         // Populate the hashtable with the attributes to connect to eDirectory.
         final Hashtable<String, String> env = new Hashtable<>();
 
         // add in basic connection info
-        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, ldapURL);
-        env.put(Context.SECURITY_PRINCIPAL, addJndiEscape(chaiConfig.getSetting(ChaiSetting.BIND_DN)));
-        env.put(Context.SECURITY_CREDENTIALS, chaiConfig.getBindPassword());
+        env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
+        env.put( Context.PROVIDER_URL, ldapURL );
+        env.put( Context.SECURITY_PRINCIPAL, addJndiEscape( chaiConfig.getSetting( ChaiSetting.BIND_DN ) ) );
+        env.put( Context.SECURITY_CREDENTIALS, chaiConfig.getBindPassword() );
 
         // set the JNDI pooler up
-        final boolean jndiConnectionPoolEnable = Boolean.valueOf(chaiConfig.getSetting(ChaiSetting.JNDI_ENABLE_POOL));
-        if (jndiConnectionPoolEnable) {
-            env.put("com.sun.jndi.ldap.connect.pool", "true");
-            env.put("com.sun.jndi.ldap.connect.pool.initsize", String.valueOf(DEFAULT_INITIAL_POOL_SIZE));
-            env.put("com.sun.jndi.ldap.connect.pool.maxsize", String.valueOf(DEFAULT_MAXIMUM_POOL_SIZE));
-            env.put("com.sun.jndi.ldap.connect.pool.prefsize", String.valueOf(DEFAULT_PREFERRED_POOL_SIZE));
+        final boolean jndiConnectionPoolEnable = Boolean.valueOf( chaiConfig.getSetting( ChaiSetting.JNDI_ENABLE_POOL ) );
+        if ( jndiConnectionPoolEnable )
+        {
+            env.put( "com.sun.jndi.ldap.connect.pool", "true" );
+            env.put( "com.sun.jndi.ldap.connect.pool.initsize", String.valueOf( DEFAULT_INITIAL_POOL_SIZE ) );
+            env.put( "com.sun.jndi.ldap.connect.pool.maxsize", String.valueOf( DEFAULT_MAXIMUM_POOL_SIZE ) );
+            env.put( "com.sun.jndi.ldap.connect.pool.prefsize", String.valueOf( DEFAULT_PREFERRED_POOL_SIZE ) );
         }
 
         // connect using plaintext or plaintext/ssl
-        env.put("com.sun.jndi.ldap.connect.pool.protocol", "plain ssl");
+        env.put( "com.sun.jndi.ldap.connect.pool.protocol", "plain ssl" );
 
         // Set the ldap timeout time.
-        env.put("com.sun.jndi.ldap.connect.timeout", chaiConfig.getSetting(ChaiSetting.LDAP_CONNECT_TIMEOUT));
+        env.put( "com.sun.jndi.ldap.connect.timeout", chaiConfig.getSetting( ChaiSetting.LDAP_CONNECT_TIMEOUT ) );
 
         // Set the ldap read timeout time.
-        if (chaiConfig.getIntSetting(ChaiSetting.LDAP_READ_TIMEOUT) > 0) {
-            env.put("com.sun.jndi.ldap.read.timeout", chaiConfig.getSetting(ChaiSetting.LDAP_READ_TIMEOUT));
+        if ( chaiConfig.getIntSetting( ChaiSetting.LDAP_READ_TIMEOUT ) > 0 )
+        {
+            env.put( "com.sun.jndi.ldap.read.timeout", chaiConfig.getSetting( ChaiSetting.LDAP_READ_TIMEOUT ) );
         }
 
         //set alias de-referencing
-        env.put("java.naming.ldap.derefAliases", chaiConfig.getSetting(ChaiSetting.LDAP_DEREFENCE_ALIAS));
+        env.put( "java.naming.ldap.derefAliases", chaiConfig.getSetting( ChaiSetting.LDAP_DEREFENCE_ALIAS ) );
 
         //set referrals
-        if (chaiConfig.getBooleanSetting(ChaiSetting.LDAP_FOLLOW_REFERRALS)) {
-            env.put(Context.REFERRAL,"follow");
+        if ( chaiConfig.getBooleanSetting( ChaiSetting.LDAP_FOLLOW_REFERRALS ) )
+        {
+            env.put( Context.REFERRAL, "follow" );
         }
 
-        final boolean isSecureLdapURL = (URI.create(ldapURL)).getScheme().equalsIgnoreCase("ldaps");
+        final boolean isSecureLdapURL = ( URI.create( ldapURL ) ).getScheme().equalsIgnoreCase( "ldaps" );
 
         //setup blind SSL socket factory
-        final boolean promiscuousMode = chaiConfig.getBooleanSetting(ChaiSetting.PROMISCUOUS_SSL);
-        if (isSecureLdapURL) {
-            if (promiscuousMode) {
-                try {
-                    final SSLContext sc = SSLContext.getInstance("SSL");
-                    sc.init(null, new X509TrustManager[]{new PromiscuousTrustManager()}, new java.security.SecureRandom());
+        final boolean promiscuousMode = chaiConfig.getBooleanSetting( ChaiSetting.PROMISCUOUS_SSL );
+        if ( isSecureLdapURL )
+        {
+            if ( promiscuousMode )
+            {
+                try
+                {
+                    final SSLContext sc = SSLContext.getInstance( "SSL" );
+                    sc.init( null, new X509TrustManager[] {new PromiscuousTrustManager()}, new java.security.SecureRandom() );
                     socketFactory = sc.getSocketFactory();
-                    ThreadLocalSocketFactory.set(socketFactory);
-                    env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
-                } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                    LOGGER.error("error configuring promiscuous socket factory");
+                    ThreadLocalSocketFactory.set( socketFactory );
+                    env.put( "java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName() );
+                }
+                catch ( NoSuchAlgorithmException | KeyManagementException e )
+                {
+                    LOGGER.error( "error configuring promiscuous socket factory" );
                 }
 
-            } else if (chaiConfig.getTrustManager() != null) {
-                try {
-                    final SSLContext sc = SSLContext.getInstance("SSL");
-                    sc.init(null, chaiConfig.getTrustManager(), new java.security.SecureRandom());
+            }
+            else if ( chaiConfig.getTrustManager() != null )
+            {
+                try
+                {
+                    final SSLContext sc = SSLContext.getInstance( "SSL" );
+                    sc.init( null, chaiConfig.getTrustManager(), new java.security.SecureRandom() );
                     socketFactory = sc.getSocketFactory();
-                    ThreadLocalSocketFactory.set(socketFactory);
+                    ThreadLocalSocketFactory.set( socketFactory );
 
-                    env.put("java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName());
-                } catch (NoSuchAlgorithmException | KeyManagementException e) {
-                    LOGGER.error("error configuring socket factory from configured trust manager");
+                    env.put( "java.naming.ldap.factory.socket", ThreadLocalSocketFactory.class.getName() );
+                }
+                catch ( NoSuchAlgorithmException | KeyManagementException e )
+                {
+                    LOGGER.error( "error configuring socket factory from configured trust manager" );
                 }
             }
         }
 
         // mix in default environment settings
-        if (chaiConfig.getImplementationConfiguration() != null && chaiConfig.getImplementationConfiguration() instanceof Map) {
-            final Map defaultEnvironment = (Map) chaiConfig.getImplementationConfiguration();
+        if ( chaiConfig.getImplementationConfiguration() != null && chaiConfig.getImplementationConfiguration() instanceof Map )
+        {
+            final Map defaultEnvironment = ( Map ) chaiConfig.getImplementationConfiguration();
 
-            for (final Map.Entry entry : (Set<Map.Entry>) defaultEnvironment.entrySet()) {
+            for ( final Map.Entry entry : ( Set<Map.Entry> ) defaultEnvironment.entrySet() )
+            {
                 final Object key = entry.getKey();
                 final Object value = entry.getValue();
-                if (key instanceof String && value instanceof String) {
-                    env.put((String) key, (String) value);
+                if ( key instanceof String && value instanceof String )
+                {
+                    env.put( ( String ) key, ( String ) value );
                 }
             }
         }
@@ -956,7 +1109,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return env;
     }
 
-    private class SearchEngine {
+    private class SearchEngine
+    {
         private final String baseDN;
         private final SearchHelper searchHelper;
         private final boolean returnAllValues;
@@ -976,7 +1130,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             this.baseDN = baseDN != null ? baseDN : "";
 
             // make a copy so if it changes somewhere else we won't be affected.
-            this.searchHelper = new SearchHelper(searchHelper);
+            this.searchHelper = new SearchHelper( searchHelper );
             this.returnAllValues = returnAllValues;
 
             this.chaiConfiguration = chaiConfiguration;
@@ -985,8 +1139,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         public Map<String, Map<String, List<String>>> getResults()
                 throws ChaiUnavailableException, ChaiOperationException
         {
-            if (used) {
-                throw new IllegalStateException("SearchEngine instance can only be used once");
+            if ( used )
+            {
+                throw new IllegalStateException( "SearchEngine instance can only be used once" );
             }
             used = true;
 
@@ -996,84 +1151,107 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             final SearchControls searchControls = makeSearchControls();
 
 
-            final int maxPageSize = getChaiConfiguration().getIntSetting(ChaiSetting.LDAP_SEARCH_PAGING_SIZE);
+            final int maxPageSize = getChaiConfiguration().getIntSetting( ChaiSetting.LDAP_SEARCH_PAGING_SIZE );
 
             // enabling paging if search count is unlimited (0) or bigger than the max page size.
-            final boolean pagingEnabled = (searchControls.getCountLimit() == 0 || (searchControls.getCountLimit() > maxPageSize)
-                    && supportsSearchResultPaging());
+            final boolean pagingEnabled = ( searchControls.getCountLimit() == 0 || ( searchControls.getCountLimit() > maxPageSize )
+                    && supportsSearchResultPaging() );
 
             final LdapContext ldapConnection = getLdapConnection();
 
             NamingEnumeration<SearchResult> answer = null;
-            try {
+            try
+            {
                 byte[] pageCookie = null;
-                do {
+                do
+                {
                     // set the paging control if using paging
-                    if (pagingEnabled) {
+                    if ( pagingEnabled )
+                    {
                         final Control pagedControl = pageCookie == null
-                                ? new PagedResultsControl(maxPageSize, Control.NONCRITICAL)
-                                : new PagedResultsControl(maxPageSize, pageCookie, Control.CRITICAL);
-                        ldapConnection.setRequestControls(new Control[]{pagedControl});
+                                ? new PagedResultsControl( maxPageSize, Control.NONCRITICAL )
+                                : new PagedResultsControl( maxPageSize, pageCookie, Control.CRITICAL );
+                        ldapConnection.setRequestControls( new Control[] {pagedControl} );
                     }
 
                     // execute the search
-                    answer = ldapConnection.search(addJndiEscape(baseDN), searchHelper.getFilter(), searchControls);
+                    answer = ldapConnection.search( addJndiEscape( baseDN ), searchHelper.getFilter(), searchControls );
 
                     // read search results from ldap into the result map
                     final int previousResultSize = results.size();
-                    parseSearchResults(answer);
-                    if (pageCookie != null && previousResultSize == results.size()) {
-                        LOGGER.warn("ldap paged search has returned an empty result page, current result size=" + results.size());
+                    parseSearchResults( answer );
+                    if ( pageCookie != null && previousResultSize == results.size() )
+                    {
+                        LOGGER.warn( "ldap paged search has returned an empty result page, current result size=" + results.size() );
                     }
 
                     // if paging enabled, read the cookie value.
                     pageCookie = pagingEnabled
-                            ? readResultResponsePageCookie(ldapConnection.getResponseControls())
+                            ? readResultResponsePageCookie( ldapConnection.getResponseControls() )
                             : null;
 
-                } while (pagingEnabled && pageCookie != null);  // loop until no more paged results.
-            } catch (SizeLimitExceededException e) {
+                    // loop until no more paged results.
+                } while ( pagingEnabled && pageCookie != null );
+            }
+            catch ( SizeLimitExceededException e )
+            {
                 // ignore
-            } catch (IOException e) {
-                throw new ChaiOperationException("io error during paged search result: " + e.getMessage(),ChaiError.COMMUNICATION);
-            } catch (NamingException e) {
-                convertNamingException(e);
-                throw new ChaiOperationException("unexpected error during search: " + e.getMessage(),ChaiError.CHAI_INTERNAL_ERROR);
-            } finally {
-                if (answer != null) {
-                    try {
+            }
+            catch ( IOException e )
+            {
+                throw new ChaiOperationException( "io error during paged search result: " + e.getMessage(), ChaiError.COMMUNICATION );
+            }
+            catch ( NamingException e )
+            {
+                convertNamingException( e );
+                throw new ChaiOperationException( "unexpected error during search: " + e.getMessage(), ChaiError.CHAI_INTERNAL_ERROR );
+            }
+            finally
+            {
+                if ( answer != null )
+                {
+                    try
+                    {
                         answer.close();
-                    } catch (NamingException e) {
+                    }
+                    catch ( NamingException e )
+                    {
                         // nothing to do
                     }
                 }
             }
 
-            return Collections.unmodifiableMap(results);
+            return Collections.unmodifiableMap( results );
         }
 
-        private SearchControls makeSearchControls() {
+        private SearchControls makeSearchControls()
+        {
             final SearchControls searchControls = new SearchControls();
-            searchControls.setReturningObjFlag(false);
-            searchControls.setReturningAttributes(new String[0]);
-            searchControls.setSearchScope(searchHelper.getSearchScope().getJndiScopeInt());
+            searchControls.setReturningObjFlag( false );
+            searchControls.setReturningAttributes( new String[0] );
+            searchControls.setSearchScope( searchHelper.getSearchScope().getJndiScopeInt() );
             final String[] returnAttributes = searchHelper.getAttributes() == null
                     ? null
-                    : searchHelper.getAttributes().toArray(new String[searchHelper.getAttributes().size()]);
+                    : searchHelper.getAttributes().toArray( new String[searchHelper.getAttributes().size()] );
 
-            searchControls.setReturningAttributes(returnAttributes);
-            searchControls.setTimeLimit(searchHelper.getTimeLimit());
-            searchControls.setCountLimit(searchHelper.getMaxResults());
+            searchControls.setReturningAttributes( returnAttributes );
+            searchControls.setTimeLimit( searchHelper.getTimeLimit() );
+            searchControls.setCountLimit( searchHelper.getMaxResults() );
             return searchControls;
         }
 
-        private byte[] readResultResponsePageCookie(final Control[] controls) {
-            if (controls != null) {
-                for (Control control : controls) {
-                    if (control instanceof PagedResultsResponseControl) {
-                        final PagedResultsResponseControl prrc = (PagedResultsResponseControl) control;
+        private byte[] readResultResponsePageCookie( final Control[] controls )
+        {
+            if ( controls != null )
+            {
+                for ( Control control : controls )
+                {
+                    if ( control instanceof PagedResultsResponseControl )
+                    {
+                        final PagedResultsResponseControl prrc = ( PagedResultsResponseControl ) control;
                         final byte[] cookie = prrc.getCookie();
-                        if (cookie != null) {
+                        if ( cookie != null )
+                        {
                             return cookie;
                         }
                     }
@@ -1087,27 +1265,35 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         )
                 throws NamingException
         {
-            while (answer.hasMore()) {
+            while ( answer.hasMore() )
+            {
                 final SearchResult searchResult = answer.next();
 
                 String entryDN = null;
-                if (chaiConfiguration.getBooleanSetting(ChaiSetting.JNDI_RESOLVE_IN_NAMESPACE)) {
-                    try {
+                if ( chaiConfiguration.getBooleanSetting( ChaiSetting.JNDI_RESOLVE_IN_NAMESPACE ) )
+                {
+                    try
+                    {
                         entryDN = searchResult.getNameInNamespace();
-                        entryDN = removeJndiEscapes(entryDN);
-                    } catch (UnsupportedOperationException e) {
-                        LOGGER.debug("unable to use jndi NameInNamespace api: " + e.getMessage());
+                        entryDN = removeJndiEscapes( entryDN );
+                    }
+                    catch ( UnsupportedOperationException e )
+                    {
+                        LOGGER.debug( "unable to use jndi NameInNamespace api: " + e.getMessage() );
                     }
                 }
 
-                if (entryDN == null) {
+                if ( entryDN == null )
+                {
                     final StringBuilder entryDNbuilder = new StringBuilder();
-                    entryDNbuilder.append(removeJndiEscapes(searchResult.getName()));
-                    if (baseDN.length() > 0) {
-                        if (entryDNbuilder.length() > 0) {
-                            entryDNbuilder.append(',');
+                    entryDNbuilder.append( removeJndiEscapes( searchResult.getName() ) );
+                    if ( baseDN.length() > 0 )
+                    {
+                        if ( entryDNbuilder.length() > 0 )
+                        {
+                            entryDNbuilder.append( ',' );
                         }
-                        entryDNbuilder.append(baseDN);
+                        entryDNbuilder.append( baseDN );
                     }
 
                     entryDN = entryDNbuilder.toString();
@@ -1116,13 +1302,16 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
                 {
                     final NamingEnumeration attributeEnum = searchResult.getAttributes().getAll();
-                    attrValues.putAll(parseAttributeValues(attributeEnum, returnAllValues));
+                    attrValues.putAll( parseAttributeValues( attributeEnum, returnAllValues ) );
                 }
 
-                if (results.containsKey(entryDN)) {
-                    LOGGER.warn("ignoring duplicate DN in search result from ldap server: " + entryDN);
-                } else {
-                    results.put(entryDN, Collections.unmodifiableMap(attrValues));
+                if ( results.containsKey( entryDN ) )
+                {
+                    LOGGER.warn( "ignoring duplicate DN in search result from ldap server: " + entryDN );
+                }
+                else
+                {
+                    results.put( entryDN, Collections.unmodifiableMap( attrValues ) );
                 }
             }
         }
@@ -1135,127 +1324,152 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             throws NamingException
     {
         final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
-        if (attributeEnum != null && attributeEnum.hasMore()) {
-            while (attributeEnum.hasMore()) {
-                final Attribute loopAttribute = (Attribute) attributeEnum.next();
+        if ( attributeEnum != null && attributeEnum.hasMore() )
+        {
+            while ( attributeEnum.hasMore() )
+            {
+                final Attribute loopAttribute = ( Attribute ) attributeEnum.next();
                 final String attrName = loopAttribute.getID();
                 final List<String> valueList = new ArrayList<String>();
-                for (NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore(); ) {
+                for ( NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore(); )
+                {
                     final Object value = attrValueEnum.next();
-                    valueList.add(value.toString());
-                    if (!returnAllValues) {
+                    valueList.add( value.toString() );
+                    if ( !returnAllValues )
+                    {
                         attrValueEnum.close();
                         break;
                     }
                 }
-                attrValues.put(attrName, Collections.unmodifiableList(valueList));
+                attrValues.put( attrName, Collections.unmodifiableList( valueList ) );
             }
         }
-        return Collections.unmodifiableMap(attrValues);
+        return Collections.unmodifiableMap( attrValues );
     }
 
     private boolean supportsSearchResultPaging()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String enableSettingStr = this.getChaiConfiguration().getSetting(ChaiSetting.LDAP_SEARCH_PAGING_ENABLE);
-        if ("auto".equalsIgnoreCase(enableSettingStr)) {
-            if (cachedPagingEnableSupport == null) {
-                final ChaiEntry rootDse = ChaiUtility.getRootDSE(this);
-                final Set<String> supportedControls = rootDse.readMultiStringAttribute("supportedControl");
-                cachedPagingEnableSupport = supportedControls.contains(PagedResultsControl.OID);
+        final String enableSettingStr = this.getChaiConfiguration().getSetting( ChaiSetting.LDAP_SEARCH_PAGING_ENABLE );
+        if ( "auto".equalsIgnoreCase( enableSettingStr ) )
+        {
+            if ( cachedPagingEnableSupport == null )
+            {
+                final ChaiEntry rootDse = ChaiUtility.getRootDSE( this );
+                final Set<String> supportedControls = rootDse.readMultiStringAttribute( "supportedControl" );
+                cachedPagingEnableSupport = supportedControls.contains( PagedResultsControl.OID );
             }
             return cachedPagingEnableSupport;
         }
-        return Boolean.parseBoolean(enableSettingStr);
+        return Boolean.parseBoolean( enableSettingStr );
     }
 
 
     private LdapContext getLdapConnection()
             throws ChaiUnavailableException
     {
-        try {
-            if (socketFactory != null) {
-                ThreadLocalSocketFactory.set(socketFactory);
+        try
+        {
+            if ( socketFactory != null )
+            {
+                ThreadLocalSocketFactory.set( socketFactory );
             }
-            return jndiConnection.newInstance(null);
-        } catch (NamingException e) {
+            return jndiConnection.newInstance( null );
+        }
+        catch ( NamingException e )
+        {
             final String errorMsg = "error creating new jndiConnection instance: " + e.getMessage();
-            throw new ChaiUnavailableException(errorMsg,ChaiError.CHAI_INTERNAL_ERROR);
+            throw new ChaiUnavailableException( errorMsg, ChaiError.CHAI_INTERNAL_ERROR );
         }
     }
 
-    private void convertNamingException(final NamingException e)
+    private void convertNamingException( final NamingException e )
             throws ChaiOperationException, ChaiUnavailableException
     {
         // important safety tip: naming exceptions sometimes come with null messages....
         final StringBuilder errorMsg = new StringBuilder();
-        errorMsg.append(e.getClass().getName());
-        if (e.getMessage() != null) {
-            errorMsg.append(": ").append(e.getMessage());
+        errorMsg.append( e.getClass().getName() );
+        if ( e.getMessage() != null )
+        {
+            errorMsg.append( ": " ).append( e.getMessage() );
         }
 
         Throwable cause = e.getCause();
         int safetyCounter = 0;
-        while (cause != null && safetyCounter < 10) {
+        while ( cause != null && safetyCounter < 10 )
+        {
             safetyCounter++;
-            errorMsg.append(", cause:").append(cause.getClass().getName());
-            if (cause.getMessage() != null) {
-                errorMsg.append(": ").append(cause.getMessage());
+            errorMsg.append( ", cause:" ).append( cause.getClass().getName() );
+            if ( cause.getMessage() != null )
+            {
+                errorMsg.append( ": " ).append( cause.getMessage() );
             }
             cause = cause.getCause();
         }
 
-        if (errorIsRetryable(e)) {
-            throw new ChaiUnavailableException(errorMsg.toString(), ChaiError.COMMUNICATION, false, false);
+        if ( errorIsRetryable( e ) )
+        {
+            throw new ChaiUnavailableException( errorMsg.toString(), ChaiError.COMMUNICATION, false, false );
         }
 
-        throw ChaiOperationException.forErrorMessage(errorMsg.toString());
+        throw ChaiOperationException.forErrorMessage( errorMsg.toString() );
     }
 
 
-    public boolean errorIsRetryable(final Exception e)
+    public boolean errorIsRetryable( final Exception e )
     {
-        if (e instanceof CommunicationException || e instanceof ServiceUnavailableException) {
+        if ( e instanceof CommunicationException || e instanceof ServiceUnavailableException )
+        {
             final String msgText = e.getMessage();
-            if (msgText != null && !msgText.toLowerCase().contains("unrecognized extended operation")) {
+            if ( msgText != null && !msgText.toLowerCase().contains( "unrecognized extended operation" ) )
+            {
                 return true;
             }
         }
 
-        return super.errorIsRetryable(e);
+        return super.errorIsRetryable( e );
     }
 
-    public boolean isConnected() {
+    public boolean isConnected()
+    {
         return jndiConnection != null;
     }
 
-    protected static String removeJndiEscapes(final String input) {
-        if (input == null) {
+    protected static String removeJndiEscapes( final String input )
+    {
+        if ( input == null )
+        {
             return null;
         }
 
         // remove surrounding quotes if the internal value contains a / character
         final String slashEscapePattern = "^\".*/.*\"$";
-        if (input.matches(slashEscapePattern)) {
-            return input.replaceAll("^\"|\"$","");
+        if ( input.matches( slashEscapePattern ) )
+        {
+            return input.replaceAll( "^\"|\"$", "" );
         }
         return input;
     }
 
-    protected static String addJndiEscape(final String input) {
-        if (input == null) {
+    protected static String addJndiEscape( final String input )
+    {
+        if ( input == null )
+        {
             return null;
         }
-        return input.replaceAll("/", "\\\\2f");
+        return input.replaceAll( "/", "\\\\2f" );
     }
 
-    protected static BasicControl[] convertControls(final ChaiRequestControl[] controls) {
-        if (controls == null) {
+    protected static BasicControl[] convertControls( final ChaiRequestControl[] controls )
+    {
+        if ( controls == null )
+        {
             return null;
         }
 
         final BasicControl[] newControls = new BasicControl[controls.length];
-        for (int i = 0; i < controls.length; i++) {
+        for ( int i = 0; i < controls.length; i++ )
+        {
             newControls[i] = new BasicControl(
                     controls[i].getId(),
                     controls[i].isCritical(),
@@ -1274,8 +1488,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         public static SocketFactory getDefault()
         {
             final SocketFactory result = local.get();
-            if ( result == null ) {
-                throw new IllegalStateException("missing threadlocal socketfactory for ChaiProvider");
+            if ( result == null )
+            {
+                throw new IllegalStateException( "missing threadlocal socketfactory for ChaiProvider" );
             }
             return result;
         }

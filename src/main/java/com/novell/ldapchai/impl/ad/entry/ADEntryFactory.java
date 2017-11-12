@@ -26,28 +26,35 @@ import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.ad.ADErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class ADEntryFactory implements ChaiEntryFactory.VendorFactory {
+public class ADEntryFactory implements ChaiEntryFactory.VendorFactory
+{
 
     private static ErrorMap errorMap;
 
-    public User createChaiUser(final String userDN, final ChaiProvider chaiProvider) {
-        return new UserImpl(userDN, chaiProvider);
+    public User createChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new UserImpl( userDN, chaiProvider );
     }
 
-    public ChaiGroup createChaiGroup(final String entryDN, final ChaiProvider provider) {
-        return new GroupImpl(entryDN, provider);
+    public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
+    {
+        return new GroupImpl( entryDN, provider );
     }
 
-    public ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider) {
-        return new TopImpl(entryDN, provider);
+    public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
+    {
+        return new TopImpl( entryDN, provider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
+    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    {
         return ChaiProvider.DIRECTORY_VENDOR.MICROSOFT_ACTIVE_DIRECTORY;
     }
 
-    public ErrorMap getErrorMap() {
-        if (errorMap == null) {
+    public ErrorMap getErrorMap()
+    {
+        if ( errorMap == null )
+        {
             errorMap = new ADErrorMap();
         }
         return errorMap;

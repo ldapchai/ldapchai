@@ -4,86 +4,87 @@ import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
 
-public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy {
+public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy
+{
 
     /**
      * All attributes used by the password policy.  Several "helper" values for each attribute are available, such as the ldap attribute name,
      * and default values.
      */
-    enum Attribute {
+    enum Attribute
+    {
         MSDS_PASSWORD_SETTINGS_PRECEDENCE(
                 TYPE.MIN,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_PRECEDENCE,
                 "0",
-                null),
+                null ),
 
         MSDS_PASSWORD_REVERSIBLE_ENCRYPTION(
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_REVERSIBLE_ENCRYPTION,
                 "FALSE",
-                null),
+                null ),
 
         MSDS_PASSWORD_HISTORY_LENGTH(
                 TYPE.MIN,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_HISTORY_LENGTH,
                 "0",
-                null),
+                null ),
 
         MSDS_PASSWORD_HISTORY_COMPLEXITY_ENABLED(
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_COMPLEXITY_ENABLED,
                 "FALSE",
-                ChaiPasswordRule.ADComplexity),
+                ChaiPasswordRule.ADComplexity ),
 
         MSDS_PASSWORD_MIN_PASSWORD_LENGTH(
                 TYPE.MIN,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_MIN_PASSWORD_LENGTH,
                 "0",
-                ChaiPasswordRule.MinimumLength),
+                ChaiPasswordRule.MinimumLength ),
 
         MSDS_PASSWORD_MIN_PASSWORD_AGE(
                 TYPE.DURATION,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_MIN_PASSWORD_AGE,
                 "0",
-                ChaiPasswordRule.MinimumLifetime),
+                ChaiPasswordRule.MinimumLifetime ),
 
         MSDS_PASSWORD_MAX_PASSWORD_AGE(
                 TYPE.DURATION,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_MAX_PASSWORD_AGE,
                 "0",
-                ChaiPasswordRule.ExpirationInterval),
+                ChaiPasswordRule.ExpirationInterval ),
 
         MSDS_PASSWORD_LOCKOUT_THRESHOLD(
                 TYPE.OTHER,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_LOCKOUT_THRESHOLD,
                 "0",
-                null),
+                null ),
 
         MSDS_PASSWORD_LOCKOUT_WINDOW(
                 TYPE.DURATION,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_LOCKOUT_WINDOW,
                 "0",
-                null),
+                null ),
 
         MSDS_PASSWORD_LOCKOUT_DURATION(
                 TYPE.DURATION,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_LOCKOUT_DURATION,
                 "0",
-                null),
+                null ),
 
         MSDS_PASSWORD_APPLIES_TO(
                 TYPE.OTHER,
                 ChaiConstant.ATTR_AD_PASSWORD_POLICY_APPLIES_TO,
                 "0",
-                null),
-        ;
+                null ),;
 
         private final TYPE type;
         private final String ldapAttr;
         private final String defaultValue;
         private final ChaiPasswordRule ruleName;
 
-        Attribute(final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName)
+        Attribute( final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName )
         {
             this.type = type;
             this.ldapAttr = ldapAttr;
@@ -146,7 +147,8 @@ public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy {
         /**
          * An enumeration indicating what type of setting is expected for this attribute's value.
          */
-        public enum TYPE {
+        public enum TYPE
+        {
             /**
              * An integer representing a maximum limit of a value
              */MAX,
@@ -164,13 +166,17 @@ public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy {
              */OTHER
         }
 
-        public static Attribute attributeForRule(final ChaiPasswordRule rule) {
-            if (rule == null) {
+        public static Attribute attributeForRule( final ChaiPasswordRule rule )
+        {
+            if ( rule == null )
+            {
                 return null;
             }
 
-            for (final Attribute attr : Attribute.values()) {
-                if (rule.equals(attr.getRuleName())) {
+            for ( final Attribute attr : Attribute.values() )
+            {
+                if ( rule.equals( attr.getRuleName() ) )
+                {
                     return attr;
                 }
             }

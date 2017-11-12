@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 
 /**
  * An immutable representation of an eDirectory DirXML-Attribute value.
- *
+ * <p>
  * <b>Example value in ldap representation:</b>
  * <pre>
  * cn=driver1,cn=DriverSet,ou=orgUnit,o=org#1#USER_ID=1,table=USERS,schema=IDM
@@ -38,7 +38,8 @@ import java.util.StringTokenizer;
  *
  * @author Jason D. Rivard
  */
-public class DirXML_Association implements Serializable {
+public class DirXMLAssociation implements Serializable
+{
 
     /**
      * ASN value of the <i>DirXML-Association</i> attribute.
@@ -48,34 +49,35 @@ public class DirXML_Association implements Serializable {
     /**
      * State of the association, stored as an integer.
      */
-    public enum State {
+    public enum State
+    {
         /**
          * 0
          */
-        DISABLED(0),
+        DISABLED( 0 ),
         /**
          * 1
          */
-        PROCESSED(1),
+        PROCESSED( 1 ),
 
         /**
          * 2
          */
-        PENDING(2),
+        PENDING( 2 ),
 
         /**
          * 3
          */
-        MANUAL(3),
+        MANUAL( 3 ),
 
         /**
          * 4
          */
-        MIGRATE(4),;
+        MIGRATE( 4 ),;
 
         private int numValue;
 
-        State(final int numValue)
+        State( final int numValue )
         {
             this.numValue = numValue;
         }
@@ -90,17 +92,18 @@ public class DirXML_Association implements Serializable {
             return numValue;
         }
 
-        public static State forIntValue(final int numValue)
+        public static State forIntValue( final int numValue )
         {
-            for (final State loopEnum : values()) {
-                if (loopEnum.getNumValue() == numValue) {
+            for ( final State loopEnum : values() )
+            {
+                if ( loopEnum.getNumValue() == numValue )
+                {
                     return loopEnum;
                 }
             }
-            throw new IllegalArgumentException("unknown state for " + DirXML_Association.class.getSimpleName() + " (" + numValue + ")");
+            throw new IllegalArgumentException( "unknown state for " + DirXMLAssociation.class.getSimpleName() + " (" + numValue + ")" );
         }
     }
-
 
 
     private static final String SEPERATOR = "#";
@@ -109,60 +112,71 @@ public class DirXML_Association implements Serializable {
     private State state;
     private String value;
 
-    public static DirXML_Association forStoredValue(final String storedValue)
+    public static DirXMLAssociation forStoredValue( final String storedValue )
     {
-        return new DirXML_Association(storedValue);
+        return new DirXMLAssociation( storedValue );
     }
 
-    public static Set<DirXML_Association> forStoredValues(final Collection<String> values)
+    public static Set<DirXMLAssociation> forStoredValues( final Collection<String> values )
     {
-        return forStoredValues(values.toArray(new String[values.size()]));
+        return forStoredValues( values.toArray( new String[values.size()] ) );
     }
 
-    public static Set<DirXML_Association> forStoredValues(final String... values)
+    public static Set<DirXMLAssociation> forStoredValues( final String... values )
     {
-        final Set<DirXML_Association> returnSet = new HashSet<DirXML_Association>();
-        for (final String value : values) {
-            final DirXML_Association assocValue = new DirXML_Association(value);
-            returnSet.add(assocValue);
+        final Set<DirXMLAssociation> returnSet = new HashSet<DirXMLAssociation>();
+        for ( final String value : values )
+        {
+            final DirXMLAssociation assocValue = new DirXMLAssociation( value );
+            returnSet.add( assocValue );
         }
         return returnSet;
     }
 
-    private DirXML_Association(final String storedValue)
+    private DirXMLAssociation( final String storedValue )
     {
-        if (storedValue == null || storedValue.length() < 1) {
-            throw new NullPointerException("missing value");
+        if ( storedValue == null || storedValue.length() < 1 )
+        {
+            throw new NullPointerException( "missing value" );
         }
 
-        final StringTokenizer st = new StringTokenizer(storedValue, SEPERATOR);
+        final StringTokenizer st = new StringTokenizer( storedValue, SEPERATOR );
 
-        try {
+        try
+        {
             this.driverDN = st.nextToken();
 
             {
                 final String stateString = st.nextToken();
-                final int stateNumber = Integer.parseInt(stateString);
-                this.state = State.forIntValue(stateNumber);
+                final int stateNumber = Integer.parseInt( stateString );
+                this.state = State.forIntValue( stateNumber );
             }
 
-            if (st.hasMoreTokens()) {
+            if ( st.hasMoreTokens() )
+            {
                 this.value = st.nextToken();
-            } else {
+            }
+            else
+            {
                 this.value = "";
             }
-        } catch (NoSuchElementException e) {
-            throw new IllegalArgumentException("malformed value");
+        }
+        catch ( NoSuchElementException e )
+        {
+            throw new IllegalArgumentException( "malformed value" );
         }
     }
 
-    public DirXML_Association(final String driverDN, final State state, final String value)
+    public DirXMLAssociation( final String driverDN, final State state, final String value )
     {
         this.driverDN = driverDN;
         this.state = state;
-        if (value == null) {
+        if ( value == null )
+        {
             this.value = "";
-        } else {
+        }
+        else
+        {
             this.value = value;
         }
     }
@@ -206,11 +220,11 @@ public class DirXML_Association implements Serializable {
     public String toString()
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append(this.getDriverDN());
-        sb.append('#');
-        sb.append(this.getState().getNumValue());
-        sb.append('#');
-        sb.append(this.getValue());
+        sb.append( this.getDriverDN() );
+        sb.append( '#' );
+        sb.append( this.getState().getNumValue() );
+        sb.append( '#' );
+        sb.append( this.getValue() );
         return sb.toString();
     }
 }

@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-public interface Organization extends NdsLoginProperties {
+public interface Organization extends NdsLoginProperties
+{
 }

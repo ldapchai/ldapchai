@@ -21,5 +21,6 @@ package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 
-interface Top extends ADEntry, ChaiEntry {
+interface Top extends ADEntry, ChaiEntry
+{
 }

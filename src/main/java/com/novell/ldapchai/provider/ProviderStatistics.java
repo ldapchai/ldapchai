@@ -28,12 +28,14 @@ import java.time.Instant;
  * @author Jason D. Rivard
  * @see com.novell.ldapchai.provider.ChaiSetting#STATISTICS_ENABLE
  */
-public interface ProviderStatistics extends Serializable {
+public interface ProviderStatistics extends Serializable
+{
 
     /**
      * Enumeration of available statistics.
      */
-    enum IncrementerStatistic {
+    enum IncrementerStatistic
+    {
         /**
          * Number of read operations
          */
@@ -60,7 +62,8 @@ public interface ProviderStatistics extends Serializable {
 
     }
 
-    enum TimestampStatistic {
+    enum TimestampStatistic
+    {
         /**
          * The last time (in ms seconds epoch) a ldap operation was initiated.
          */
@@ -84,8 +87,8 @@ public interface ProviderStatistics extends Serializable {
      * @param statistic requested statistc
      * @return the string value of the statistic, typically a number or timestamp.
      */
-    long getIncrementorStatistic(IncrementerStatistic statistic);
+    long getIncrementorStatistic( IncrementerStatistic statistic );
 
-    Instant getTimestampStatistic(TimestampStatistic statistic);
+    Instant getTimestampStatistic( TimestampStatistic statistic );
 
 }

@@ -29,37 +29,42 @@ import com.novell.ldapchai.util.ChaiLogger;
 
 import java.util.Date;
 
-public class OpenLDAPEntries {
+public class OpenLDAPEntries
+{
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(OpenLDAPEntries.class);
-    
-    public static Date convertZuluToDate(final String dateString)
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( OpenLDAPEntries.class );
+
+    public static Date convertZuluToDate( final String dateString )
     {
-        return EdirEntries.convertZuluToDate(dateString);
+        return EdirEntries.convertZuluToDate( dateString );
     }
 
-    public static String convertDateToZulu(final Date date)
+    public static String convertDateToZulu( final Date date )
     {
-        return EdirEntries.convertDateToZulu(date);
+        return EdirEntries.convertDateToZulu( date );
     }
 
-    static OpenLDAPPasswordPolicy readPasswordPolicy(final OpenLDAPUser person)
+    static OpenLDAPPasswordPolicy readPasswordPolicy( final OpenLDAPUser person )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        ChaiEntry searchEntry = new OpenLDAPEntry(person.getEntryDN(), person.getChaiProvider());
+        ChaiEntry searchEntry = new OpenLDAPEntry( person.getEntryDN(), person.getChaiProvider() );
         OpenLDAPEntry discoveredPolicy = null;
         int safetyCounter = 0;
 
-        while (safetyCounter < 50 && searchEntry != null && discoveredPolicy == null) {
+        while ( safetyCounter < 50 && searchEntry != null && discoveredPolicy == null )
+        {
             safetyCounter++;
-            if (searchEntry.isValid()) {
+            if ( searchEntry.isValid() )
+            {
                 final String pwdPolicySubentryValue = searchEntry.readStringAttribute(
-                        ChaiConstant.ATTR_OPENLDAP_PASSWORD_SUB_ENTRY);
-                LOGGER.trace("pwdPolicySubentryValue = " + pwdPolicySubentryValue);
-                if (pwdPolicySubentryValue != null && !pwdPolicySubentryValue.isEmpty()) {
-                    final OpenLDAPEntry policyEntry = new OpenLDAPEntry(pwdPolicySubentryValue,
-                            person.getChaiProvider());
-                    if (policyEntry.isValid()) {
+                        ChaiConstant.ATTR_OPENLDAP_PASSWORD_SUB_ENTRY );
+                LOGGER.trace( "pwdPolicySubentryValue = " + pwdPolicySubentryValue );
+                if ( pwdPolicySubentryValue != null && !pwdPolicySubentryValue.isEmpty() )
+                {
+                    final OpenLDAPEntry policyEntry = new OpenLDAPEntry( pwdPolicySubentryValue,
+                            person.getChaiProvider() );
+                    if ( policyEntry.isValid() )
+                    {
                         discoveredPolicy = policyEntry;
                     }
                 }
@@ -67,15 +72,18 @@ public class OpenLDAPEntries {
             searchEntry = searchEntry.getParentEntry();
         }
 
-        if (discoveredPolicy != null) {
-            return new OpenLDAPPasswordPolicy(discoveredPolicy.getEntryDN(), person.getChaiProvider());
+        if ( discoveredPolicy != null )
+        {
+            return new OpenLDAPPasswordPolicy( discoveredPolicy.getEntryDN(), person.getChaiProvider() );
         }
-        
-        final String passwordPolicyDn = person.getChaiProvider().getChaiConfiguration().getSetting(ChaiSetting.PASSWORD_POLICY_DN);
-        LOGGER.debug("passwordPolicyDn = " + passwordPolicyDn);
-        if (passwordPolicyDn != null && passwordPolicyDn.trim().length() > 0) {
-            final OpenLDAPPasswordPolicy defaultPolicy = new OpenLDAPPasswordPolicy(passwordPolicyDn, person.getChaiProvider());
-            if (defaultPolicy.isValid()) {
+
+        final String passwordPolicyDn = person.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.PASSWORD_POLICY_DN );
+        LOGGER.debug( "passwordPolicyDn = " + passwordPolicyDn );
+        if ( passwordPolicyDn != null && passwordPolicyDn.trim().length() > 0 )
+        {
+            final OpenLDAPPasswordPolicy defaultPolicy = new OpenLDAPPasswordPolicy( passwordPolicyDn, person.getChaiProvider() );
+            if ( defaultPolicy.isValid() )
+            {
                 return defaultPolicy;
             }
         }

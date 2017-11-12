@@ -32,28 +32,35 @@ import com.novell.ldapchai.provider.ChaiProvider;
  * In most cases, this factory should not
  * be used directly.  Instead, use {@link ChaiFactory}.
  */
-public class EdirEntryFactory implements ChaiEntryFactory.VendorFactory {
+public class EdirEntryFactory implements ChaiEntryFactory.VendorFactory
+{
 
     private static ErrorMap errorMap;
 
-    public InetOrgPerson createChaiUser(final String userDN, final ChaiProvider chaiProvider) {
-        return new InetOrgPersonImpl(userDN, chaiProvider);
+    public InetOrgPerson createChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new InetOrgPersonImpl( userDN, chaiProvider );
     }
 
-    public GroupOfNames createChaiGroup(final String userDN, final ChaiProvider chaiProvider) {
-        return new GroupOfNamesImpl(userDN, chaiProvider);
+    public GroupOfNames createChaiGroup( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new GroupOfNamesImpl( userDN, chaiProvider );
     }
 
-    public ChaiEntry createChaiEntry(final String userDN, final ChaiProvider chaiProvider) {
-        return new ChaiEntryImpl(userDN, chaiProvider);
+    public ChaiEntry createChaiEntry( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new ChaiEntryImpl( userDN, chaiProvider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
+    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    {
         return ChaiProvider.DIRECTORY_VENDOR.NOVELL_EDIRECTORY;
     }
 
-    public ErrorMap getErrorMap() {
-        if (errorMap == null) {
+    public ErrorMap getErrorMap()
+    {
+        if ( errorMap == null )
+        {
             errorMap = new EdirErrorMap();
         }
         return errorMap;

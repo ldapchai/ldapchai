@@ -27,28 +27,35 @@ import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class DirectoryServer389EntryFactory implements ChaiEntryFactory.VendorFactory {
+public class DirectoryServer389EntryFactory implements ChaiEntryFactory.VendorFactory
+{
 
     private static ErrorMap errorMap;
 
-    public ChaiUser createChaiUser(final String entryDN, final ChaiProvider provider) {
-        return new DirectoryServer389User(entryDN, provider);
+    public ChaiUser createChaiUser( final String entryDN, final ChaiProvider provider )
+    {
+        return new DirectoryServer389User( entryDN, provider );
     }
 
-    public ChaiGroup createChaiGroup(final String entryDN, final ChaiProvider provider) {
-        return new DirectoryServer389Group(entryDN, provider);
+    public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
+    {
+        return new DirectoryServer389Group( entryDN, provider );
     }
 
-    public ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider) {
-        return new DirectoryServer389Entry(entryDN, provider);
+    public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
+    {
+        return new DirectoryServer389Entry( entryDN, provider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
+    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    {
         return ChaiProvider.DIRECTORY_VENDOR.GENERIC;
     }
 
-    public ErrorMap getErrorMap() {
-        if (errorMap == null) {
+    public ErrorMap getErrorMap()
+    {
+        if ( errorMap == null )
+        {
             errorMap = new EdirErrorMap();
         }
         return errorMap;

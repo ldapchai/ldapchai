@@ -23,33 +23,41 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class OracleDSErrorMap implements ErrorMap {
+public class OracleDSErrorMap implements ErrorMap
+{
     public ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor()
     {
         return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
     }
 
-    public ChaiError errorForMessage(final String message)
+    public ChaiError errorForMessage( final String message )
     {
-        return forMessage(message).getChaiErrorCode();
+        return forMessage( message ).getChaiErrorCode();
     }
 
-    public boolean isPermanent(final String message) {
-        return forMessage(message).isPermenant();
+    public boolean isPermanent( final String message )
+    {
+        return forMessage( message ).isPermenant();
     }
 
-    public boolean isAuthenticationRelated(final String message) {
-        return forMessage(message).isAuthentication();
+    public boolean isAuthenticationRelated( final String message )
+    {
+        return forMessage( message ).isAuthentication();
     }
 
-    private static OracleDSError forMessage(final String message) {
-        if (message == null || message.length() < 1) {
+    private static OracleDSError forMessage( final String message )
+    {
+        if ( message == null || message.length() < 1 )
+        {
             return OracleDSError.UNKNOWN;
         }
 
-        for (final OracleDSError error : OracleDSError.values()) {
-            for (final String errorString : error.getErrorStrings()) {
-                if (message.contains(String.valueOf(errorString))) {
+        for ( final OracleDSError error : OracleDSError.values() )
+        {
+            for ( final String errorString : error.getErrorStrings() )
+            {
+                if ( message.contains( String.valueOf( errorString ) ) )
+                {
                     return error;
                 }
             }
@@ -58,16 +66,16 @@ public class OracleDSErrorMap implements ErrorMap {
         return OracleDSError.UNKNOWN;
     }
 
-    enum OracleDSError {
-        NO_SUCH_ENTRY           (ChaiError.NO_SUCH_ENTRY, true, false, "error code 32"),
-        USER_INTRUDER_LOCK      (ChaiError.INTRUDER_LOCKOUT, true, false, "error code 19 - Exceed password retry limit. Account locked"),
-        PASSWORD_TOO_EARLY      (ChaiError.PASSWORD_TOO_SOON, true, false, "error code 19 - within password minimum age"),
-        INVALID_CREDENTIALS     (ChaiError.FAILED_AUTHENTICATION, true, false, "error code 49 - Invalid Credentials"),
-        PASSWORD_IN_HISTORY     (ChaiError.PASSWORD_PREVIOUSLYUSED, true, false, "error code 19 - password in history"),
-        PASSWORD_REQ_CHANGES    (ChaiError.NEW_PASSWORD_REQUIRED, true, false, "error code 53 - Password was reset and must be changed"),
+    enum OracleDSError
+    {
+        NO_SUCH_ENTRY( ChaiError.NO_SUCH_ENTRY, true, false, "error code 32" ),
+        USER_INTRUDER_LOCK( ChaiError.INTRUDER_LOCKOUT, true, false, "error code 19 - Exceed password retry limit. Account locked" ),
+        PASSWORD_TOO_EARLY( ChaiError.PASSWORD_TOO_SOON, true, false, "error code 19 - within password minimum age" ),
+        INVALID_CREDENTIALS( ChaiError.FAILED_AUTHENTICATION, true, false, "error code 49 - Invalid Credentials" ),
+        PASSWORD_IN_HISTORY( ChaiError.PASSWORD_PREVIOUSLYUSED, true, false, "error code 19 - password in history" ),
+        PASSWORD_REQ_CHANGES( ChaiError.NEW_PASSWORD_REQUIRED, true, false, "error code 53 - Password was reset and must be changed" ),
 
-        UNKNOWN                 (ChaiError.UNKNOWN, true, false),
-        ;
+        UNKNOWN( ChaiError.UNKNOWN, true, false ),;
 
         private ChaiError chaiErrorCode;
         private boolean permenant;

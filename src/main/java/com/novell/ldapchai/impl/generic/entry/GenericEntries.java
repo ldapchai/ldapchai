@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.generic.entry;
 
-class GenericEntries {
+class GenericEntries
+{
 }

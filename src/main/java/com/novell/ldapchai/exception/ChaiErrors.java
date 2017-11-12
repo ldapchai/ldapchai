@@ -28,24 +28,30 @@ import java.util.Map;
 /**
  * Static methods useful for error handling.
  */
-public final class ChaiErrors {
+public final class ChaiErrors
+{
 
-    private static final Map<ChaiProvider.DIRECTORY_VENDOR,ErrorMap> ERROR_MAPS = new LinkedHashMap<ChaiProvider.DIRECTORY_VENDOR,ErrorMap>();
+    private static final Map<ChaiProvider.DIRECTORY_VENDOR, ErrorMap> ERROR_MAPS = new LinkedHashMap<>();
 
-    static {
-        for (final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values()) {
-            ERROR_MAPS.put(vendor, ChaiEntryFactory.getErrorMap(vendor));
+    static
+    {
+        for ( final ChaiProvider.DIRECTORY_VENDOR vendor : ChaiProvider.DIRECTORY_VENDOR.values() )
+        {
+            ERROR_MAPS.put( vendor, ChaiEntryFactory.getErrorMap( vendor ) );
         }
     }
 
-    private ChaiErrors() {
+    private ChaiErrors()
+    {
     }
 
-    public static ChaiError getErrorForMessage(final String message)
+    public static ChaiError getErrorForMessage( final String message )
     {
-        for (final ErrorMap errorMap : ERROR_MAPS.values()) {
-            final ChaiError errorCode = errorMap.errorForMessage(message);
-            if (errorCode != null && errorCode != ChaiError.UNKNOWN) {
+        for ( final ErrorMap errorMap : ERROR_MAPS.values() )
+        {
+            final ChaiError errorCode = errorMap.errorForMessage( message );
+            if ( errorCode != null && errorCode != ChaiError.UNKNOWN )
+            {
                 return errorCode;
             }
         }
@@ -58,10 +64,12 @@ public final class ChaiErrors {
      *
      * @return true if the error is defined as being related to authentication.
      */
-    static boolean isAuthenticationRelated(final String message)
+    static boolean isAuthenticationRelated( final String message )
     {
-        for (final ErrorMap errorMap : ERROR_MAPS.values()) {
-            if (errorMap.isAuthenticationRelated(message)) {
+        for ( final ErrorMap errorMap : ERROR_MAPS.values() )
+        {
+            if ( errorMap.isAuthenticationRelated( message ) )
+            {
                 return true;
             }
         }
@@ -71,20 +79,22 @@ public final class ChaiErrors {
 
     /**
      * Indicates if the error is deemed permanent or temporary.
-     *
+     * <p>
      * Permanent errors are those that, if retried, the error would most likely
      * occur indefinitely.  This would generally include any error that if repeated against
      * a different server, the error returned would be the same.
-     *
+     * <p>
      * Fail-over mechanisms use this indication to decide if an operation that
      * generated an error should be retried.
      *
      * @return true if the error is defined as permanent
      */
-    static boolean isPermanent(final String message)
+    static boolean isPermanent( final String message )
     {
-        for (final ErrorMap errorMap : ERROR_MAPS.values()) {
-            if (!errorMap.isPermanent(message)) {
+        for ( final ErrorMap errorMap : ERROR_MAPS.values() )
+        {
+            if ( !errorMap.isPermanent( message ) )
+            {
                 return false;
             }
         }

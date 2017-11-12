@@ -22,12 +22,15 @@ package com.novell.ldapchai.exception;
 /**
  * General non-checked runtime exception thrown by Chai
  */
-public class ChaiRuntimeException extends RuntimeException {
-    public ChaiRuntimeException() {
-        super();    
+public class ChaiRuntimeException extends RuntimeException
+{
+    public ChaiRuntimeException()
+    {
+        super();
     }
 
-    public ChaiRuntimeException(final String message) {
-        super(message);
+    public ChaiRuntimeException( final String message )
+    {
+        super( message );
     }
 }

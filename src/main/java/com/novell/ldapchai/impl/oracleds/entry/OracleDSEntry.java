@@ -23,9 +23,10 @@ import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class OracleDSEntry extends AbstractChaiEntry implements ChaiEntry {
-    public OracleDSEntry(final String entryDN, final ChaiProvider chaiProvider)
+public class OracleDSEntry extends AbstractChaiEntry implements ChaiEntry
+{
+    public OracleDSEntry( final String entryDN, final ChaiProvider chaiProvider )
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
     }
 }

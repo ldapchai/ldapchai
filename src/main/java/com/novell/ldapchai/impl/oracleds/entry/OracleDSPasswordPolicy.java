@@ -35,13 +35,15 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswordPolicy {
+public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswordPolicy
+{
 
     /**
      * All attributes used by the password policy.  Several "helper" values for each attribute are available, such as the ldap attribute name,
      * and default values.
      */
-    enum Attribute {
+    enum Attribute
+    {
 
         /**
          * Minimum total length of the password.
@@ -50,7 +52,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
                 TYPE.MIN,
                 ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_MIN_LENGTH,
                 "0",
-                ChaiPasswordRule.MinimumLength),
+                ChaiPasswordRule.MinimumLength ),
 
 
         /**
@@ -61,7 +63,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
                 TYPE.MIN,
                 ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT,
                 "0",
-                null),
+                null ),
 
         /**
          * The time interval between required password changes (true/false).
@@ -71,7 +73,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
                 TYPE.MAX,
                 ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_MAX_PASSWORD_AGE,
                 "0",
-                ChaiPasswordRule.ExpirationInterval),
+                ChaiPasswordRule.ExpirationInterval ),
 
 
         /**
@@ -82,14 +84,14 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
                 TYPE.MIN,
                 ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_MIN_PASSWORD_AGE,
                 "0",
-                ChaiPasswordRule.MinimumLifetime);
+                ChaiPasswordRule.MinimumLifetime );
 
         private final TYPE type;
         private final String ldapAttr;
         private final String defaultValue;
         private final ChaiPasswordRule ruleName;
 
-        Attribute(final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName)
+        Attribute( final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName )
         {
             this.type = type;
             this.ldapAttr = ldapAttr;
@@ -152,7 +154,8 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         /**
          * An enumeration indicating what type of setting is expected for this attribute's value.
          */
-        public enum TYPE {
+        public enum TYPE
+        {
             /**
              * An integer representing a maximum limit of a value
              */MAX,
@@ -167,13 +170,17 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
              */OTHER
         }
 
-        public static Attribute attributeForRule(final ChaiPasswordRule rule) {
-            if (rule == null) {
+        public static Attribute attributeForRule( final ChaiPasswordRule rule )
+        {
+            if ( rule == null )
+            {
                 return null;
             }
 
-            for (final Attribute attr : Attribute.values()) {
-                if (rule.equals(attr.getRuleName())) {
+            for ( final Attribute attr : Attribute.values() )
+            {
+                if ( rule.equals( attr.getRuleName() ) )
+                {
                     return attr;
                 }
             }
@@ -184,12 +191,14 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
 
     static final Set<String> LDAP_PASSWORD_ATTRIBUTES;
 
-    static {
+    static
+    {
         final Set<String> ldapPasswordAttributes = new HashSet<String>();
-        for (final Attribute attribute : Attribute.values()) {
-            ldapPasswordAttributes.add(attribute.getLdapAttribute());
+        for ( final Attribute attribute : Attribute.values() )
+        {
+            ldapPasswordAttributes.add( attribute.getLdapAttribute() );
         }
-        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet(ldapPasswordAttributes);
+        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet( ldapPasswordAttributes );
     }
 
 
@@ -202,11 +211,11 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
     )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
 
         //read all attribute values from entry.
-        allEntryValues.putAll(readStringAttributes(LDAP_PASSWORD_ATTRIBUTES));
-        ruleMap.putAll(createRuleMapUsingAttributeValues(allEntryValues));
+        allEntryValues.putAll( readStringAttributes( LDAP_PASSWORD_ATTRIBUTES ) );
+        ruleMap.putAll( createRuleMapUsingAttributeValues( allEntryValues ) );
     }
 
     public String getLdapObjectClassName()
@@ -214,65 +223,81 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         return "pwdPolicy";
     }
 
-    public String getSourceDN() {
+    public String getSourceDN()
+    {
         return this.getEntryDN();
     }
 
-    public PasswordRuleHelper getRuleHelper() {
-        return new GenericRuleHelper(this);
+    public PasswordRuleHelper getRuleHelper()
+    {
+        return new GenericRuleHelper( this );
     }
 
-    private static Map<String,String> createRuleMapUsingAttributeValues(final Map<String,String> entryValues) {
-        final Map<String,String> returnMap = new HashMap<String,String>();
+    private static Map<String, String> createRuleMapUsingAttributeValues( final Map<String, String> entryValues )
+    {
+        final Map<String, String> returnMap = new HashMap<>();
 
         // defaults for ad policy
-        returnMap.put(ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf(true));
-        returnMap.put(ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf(true));
-        returnMap.put(ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf(true));
+        returnMap.put( ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf( true ) );
+        returnMap.put( ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf( true ) );
+        returnMap.put( ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf( true ) );
 
         // convert the standard attributes to chai rules
-        for (final ChaiPasswordRule rule : ChaiPasswordRule.values()) {
-            final Attribute attribute = Attribute.attributeForRule(rule);
-            if (attribute != null) {
-                returnMap.put(rule.getKey(), attribute.getDefaultValue());
+        for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
+        {
+            final Attribute attribute = Attribute.attributeForRule( rule );
+            if ( attribute != null )
+            {
+                returnMap.put( rule.getKey(), attribute.getDefaultValue() );
                 final String attributeName = attribute.getLdapAttribute();
-                if (attributeName != null && entryValues != null && entryValues.containsKey(attributeName)) {
-                    returnMap.put(rule.getKey(), entryValues.get(attributeName));
+                if ( attributeName != null && entryValues != null && entryValues.containsKey( attributeName ) )
+                {
+                    returnMap.put( rule.getKey(), entryValues.get( attributeName ) );
                 }
             }
 
-            if (!returnMap.containsKey(rule.getKey())) {
-                returnMap.put(rule.getKey(), rule.getDefaultValue());
+            if ( !returnMap.containsKey( rule.getKey() ) )
+            {
+                returnMap.put( rule.getKey(), rule.getDefaultValue() );
             }
         }
 
-        if (entryValues != null && entryValues.containsKey(ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT)) {
-            try {
-                final int historyCount = Integer.parseInt(entryValues.get(ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT));
-                if (historyCount > 0) {
-                    returnMap.put(ChaiPasswordRule.UniqueRequired.getKey(),"true");
+        if ( entryValues != null && entryValues.containsKey( ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT ) )
+        {
+            try
+            {
+                final int historyCount = Integer.parseInt( entryValues.get( ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT ) );
+                if ( historyCount > 0 )
+                {
+                    returnMap.put( ChaiPasswordRule.UniqueRequired.getKey(), "true" );
                 }
-            } catch (Exception e) {
-                LOGGER.error("error while parsing " + ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT + " value: " + e.getMessage());
+            }
+            catch ( Exception e )
+            {
+                LOGGER.error( "error while parsing " + ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT + " value: " + e.getMessage() );
             }
         }
 
         return returnMap;
     }
 
-    public String getValue(final String key) {
-        return ruleMap.get(key);
+    public String getValue( final String key )
+    {
+        return ruleMap.get( key );
     }
 
-    public String getValue(final ChaiPasswordRule rule) {
-        return ruleMap.get(rule.getKey());
+    public String getValue( final ChaiPasswordRule rule )
+    {
+        return ruleMap.get( rule.getKey() );
     }
 
-    public Set<String> getKeys() {
-        return Collections.unmodifiableSet(ruleMap.keySet());
+    public Set<String> getKeys()
+    {
+        return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
-    public ChaiEntry getPolicyEntry() {
+    public ChaiEntry getPolicyEntry()
+    {
         return this;
     }
 }

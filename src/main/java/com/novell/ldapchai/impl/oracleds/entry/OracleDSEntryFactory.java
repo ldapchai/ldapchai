@@ -23,28 +23,35 @@ import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class OracleDSEntryFactory implements ChaiEntryFactory.VendorFactory {
+public class OracleDSEntryFactory implements ChaiEntryFactory.VendorFactory
+{
 
     private static ErrorMap errorMap;
 
-    public InetOrgPerson createChaiUser(final String userDN, final ChaiProvider chaiProvider) {
-        return new InetOrgPerson(userDN, chaiProvider);
+    public InetOrgPerson createChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new InetOrgPerson( userDN, chaiProvider );
     }
 
-    public GroupOfUniqueNames createChaiGroup(final String userDN, final ChaiProvider chaiProvider) {
-        return new GroupOfUniqueNames(userDN, chaiProvider);
+    public GroupOfUniqueNames createChaiGroup( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new GroupOfUniqueNames( userDN, chaiProvider );
     }
 
-    public OracleDSEntry createChaiEntry(final String userDN, final ChaiProvider chaiProvider) {
-        return new OracleDSEntry(userDN, chaiProvider);
+    public OracleDSEntry createChaiEntry( final String userDN, final ChaiProvider chaiProvider )
+    {
+        return new OracleDSEntry( userDN, chaiProvider );
     }
 
-    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor() {
+    public ChaiProvider.DIRECTORY_VENDOR getDirectoryVendor()
+    {
         return ChaiProvider.DIRECTORY_VENDOR.ORACLE_DS;
     }
 
-    public ErrorMap getErrorMap() {
-        if (errorMap == null) {
+    public ErrorMap getErrorMap()
+    {
+        if ( errorMap == null )
+        {
             errorMap = new OracleDSErrorMap();
         }
         return errorMap;

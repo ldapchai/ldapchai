@@ -29,107 +29,112 @@ import java.util.List;
  *
  * @author Jason D. Rivard
  */
-public class GenericRuleHelper implements PasswordRuleHelper {
+public class GenericRuleHelper implements PasswordRuleHelper
+{
     private final ChaiPasswordPolicy wrappedPolicy;
 
-    public GenericRuleHelper(final ChaiPasswordPolicy policy) {
+    public GenericRuleHelper( final ChaiPasswordPolicy policy )
+    {
         this.wrappedPolicy = policy;
     }
 
     public boolean isAllowNumeric()
     {
-        return StringHelper.convertStrToBoolean(readSetting(ChaiPasswordRule.AllowNumeric));
+        return StringHelper.convertStrToBoolean( readSetting( ChaiPasswordRule.AllowNumeric ) );
     }
 
     public boolean isAllowFirstCharNumeric()
     {
-        return readBooleanSetting(ChaiPasswordRule.AllowFirstCharNumeric);
+        return readBooleanSetting( ChaiPasswordRule.AllowFirstCharNumeric );
     }
 
     public boolean isAllowLastCharNumeric()
     {
-        return readBooleanSetting(ChaiPasswordRule.AllowLastCharNumeric);
+        return readBooleanSetting( ChaiPasswordRule.AllowLastCharNumeric );
     }
 
     public boolean isAllowSpecial()
     {
-        return readBooleanSetting(ChaiPasswordRule.AllowSpecial);
+        return readBooleanSetting( ChaiPasswordRule.AllowSpecial );
     }
 
     public boolean isAllowFirstCharSpecial()
     {
-        return readBooleanSetting(ChaiPasswordRule.AllowFirstCharSpecial);
+        return readBooleanSetting( ChaiPasswordRule.AllowFirstCharSpecial );
     }
 
     public boolean isAllowLastCharSpecial()
     {
-        return readBooleanSetting(ChaiPasswordRule.AllowLastCharSpecial);
+        return readBooleanSetting( ChaiPasswordRule.AllowLastCharSpecial );
     }
 
     public int getMaximumSequentialRepeat()
     {
-        return readNumericSetting(ChaiPasswordRule.MaximumSequentialRepeat);
+        return readNumericSetting( ChaiPasswordRule.MaximumSequentialRepeat );
     }
 
     public int getMaximumRepeat()
     {
-        return readNumericSetting(ChaiPasswordRule.MaximumRepeat);
+        return readNumericSetting( ChaiPasswordRule.MaximumRepeat );
     }
 
     public int getMinimumLifetime()
     {
-        return readNumericSetting(ChaiPasswordRule.MinimumLifetime);
+        return readNumericSetting( ChaiPasswordRule.MinimumLifetime );
     }
 
     public final String getChangeMessage()
     {
-        return  readSetting(ChaiPasswordRule.ChangeMessage);
+        return readSetting( ChaiPasswordRule.ChangeMessage );
     }
 
     public int getExpirationInterval()
     {
-        return readNumericSetting(ChaiPasswordRule.ExpirationInterval);
+        return readNumericSetting( ChaiPasswordRule.ExpirationInterval );
     }
 
     public boolean isCaseSensitive()
     {
-        return readBooleanSetting(ChaiPasswordRule.CaseSensitive);
+        return readBooleanSetting( ChaiPasswordRule.CaseSensitive );
     }
 
     public boolean isEnforceAtLogin()
     {
-        return readBooleanSetting(ChaiPasswordRule.EnforceAtLogin);
+        return readBooleanSetting( ChaiPasswordRule.EnforceAtLogin );
     }
 
     public boolean isUniqueRequired()
     {
-        return readBooleanSetting(ChaiPasswordRule.UniqueRequired);
+        return readBooleanSetting( ChaiPasswordRule.UniqueRequired );
     }
 
-    public boolean isPolicyEnabled() {
-        return readBooleanSetting(ChaiPasswordRule.PolicyEnabled);
-    }
-
-    private String readSetting(final ChaiPasswordRule attr)
+    public boolean isPolicyEnabled()
     {
-        return wrappedPolicy.getValue(attr);
+        return readBooleanSetting( ChaiPasswordRule.PolicyEnabled );
     }
 
-    private boolean readBooleanSetting(final ChaiPasswordRule attr)
+    private String readSetting( final ChaiPasswordRule attr )
     {
-        return StringHelper.convertStrToBoolean(readSetting(attr));
+        return wrappedPolicy.getValue( attr );
     }
 
-    private int readNumericSetting(final ChaiPasswordRule attr)
+    private boolean readBooleanSetting( final ChaiPasswordRule attr )
     {
-        return StringHelper.convertStrToInt(readSetting(attr),0);
+        return StringHelper.convertStrToBoolean( readSetting( attr ) );
     }
 
-    public List<String> getDisallowedValues() {
-        return StringHelper.tokenizeString(readSetting(ChaiPasswordRule.DisallowedValues),"\n");
+    private int readNumericSetting( final ChaiPasswordRule attr )
+    {
+        return StringHelper.convertStrToInt( readSetting( attr ), 0 );
     }
 
-    public List<String> getDisallowedAttributes() {
-        return StringHelper.tokenizeString(readSetting(ChaiPasswordRule.DisallowedAttributes),"\n");
+    public List<String> getDisallowedValues()
+    {
+        return StringHelper.tokenizeString( readSetting( ChaiPasswordRule.DisallowedValues ), "\n" );
+    }
+
+    public List<String> getDisallowedAttributes()
+    {
+        return StringHelper.tokenizeString( readSetting( ChaiPasswordRule.DisallowedAttributes ), "\n" );
     }
 }

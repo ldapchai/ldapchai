@@ -21,11 +21,12 @@ package com.novell.ldapchai;
 
 /**
  * Represents an ldap organizational unit (OrganizationalUnit) entry.
- *
+ * <p>
  * Instances of ChaiOrganizationalUnit can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
  */
-interface ChaiOrganizationalUnit extends ChaiEntry {
+interface ChaiOrganizationalUnit extends ChaiEntry
+{
 }
 

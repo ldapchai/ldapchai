@@ -27,11 +27,11 @@ import java.util.List;
  * of a rule helper is not required, they are only available to make reading the most common password rules
  * easy for Java clients.
  *
- * @see com.novell.ldapchai.ChaiPasswordPolicy#getRuleHelper()
- *
  * @author Jason D. Rivard
+ * @see com.novell.ldapchai.ChaiPasswordPolicy#getRuleHelper()
  */
-public interface PasswordRuleHelper {
+public interface PasswordRuleHelper
+{
     /**
      * @return value of the rule
      * @see com.novell.ldapchai.ChaiPasswordRule#AllowNumeric

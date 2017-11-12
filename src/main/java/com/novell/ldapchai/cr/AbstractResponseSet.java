@@ -32,20 +32,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public abstract class AbstractResponseSet implements ResponseSet {
+public abstract class AbstractResponseSet implements ResponseSet
+{
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractResponseSet.class.getName());
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractResponseSet.class.getName() );
 
 
-
-    public enum STATE {
-        NEW(true),
-        WRITTEN(true),
-        READ(false);
+    public enum STATE
+    {
+        NEW( true ),
+        WRITTEN( true ),
+        READ( false );
 
         private boolean readableResponses;
 
-        STATE(final boolean readableResponses)
+        STATE( final boolean readableResponses )
         {
             this.readableResponses = readableResponses;
         }
@@ -86,10 +87,11 @@ public abstract class AbstractResponseSet implements ResponseSet {
 
         this.timestamp = new Date();
 
-        allChallengeSet = new ChaiChallengeSet(crMap.keySet(), minimumRandomRequired, locale, csIdentifier);
-        presentableChallengeSet = reduceCsToMinRandoms(allChallengeSet);
+        allChallengeSet = new ChaiChallengeSet( crMap.keySet(), minimumRandomRequired, locale, csIdentifier );
+        presentableChallengeSet = reduceCsToMinRandoms( allChallengeSet );
 
-        if (state == STATE.READ) {
+        if ( state == STATE.READ )
+        {
             this.allChallengeSet.lock();
             this.presentableChallengeSet.lock();
         }
@@ -100,47 +102,56 @@ public abstract class AbstractResponseSet implements ResponseSet {
     public String toString()
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append(this.getClass().getSimpleName());
-        sb.append(": state(").append(state).append(") ");
-        sb.append("ChallengeSet: (");
-        try {
-            sb.append(this.getChallengeSet().toString());
-        } catch (Exception e) {
-            sb.append("[error]");
+        sb.append( this.getClass().getSimpleName() );
+        sb.append( ": state(" ).append( state ).append( ") " );
+        sb.append( "ChallengeSet: (" );
+        try
+        {
+            sb.append( this.getChallengeSet().toString() );
         }
-        sb.append(")");
+        catch ( Exception e )
+        {
+            sb.append( "[error]" );
+        }
+        sb.append( ")" );
         return sb.toString();
     }
 
 
-    public final ChallengeSet getChallengeSet() throws ChaiValidationException
+    public final ChallengeSet getChallengeSet()
+            throws ChaiValidationException
     {
         return allChallengeSet;
     }
 
-    public boolean meetsChallengeSetRequirements(final ChallengeSet challengeSet)
+    public boolean meetsChallengeSetRequirements( final ChallengeSet challengeSet )
             throws ChaiValidationException
     {
-        for (final Challenge loopChallenge : challengeSet.getChallenges()) {
-            if (loopChallenge.isRequired() && loopChallenge.isAdminDefined()) {
+        for ( final Challenge loopChallenge : challengeSet.getChallenges() )
+        {
+            if ( loopChallenge.isRequired() && loopChallenge.isAdminDefined() )
+            {
                 final String loopChallengeText = loopChallenge.getChallengeText();
                 final List<String> challengeTexts = this.getChallengeSet().getChallengeTexts();
 
-                if (!challengeTexts.contains(loopChallengeText)) {
-                    throw new ChaiValidationException("multiple challenges have the same value", ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT, loopChallengeText);
+                if ( !challengeTexts.contains( loopChallengeText ) )
+                {
+                    throw new ChaiValidationException( "multiple challenges have the same value", ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT, loopChallengeText );
                 }
             }
         }
 
-        if (this.getChallengeSet().getRequiredChallenges().size() < challengeSet.getRequiredChallenges().size()) {
-            throw new ChaiValidationException("too few challenges are required", ChaiError.CR_TOO_FEW_CHALLENGES);
+        if ( this.getChallengeSet().getRequiredChallenges().size() < challengeSet.getRequiredChallenges().size() )
+        {
+            throw new ChaiValidationException( "too few challenges are required", ChaiError.CR_TOO_FEW_CHALLENGES );
         }
 
-        if (this.getChallengeSet().getRandomChallenges().size() < challengeSet.getMinRandomRequired()) {
+        if ( this.getChallengeSet().getRandomChallenges().size() < challengeSet.getMinRandomRequired() )
+        {
             final StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append("minimum number of ramdom responses in response set (").append(this.getChallengeSet().getRandomChallenges().size()).append(")");
-            errorMsg.append(" is less than minimum number of random responses required in challenge set (").append(challengeSet.getMinRandomRequired()).append(")");
-            throw new ChaiValidationException(errorMsg.toString(), ChaiError.CR_TOO_FEW_RANDOM_RESPONSES);
+            errorMsg.append( "minimum number of ramdom responses in response set (" ).append( this.getChallengeSet().getRandomChallenges().size() ).append( ")" );
+            errorMsg.append( " is less than minimum number of random responses required in challenge set (" ).append( challengeSet.getMinRandomRequired() ).append( ")" );
+            throw new ChaiValidationException( errorMsg.toString(), ChaiError.CR_TOO_FEW_RANDOM_RESPONSES );
         }
 
         return true;
@@ -151,55 +162,65 @@ public abstract class AbstractResponseSet implements ResponseSet {
         return locale;
     }
 
-    public Date getTimestamp() {
+    public Date getTimestamp()
+    {
         return timestamp;
     }
 
-    public ChallengeSet getPresentableChallengeSet() throws ChaiValidationException {
+    public ChallengeSet getPresentableChallengeSet()
+            throws ChaiValidationException
+    {
         return presentableChallengeSet;
     }
 
-    public Map<Challenge, String> getHelpdeskResponses() {
+    public Map<Challenge, String> getHelpdeskResponses()
+    {
         final Map<Challenge, String> returnMap = new LinkedHashMap<>();
-        if (this.helpdeskCrMap != null) {
-            for (final Map.Entry<Challenge, HelpdeskAnswer> entry : helpdeskCrMap.entrySet()) {
+        if ( this.helpdeskCrMap != null )
+        {
+            for ( final Map.Entry<Challenge, HelpdeskAnswer> entry : helpdeskCrMap.entrySet() )
+            {
                 final Challenge challenge = entry.getKey();
                 final HelpdeskAnswer answer = entry.getValue();
                 final String answerText = answer.answerText();
-                returnMap.put(challenge, answerText);
+                returnMap.put( challenge, answerText );
             }
         }
         return returnMap;
     }
 
-    private static ChallengeSet reduceCsToMinRandoms(final ChallengeSet allChallengeSet)
+    private static ChallengeSet reduceCsToMinRandoms( final ChallengeSet allChallengeSet )
             throws ChaiValidationException
     {
-        if (allChallengeSet.getRandomChallenges().size() <= allChallengeSet.getMinRandomRequired()) {
+        if ( allChallengeSet.getRandomChallenges().size() <= allChallengeSet.getMinRandomRequired() )
+        {
             return allChallengeSet;
         }
 
         final SecureRandom random = new SecureRandom();
         final List<Challenge> newChallenges = new ArrayList<>();
-        final List<Challenge> allRandoms = new ArrayList<>(allChallengeSet.getRandomChallenges());
-        while (newChallenges.size() < allChallengeSet.getMinRandomRequired()) {
-            newChallenges.add(allRandoms.remove(random.nextInt(allRandoms.size())));
+        final List<Challenge> allRandoms = new ArrayList<>( allChallengeSet.getRandomChallenges() );
+        while ( newChallenges.size() < allChallengeSet.getMinRandomRequired() )
+        {
+            newChallenges.add( allRandoms.remove( random.nextInt( allRandoms.size() ) ) );
         }
-        newChallenges.addAll(allChallengeSet.getRequiredChallenges());
+        newChallenges.addAll( allChallengeSet.getRequiredChallenges() );
         return new ChaiChallengeSet(
                 newChallenges,
                 allChallengeSet.getMinRandomRequired(),
                 allChallengeSet.getLocale(),
                 allChallengeSet.getIdentifier()
-                );
+        );
     }
 
-    public Map<Challenge,Answer> getChallengeAnswers() {
+    public Map<Challenge, Answer> getChallengeAnswers()
+    {
 
-        return crMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(crMap);
+        return crMap == null ? Collections.emptyMap() : Collections.unmodifiableMap( crMap );
     }
 
-    public Map<Challenge,HelpdeskAnswer> getHelpdeskAnswers() {
-        return helpdeskCrMap == null ? Collections.emptyMap() : Collections.unmodifiableMap(helpdeskCrMap);
+    public Map<Challenge, HelpdeskAnswer> getHelpdeskAnswers()
+    {
+        return helpdeskCrMap == null ? Collections.emptyMap() : Collections.unmodifiableMap( helpdeskCrMap );
     }
 }

@@ -36,71 +36,91 @@ import java.nio.charset.Charset;
  * @see javax.naming.ldap.ExtendedRequest
  */
 public class OpenLDAPModifyPasswordRequest
-    implements ExtendedRequest, Serializable
+        implements ExtendedRequest, Serializable
 {
+
+    /**
+     * The OID of the modify password extended operation
+     */
+    public static final String LDAP_EXOP_X_MODIFY_PASSWD =
+            "1.3.6.1.4.1.4203.1.11.1";
+    /**
+     * The BER tag for the modify password dn entry
+     */
+    private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID =
+            ( byte ) 0x80;
+    /**
+     * The BER tag for the modify password new password entry
+     */
+    private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW =
+            ( byte ) 0x82;
+    /**
+     * The dn we want to change
+     */
+    private String modifyDn;
+    /**
+     * The password to change to
+     */
+    private String modifyPassword;
 
     private final ChaiConfiguration chaiConfiguration;
 
     /**
      * Creates a new <code>OpenLDAPUser</code> instance.
      *
-     * @param dn the dn whose password is to change
+     * @param dn       the dn whose password is to change
      * @param password the new password
-     * @exception NullPointerException if dn or password is null
-     * @exception javax.naming.SizeLimitExceededException when the dn or password
-     *            is too long
+     * @throws NullPointerException                    if dn or password is null
+     * @throws javax.naming.SizeLimitExceededException when the dn or password
+     *                                                 is too long
      */
-    public OpenLDAPModifyPasswordRequest(final String dn, final String password, final ChaiConfiguration chaiConfiguration)
-        throws NullPointerException, SizeLimitExceededException
+    public OpenLDAPModifyPasswordRequest( final String dn, final String password, final ChaiConfiguration chaiConfiguration )
+            throws NullPointerException, SizeLimitExceededException
     {
         this.chaiConfiguration = chaiConfiguration;
 
-        if (dn == null)
+        if ( dn == null )
         {
-            throw new NullPointerException("dn cannot be null");
+            throw new NullPointerException( "dn cannot be null" );
         }
 
-        if (password == null)
+        if ( password == null )
         {
-            throw new NullPointerException("password cannot be null");
+            throw new NullPointerException( "password cannot be null" );
         }
 
         final int dnlen = dn.length();
         final int passlen = password.length();
         final int totallen = 4 + dnlen + passlen;
 
-        if (dnlen <= 0)
+        if ( dnlen <= 0 )
         {
-            throw new SizeLimitExceededException("dn cannot be 0 length");
+            throw new SizeLimitExceededException( "dn cannot be 0 length" );
         }
 
-        if (dnlen > 0xFF)
+        if ( dnlen > 0xFF )
         {
-            throw new SizeLimitExceededException(
-                "dn cannot be larger then 255 characters");
+            throw new SizeLimitExceededException( "dn cannot be larger then 255 characters" );
         }
 
-        if (passlen <= 0)
+        if ( passlen <= 0 )
         {
-            throw new SizeLimitExceededException(
-                "password cannot be 0 length");
+            throw new SizeLimitExceededException( "password cannot be 0 length" );
         }
 
-        if (passlen > 0xFF)
+        if ( passlen > 0xFF )
         {
-            throw new SizeLimitExceededException(
-                "password cannot be larger then 255 characters");
+            throw new SizeLimitExceededException( "password cannot be larger then 255 characters" );
         }
 
-        if (totallen > 0xFF)
+        if ( totallen > 0xFF )
         {
-            throw new SizeLimitExceededException(
-                "the lengh of the dn + the lengh of the password cannot" +
-                    " exceed 251 characters");
+            throw new SizeLimitExceededException( "the length of the dn + the lengh of the password cannot"
+                            + " exceed 251 characters" );
         }
 
-        mDn = dn;
-        mPassword = password;
+        modifyDn = dn;
+        modifyPassword = password;
     }
 
     /**
@@ -120,9 +140,9 @@ public class OpenLDAPModifyPasswordRequest
      */
     public byte[] getEncodedValue()
     {
-        final String characterEncoding = this.chaiConfiguration.getSetting(ChaiSetting.LDAP_CHARACTER_ENCODING);
-        final byte[] password = mPassword.getBytes(Charset.forName(characterEncoding));
-        final byte[] dn = mDn.getBytes(Charset.forName(characterEncoding));
+        final String characterEncoding = this.chaiConfiguration.getSetting( ChaiSetting.LDAP_CHARACTER_ENCODING );
+        final byte[] password = modifyPassword.getBytes( Charset.forName( characterEncoding ) );
+        final byte[] dn = modifyDn.getBytes( Charset.forName( characterEncoding ) );
 
         // Sequence tag (1) + sequence length (1) + dn tag (1) +
         // dn length (1) + dn (variable) + password tag (1) +
@@ -132,21 +152,24 @@ public class OpenLDAPModifyPasswordRequest
         final byte[] encoded = new byte[encodedLength];
 
         int valueI = 0;
-        encoded[valueI++] = (byte) 0x30; // sequence start
+
+        // sequence start
+        encoded[valueI++] = ( byte ) 0x30;
+
         // length of body
-        encoded[valueI++] = (byte) (4 + dn.length + password.length);
+        encoded[valueI++] = ( byte ) ( 4 + dn.length + password.length );
 
 
         encoded[valueI++] = LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID;
-        encoded[valueI++] = (byte) dn.length;
+        encoded[valueI++] = ( byte ) dn.length;
 
-        System.arraycopy(dn, 0, encoded, valueI, dn.length);
+        System.arraycopy( dn, 0, encoded, valueI, dn.length );
         valueI += dn.length;
 
         encoded[valueI++] = LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW;
-        encoded[valueI++] = (byte) password.length;
+        encoded[valueI++] = ( byte ) password.length;
 
-        System.arraycopy(password, 0, encoded, valueI, password.length);
+        System.arraycopy( password, 0, encoded, valueI, password.length );
         valueI += password.length;
 
         return encoded;
@@ -157,33 +180,20 @@ public class OpenLDAPModifyPasswordRequest
      * operation for Password modification doesn't create a
      * response so we just return null here.
      *
-     * @param id the OID of the response
+     * @param id       the OID of the response
      * @param berValue the BER encoded value of the response
-     * @param offset the offset
-     * @param length the length of the response
+     * @param offset   the offset
+     * @param length   the length of the response
      * @return returns null as the modify password operation doesn't
-     *         generate a response.
+     * generate a response.
      */
     public ExtendedResponse createExtendedResponse(
-        final String id,
-        final byte[] berValue,
-        final int offset,
-        final int length)
+            final String id,
+            final byte[] berValue,
+            final int offset,
+            final int length )
     {
         return null;
     }
 
-    /** The OID of the modify password extended operation */
-    public static final String LDAP_EXOP_X_MODIFY_PASSWD =
-        "1.3.6.1.4.1.4203.1.11.1";
-    /** The BER tag for the modify password dn entry */
-    private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID =
-        (byte) 0x80;
-    /** The BER tag for the modify password new password entry */
-    private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW =
-        (byte) 0x82;
-    /** The dn we want to change */
-    private String mDn;
-    /** The password to change to */
-    private String mPassword;
 }

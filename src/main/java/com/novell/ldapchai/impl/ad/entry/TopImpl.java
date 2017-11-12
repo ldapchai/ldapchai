@@ -27,24 +27,32 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Date;
 
-class TopImpl extends AbstractChaiEntry implements ChaiEntry {
+class TopImpl extends AbstractChaiEntry implements ChaiEntry
+{
 
-    TopImpl(final String entryDN, final ChaiProvider chaiProvider) {
-        super(entryDN, chaiProvider);
+    TopImpl( final String entryDN, final ChaiProvider chaiProvider )
+    {
+        super( entryDN, chaiProvider );
     }
 
     @Override
-    public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
-        return ADEntries.readDateAttribute(this, attributeName);
+    public Date readDateAttribute( final String attributeName )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return ADEntries.readDateAttribute( this, attributeName );
     }
 
     @Override
-    public void writeDateAttribute(final String attributeName, final Date date) throws ChaiUnavailableException, ChaiOperationException {
-        ADEntries.writeDateAttribute(this, attributeName, date);
+    public void writeDateAttribute( final String attributeName, final Date date )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        ADEntries.writeDateAttribute( this, attributeName, date );
     }
 
     @Override
-    public String readCanonicalDN() throws ChaiOperationException, ChaiUnavailableException {
-        return readStringAttribute("distinguishedName");
+    public String readCanonicalDN()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readStringAttribute( "distinguishedName" );
     }
 }

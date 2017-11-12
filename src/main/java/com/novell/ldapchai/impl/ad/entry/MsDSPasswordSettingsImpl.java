@@ -17,54 +17,65 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MsDSPasswordSettingsImpl extends TopImpl implements MsDSPasswordSettings {
+public class MsDSPasswordSettingsImpl extends TopImpl implements MsDSPasswordSettings
+{
 
     static final Collection<String> LDAP_PASSWORD_ATTRIBUTES;
 
-    static {
+    static
+    {
         final ArrayList<String> ldapPasswordAttributes = new ArrayList<String>();
-        for (final MsDSPasswordSettings.Attribute attribute : MsDSPasswordSettings.Attribute.values()) {
-            ldapPasswordAttributes.add(attribute.getLdapAttribute());
+        for ( final MsDSPasswordSettings.Attribute attribute : MsDSPasswordSettings.Attribute.values() )
+        {
+            ldapPasswordAttributes.add( attribute.getLdapAttribute() );
         }
-        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableCollection(ldapPasswordAttributes);
+        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableCollection( ldapPasswordAttributes );
     }
 
     private final Map<String, String> ruleMap = new HashMap<String, String>();
     private final Map<String, List<String>> allEntryValues = new HashMap<String, List<String>>();
 
-    MsDSPasswordSettingsImpl(final String entryDN, final ChaiProvider chaiProvider)
+    MsDSPasswordSettingsImpl( final String entryDN, final ChaiProvider chaiProvider )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
 
         //read all attribute values from entry.
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setFilter(SearchHelper.DEFAULT_FILTER);
-        searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
-        searchHelper.setAttributes(LDAP_PASSWORD_ATTRIBUTES);
+        searchHelper.setFilter( SearchHelper.DEFAULT_FILTER );
+        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        searchHelper.setAttributes( LDAP_PASSWORD_ATTRIBUTES );
 
-        final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues(getEntryDN(), searchHelper);
-        final Map<String, List<String>> results = bigResults.get(this.getEntryDN());
+        final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues( getEntryDN(), searchHelper );
+        final Map<String, List<String>> results = bigResults.get( this.getEntryDN() );
 
-        allEntryValues.putAll(results);
-        ruleMap.putAll(createRuleMapUsingAttributeValues(results));
+        allEntryValues.putAll( results );
+        ruleMap.putAll( createRuleMapUsingAttributeValues( results ) );
     }
 
-    private static Map<String,String> createRuleMapUsingAttributeValues(final Map<String,List<String>> entryValues) {
-        final Map<String,String> returnMap = new HashMap<String,String>();
+    private static Map<String, String> createRuleMapUsingAttributeValues( final Map<String, List<String>> entryValues )
+    {
+        final Map<String, String> returnMap = new HashMap<>();
 
         // convert the standard attributes to chai rules
-        for (final ChaiPasswordRule rule : ChaiPasswordRule.values()) {
-            final MsDSPasswordSettings.Attribute attribute = MsDSPasswordSettings.Attribute.attributeForRule(rule);
-            if (attribute != null) {
+        for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
+        {
+            final MsDSPasswordSettings.Attribute attribute = MsDSPasswordSettings.Attribute.attributeForRule( rule );
+            if ( attribute != null )
+            {
                 //returnMap.put(rule.getKey(),attribute.getDefaultValue());
-                if (attribute.getLdapAttribute() != null) {
-                    final List<String> ruleValues = entryValues.get(attribute.getLdapAttribute());
-                    if (ruleValues != null && !ruleValues.isEmpty()) {
-                        if (attribute.getType() == Attribute.TYPE.DURATION) {
-                            returnMap.put(rule.getKey(),timeSpanSyntaxToSeconds(ruleValues.get(0)));
-                        } else {
-                            returnMap.put(rule.getKey(),ruleValues.get(0));
+                if ( attribute.getLdapAttribute() != null )
+                {
+                    final List<String> ruleValues = entryValues.get( attribute.getLdapAttribute() );
+                    if ( ruleValues != null && !ruleValues.isEmpty() )
+                    {
+                        if ( attribute.getType() == Attribute.TYPE.DURATION )
+                        {
+                            returnMap.put( rule.getKey(), timeSpanSyntaxToSeconds( ruleValues.get( 0 ) ) );
+                        }
+                        else
+                        {
+                            returnMap.put( rule.getKey(), ruleValues.get( 0 ) );
                         }
                     }
                 }
@@ -75,47 +86,60 @@ public class MsDSPasswordSettingsImpl extends TopImpl implements MsDSPasswordSet
     }
 
 
-    public String getValue(final String key) {
-        return ruleMap.get(key);
+    public String getValue( final String key )
+    {
+        return ruleMap.get( key );
     }
 
-    public String getValue(final ChaiPasswordRule rule) {
-        return ruleMap.get(rule.getKey());
+    public String getValue( final ChaiPasswordRule rule )
+    {
+        return ruleMap.get( rule.getKey() );
     }
 
-    public Set<String> getKeys() {
-        return Collections.unmodifiableSet(ruleMap.keySet());
+    public Set<String> getKeys()
+    {
+        return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
-    public ChaiEntry getPolicyEntry() {
+    public ChaiEntry getPolicyEntry()
+    {
         return this;
     }
 
-    public PasswordRuleHelper getRuleHelper() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    public PasswordRuleHelper getRuleHelper()
+    {
+        return null;
     }
 
-    private static String timeSpanSyntaxToSeconds(final String input) {
-        if (input == null || input.length() < 1) {
+    private static String timeSpanSyntaxToSeconds( final String input )
+    {
+        if ( input == null || input.length() < 1 )
+        {
             return "0";
         }
 
         final BigInteger numberValue;
-        try {
-            numberValue = new BigInteger(input).abs();
-        } catch (NumberFormatException e) {
+        try
+        {
+            numberValue = new BigInteger( input ).abs();
+        }
+        catch ( NumberFormatException e )
+        {
             return "0";
         }
 
-        if (numberValue.compareTo(new BigInteger("9999999")) <= 0) {
+        if ( numberValue.compareTo( new BigInteger( "9999999" ) ) <= 0 )
+        {
             return "0";
         }
 
-        return numberValue.divide(new BigInteger("10000000")).toString();
+        return numberValue.divide( new BigInteger( "10000000" ) ).toString();
     }
 
     @Override
-    public String readCanonicalDN() throws ChaiOperationException, ChaiUnavailableException {
-        return readStringAttribute("distinguishedName");
+    public String readCanonicalDN()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readStringAttribute( "distinguishedName" );
     }
 }

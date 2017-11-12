@@ -36,19 +36,22 @@ import java.util.StringTokenizer;
  *
  * @author Jason D. Rivard
  */
-public class DirXML_EntitlementRef implements Serializable {
+
+public class DirXMLEntitlementRef implements Serializable
+{
 
 
     //@todo make this class public
     public static final String ASN_VALUE = "2.16.840.1.113719.1.14.4.1.2087";
 
-    public enum State {
-        REVOKED(0),
-        GRANTED(1);
+    public enum State
+    {
+        REVOKED( 0 ),
+        GRANTED( 1 );
 
         private int numValue;
 
-        State(final int intValue)
+        State( final int intValue )
         {
             this.numValue = intValue;
         }
@@ -58,14 +61,16 @@ public class DirXML_EntitlementRef implements Serializable {
             return numValue;
         }
 
-        static State forNumValue(final int numValue)
+        static State forNumValue( final int numValue )
         {
-            for (final State s : values()) {
-                if (numValue == s.numValue) {
+            for ( final State s : values() )
+            {
+                if ( numValue == s.numValue )
+                {
                     return s;
                 }
             }
-            throw new IllegalArgumentException("unknown state for " + DirXML_EntitlementRef.class.getSimpleName() + " (" + numValue + ")");
+            throw new IllegalArgumentException( "unknown state for " + DirXMLEntitlementRef.class.getSimpleName() + " (" + numValue + ")" );
         }
     }
 
@@ -73,34 +78,40 @@ public class DirXML_EntitlementRef implements Serializable {
     private int state;
     private String payload;
 
-    public DirXML_EntitlementRef(final String value, final ChaiProvider provider)
+    public DirXMLEntitlementRef( final String value, final ChaiProvider provider )
     {
-        if (value == null || value.length() < 1) {
-            throw new NullPointerException("missing value");
+        if ( value == null || value.length() < 1 )
+        {
+            throw new NullPointerException( "missing value" );
         }
 
-        final StringTokenizer st = new StringTokenizer(value, "#");
+        final StringTokenizer st = new StringTokenizer( value, "#" );
         this.entitlementDN = st.nextToken();
         final String stateString = st.nextToken();
-        this.state = Integer.parseInt(stateString);
-        if (st.hasMoreTokens()) {
+        this.state = Integer.parseInt( stateString );
+        if ( st.hasMoreTokens() )
+        {
             this.payload = st.nextToken();
-        } else {
+        }
+        else
+        {
             this.payload = null;
         }
     }
 
-    private static Document convertStrToDoc(final String str)
+    private static Document convertStrToDoc( final String str )
     {
-        final Reader xmlreader = new StringReader(str);
+        final Reader xmlreader = new StringReader( str );
         final SAXBuilder builder = new SAXBuilder();
         Document doc = null;
-        try {
-            doc = builder.build(xmlreader);
-        } catch (JDOMException e) {
-            e.printStackTrace();  //@todo
-        } catch (IOException e) {
-            e.printStackTrace();  //@todo
+        try
+        {
+            doc = builder.build( xmlreader );
+        }
+        catch ( JDOMException | IOException e )
+        {
+            //@todo
+            e.printStackTrace();
         }
         return doc;
     }
@@ -112,18 +123,21 @@ public class DirXML_EntitlementRef implements Serializable {
 
     public State getStateType()
     {
-        return State.forNumValue(getState());
+        return State.forNumValue( getState() );
     }
 
-    public int getState() {
+    public int getState()
+    {
         return state;
     }
 
-    public String getPayload() {
+    public String getPayload()
+    {
         return payload;
     }
 
-    public Document getPayloadDocument() {
-        return convertStrToDoc(getPayload());
+    public Document getPayloadDocument()
+    {
+        return convertStrToDoc( getPayload() );
     }
 }

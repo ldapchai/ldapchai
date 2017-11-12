@@ -23,27 +23,29 @@ import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
 
-public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
+public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
+{
     /**
      * Return the source of the challenge set policy information
      *
      * @return A string with the ldap syntax DN of the policy.  May be null if the policy was
-     *         not read from ldap.
+     * not read from ldap.
      */
     String getSourceDN();
 
     /**
      * Enumeration that describes the selected mode for password recovery.
      */
-    enum FORGOTTEN_MODE {
-        CHANGE_PASSWORD("ChangePassword"),
-        EMAIL_PASSWORD("EmailPassword"),
-        EMAIL_HINT("EmailHint"),
-        SHOW_HINT("ShowHint");
+    enum ForgottenMode
+    {
+        CHANGE_PASSWORD( "ChangePassword" ),
+        EMAIL_PASSWORD( "EmailPassword" ),
+        EMAIL_HINT( "EmailHint" ),
+        SHOW_HINT( "ShowHint" );
 
         protected String xmlName;
 
-        FORGOTTEN_MODE(final String xmlName)
+        ForgottenMode( final String xmlName )
         {
             this.xmlName = xmlName;
         }
@@ -53,11 +55,13 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
             return xmlName;
         }
 
-        public static FORGOTTEN_MODE forXmlString(final String xmlString)
+        public static ForgottenMode forXmlString( final String xmlString )
         {
-            final FORGOTTEN_MODE[] allErrorCodes = FORGOTTEN_MODE.values();
-            for (final FORGOTTEN_MODE loopCode : allErrorCodes) {
-                if (loopCode.getXmlName().equalsIgnoreCase(xmlString)) {
+            final ForgottenMode[] allErrorCodes = ForgottenMode.values();
+            for ( final ForgottenMode loopCode : allErrorCodes )
+            {
+                if ( loopCode.getXmlName().equalsIgnoreCase( xmlString ) )
+                {
                     return loopCode;
                 }
             }
@@ -69,7 +73,8 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
      * All attributes used by the password policy.  Several "helper" values for each attribute are available, such as the ldap attribute name,
      * and default values.
      */
-    enum Attribute {
+    enum Attribute
+    {
         /**
          * Maximum number of times a character can be consecutively repeated.
          */
@@ -77,7 +82,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_CONSECUTIVE_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MaximumSequentialRepeat),
+                ChaiPasswordRule.MaximumSequentialRepeat ),
         /**
          * Maximum number of times a lower case character may appear in the password.
          */
@@ -85,7 +90,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_LOWER_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MaximumLowerCase),
+                ChaiPasswordRule.MaximumLowerCase ),
 
         /**
          * Maximum number of times a numeric character may appear in the password.
@@ -94,7 +99,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_NUMERIC_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MaximumNumeric),
+                ChaiPasswordRule.MaximumNumeric ),
 
         /**
          * Maximum number of times a character may be repeated in the password.
@@ -103,7 +108,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_REPEATED_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MaximumNumeric),
+                ChaiPasswordRule.MaximumNumeric ),
 
         /**
          * Maximum number of times a special (non alphanumeric) character may appear in the password
@@ -112,7 +117,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_SPECIAL_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MaximumSpecial),
+                ChaiPasswordRule.MaximumSpecial ),
 
 
         /**
@@ -121,8 +126,10 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
         MAX_LENGTH(
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_LENGTH,
-                "512",  //default eDir value
-                ChaiPasswordRule.MaximumLength),
+
+                //default eDir value
+                "512",
+                ChaiPasswordRule.MaximumLength ),
 
         /**
          * Minimim total length of the password.
@@ -131,7 +138,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_LOWER_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MinimumLowerCase),
+                ChaiPasswordRule.MinimumLowerCase ),
 
         /**
          * Minimum number of times a numeric character mayappear in the password.
@@ -140,7 +147,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MinimumNumeric),
+                ChaiPasswordRule.MinimumNumeric ),
 
         /**
          * Minimum number of times a special (non-alphanumeric) character may appear in the password.
@@ -149,7 +156,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MinimumSpecial),
+                ChaiPasswordRule.MinimumSpecial ),
 
         /**
          * Minimum number of unique characters in the password.
@@ -158,7 +165,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_UNIQUE_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MinimumUnique),
+                ChaiPasswordRule.MinimumUnique ),
 
         /**
          * Minimum number of upper case characters in the password.
@@ -167,7 +174,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_UPPER_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MinimumUpperCase),
+                ChaiPasswordRule.MinimumUpperCase ),
 
         /**
          * Maximum number of upper case characters in the password.
@@ -176,7 +183,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_UPPER_CHARACTERS,
                 "0",
-                ChaiPasswordRule.MaximumUpperCase),
+                ChaiPasswordRule.MaximumUpperCase ),
         /**
          * Minimum total length of the password.
          */
@@ -184,7 +191,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_LENGTH,
                 "0",
-                ChaiPasswordRule.MinimumLength),
+                ChaiPasswordRule.MinimumLength ),
 
         /**
          * If numeric characters are allowed (true/false).
@@ -193,7 +200,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_NUMERIC_ALLOWED,
                 "TRUE",
-                ChaiPasswordRule.AllowNumeric),
+                ChaiPasswordRule.AllowNumeric ),
 
         /**
          * If the first character in the password is permitted to be a numeric character (true/false).
@@ -202,7 +209,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_NUMERIC_FIRST_ALLOWED,
                 "TRUE",
-                ChaiPasswordRule.AllowFirstCharNumeric),
+                ChaiPasswordRule.AllowFirstCharNumeric ),
 
         /**
          * If the last character in the password is permitted to be a numeric character (true/false).
@@ -211,7 +218,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_NUMERIC_LAST_ALLOWED,
                 "TRUE",
-                ChaiPasswordRule.AllowLastCharNumeric),
+                ChaiPasswordRule.AllowLastCharNumeric ),
 
         /**
          * If special (non-alphanumeric) characters are allowed (true/false).
@@ -220,7 +227,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_SPECIAL_ALLOWED,
                 "TRUE",
-                ChaiPasswordRule.AllowSpecial),
+                ChaiPasswordRule.AllowSpecial ),
 
         /**
          * If the first character in the password is permitted to be a numeric character (true/false).
@@ -229,7 +236,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_SPECIAL_FIRST_ALLOWED,
                 "TRUE",
-                ChaiPasswordRule.AllowFirstCharSpecial),
+                ChaiPasswordRule.AllowFirstCharSpecial ),
 
         /**
          * If the last character in the password is permitted to be a numeric character (true/false).
@@ -238,7 +245,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_SPECIAL_LAST_ALLOWED,
                 "TRUE",
-                ChaiPasswordRule.AllowLastCharSpecial),
+                ChaiPasswordRule.AllowLastCharSpecial ),
 
         /**
          * If the password should be recognized as case sensitive (true/false).
@@ -247,7 +254,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_CASE_SENSITIVE,
                 "TRUE",
-                ChaiPasswordRule.CaseSensitive),
+                ChaiPasswordRule.CaseSensitive ),
 
         /**
          * If the password must be unique when compared to previously used passwords (true/false).  This rule
@@ -257,7 +264,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_UNIQUE_REQUIRED,
                 "FALSE",
-                ChaiPasswordRule.UniqueRequired),
+                ChaiPasswordRule.UniqueRequired ),
 
         /**
          * If this policy is enabled (true/false).
@@ -266,7 +273,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_RULE_ENFORCEMENT,
                 "FALSE",
-                null),
+                null ),
 
 
         /**
@@ -277,7 +284,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_EXPIRATION_INTERVAL,
                 "0",
-                ChaiPasswordRule.ExpirationInterval),
+                ChaiPasswordRule.ExpirationInterval ),
 
         /**
          * The maximum number of passwords allowed in the user's password history list(true/false).
@@ -287,7 +294,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_HISTORY_LIMIT,
                 "0",
-                null),
+                null ),
 
         /**
          * While stored in this {@code PasswordPolicy}, values are separated by {@link Character#LINE_SEPARATOR}.
@@ -297,7 +304,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_EXCLUDE_LIST,
                 "",
-                ChaiPasswordRule.DisallowedValues),
+                ChaiPasswordRule.DisallowedValues ),
 
         /**
          * Bitmask of policy options.
@@ -308,7 +315,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_OPTIONS,
                 "884",
-                null),
+                null ),
 
         /**
          * Message to display to user during password change.
@@ -317,7 +324,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_CHANGE_MESSAGE,
                 "",
-                ChaiPasswordRule.ChangeMessage),
+                ChaiPasswordRule.ChangeMessage ),
 
         /**
          * The ldap DN of the entry from which this {@code PasswordPolicy} was built.  There are no gaurentees made about
@@ -330,7 +337,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_CHALLENGE_SET_DN,
                 "",
-                null),
+                null ),
 
         /**
          * The "guid" of the entry from which this {@code PasswordPolicy} was built.  There are no gaurentees made about
@@ -343,7 +350,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_CHALLENGE_SET_GUID,
                 "",
-                null),
+                null ),
 
         /**
          * The configured action to take when a user is trying to recover a forgotten password.
@@ -353,7 +360,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_FORGOTTEN_ACTION,
                 "",
-                null),
+                null ),
 
         /**
          * The configuration for forgotten password.
@@ -363,7 +370,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_FORGOTTEN_LOGIN_CONFIG,
                 "TRUE",
-                null),
+                null ),
 
         /**
          * Values of the user's password that are not permitted inside the user's password.
@@ -373,7 +380,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_DISALLOWED_ATTRIBUTES,
                 "",
-                ChaiPasswordRule.DisallowedAttributes),
+                ChaiPasswordRule.DisallowedAttributes ),
 
         /**
          * Minimum lifetime of the user's password.  Once set, the user will not be able to modify
@@ -383,7 +390,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MIN,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_LIFETIME,
                 "0",
-                ChaiPasswordRule.MinimumLifetime),
+                ChaiPasswordRule.MinimumLifetime ),
 
 
         /**
@@ -393,7 +400,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.OTHER,
                 "nspmComplexityRules",
                 "",
-                null),
+                null ),
         /**
          * AD 2008 Complexity Policy
          */
@@ -401,7 +408,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.BOOLEAN,
                 "nspmAD2K8Syntax",
                 "FALSE",
-                ChaiPasswordRule.ADComplexity2008),
+                ChaiPasswordRule.ADComplexity2008 ),
 
         /**
          * AD 2008 Complexity Policy
@@ -410,9 +417,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
                 TYPE.MAX,
                 "nspmAD2K8maxViolaton",
                 "2",
-                ChaiPasswordRule.ADComplexityMaxViolation),
-        ;
-
+                ChaiPasswordRule.ADComplexityMaxViolation ),;
 
 
         private final TYPE type;
@@ -420,7 +425,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
         private final String defaultValue;
         private final ChaiPasswordRule ruleName;
 
-        Attribute(final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName)
+        Attribute( final TYPE type, final String ldapAttr, final String defaultValue, final ChaiPasswordRule ruleName )
         {
             this.type = type;
             this.ldapAttr = ldapAttr;
@@ -483,7 +488,8 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
         /**
          * An enumeration indicating what type of setting is expected for this attribute's value.
          */
-        public enum TYPE {
+        public enum TYPE
+        {
             /**
              * An integer representing a maximum limit of a value
              */MAX,
@@ -498,13 +504,17 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy {
              */OTHER
         }
 
-        public static Attribute attributeForRule(final ChaiPasswordRule rule) {
-            if (rule == null) {
+        public static Attribute attributeForRule( final ChaiPasswordRule rule )
+        {
+            if ( rule == null )
+            {
                 return null;
             }
 
-            for (final Attribute attr : Attribute.values()) {
-                if (rule.equals(attr.getRuleName())) {
+            for ( final Attribute attr : Attribute.values() )
+            {
+                if ( rule.equals( attr.getRuleName() ) )
+                {
                     return attr;
                 }
             }

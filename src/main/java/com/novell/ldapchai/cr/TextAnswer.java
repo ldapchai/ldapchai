@@ -22,56 +22,67 @@ package com.novell.ldapchai.cr;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import org.jdom2.Element;
 
-class TextAnswer implements Answer {
+class TextAnswer implements Answer
+{
     private String answer;
     private boolean caseInsensitive;
 
-    TextAnswer(final String answer, final boolean caseInsensitive) {
-        if (answer == null || answer.length() < 1) {
-            throw new IllegalArgumentException("missing answer text");
+    TextAnswer( final String answer, final boolean caseInsensitive )
+    {
+        if ( answer == null || answer.length() < 1 )
+        {
+            throw new IllegalArgumentException( "missing answer text" );
         }
 
         this.answer = answer;
         this.caseInsensitive = caseInsensitive;
     }
 
-    public Element toXml() {
-        final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
-        answerElement.setText(answer);
-        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.TEXT.toString());
+    public Element toXml()
+    {
+        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        answerElement.setText( answer );
+        answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.TEXT.toString() );
         return answerElement;
     }
 
-    public boolean testAnswer(final String testResponse) {
-        if (testResponse == null) {
+    public boolean testAnswer( final String testResponse )
+    {
+        if ( testResponse == null )
+        {
             return false;
         }
 
         final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
-        return answer.equalsIgnoreCase(casedResponse);
+        return answer.equalsIgnoreCase( casedResponse );
     }
 
-    public AnswerBean asAnswerBean() {
+    public AnswerBean asAnswerBean()
+    {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(FormatType.TEXT);
-        answerBean.setAnswerText(answer);
-        answerBean.setCaseInsensitive(caseInsensitive);
+        answerBean.setType( FormatType.TEXT );
+        answerBean.setAnswerText( answer );
+        answerBean.setCaseInsensitive( caseInsensitive );
         return answerBean;
     }
 
-    static class TextAnswerFactory implements ImplementationFactory {
-        public TextAnswer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
+    static class TextAnswerFactory implements ImplementationFactory
+    {
+        public TextAnswer newAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+        {
             final boolean caseInsensitive = answerConfiguration.caseInsensitive;
-            return new TextAnswer(answer, caseInsensitive);
+            return new TextAnswer( answer, caseInsensitive );
         }
 
-        public Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
-            return new TextAnswer(input.getAnswerText(), input.isCaseInsensitive());
+        public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
+        {
+            return new TextAnswer( input.getAnswerText(), input.isCaseInsensitive() );
         }
 
-        public TextAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+        public TextAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        {
             final String answerValue = element.getText();
-            return new TextAnswer(answerValue, caseInsensitive);
+            return new TextAnswer( answerValue, caseInsensitive );
         }
     }
 }

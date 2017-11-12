@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-public interface Server extends Top {
+public interface Server extends Top
+{
 }

@@ -33,15 +33,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author Jason D. Rivard
  * @see ChaiSetting#WIRETRACE_ENABLE
  */
-class WireTraceWrapper extends AbstractWrapper {
+class WireTraceWrapper extends AbstractWrapper
+{
 
 
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WireTraceWrapper.class );
 
-
-
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(WireTraceWrapper.class);
-
-    private AtomicLong operationCounter = new AtomicLong(0);
+    private AtomicLong operationCounter = new AtomicLong( 0 );
 
     /**
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.
@@ -54,22 +52,24 @@ class WireTraceWrapper extends AbstractWrapper {
     )
     {
         //check to make sure watchdog ise enabled;
-        final boolean watchDogEnabled = Boolean.parseBoolean(chaiProvider.getChaiConfiguration().getSetting(ChaiSetting.WIRETRACE_ENABLE));
-        if (!watchDogEnabled) {
+        final boolean watchDogEnabled = Boolean.parseBoolean( chaiProvider.getChaiConfiguration().getSetting( ChaiSetting.WIRETRACE_ENABLE ) );
+        if ( !watchDogEnabled )
+        {
             final String errorStr = "attempt to obtain WireTrace wrapper when watchdog is not enabled in chai config";
-            LOGGER.warn(errorStr);
-            throw new IllegalStateException(errorStr);
+            LOGGER.warn( errorStr );
+            throw new IllegalStateException( errorStr );
         }
 
-        if (Proxy.isProxyClass(chaiProvider.getClass()) && chaiProvider instanceof WireTraceWrapper) {
-            LOGGER.warn("attempt to obtain WireTraceWrapper wrapper for already wrapped Provider.");
+        if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof WireTraceWrapper )
+        {
+            LOGGER.warn( "attempt to obtain WireTraceWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 
-        return (ChaiProviderImplementor) Proxy.newProxyInstance(
+        return ( ChaiProviderImplementor ) Proxy.newProxyInstance(
                 chaiProvider.getClass().getClassLoader(),
                 chaiProvider.getClass().getInterfaces(),
-                new WireTraceWrapper(chaiProvider));
+                new WireTraceWrapper( chaiProvider ) );
     }
 
     WireTraceWrapper(
@@ -82,51 +82,65 @@ class WireTraceWrapper extends AbstractWrapper {
     public Object invoke(
             final Object proxy,
             final Method method,
-            final Object[] args)
+            final Object[] args )
             throws Throwable
     {
-        final boolean isLdap = method.getAnnotation(ChaiProviderImplementor.LdapOperation.class) != null;
+        final boolean isLdap = method.getAnnotation( ChaiProviderImplementor.LdapOperation.class ) != null;
 
-        try {
-            if (isLdap) {
-                return traceInvokation(method, args);
-            } else {
-                return method.invoke(realProvider, args);
+        try
+        {
+            if ( isLdap )
+            {
+                return traceInvokation( method, args );
             }
-        } catch (InvocationTargetException e) {
+            else
+            {
+                return method.invoke( realProvider, args );
+            }
+        }
+        catch ( InvocationTargetException e )
+        {
             throw e.getTargetException();
-        } catch (Exception e) {
-            throw new RuntimeException("unexpected invocation exception: " + e.getMessage(),e);
+        }
+        catch ( Exception e )
+        {
+            throw new RuntimeException( "unexpected invocation exception: " + e.getMessage(), e );
         }
     }
 
     private Object traceInvokation(
             final Method method,
-            final Object[] args)
+            final Object[] args )
             throws Throwable
     {
         final long opNumber = getNextCounter();
         final String messageLabel = "id=" + realProvider.getIdentifier() + ",op#" + opNumber;
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("begin " + messageLabel + " method " + AbstractProvider.methodToDebugStr(method, args));
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "begin " + messageLabel + " method " + AbstractProvider.methodToDebugStr( method, args ) );
         }
 
         final long startTime = System.currentTimeMillis();
-        final Object result = method.invoke(realProvider, args);
+        final Object result = method.invoke( realProvider, args );
         final long totalTime = System.currentTimeMillis() - startTime;
 
         String debugResult = null;
-        if (result != null) {
-            try {
-                debugResult = (new GsonBuilder().disableHtmlEscaping().create()).toJson(result);
-            } catch (Exception e) {
+        if ( result != null )
+        {
+            try
+            {
+                debugResult = ( new GsonBuilder().disableHtmlEscaping().create() ).toJson( result );
+            }
+            catch ( Exception e )
+            {
                 debugResult = toString();
             }
         }
 
-        if (LOGGER.isTraceEnabled()) {
-            LOGGER.trace("finish " + messageLabel + " result: " + (debugResult== null ? "null" : debugResult) + " (" + totalTime + "ms)");
+        if ( LOGGER.isTraceEnabled() )
+        {
+            LOGGER.trace( "finish " + messageLabel + " result: " + ( debugResult == null ? "null" : debugResult ) + " (" + totalTime + "ms)" );
         }
 
         return result;

@@ -39,14 +39,14 @@ import java.util.Set;
  *
  * @author Jason D. Rivard
  */
-public class SearchHelper implements Serializable {
+public class SearchHelper implements Serializable
+{
 
 
     public static final String DEFAULT_FILTER = "(objectClass=*)";
     public static final ChaiProvider.SEARCH_SCOPE DEFAULT_SCOPE = ChaiProvider.SEARCH_SCOPE.SUBTREE;
     public static final int DEFAULT_TIMEOUT = 0;
     public static final int DEFAULT_MAX_RESULTS = 0;
-
 
 
     private String filter = DEFAULT_FILTER;
@@ -62,7 +62,8 @@ public class SearchHelper implements Serializable {
     {
     }
 
-    public SearchHelper(final SearchHelper source) {
+    public SearchHelper( final SearchHelper source )
+    {
         this.filter = source.filter;
         this.searchScope = source.searchScope;
         this.attributes = source.attributes;
@@ -76,9 +77,9 @@ public class SearchHelper implements Serializable {
      *
      * @param filter A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      */
-    public SearchHelper(final String filter)
+    public SearchHelper( final String filter )
     {
-        this.setFilter(filter);
+        this.setFilter( filter );
     }
 
     /**
@@ -86,7 +87,7 @@ public class SearchHelper implements Serializable {
      *
      * @param filter A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      */
-    public void setFilter(final String filter)
+    public void setFilter( final String filter )
     {
         this.filter = filter == null ? DEFAULT_FILTER : filter;
     }
@@ -97,9 +98,9 @@ public class SearchHelper implements Serializable {
      *
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public SearchHelper(final ChaiProvider.SEARCH_SCOPE searchScope)
+    public SearchHelper( final ChaiProvider.SEARCH_SCOPE searchScope )
     {
-        this.setSearchScope(searchScope);
+        this.setSearchScope( searchScope );
     }
 
     /**
@@ -108,9 +109,9 @@ public class SearchHelper implements Serializable {
      *
      * @param attributes A list of attribute names.
      */
-    public SearchHelper(final String[] attributes)
+    public SearchHelper( final String[] attributes )
     {
-        this.setAttributes(attributes);
+        this.setAttributes( attributes );
     }
 
     /**
@@ -119,9 +120,9 @@ public class SearchHelper implements Serializable {
      *
      * @param attributes A list of attribute names.
      */
-    public SearchHelper(final Set<String> attributes)
+    public SearchHelper( final Set<String> attributes )
     {
-        this.setAttributes(attributes);
+        this.setAttributes( attributes );
     }
 
     /**
@@ -129,9 +130,9 @@ public class SearchHelper implements Serializable {
      *
      * @param attributes a collection of attribute names
      */
-    public void setAttributes(final Collection<String> attributes)
+    public void setAttributes( final Collection<String> attributes )
     {
-        this.attributes = attributes == null ? null : Collections.unmodifiableSet(new HashSet<String>(attributes));
+        this.attributes = attributes == null ? null : Collections.unmodifiableSet( new HashSet<String>( attributes ) );
     }
 
     /**
@@ -141,10 +142,10 @@ public class SearchHelper implements Serializable {
      * @param filter      A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public SearchHelper(final String filter, final ChaiProvider.SEARCH_SCOPE searchScope)
+    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope )
     {
-        this.setFilter(filter);
-        this.setSearchScope(searchScope);
+        this.setFilter( filter );
+        this.setSearchScope( searchScope );
     }
 
     /**
@@ -154,10 +155,10 @@ public class SearchHelper implements Serializable {
      * @param filter     A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      * @param attributes A list of attribute names.
      */
-    public SearchHelper(final String filter, final String[] attributes)
+    public SearchHelper( final String filter, final String[] attributes )
     {
-        this.setFilter(filter);
-        this.setAttributes(attributes);
+        this.setFilter( filter );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -167,10 +168,10 @@ public class SearchHelper implements Serializable {
      * @param filter     A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      * @param attributes A list of attribute names.
      */
-    public SearchHelper(final String filter, final Set<String> attributes)
+    public SearchHelper( final String filter, final Set<String> attributes )
     {
-        this.setFilter(filter);
-        this.setAttributes(attributes);
+        this.setFilter( filter );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -180,10 +181,10 @@ public class SearchHelper implements Serializable {
      * @param filter     A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
      * @param attributes A list of comma or space seperated attributes
      */
-    public SearchHelper(final String filter, final String attributes)
+    public SearchHelper( final String filter, final String attributes )
     {
-        this.setFilter(filter);
-        this.setAttributes(attributes);
+        this.setFilter( filter );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -191,9 +192,9 @@ public class SearchHelper implements Serializable {
      *
      * @param attributes A list of comma or space seperated attributes
      */
-    public void setAttributes(final String attributes)
+    public void setAttributes( final String attributes )
     {
-        setAttributes(attributes.split(",| "));
+        setAttributes( attributes.split( ",| " ) );
     }
 
     /**
@@ -203,10 +204,10 @@ public class SearchHelper implements Serializable {
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper(final String[] attributes, final ChaiProvider.SEARCH_SCOPE searchScope)
+    public SearchHelper( final String[] attributes, final ChaiProvider.SEARCH_SCOPE searchScope )
     {
-        this.setSearchScope(searchScope);
-        this.setAttributes(attributes);
+        this.setSearchScope( searchScope );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -216,25 +217,10 @@ public class SearchHelper implements Serializable {
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper(final Set<String> attributes, final ChaiProvider.SEARCH_SCOPE searchScope)
+    public SearchHelper( final Set<String> attributes, final ChaiProvider.SEARCH_SCOPE searchScope )
     {
-        this.setSearchScope(searchScope);
-        this.setAttributes(attributes);
-    }
-
-    /**
-     * Construct a {@code SearchHelper} with the supplied parameters.  Default values are used for
-     * missing values.
-     *
-     * @param filter      A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
-     * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
-     * @param attributes  A list of attribute names.
-     */
-    public SearchHelper(final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final String[] attributes)
-    {
-        this.setFilter(filter);
-        this.setSearchScope(searchScope);
-        this.setAttributes(attributes);
+        this.setSearchScope( searchScope );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -245,11 +231,26 @@ public class SearchHelper implements Serializable {
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of attribute names.
      */
-    public SearchHelper(final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final Set<String> attributes)
+    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final String[] attributes )
     {
-        this.setFilter(filter);
-        this.setSearchScope(searchScope);
-        this.setAttributes(attributes);
+        this.setFilter( filter );
+        this.setSearchScope( searchScope );
+        this.setAttributes( attributes );
+    }
+
+    /**
+     * Construct a {@code SearchHelper} with the supplied parameters.  Default values are used for
+     * missing values.
+     *
+     * @param filter      A valid ldap search filter.  <i>null</i> will set the filter to {@link #DEFAULT_FILTER}.
+     * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
+     * @param attributes  A list of attribute names.
+     */
+    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final Set<String> attributes )
+    {
+        this.setFilter( filter );
+        this.setSearchScope( searchScope );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -260,11 +261,11 @@ public class SearchHelper implements Serializable {
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      * @param attributes  A list of comma or space seperated attributes
      */
-    public SearchHelper(final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final String attributes)
+    public SearchHelper( final String filter, final ChaiProvider.SEARCH_SCOPE searchScope, final String attributes )
     {
-        this.setFilter(filter);
-        this.setSearchScope(searchScope);
-        this.setAttributes(attributes);
+        this.setFilter( filter );
+        this.setSearchScope( searchScope );
+        this.setAttributes( attributes );
     }
 
     /**
@@ -276,7 +277,7 @@ public class SearchHelper implements Serializable {
      */
     public Set<String> getAttributes()
     {
-        return attributes == null ? null : Collections.unmodifiableSet(attributes);
+        return attributes == null ? null : Collections.unmodifiableSet( attributes );
     }
 
     /**
@@ -284,9 +285,9 @@ public class SearchHelper implements Serializable {
      *
      * @param attributes A list of attribute names.
      */
-    public void setAttributes(final String... attributes)
+    public void setAttributes( final String... attributes )
     {
-        this.attributes = attributes == null ? null : new HashSet<String>(Arrays.asList(attributes));
+        this.attributes = attributes == null ? null : new HashSet<String>( Arrays.asList( attributes ) );
     }
 
     /**
@@ -304,7 +305,7 @@ public class SearchHelper implements Serializable {
         return maxResults;
     }
 
-    public void setMaxResults(final int maxResults)
+    public void setMaxResults( final int maxResults )
     {
         this.maxResults = maxResults;
     }
@@ -324,7 +325,7 @@ public class SearchHelper implements Serializable {
      *
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
-    public void setSearchScope(final ChaiProvider.SEARCH_SCOPE searchScope)
+    public void setSearchScope( final ChaiProvider.SEARCH_SCOPE searchScope )
     {
         this.searchScope = searchScope;
     }
@@ -334,36 +335,44 @@ public class SearchHelper implements Serializable {
         return timeLimit;
     }
 
-    public void setTimeLimit(final int timeLimit)
+    public void setTimeLimit( final int timeLimit )
     {
         this.timeLimit = timeLimit;
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
             return true;
         }
 
-        if (o == null || getClass() != o.getClass()) {
+        if ( o == null || getClass() != o.getClass() )
+        {
             return false;
         }
 
-        final SearchHelper that = (SearchHelper) o;
+        final SearchHelper that = ( SearchHelper ) o;
 
-        if (maxResults != that.maxResults) {
+        if ( maxResults != that.maxResults )
+        {
             return false;
         }
-        if (timeLimit != that.timeLimit) {
+        if ( timeLimit != that.timeLimit )
+        {
             return false;
         }
-        if (attributes != null ? !attributes.equals(that.attributes) : that.attributes != null) {
+        if ( attributes != null ? !attributes.equals( that.attributes ) : that.attributes != null )
+        {
             return false;
         }
-        if (filter != null ? !filter.equals(that.filter) : that.filter != null) {
+        if ( filter != null ? !filter.equals( that.filter ) : that.filter != null )
+        {
             return false;
         }
-        if (searchScope != that.searchScope) {
+        if ( searchScope != that.searchScope )
+        {
             return false;
         }
 
@@ -371,10 +380,11 @@ public class SearchHelper implements Serializable {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         int result = filter != null ? filter.hashCode() : 0;
-        result = 31 * result + (searchScope != null ? searchScope.hashCode() : 0);
-        result = 31 * result + (attributes != null ? attributes.hashCode() : 0);
+        result = 31 * result + ( searchScope != null ? searchScope.hashCode() : 0 );
+        result = 31 * result + ( attributes != null ? attributes.hashCode() : 0 );
         result = 31 * result + maxResults;
         result = 31 * result + timeLimit;
         return result;
@@ -389,11 +399,12 @@ public class SearchHelper implements Serializable {
     {
         final StringBuilder sb = new StringBuilder();
 
-        sb.append("SearchHelper: ");
-        sb.append("filter: ").append(filter).append(", ");
-        sb.append("scope: ").append(this.getSearchScope()).append(", ");
-        if (attributes != null) {
-            sb.append("attributes: ").append(Arrays.toString(attributes.toArray(new String[attributes.size()])));
+        sb.append( "SearchHelper: " );
+        sb.append( "filter: " ).append( filter ).append( ", " );
+        sb.append( "scope: " ).append( this.getSearchScope() ).append( ", " );
+        if ( attributes != null )
+        {
+            sb.append( "attributes: " ).append( Arrays.toString( attributes.toArray( new String[attributes.size()] ) ) );
         }
 
         return sb.toString();
@@ -430,40 +441,48 @@ public class SearchHelper implements Serializable {
      *
      * @param nameValuePairs A valid list of attribute to name pairs
      */
-    public void setFilterAnd(final Map<String, String> nameValuePairs)
+    public void setFilterAnd( final Map<String, String> nameValuePairs )
     {
-        if (nameValuePairs == null) {
+        if ( nameValuePairs == null )
+        {
             throw new NullPointerException();
         }
 
-        if (nameValuePairs.size() < 1) {
-            throw new IllegalArgumentException("requires at least one key");
+        if ( nameValuePairs.size() < 1 )
+        {
+            throw new IllegalArgumentException( "requires at least one key" );
         }
 
-        final List<FilterSequence> filters = new ArrayList<FilterSequence>();
-        for (final Map.Entry<String,String> entry : nameValuePairs.entrySet()) {
-            filters.add(new FilterSequence(entry.getKey(), entry.getValue(), FilterSequence.MatchingRuleEnum.EQUALS));
+        final List<FilterSequence> filters = new ArrayList<>();
+        for ( final Map.Entry<String, String> entry : nameValuePairs.entrySet() )
+        {
+            filters.add( new FilterSequence( entry.getKey(), entry.getValue(), FilterSequence.MatchingRuleEnum.EQUALS ) );
         }
-        setFilterBind(filters, "&");
+        setFilterBind( filters, "&" );
     }
 
-    private void setFilterBind(final List<FilterSequence> filterSequences, final String operator)
+    private void setFilterBind( final List<FilterSequence> filterSequences, final String operator )
     {
-        if (filterSequences == null || filterSequences.size() < 1) {
-            throw new IllegalArgumentException("requires at least one key");
+        if ( filterSequences == null || filterSequences.size() < 1 )
+        {
+            throw new IllegalArgumentException( "requires at least one key" );
         }
 
         final StringBuilder sb = new StringBuilder();
 
-        if (filterSequences.size() > 1) {
-            sb.append("(");
-            sb.append(operator);
-            for (final FilterSequence sequence : filterSequences) {
-                sb.append(sequence.toString());
+        if ( filterSequences.size() > 1 )
+        {
+            sb.append( "(" );
+            sb.append( operator );
+            for ( final FilterSequence sequence : filterSequences )
+            {
+                sb.append( sequence.toString() );
             }
-            sb.append(")");
-        } else {
-            sb.append(filterSequences.get(0).toString());
+            sb.append( ")" );
+        }
+        else
+        {
+            sb.append( filterSequences.get( 0 ).toString() );
         }
 
         filter = sb.toString();
@@ -475,18 +494,20 @@ public class SearchHelper implements Serializable {
      * @param nameValuePairs A valid map of name=value pairs.
      * @see #setFilterAnd(java.util.Map)
      */
-    public void setFilterAnd(final Properties nameValuePairs)
+    public void setFilterAnd( final Properties nameValuePairs )
     {
-        if (nameValuePairs == null) {
+        if ( nameValuePairs == null )
+        {
             throw new NullPointerException();
         }
 
         final Map<String, String> newMap = new HashMap<String, String>();
-        for (Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); ) {
-            final String name = (String) enumer.nextElement();
-            newMap.put(name, nameValuePairs.getProperty(name));
+        for ( Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); )
+        {
+            final String name = ( String ) enumer.nextElement();
+            newMap.put( name, nameValuePairs.getProperty( name ) );
         }
-        setFilterAnd(newMap);
+        setFilterAnd( newMap );
     }
 
     /**
@@ -501,12 +522,12 @@ public class SearchHelper implements Serializable {
      *
      * @param attributeName A valid attribute name
      */
-    public void setFilterExists(final String attributeName)
+    public void setFilterExists( final String attributeName )
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("(");
-        sb.append(new FilterSequence(attributeName, "*", FilterSequence.MatchingRuleEnum.EQUALS));
-        sb.append(")");
+        sb.append( "(" );
+        sb.append( new FilterSequence( attributeName, "*", FilterSequence.MatchingRuleEnum.EQUALS ) );
+        sb.append( ")" );
         this.filter = sb.toString();
     }
 
@@ -523,18 +544,19 @@ public class SearchHelper implements Serializable {
      *
      * @param attributeNames A valid set of attribute names
      */
-    public void setFilterExists(final Set<String> attributeNames)
+    public void setFilterExists( final Set<String> attributeNames )
     {
         final StringBuilder sb = new StringBuilder();
-        sb.append("(&");
+        sb.append( "(&" );
 
-        for (final String name : attributeNames) {
-            sb.append("(");
-            sb.append(new FilterSequence(name, "*", FilterSequence.MatchingRuleEnum.EQUALS));
-            sb.append(")");
+        for ( final String name : attributeNames )
+        {
+            sb.append( "(" );
+            sb.append( new FilterSequence( name, "*", FilterSequence.MatchingRuleEnum.EQUALS ) );
+            sb.append( ")" );
         }
 
-        sb.append(")");
+        sb.append( ")" );
 
         filter = sb.toString();
     }
@@ -552,9 +574,9 @@ public class SearchHelper implements Serializable {
      * @param attributeName A valid attribute name
      * @param value         A value that, if it exists, will cause the object to be excluded from the result set.
      */
-    public void setFilterNot(final String attributeName, final String value)
+    public void setFilterNot( final String attributeName, final String value )
     {
-        this.setFilter(attributeName, value);
+        this.setFilter( attributeName, value );
         filter = "(!" + filter + ")";
     }
 
@@ -571,9 +593,9 @@ public class SearchHelper implements Serializable {
      * @param attributeName A valid attribute name
      * @param value         A value that, if it exists, will cause the object to be included in result set.
      */
-    public void setFilter(final String attributeName, final String value)
+    public void setFilter( final String attributeName, final String value )
     {
-        filter = new FilterSequence(attributeName, value).toString();
+        filter = new FilterSequence( attributeName, value ).toString();
     }
 
     /**
@@ -589,21 +611,24 @@ public class SearchHelper implements Serializable {
      *
      * @param nameValuePairs A valid list of attribute to name pairs
      */
-    public void setFilterOr(final Map<String, String> nameValuePairs)
+    public void setFilterOr( final Map<String, String> nameValuePairs )
     {
-        if (nameValuePairs == null) {
+        if ( nameValuePairs == null )
+        {
             throw new NullPointerException();
         }
 
-        if (nameValuePairs.size() < 1) {
-            throw new IllegalArgumentException("requires at least one key");
+        if ( nameValuePairs.size() < 1 )
+        {
+            throw new IllegalArgumentException( "requires at least one key" );
         }
 
-        final List<FilterSequence> filters = new ArrayList<FilterSequence>();
-        for (final Map.Entry<String,String> entry : nameValuePairs.entrySet()) {
-            filters.add(new FilterSequence(entry.getKey(), entry.getValue(), FilterSequence.MatchingRuleEnum.EQUALS));
+        final List<FilterSequence> filters = new ArrayList<>();
+        for ( final Map.Entry<String, String> entry : nameValuePairs.entrySet() )
+        {
+            filters.add( new FilterSequence( entry.getKey(), entry.getValue(), FilterSequence.MatchingRuleEnum.EQUALS ) );
         }
-        setFilterBind(filters, "|");
+        setFilterBind( filters, "|" );
     }
 
     /**
@@ -612,30 +637,34 @@ public class SearchHelper implements Serializable {
      * @param nameValuePairs A valid map of name=value pairs.
      * @see #setFilterOr(java.util.Map)
      */
-    public void setFilterOr(final Properties nameValuePairs)
+    public void setFilterOr( final Properties nameValuePairs )
     {
-        if (nameValuePairs == null) {
+        if ( nameValuePairs == null )
+        {
             throw new NullPointerException();
         }
 
         final Map<String, String> newMap = new HashMap<String, String>();
-        for (Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); ) {
-            final String name = (String) enumer.nextElement();
-            newMap.put(name, nameValuePairs.getProperty(name));
+        for ( Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); )
+        {
+            final String name = ( String ) enumer.nextElement();
+            newMap.put( name, nameValuePairs.getProperty( name ) );
         }
-        setFilterOr(newMap);
+        setFilterOr( newMap );
     }
 
-    static class FilterSequence {
-        public enum MatchingRuleEnum {
-            EQUALS("="),
-            APPROX_EQUALS("~="),
-            GREATER(">="),
-            LESS("<=");
+    static class FilterSequence
+    {
+        public enum MatchingRuleEnum
+        {
+            EQUALS( "=" ),
+            APPROX_EQUALS( "~=" ),
+            GREATER( ">=" ),
+            LESS( "<=" );
 
             private String matchCode;
 
-            MatchingRuleEnum(final String matchCode)
+            MatchingRuleEnum( final String matchCode )
             {
                 this.matchCode = matchCode;
             }
@@ -651,10 +680,11 @@ public class SearchHelper implements Serializable {
         private MatchingRuleEnum matchingRule;
 
 
-        FilterSequence(final String attr, final String value, final MatchingRuleEnum matchingRule)
+        FilterSequence( final String attr, final String value, final MatchingRuleEnum matchingRule )
         {
-            if (attr == null) {
-                throw new NullPointerException("attr is required");
+            if ( attr == null )
+            {
+                throw new NullPointerException( "attr is required" );
             }
 
             this.attr = attr;
@@ -662,9 +692,9 @@ public class SearchHelper implements Serializable {
             this.matchingRule = matchingRule;
         }
 
-        FilterSequence(final String attr, final String value)
+        FilterSequence( final String attr, final String value )
         {
-            this(attr, value, MatchingRuleEnum.EQUALS);
+            this( attr, value, MatchingRuleEnum.EQUALS );
         }
 
         public String getAttr()

@@ -29,50 +29,50 @@ import java.util.TreeSet;
  * Main class to display the chai version info and about when the ldapChai.jar
  * is executed.
  */
-class MainHandler {
+class MainHandler
+{
 
 
+    private static final ResourceBundle BUILD_INFO_BUNDLE = ResourceBundle.getBundle( "com.novell.ldapchai.BuildInformation" );
+    private static final String CHAI_VERSION = BUILD_INFO_BUNDLE.getString( "chai.version" );
+    private static final String CHAI_WEBSITE = BUILD_INFO_BUNDLE.getString( "chai.website" );
 
-
-
-    private static final ResourceBundle BUILD_INFO_BUNDLE = ResourceBundle.getBundle("com.novell.ldapchai.BuildInformation");
-    private static final String CHAI_VERSION = BUILD_INFO_BUNDLE.getString("chai.version");
-    private static final String CHAI_WEBSITE = BUILD_INFO_BUNDLE.getString("chai.website");
-
-    public static void main(final String[] args)
+    public static void main( final String[] args )
     {
-        System.out.println(buildInfoString());
+        System.out.println( buildInfoString() );
 
         JOptionPane.showMessageDialog
-                (null,
+                ( null,
                         buildInfoString(),
                         "About",
-                        JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.INFORMATION_MESSAGE );
     }
 
     private static String buildInfoString()
     {
         final StringBuilder sb = new StringBuilder();
 
-        sb.append("LDAP Chai API v").append(CHAI_VERSION).append(" library\n");
-        sb.append("\n");
-        sb.append("Build Information: \n");
+        sb.append( "LDAP Chai API v" ).append( CHAI_VERSION ).append( " library\n" );
+        sb.append( "\n" );
+        sb.append( "Build Information: \n" );
 
         final Set<String> keySet = new TreeSet<String>();
-        for (Enumeration<String> keyEnum = BUILD_INFO_BUNDLE.getKeys(); keyEnum.hasMoreElements(); ) {
-            keySet.add(keyEnum.nextElement());
+        for ( Enumeration<String> keyEnum = BUILD_INFO_BUNDLE.getKeys(); keyEnum.hasMoreElements(); )
+        {
+            keySet.add( keyEnum.nextElement() );
         }
 
-        for (final String key : keySet) {
-            final String property = BUILD_INFO_BUNDLE.getString(key);
-            sb.append("    ").append(key).append("=").append(property);
-            sb.append("\n");
+        for ( final String key : keySet )
+        {
+            final String property = BUILD_INFO_BUNDLE.getString( key );
+            sb.append( "    " ).append( key ).append( "=" ).append( property );
+            sb.append( "\n" );
         }
 
-        sb.append("\n");
-        sb.append("LDAP Chai project page: " + CHAI_WEBSITE + "\n");
-        sb.append("\n");
-        sb.append("source files are included inside jar archive");
+        sb.append( "\n" );
+        sb.append( "LDAP Chai project page: " + CHAI_WEBSITE + "\n" );
+        sb.append( "\n" );
+        sb.append( "source files are included inside jar archive" );
 
         return sb.toString();
     }

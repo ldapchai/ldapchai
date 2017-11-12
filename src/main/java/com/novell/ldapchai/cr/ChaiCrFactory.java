@@ -44,7 +44,8 @@ import java.util.Set;
  *
  * @author Jason D. Rivard
  */
-public final class ChaiCrFactory {
+public final class ChaiCrFactory
+{
 
 
     /**
@@ -53,8 +54,7 @@ public final class ChaiCrFactory {
     public static final String USER_SUPPLIED_QUESTION = "%user%";
 
 
-
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiCrFactory.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiCrFactory.class );
 
     /**
      * Create a new ResponseSet.  The generated ResponseSet will be suitable for writing to the directory.
@@ -65,8 +65,7 @@ public final class ChaiCrFactory {
      * @param chaiConfiguration     Appropriate configuration to use during this operation
      * @param csIdentifier          Identifier to store on generated ChaiResponseSet
      * @return A ResponseSet suitable for writing.
-     * @throws com.novell.ldapchai.exception.ChaiValidationException
-     *          when there is a logical problem with the response set data, such as more randoms required then exist
+     * @throws com.novell.ldapchai.exception.ChaiValidationException when there is a logical problem with the response set data, such as more randoms required then exist
      */
     public static ChaiResponseSet newChaiResponseSet(
             final Map<Challenge, String> challengeResponseMap,
@@ -77,7 +76,7 @@ public final class ChaiCrFactory {
     )
             throws ChaiValidationException
     {
-        return newChaiResponseSet(challengeResponseMap, Collections.<Challenge,String>emptyMap(), locale, minimumRandomRequired, chaiConfiguration, csIdentifier);
+        return newChaiResponseSet( challengeResponseMap, Collections.emptyMap(), locale, minimumRandomRequired, chaiConfiguration, csIdentifier );
     }
 
     public static ChaiResponseSet newChaiResponseSet(
@@ -90,11 +89,11 @@ public final class ChaiCrFactory {
     )
             throws ChaiValidationException
     {
-        final boolean caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
-        validateAnswers(challengeResponseMap,chaiConfiguration);
-        final Map<Challenge,Answer> answerMap = makeAnswerMap(challengeResponseMap, chaiConfiguration);
-        final Map<Challenge,HelpdeskAnswer> helpdeskAnswerMap = makeHelpdeskAnswerMap(helpdeskChallengeResponseMap, chaiConfiguration);
-        return new ChaiResponseSet(answerMap, helpdeskAnswerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date());
+        final boolean caseInsensitive = chaiConfiguration.getBooleanSetting( ChaiSetting.CR_CASE_INSENSITIVE );
+        validateAnswers( challengeResponseMap, chaiConfiguration );
+        final Map<Challenge, Answer> answerMap = makeAnswerMap( challengeResponseMap, chaiConfiguration );
+        final Map<Challenge, HelpdeskAnswer> helpdeskAnswerMap = makeHelpdeskAnswerMap( helpdeskChallengeResponseMap, chaiConfiguration );
+        return new ChaiResponseSet( answerMap, helpdeskAnswerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date() );
     }
 
     public static ChaiResponseSet newChaiResponseSet(
@@ -106,24 +105,27 @@ public final class ChaiCrFactory {
     )
             throws ChaiValidationException
     {
-        final Map<Challenge, Answer> tempCrMap = new LinkedHashMap<Challenge, Answer>();
+        final Map<Challenge, Answer> tempCrMap = new LinkedHashMap<>();
         final boolean caseInsensitive = challengeResponses.isEmpty() ? false : challengeResponses.iterator().next().getAnswer().isCaseInsensitive();
-        for (final ChallengeBean challengeBean : challengeResponses) {
+        for ( final ChallengeBean challengeBean : challengeResponses )
+        {
             final AnswerBean answerBean = challengeBean.getAnswer();
-            final Challenge challenge = ChaiChallenge.fromChallengeBean(challengeBean);
-            tempCrMap.put(challenge, AnswerFactory.fromAnswerBean(answerBean, challenge.getChallengeText()));
-            if (answerBean.isCaseInsensitive() != caseInsensitive) {
-                throw new IllegalArgumentException("all answers must have the same caseInsensitive value");
+            final Challenge challenge = ChaiChallenge.fromChallengeBean( challengeBean );
+            tempCrMap.put( challenge, AnswerFactory.fromAnswerBean( answerBean, challenge.getChallengeText() ) );
+            if ( answerBean.isCaseInsensitive() != caseInsensitive )
+            {
+                throw new IllegalArgumentException( "all answers must have the same caseInsensitive value" );
             }
         }
         final Map<Challenge, HelpdeskAnswer> tempHelpdeskCrMap = new LinkedHashMap<Challenge, HelpdeskAnswer>();
-        for (final ChallengeBean challengeBean : helpdeskChallengeResponses) {
+        for ( final ChallengeBean challengeBean : helpdeskChallengeResponses )
+        {
             final AnswerBean answerBean = challengeBean.getAnswer();
-            final Challenge challenge = ChaiChallenge.fromChallengeBean(challengeBean);
-            tempHelpdeskCrMap.put(challenge,(HelpdeskAnswer) AnswerFactory.fromAnswerBean(answerBean, challenge.getChallengeText()));
+            final Challenge challenge = ChaiChallenge.fromChallengeBean( challengeBean );
+            tempHelpdeskCrMap.put( challenge, ( HelpdeskAnswer ) AnswerFactory.fromAnswerBean( answerBean, challenge.getChallengeText() ) );
         }
 
-        return new ChaiResponseSet(tempCrMap, tempHelpdeskCrMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date());
+        return new ChaiResponseSet( tempCrMap, tempHelpdeskCrMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date() );
     }
 
     public static boolean writeChaiResponseSet(
@@ -132,91 +134,106 @@ public final class ChaiCrFactory {
     )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        return chaiResponseSet.write(chaiUser);
+        return chaiResponseSet.write( chaiUser );
     }
 
-    private static Map<Challenge,HelpdeskAnswer> makeHelpdeskAnswerMap(
+    private static Map<Challenge, HelpdeskAnswer> makeHelpdeskAnswerMap(
             final Map<Challenge, String> crMap,
             final ChaiConfiguration chaiConfiguration
     )
     {
-        final Map<Challenge,Answer> tempMap = makeAnswerMap(crMap, Answer.FormatType.HELPDESK, chaiConfiguration);
-        final Map<Challenge,HelpdeskAnswer> returnMap = new LinkedHashMap<Challenge, HelpdeskAnswer>();
-        for (final Challenge challenge : tempMap.keySet()) {
-            returnMap.put(challenge, (HelpdeskAnswer)tempMap.get(challenge));
+        final Map<Challenge, Answer> tempMap = makeAnswerMap( crMap, Answer.FormatType.HELPDESK, chaiConfiguration );
+        final Map<Challenge, HelpdeskAnswer> returnMap = new LinkedHashMap<>();
+        for ( final Challenge challenge : tempMap.keySet() )
+        {
+            returnMap.put( challenge, ( HelpdeskAnswer ) tempMap.get( challenge ) );
         }
         return returnMap;
     }
 
 
-    private static Map<Challenge,Answer> makeAnswerMap(
+    private static Map<Challenge, Answer> makeAnswerMap(
             final Map<Challenge, String> crMap,
             final ChaiConfiguration chaiConfiguration
     )
     {
-        final Answer.FormatType formatType = Answer.FormatType.valueOf(chaiConfiguration.getSetting(ChaiSetting.CR_DEFAULT_FORMAT_TYPE));
-        return makeAnswerMap(crMap, formatType, chaiConfiguration);
+        final Answer.FormatType formatType = Answer.FormatType.valueOf( chaiConfiguration.getSetting( ChaiSetting.CR_DEFAULT_FORMAT_TYPE ) );
+        return makeAnswerMap( crMap, formatType, chaiConfiguration );
     }
 
-    private static Map<Challenge,Answer> makeAnswerMap(
+    private static Map<Challenge, Answer> makeAnswerMap(
             final Map<Challenge, String> crMap,
             final Answer.FormatType formatType,
             final ChaiConfiguration chaiConfiguration
     )
     {
 
-        final Map<Challenge,Answer> answerMap = new LinkedHashMap<Challenge, Answer>();
-        for (final Challenge challenge : crMap.keySet()) {
+        final Map<Challenge, Answer> answerMap = new LinkedHashMap<>();
+        for ( final Challenge challenge : crMap.keySet() )
+        {
             final AnswerFactory.AnswerConfiguration answerConfiguration = new AnswerFactory.AnswerConfiguration();
-            answerConfiguration.caseInsensitive = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_CASE_INSENSITIVE);
+            answerConfiguration.caseInsensitive = chaiConfiguration.getBooleanSetting( ChaiSetting.CR_CASE_INSENSITIVE );
             answerConfiguration.formatType = formatType;
-            answerConfiguration.hashCount = Integer.parseInt(chaiConfiguration.getSetting(ChaiSetting.CR_CHAI_SALT_COUNT));
-            answerConfiguration.challengeText = challenge.getChallengeText();  //needed for helpdesk challenges
-            final String answerText = crMap.get(challenge);
-            final Answer answer = AnswerFactory.newAnswer(answerConfiguration, answerText);
-            answerMap.put(challenge,answer);
+            answerConfiguration.hashCount = Integer.parseInt( chaiConfiguration.getSetting( ChaiSetting.CR_CHAI_SALT_COUNT ) );
+
+            //needed for helpdesk challenges
+            answerConfiguration.challengeText = challenge.getChallengeText();
+            final String answerText = crMap.get( challenge );
+            final Answer answer = AnswerFactory.newAnswer( answerConfiguration, answerText );
+            answerMap.put( challenge, answer );
         }
         return answerMap;
     }
 
-    private static void validateAnswers(final Map<Challenge, String> crMap, final ChaiConfiguration chaiConfiguration)
+    private static void validateAnswers( final Map<Challenge, String> crMap, final ChaiConfiguration chaiConfiguration )
             throws ChaiValidationException
     {
-        final boolean allowDuplicates = chaiConfiguration.getBooleanSetting(ChaiSetting.CR_ALLOW_DUPLICATE_RESPONSES);
-        for (final Challenge loopChallenge : crMap.keySet()) {
-            final String answerText = crMap.get(loopChallenge);
+        final boolean allowDuplicates = chaiConfiguration.getBooleanSetting( ChaiSetting.CR_ALLOW_DUPLICATE_RESPONSES );
+        for ( final Challenge loopChallenge : crMap.keySet() )
+        {
+            final String answerText = crMap.get( loopChallenge );
 
-            if (loopChallenge.getChallengeText() == null || loopChallenge.getChallengeText().length() < 1) {
-                throw new ChaiValidationException("challenge text missing for challenge", ChaiError.CR_MISSING_REQUIRED_CHALLENGE_TEXT);
+            if ( loopChallenge.getChallengeText() == null || loopChallenge.getChallengeText().length() < 1 )
+            {
+                throw new ChaiValidationException( "challenge text missing for challenge", ChaiError.CR_MISSING_REQUIRED_CHALLENGE_TEXT );
             }
 
-            if (answerText == null || answerText.length() < 1) {
+            if ( answerText == null || answerText.length() < 1 )
+            {
                 final String errorString = "response text missing for challenge '" + loopChallenge.getChallengeText() + "'";
-                throw new ChaiValidationException(errorString, ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT,loopChallenge.getChallengeText());
+                throw new ChaiValidationException( errorString, ChaiError.CR_MISSING_REQUIRED_RESPONSE_TEXT, loopChallenge.getChallengeText() );
             }
 
-            if (answerText.length() < loopChallenge.getMinLength()) {
+            if ( answerText.length() < loopChallenge.getMinLength() )
+            {
                 final String errorString = "response text is too short for challenge '" + loopChallenge.getChallengeText() + "'";
-                throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_SHORT,loopChallenge.getChallengeText());
+                throw new ChaiValidationException( errorString, ChaiError.CR_RESPONSE_TOO_SHORT, loopChallenge.getChallengeText() );
             }
 
-            if (answerText.length() > loopChallenge.getMaxLength()) {
+            if ( answerText.length() > loopChallenge.getMaxLength() )
+            {
                 final String errorString = "response text is too long for challenge '" + loopChallenge.getChallengeText() + "'";
-                throw new ChaiValidationException(errorString, ChaiError.CR_RESPONSE_TOO_LONG,loopChallenge.getChallengeText());
+                throw new ChaiValidationException( errorString, ChaiError.CR_RESPONSE_TOO_LONG, loopChallenge.getChallengeText() );
             }
 
-            if (loopChallenge.getMaxQuestionCharsInAnswer() > 0) {
+            if ( loopChallenge.getMaxQuestionCharsInAnswer() > 0 )
+            {
                 final int maxChallengeLengthInResponse = loopChallenge.getMaxQuestionCharsInAnswer();
-                if (loopChallenge.getChallengeText() != null) {
-                    final String[] challengeWords = loopChallenge.getChallengeText().toLowerCase().split("\\s");
+                if ( loopChallenge.getChallengeText() != null )
+                {
+                    final String[] challengeWords = loopChallenge.getChallengeText().toLowerCase().split( "\\s" );
                     final String responseTextLower = answerText.toLowerCase();
-                    for (final String challengeWord : challengeWords) {
-                        if (challengeWord.length() > maxChallengeLengthInResponse) {
-                            for (int i = 0; i <= challengeWord.length() - (maxChallengeLengthInResponse + 1); i++) {
-                                final String wordPart = challengeWord.substring(i, i + (maxChallengeLengthInResponse + 1));
-                                if (responseTextLower.contains(wordPart)) {
+                    for ( final String challengeWord : challengeWords )
+                    {
+                        if ( challengeWord.length() > maxChallengeLengthInResponse )
+                        {
+                            for ( int i = 0; i <= challengeWord.length() - ( maxChallengeLengthInResponse + 1 ); i++ )
+                            {
+                                final String wordPart = challengeWord.substring( i, i + ( maxChallengeLengthInResponse + 1 ) );
+                                if ( responseTextLower.contains( wordPart ) )
+                                {
                                     final String errorString = "response text contains too many challenge characters for challenge '" + loopChallenge.getChallengeText() + "'";
-                                    throw new ChaiValidationException(errorString, ChaiError.CR_TOO_MANY_QUESTION_CHARS, loopChallenge.getChallengeText());
+                                    throw new ChaiValidationException( errorString, ChaiError.CR_TOO_MANY_QUESTION_CHARS, loopChallenge.getChallengeText() );
                                 }
                             }
                         }
@@ -226,16 +243,20 @@ public final class ChaiCrFactory {
             }
         }
 
-        if (!allowDuplicates) {
+        if ( !allowDuplicates )
+        {
             final Set<String> seenResponses = new HashSet<String>();
-            for (final Challenge loopChallenge : crMap.keySet()) {
-                final String responseText = crMap.get(loopChallenge);
-                if (responseText != null && responseText.length() > 1) {
+            for ( final Challenge loopChallenge : crMap.keySet() )
+            {
+                final String responseText = crMap.get( loopChallenge );
+                if ( responseText != null && responseText.length() > 1 )
+                {
                     final String lowercaseResponseText = responseText.toLowerCase();
-                    if (seenResponses.contains(lowercaseResponseText)) {
-                        throw new ChaiValidationException("multiple responses have the same value", ChaiError.CR_DUPLICATE_RESPONSES, loopChallenge.getChallengeText());
+                    if ( seenResponses.contains( lowercaseResponseText ) )
+                    {
+                        throw new ChaiValidationException( "multiple responses have the same value", ChaiError.CR_DUPLICATE_RESPONSES, loopChallenge.getChallengeText() );
                     }
-                    seenResponses.add(lowercaseResponseText);
+                    seenResponses.add( lowercaseResponseText );
                 }
             }
         }
@@ -247,25 +268,24 @@ public final class ChaiCrFactory {
 
     /**
      * Read the user's configured ResponseSet from the directory.
-     *
+     * <p>
      * A caller would typically use the returned {@code ResponseSet} for testing responses by calling the ResponseSet's
      * {@link ResponseSet#test(java.util.Map<com.novell.ldapchai.cr.Challenge,java.lang.String>)} method.
      *
-     * @param user         ChaiUser to read responses for
+     * @param user ChaiUser to read responses for
      * @return A valid ResponseSet if found, otherwise null.
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     * @throws com.novell.ldapchai.exception.ChaiValidationException
-     *                                  when there is a logical problem with the response set data, such as more randoms required then exist
+     * @throws ChaiUnavailableException                              If the directory server(s) are unavailable
+     * @throws com.novell.ldapchai.exception.ChaiValidationException when there is a logical problem with the response set data, such as more randoms required then exist
      */
-    public static ChaiResponseSet readChaiResponseSet(final ChaiUser user)
+    public static ChaiResponseSet readChaiResponseSet( final ChaiUser user )
             throws ChaiUnavailableException, ChaiValidationException, ChaiOperationException
     {
-        return ChaiResponseSet.readUserResponseSet(user);
+        return ChaiResponseSet.readUserResponseSet( user );
     }
 
-    public static ResponseSet parseChaiResponseSetXML(final String inputXmlString)
+    public static ResponseSet parseChaiResponseSetXML( final String inputXmlString )
             throws ChaiValidationException, ChaiOperationException
     {
-        return ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML(inputXmlString);
+        return ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML( inputXmlString );
     }
 }

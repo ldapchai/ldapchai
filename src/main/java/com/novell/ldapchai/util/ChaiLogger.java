@@ -24,26 +24,27 @@ package com.novell.ldapchai.util;
  *
  * @author Jason D. Rivard
  */
-public class ChaiLogger {
+public class ChaiLogger
+{
 
 
     private final String name;
     private final org.apache.log4j.Logger logger;
 
-    public static ChaiLogger getLogger(final Class className)
+    public static ChaiLogger getLogger( final Class className )
     {
-        return new ChaiLogger(className.getName());
+        return new ChaiLogger( className.getName() );
     }
 
-    public static ChaiLogger getLogger(final String name)
+    public static ChaiLogger getLogger( final String name )
     {
-        return new ChaiLogger(name);
+        return new ChaiLogger( name );
     }
 
-    public ChaiLogger(final String name)
+    public ChaiLogger( final String name )
     {
         this.name = name;
-        logger = org.apache.log4j.Logger.getLogger(name);
+        logger = org.apache.log4j.Logger.getLogger( name );
     }
 
     public String getName()
@@ -51,44 +52,44 @@ public class ChaiLogger {
         return name;
     }
 
-    public void debug(final Object message)
+    public void debug( final Object message )
     {
-        logger.debug(message);
+        logger.debug( message );
     }
 
-    public void debug(final Object message, final Exception exception)
+    public void debug( final Object message, final Exception exception )
     {
-        logger.trace(message, exception);
+        logger.trace( message, exception );
     }
 
-    public void error(final Object message)
+    public void error( final Object message )
     {
-        logger.error(message);
+        logger.error( message );
     }
 
-    public void error(final Object message, final Exception exception)
+    public void error( final Object message, final Exception exception )
     {
-        logger.error(message, exception);
+        logger.error( message, exception );
     }
 
-    public void fatal(final Object message)
+    public void fatal( final Object message )
     {
-        logger.fatal(message);
+        logger.fatal( message );
     }
 
-    public void fatal(final Object message, final Exception exception)
+    public void fatal( final Object message, final Exception exception )
     {
-        logger.fatal(message, exception);
+        logger.fatal( message, exception );
     }
 
-    public void info(final Object message)
+    public void info( final Object message )
     {
-        logger.info(message);
+        logger.info( message );
     }
 
-    public void info(final Object message, final Exception exception)
+    public void info( final Object message, final Exception exception )
     {
-        logger.info(message, exception);
+        logger.info( message, exception );
     }
 
     public boolean isDebugEnabled()
@@ -106,23 +107,23 @@ public class ChaiLogger {
         return logger.isTraceEnabled();
     }
 
-    public void trace(final Object message)
+    public void trace( final Object message )
     {
-        logger.trace(message);
+        logger.trace( message );
     }
 
-    public void trace(final Object message, final Exception exception)
+    public void trace( final Object message, final Exception exception )
     {
-        logger.debug(message, exception);
+        logger.debug( message, exception );
     }
 
-    public void warn(final Object message)
+    public void warn( final Object message )
     {
-        logger.warn(message);
+        logger.warn( message );
     }
 
-    public void warn(final Object message, final Exception exception)
+    public void warn( final Object message, final Exception exception )
     {
-        logger.warn(message, exception);
+        logger.warn( message, exception );
     }
 }

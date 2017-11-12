@@ -34,52 +34,55 @@ import java.lang.reflect.Proxy;
  * @author Jason D. Rivard
  * @see com.novell.ldapchai.provider.ChaiSetting#READONLY
  */
-class ReadOnlyWrapper implements InvocationHandler {
+class ReadOnlyWrapper implements InvocationHandler
+{
 
 
-
-
-
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ReadOnlyWrapper.class.getName());
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ReadOnlyWrapper.class.getName() );
 
     /**
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
      */
     private ChaiProviderImplementor realProvider;
 
-    static ChaiProviderImplementor forProvider(final ChaiProviderImplementor chaiProvider)
+    static ChaiProviderImplementor forProvider( final ChaiProviderImplementor chaiProvider )
     {
-        if (Proxy.isProxyClass(chaiProvider.getClass()) && chaiProvider instanceof ReadOnlyWrapper) {
-            LOGGER.warn("attempt to obtain ReadOnlyWrapper wrapper for already wrapped Provider.");
+        if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof ReadOnlyWrapper )
+        {
+            LOGGER.warn( "attempt to obtain ReadOnlyWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 
-        return (ChaiProviderImplementor) Proxy.newProxyInstance(
+        return ( ChaiProviderImplementor ) Proxy.newProxyInstance(
                 chaiProvider.getClass().getClassLoader(),
                 chaiProvider.getClass().getInterfaces(),
-                new ReadOnlyWrapper(chaiProvider));
+                new ReadOnlyWrapper( chaiProvider ) );
     }
 
-    private ReadOnlyWrapper(final ChaiProviderImplementor realProvider)
+    private ReadOnlyWrapper( final ChaiProviderImplementor realProvider )
     {
         this.realProvider = realProvider;
     }
 
-    public Object invoke(final Object proxy, final Method method, final Object[] args)
+    public Object invoke( final Object proxy, final Method method, final Object[] args )
             throws Throwable
     {
-        final boolean isModify = method.getAnnotation(ChaiProviderImplementor.ModifyOperation.class) != null;
+        final boolean isModify = method.getAnnotation( ChaiProviderImplementor.ModifyOperation.class ) != null;
 
-        if (isModify) {
-            throw new ChaiOperationException("attempt to make ldap modifaction, but Chai is configured for read-only",
+        if ( isModify )
+        {
+            throw new ChaiOperationException( "attempt to make ldap modifaction, but Chai is configured for read-only",
                     ChaiError.READ_ONLY_VIOLATION,
                     true,
-                    false);
+                    false );
         }
 
-        try {
-            return method.invoke(realProvider, args);
-        } catch (InvocationTargetException e) {
+        try
+        {
+            return method.invoke( realProvider, args );
+        }
+        catch ( InvocationTargetException e )
+        {
             throw e.getCause();
         }
     }

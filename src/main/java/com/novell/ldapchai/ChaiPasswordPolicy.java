@@ -27,22 +27,23 @@ import java.util.Set;
  * Represents a password policy ldap entry.  The actual implementation for this
  * class may or may not represent a one to one relationship with an ldap entry, such
  * functionality is directory implementation specific.
- *
+ * <p>
  * Generally, a {@code ChaiPasswordPolicy} will behave as an
  * immutable object.  Specifically, there are no set operations to modify a
  * {@code ChaiPasswordPolicy} once instantiated.
  * However, an instance of {@code ChaiPasswordPolicy}
  * may be backed directly by interaction with the underlying directory; therefore
  * it is possible that returned values change over time.
- *
+ * <p>
  * {@code ChaiPasswordPolicy} instances can generally be
  * thought of as simple wrappers for a Map of String/String where the keys are
  * keys defined by {@link ChaiPasswordRule#getKey()} and values
- * are string representations of the policy values. 
+ * are string representations of the policy values.
  *
  * @author Jason D. Rivard
  */
-public interface ChaiPasswordPolicy {
+public interface ChaiPasswordPolicy
+{
 
     /**
      * Returns the value for the requested key.  If the {@code ChaiPasswordPolicy} does
@@ -51,9 +52,9 @@ public interface ChaiPasswordPolicy {
      *
      * @param key requested key value.
      * @return String representation of the value, or {@code null} if no value.
-     * @see ChaiPasswordRule#getKey() 
+     * @see ChaiPasswordRule#getKey()
      */
-    String getValue(String key);
+    String getValue( String key );
 
     /**
      * Returns the value for the requested key.  If the {@code com.novell.ldapchai.ChaiPasswordPolicy} does
@@ -62,7 +63,7 @@ public interface ChaiPasswordPolicy {
      * @param key requested key value.
      * @return String representation of the value, or null if no value.
      */
-    String getValue(ChaiPasswordRule key);
+    String getValue( ChaiPasswordRule key );
 
     /**
      * Get a list of all keys available from the instance.

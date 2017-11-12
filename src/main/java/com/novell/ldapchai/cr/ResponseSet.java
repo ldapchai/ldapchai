@@ -33,18 +33,19 @@ import java.util.Map;
  * A representation of the responses part of challenge/response set.  {@code RespnseSet}s include an embedded {@link com.novell.ldapchai.cr.ChallengeSet}.
  * This means that a full copy of the challenges are embedded at the response set, and a seperate challenge set instance
  * is not required to test responses.
- *
+ * <p>
  * Response sets are associated to a user.
- *
+ * <p>
  * The underlying implementation may pull all response information into memory at time of
  * creation, or there may be directory communication required for operation of methods on this
  * interface.
- *
+ * <p>
  * Instances of {@code ResponseSet} can be created or read using {@link ChaiCrFactory}.
  *
  * @author Jason D. Rivard
  */
-public interface ResponseSet {
+public interface ResponseSet
+{
 
     /**
      * Get a debug-friendly representation of this {@code ResponseSet}.
@@ -68,7 +69,7 @@ public interface ResponseSet {
     /**
      * Tests the {@code ResponseSet} to see if it meets the requirements of the supplied {@link com.novell.ldapchai.cr.ChallengeSet}.
      * This method does not test any response values.
-     *
+     * <p>
      * A typical use case for this method is to validate if an existing, stored {@code com.novell.ldapchai.cr.ResponseSet} of
      * a user satisfies a current {@code com.novell.ldapchai.cr.ChallengeSet} policy.
      *
@@ -76,7 +77,7 @@ public interface ResponseSet {
      * @return true if this {@code ResponseSet} meets the requirements of the challenge set.
      * @throws ChaiValidationException if this response set does not meet the requirements of the challenge set
      */
-    boolean meetsChallengeSetRequirements(ChallengeSet challengeSet)
+    boolean meetsChallengeSetRequirements( ChallengeSet challengeSet )
             throws ChaiValidationException;
 
     /**
@@ -92,7 +93,7 @@ public interface ResponseSet {
 
     /**
      * Test the returned response set.
-     *
+     * <p>
      * <b>Note:</b> There is no implementation (yet) for testing NMAS response sets.  Attempting
      * to test an NMAS ResponseSet will throw an {@link UnsupportedOperationException}.
      *
@@ -101,12 +102,13 @@ public interface ResponseSet {
      * @throws ChaiUnavailableException      If the directory server(s) are unavailable
      * @throws UnsupportedOperationException if the implementation does not support a test operation.
      */
-    boolean test(Map<Challenge, String> responseTest)
+    boolean test( Map<Challenge, String> responseTest )
             throws ChaiUnavailableException;
 
     /**
      * Get the locale of the response set.  A response set is always stored with a single
      * locale.
+     *
      * @return the Locale used to save the response set.
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @throws ChaiOperationException   If there is an error during the write operation
@@ -117,6 +119,7 @@ public interface ResponseSet {
 
     /**
      * Get the timestamp of the response.  Generally indicates when the responseset was created.
+     *
      * @return the Locale used to save the response set.
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @throws ChaiOperationException   If there is an error during the write operation
@@ -129,12 +132,13 @@ public interface ResponseSet {
      * Return the helpdesk challenge responses.  The helpdesk challenge response answers are stored in reversable format
      * to be used by helpdesk administrators.  The answers can be used to help verify the identity of users when authenticating
      * over the phone to a helpdesk or other 3rd party.
+     *
      * @return
      */
 
     Map<Challenge, String> getHelpdeskResponses();
 
-    List<ChallengeBean> asChallengeBeans(boolean includeAnswers);
+    List<ChallengeBean> asChallengeBeans( boolean includeAnswers );
 
-    List<ChallengeBean> asHelpdeskChallengeBeans(boolean includeAnswers);
+    List<ChallengeBean> asHelpdeskChallengeBeans( boolean includeAnswers );
 }

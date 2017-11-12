@@ -30,8 +30,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-class HashSaltAnswer implements Answer {
-    private static final Map<FormatType,String> SUPPORTED_FORMATS;
+class HashSaltAnswer implements Answer
+{
+    private static final Map<FormatType, String> SUPPORTED_FORMATS;
     private static final String VERSION_SEPARATOR = ":";
     private static final VERSION DEFAULT_VERSION = VERSION.B;
 
@@ -42,19 +43,24 @@ class HashSaltAnswer implements Answer {
     protected final FormatType formatType;
     protected final VERSION version;
 
-    enum VERSION {
-        A, // original version had bug where only one iteration was ever actually performed regardless of hashCount value
-        B, // nominal working version
+    enum VERSION
+    {
+        // original version had bug where only one iteration was ever actually performed regardless of hashCount value
+        A,
+
+        // nominal working version
+        B,
     }
 
-    static {
-        final Map<FormatType,String> map = new HashMap<FormatType,String>();
-        map.put(FormatType.MD5,"MD5");
-        map.put(FormatType.SHA1,"SHA1");
-        map.put(FormatType.SHA1_SALT,"SHA1");
-        map.put(FormatType.SHA256_SALT,"SHA-256");
-        map.put(FormatType.SHA512_SALT,"SHA-512");
-        SUPPORTED_FORMATS = Collections.unmodifiableMap(map);
+    static
+    {
+        final Map<FormatType, String> map = new HashMap<>();
+        map.put( FormatType.MD5, "MD5" );
+        map.put( FormatType.SHA1, "SHA1" );
+        map.put( FormatType.SHA1_SALT, "SHA1" );
+        map.put( FormatType.SHA256_SALT, "SHA-256" );
+        map.put( FormatType.SHA512_SALT, "SHA-512" );
+        SUPPORTED_FORMATS = Collections.unmodifiableMap( map );
     }
 
     HashSaltAnswer(
@@ -64,13 +70,16 @@ class HashSaltAnswer implements Answer {
             final boolean caseInsensitive,
             final FormatType formatType,
             final VERSION version
-    ) {
-        if (answerHash == null || answerHash.length() < 1) {
-            throw new IllegalArgumentException("missing answerHash");
+    )
+    {
+        if ( answerHash == null || answerHash.length() < 1 )
+        {
+            throw new IllegalArgumentException( "missing answerHash" );
         }
 
-        if (formatType == null || !SUPPORTED_FORMATS.containsKey(formatType)) {
-            throw new IllegalArgumentException("unsupported format type '" + (formatType == null ? "null" : formatType.toString() + "'"));
+        if ( formatType == null || !SUPPORTED_FORMATS.containsKey( formatType ) )
+        {
+            throw new IllegalArgumentException( "unsupported format type '" + ( formatType == null ? "null" : formatType.toString() + "'" ) );
         }
 
         this.answerHash = answerHash;
@@ -81,57 +90,67 @@ class HashSaltAnswer implements Answer {
         this.caseInsensitive = caseInsensitive;
     }
 
-    HashSaltAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer) {
+    HashSaltAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+    {
         this.hashCount = answerConfiguration.hashCount;
         this.caseInsensitive = answerConfiguration.caseInsensitive;
         this.formatType = answerConfiguration.formatType;
         this.version = DEFAULT_VERSION;
 
-        if (answer == null || answer.length() < 1) {
-            throw new IllegalArgumentException("missing answerHash text");
+        if ( answer == null || answer.length() < 1 )
+        {
+            throw new IllegalArgumentException( "missing answerHash text" );
         }
 
-        if (formatType == null || !SUPPORTED_FORMATS.containsKey(formatType)) {
-            throw new IllegalArgumentException("unsupported format type '" + (formatType == null ? "null" : formatType.toString() + "'"));
+        if ( formatType == null || !SUPPORTED_FORMATS.containsKey( formatType ) )
+        {
+            throw new IllegalArgumentException( "unsupported format type '" + ( formatType == null ? "null" : formatType.toString() + "'" ) );
         }
 
-        { // make hash
-            final boolean includeSalt = formatType.toString().contains("SALT");
+        {
+            // make hash
+            final boolean includeSalt = formatType.toString().contains( "SALT" );
             final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
-            this.salt = includeSalt ? generateSalt(32) : "";
+            this.salt = includeSalt ? generateSalt( 32 ) : "";
             final String saltedAnswer = includeSalt ? salt + casedAnswer : casedAnswer;
-            this.answerHash = hashValue(saltedAnswer);
+            this.answerHash = hashValue( saltedAnswer );
         }
 
     }
 
-    public Element toXml() {
-        final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
-        answerElement.setText(version.toString() + VERSION_SEPARATOR + answerHash);
-        if (salt != null && salt.length() > 0) {
-            answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT,salt);
+    public Element toXml()
+    {
+        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        answerElement.setText( version.toString() + VERSION_SEPARATOR + answerHash );
+        if ( salt != null && salt.length() > 0 )
+        {
+            answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT, salt );
         }
-        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString());
-        if (hashCount > 1) {
-            answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT,String.valueOf(hashCount));
+        answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString() );
+        if ( hashCount > 1 )
+        {
+            answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT, String.valueOf( hashCount ) );
         }
         return answerElement;
     }
 
 
-    public boolean testAnswer(final String testResponse) {
-        if (testResponse == null) {
+    public boolean testAnswer( final String testResponse )
+    {
+        if ( testResponse == null )
+        {
             return false;
         }
 
         final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
         final String saltedTest = salt + casedResponse;
-        final String hashedTest = hashValue(saltedTest);
-        return answerHash.equalsIgnoreCase(hashedTest);
+        final String hashedTest = hashValue( saltedTest );
+        return answerHash.equalsIgnoreCase( hashedTest );
     }
 
-    protected String hashValue(final String input) {
-        return doHash(input, hashCount, formatType, version);
+    protected String hashValue( final String input )
+    {
+        return doHash( input, hashCount, formatType, version );
     }
 
     static String doHash(
@@ -142,80 +161,97 @@ class HashSaltAnswer implements Answer {
     )
             throws IllegalStateException
     {
-        final String algorithm = SUPPORTED_FORMATS.get(formatType);
+        final String algorithm = SUPPORTED_FORMATS.get( formatType );
         final MessageDigest md;
-        try {
-            md = MessageDigest.getInstance(algorithm);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("unable to load " + algorithm + " message digest algorithm: " + e.getMessage());
+        try
+        {
+            md = MessageDigest.getInstance( algorithm );
+        }
+        catch ( NoSuchAlgorithmException e )
+        {
+            throw new IllegalStateException( "unable to load " + algorithm + " message digest algorithm: " + e.getMessage() );
         }
 
 
         byte[] hashedBytes = input.getBytes();
-        switch (version) {
+        switch ( version )
+        {
             case A:
-                hashedBytes = md.digest(hashedBytes);
-                return Base64.encodeBytes(hashedBytes);
+                hashedBytes = md.digest( hashedBytes );
+                return Base64.encodeBytes( hashedBytes );
 
             case B:
-                for (int i = 0; i < hashCount; i++) {
-                    hashedBytes = md.digest(hashedBytes);
+                for ( int i = 0; i < hashCount; i++ )
+                {
+                    hashedBytes = md.digest( hashedBytes );
                 }
-                return Base64.encodeBytes(hashedBytes);
+                return Base64.encodeBytes( hashedBytes );
 
             default:
-                throw new IllegalStateException("unexpected version enum in hash method");
+                throw new IllegalStateException( "unexpected version enum in hash method" );
         }
     }
 
 
-    private static String generateSalt(final int length)
+    private static String generateSalt( final int length )
     {
         final SecureRandom random = new SecureRandom();
-        final StringBuilder sb = new StringBuilder(length);
-        for (int i = 0; i < length; i++) {
-            sb.append(ChaiResponseSet.SALT_CHARS.charAt(random.nextInt(ChaiResponseSet.SALT_CHARS.length())));
+        final StringBuilder sb = new StringBuilder( length );
+        for ( int i = 0; i < length; i++ )
+        {
+            sb.append( ChaiResponseSet.SALT_CHARS.charAt( random.nextInt( ChaiResponseSet.SALT_CHARS.length() ) ) );
         }
         return sb.toString();
     }
 
-    public AnswerBean asAnswerBean() {
+    public AnswerBean asAnswerBean()
+    {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(formatType);
-        answerBean.setAnswerHash(version.toString() + VERSION_SEPARATOR + answerHash);
-        answerBean.setCaseInsensitive(caseInsensitive);
-        answerBean.setHashCount(hashCount);
-        answerBean.setSalt(salt);
+        answerBean.setType( formatType );
+        answerBean.setAnswerHash( version.toString() + VERSION_SEPARATOR + answerHash );
+        answerBean.setCaseInsensitive( caseInsensitive );
+        answerBean.setHashCount( hashCount );
+        answerBean.setSalt( salt );
         return answerBean;
     }
 
-    static class HashSaltAnswerFactory implements ImplementationFactory {
+    static class HashSaltAnswerFactory implements ImplementationFactory
+    {
         public HashSaltAnswer newAnswer(
                 final AnswerFactory.AnswerConfiguration answerConfiguration,
                 final String answer
-        ) {
-            return new HashSaltAnswer(answerConfiguration, answer);
+        )
+        {
+            return new HashSaltAnswer( answerConfiguration, answer );
         }
 
-        public Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
+        public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
+        {
 
             final String answerValue = input.getAnswerHash();
 
-            if (answerValue == null || answerValue.length() < 1) {
-                throw new IllegalArgumentException("missing answer value");
+            if ( answerValue == null || answerValue.length() < 1 )
+            {
+                throw new IllegalArgumentException( "missing answer value" );
             }
 
             final String hashString;
             final VERSION version;
-            if (answerValue.contains(VERSION_SEPARATOR)) {
-                final String[] s = answerValue.split(VERSION_SEPARATOR);
-                try {
-                    version = VERSION.valueOf(s[0]);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("unsupported version type " + s[0]);
+            if ( answerValue.contains( VERSION_SEPARATOR ) )
+            {
+                final String[] s = answerValue.split( VERSION_SEPARATOR );
+                try
+                {
+                    version = VERSION.valueOf( s[0] );
+                }
+                catch ( IllegalArgumentException e )
+                {
+                    throw new IllegalArgumentException( "unsupported version type " + s[0] );
                 }
                 hashString = s[1];
-            } else {
+            }
+            else
+            {
                 version = VERSION.A;
                 hashString = answerValue;
             }
@@ -230,40 +266,62 @@ class HashSaltAnswer implements Answer {
             );
         }
 
-        public HashSaltAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+        public HashSaltAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        {
             final String answerValue = element.getText();
 
-            if (answerValue == null || answerValue.length() < 1) {
-                throw new IllegalArgumentException("missing answer value");
+            if ( answerValue == null || answerValue.length() < 1 )
+            {
+                throw new IllegalArgumentException( "missing answer value" );
             }
 
             final String hashString;
             final VERSION version;
-            if (answerValue.contains(VERSION_SEPARATOR)) {
-                final String[] s = answerValue.split(VERSION_SEPARATOR);
-                try {
-                    version = VERSION.valueOf(s[0]);
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("unsupported version type " + s[0]);
+            if ( answerValue.contains( VERSION_SEPARATOR ) )
+            {
+                final String[] s = answerValue.split( VERSION_SEPARATOR );
+                try
+                {
+                    version = VERSION.valueOf( s[0] );
+                }
+                catch ( IllegalArgumentException e )
+                {
+                    throw new IllegalArgumentException( "unsupported version type " + s[0] );
                 }
                 hashString = s[1];
-            } else {
+            }
+            else
+            {
                 version = VERSION.A;
                 hashString = answerValue;
             }
 
-            final String salt = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT) == null ? "" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_SALT).getValue();
-            final String hashCount = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT) == null ? "1" : element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT).getValue();
+            final String salt = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ) == null
+                    ? ""
+                    : element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ).getValue();
+            final String hashCount = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ) == null
+                    ? "1"
+                    : element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ).getValue();
             int saltCount = 1;
-            try { saltCount = Integer.parseInt(hashCount); } catch (NumberFormatException e) { /* noop */ }
-            final String formatStr = element.getAttributeValue(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT) == null ? "" : element.getAttributeValue(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT);
-            final FormatType formatType;
-            try {
-                formatType = FormatType.valueOf(formatStr);
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("unknown content format specified in xml format value: '" + formatStr + "'");
+            try
+            {
+                saltCount = Integer.parseInt( hashCount );
             }
-            return new HashSaltAnswer(hashString,salt,saltCount,caseInsensitive,formatType,version);
+            catch ( NumberFormatException e )
+            { /* noop */ }
+            final String formatStr = element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT ) == null
+                    ? ""
+                    : element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
+            final FormatType formatType;
+            try
+            {
+                formatType = FormatType.valueOf( formatStr );
+            }
+            catch ( IllegalArgumentException e )
+            {
+                throw new IllegalArgumentException( "unknown content format specified in xml format value: '" + formatStr + "'" );
+            }
+            return new HashSaltAnswer( hashString, salt, saltCount, caseInsensitive, formatType, version );
         }
     }
 }

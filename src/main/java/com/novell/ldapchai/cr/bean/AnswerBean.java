@@ -25,7 +25,8 @@ import com.novell.ldapchai.cr.AnswerFactory;
 
 import java.io.Serializable;
 
-public class AnswerBean implements Serializable {
+public class AnswerBean implements Serializable
+{
     public Answer.FormatType type;
     public String answerText;
     public String answerHash;
@@ -33,55 +34,68 @@ public class AnswerBean implements Serializable {
     public int hashCount;
     public boolean caseInsensitive;
 
-    public Answer.FormatType getType() {
+    public Answer.FormatType getType()
+    {
         return type;
     }
 
-    public void setType(final Answer.FormatType type) {
+    public void setType( final Answer.FormatType type )
+    {
         this.type = type;
     }
 
-    public String getAnswerText() {
+    public String getAnswerText()
+    {
         return answerText;
     }
 
-    public void setAnswerText(final String answerText) {
+    public void setAnswerText( final String answerText )
+    {
         this.answerText = answerText;
     }
 
-    public String getAnswerHash() {
+    public String getAnswerHash()
+    {
         return answerHash;
     }
 
-    public void setAnswerHash(final String answerHash) {
+    public void setAnswerHash( final String answerHash )
+    {
         this.answerHash = answerHash;
     }
 
-    public String getSalt() {
+    public String getSalt()
+    {
         return salt;
     }
 
-    public void setSalt(final String salt) {
+    public void setSalt( final String salt )
+    {
         this.salt = salt;
     }
 
-    public int getHashCount() {
+    public int getHashCount()
+    {
         return hashCount;
     }
 
-    public void setHashCount(final int hashCount) {
+    public void setHashCount( final int hashCount )
+    {
         this.hashCount = hashCount;
     }
 
-    public boolean isCaseInsensitive() {
+    public boolean isCaseInsensitive()
+    {
         return caseInsensitive;
     }
 
-    public void setCaseInsensitive(final boolean caseInsensitive) {
+    public void setCaseInsensitive( final boolean caseInsensitive )
+    {
         this.caseInsensitive = caseInsensitive;
     }
 
-    public Answer asAnswer(final ChallengeBean associatedChallengeBean) {
-        return AnswerFactory.fromAnswerBean(this, associatedChallengeBean.getChallengeText());
+    public Answer asAnswer( final ChallengeBean associatedChallengeBean )
+    {
+        return AnswerFactory.fromAnswerBean( this, associatedChallengeBean.getChallengeText() );
     }
 }

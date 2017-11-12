@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-public interface Person extends NdsLoginProperties {
+public interface Person extends NdsLoginProperties
+{
 }

@@ -21,5 +21,6 @@ package com.novell.ldapchai.impl.ad.entry;
 
 import com.novell.ldapchai.ChaiGroup;
 
-interface Group extends Top, ChaiGroup {
+interface Group extends Top, ChaiGroup
+{
 }

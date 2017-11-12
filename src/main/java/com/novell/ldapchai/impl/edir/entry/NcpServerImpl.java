@@ -28,31 +28,38 @@ import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.Set;
 
-class NcpServerImpl extends TopImpl implements NcpServer {
+class NcpServerImpl extends TopImpl implements NcpServer
+{
 
     public String getLdapObjectClassName()
     {
         return NcpServer.OBJECT_CLASS_VALUE;
     }
 
-    NcpServerImpl(final String entryDN, final ChaiProvider chaiProvider)
+    NcpServerImpl( final String entryDN, final ChaiProvider chaiProvider )
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
     }
 
     public Set<URI> getLdapAddresses()
             throws ChaiUnavailableException, ChaiOperationException
     {
         final Set<String> strAddresses = this.getNetworkAddressAttrValue();
-        final Set<URI> addresses = new HashSet<URI>();
+        final Set<URI> addresses = new HashSet<>();
 
-        for (final String str : strAddresses) {
-            if (str.toLowerCase().startsWith("ldap")) {
-                try {
-                    final URI uri = new URI(str);
-                    addresses.add(uri);
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        for ( final String str : strAddresses )
+        {
+            if ( str.toLowerCase().startsWith( "ldap" ) )
+            {
+                try
+                {
+                    final URI uri = new URI( str );
+                    addresses.add( uri );
+                }
+                catch ( URISyntaxException e )
+                {
+                    //To change body of catch statement use File | Settings | File Templates.
+                    e.printStackTrace();
                 }
             }
         }
@@ -63,26 +70,31 @@ class NcpServerImpl extends TopImpl implements NcpServer {
     private Set<String> getNetworkAddressAttrValue()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final byte[][] addies = this.readMultiByteAttribute("networkAddress");
+        final byte[][] addies = this.readMultiByteAttribute( "networkAddress" );
 
-        final Set<String> strings = new HashSet<String>();
+        final Set<String> strings = new HashSet<>();
 
-        for (final byte[] addy : addies) {
+        for ( final byte[] addy : addies )
+        {
             final StringBuilder sb = new StringBuilder();
             int valueI = 0;
-            for (final byte b : addy) {
+            for ( final byte b : addy )
+            {
                 valueI++;
-                if (valueI % 2 == 0) {
-                    sb.append((char) b);
+                if ( valueI % 2 == 0 )
+                {
+                    sb.append( ( char ) b );
                 }
             }
-            if (sb.length() > 0) {
-                sb.delete(0, 1);
+            if ( sb.length() > 0 )
+            {
+                sb.delete( 0, 1 );
             }
-            if (sb.length() > 0) {
-                sb.delete(sb.length() - 1, sb.length());
+            if ( sb.length() > 0 )
+            {
+                sb.delete( sb.length() - 1, sb.length() );
             }
-            strings.add(sb.toString());
+            strings.add( sb.toString() );
         }
 
         return strings;

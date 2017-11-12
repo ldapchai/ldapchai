@@ -20,4 +20,5 @@
 /**
  * The LDAP Chai API, easy to use LDAP for Java developers.
  */
+
 package com.novell.ldapchai;

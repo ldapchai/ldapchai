@@ -23,12 +23,13 @@ import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public class GroupOfUniqueNames extends AbstractChaiGroup implements ChaiGroup {
+public class GroupOfUniqueNames extends AbstractChaiGroup implements ChaiGroup
+{
     public GroupOfUniqueNames(
             final String groupDN,
             final ChaiProvider chaiProvider
     )
     {
-        super(groupDN, chaiProvider);
+        super( groupDN, chaiProvider );
     }
 }

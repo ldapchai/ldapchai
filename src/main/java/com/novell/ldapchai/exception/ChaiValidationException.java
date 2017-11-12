@@ -25,19 +25,23 @@ package com.novell.ldapchai.exception;
  *
  * @author Jason D. Rivard
  */
-public class ChaiValidationException extends ChaiException {
+public class ChaiValidationException extends ChaiException
+{
     private final String fieldName;
 
-    public ChaiValidationException(final String message, final ChaiError errorCode) {
-        this(message, errorCode, null);
+    public ChaiValidationException( final String message, final ChaiError errorCode )
+    {
+        this( message, errorCode, null );
     }
 
-    public ChaiValidationException(final String message, final ChaiError errorCode, final String fieldName) {
-        super(message, errorCode);
+    public ChaiValidationException( final String message, final ChaiError errorCode, final String fieldName )
+    {
+        super( message, errorCode );
         this.fieldName = fieldName;
     }
 
-    public String getFieldName() {
+    public String getFieldName()
+    {
         return fieldName;
     }
 }

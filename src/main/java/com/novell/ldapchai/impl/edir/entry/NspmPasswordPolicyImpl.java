@@ -45,55 +45,58 @@ import java.util.Set;
 /**
  * An immutable class describing a user password policy.  {@code nspmPasswordPolicyImpl} features directly
  * map to features and options that are part of the Universal Password policy object (ldap class <i>nspmPasswordPolicyImpl</i>).
- *
+ * <p>
  * {@code nspmPasswordPolicyImpl} instances are backed by a {@link java.util.Properties} keymap.  The key
  * values are all defined as public fields of {@code PasswordPolicy}.  Each of these keys are
  * the attribute names found on a ldap <i>nspmPasswordPolicyImpl</i> entry.
- *
+ * <p>
  * This class contains no mechanisms to contact an ldap directory.  Specifically,
  * it does not hold a {@link com.novell.ldapchai.provider.ChaiProvider} reference.  {@code nspmPasswordPolicyImpl} instances
  * do hold a <i>sourceDN</i> attribute, however this is for reference use only.  {@code nspmPasswordPolicyImpl} instances
  * do not use the <i>sourceDN</i> value themselves.
- *
+ * <p>
  * <i>Notes for implementors:</i>
- *
+ * <p>
  * This class is designed to be subclassed for feature enhancements.  Subclasses can add their own
  * settings to the properties environment.
  *
  * @author Jason D. Rivard
  */
-class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
+class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
+{
 
     static final Collection<String> LDAP_PASSWORD_ATTRIBUTES;
 
-    static {
+    static
+    {
         final ArrayList<String> ldapPasswordAttributes = new ArrayList<String>();
-        for (final Attribute attribute : Attribute.values()) {
-            ldapPasswordAttributes.add(attribute.getLdapAttribute());
+        for ( final Attribute attribute : Attribute.values() )
+        {
+            ldapPasswordAttributes.add( attribute.getLdapAttribute() );
         }
-        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableCollection(ldapPasswordAttributes);
+        LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableCollection( ldapPasswordAttributes );
     }
 
 
     private final Map<String, String> ruleMap = new HashMap<String, String>();
     private final Map<String, List<String>> allEntryValues = new HashMap<String, List<String>>();
 
-    NspmPasswordPolicyImpl(final String entryDN, final ChaiProvider chaiProvider)
+    NspmPasswordPolicyImpl( final String entryDN, final ChaiProvider chaiProvider )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
 
         //read all attribute values from entry.
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setFilter(SearchHelper.DEFAULT_FILTER);
-        searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
-        searchHelper.setAttributes(LDAP_PASSWORD_ATTRIBUTES);
+        searchHelper.setFilter( SearchHelper.DEFAULT_FILTER );
+        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        searchHelper.setAttributes( LDAP_PASSWORD_ATTRIBUTES );
 
-        final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues(getEntryDN(), searchHelper);
-        final Map<String, List<String>> results = bigResults.get(this.getEntryDN());
+        final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues( getEntryDN(), searchHelper );
+        final Map<String, List<String>> results = bigResults.get( this.getEntryDN() );
 
-        allEntryValues.putAll(results);
-        ruleMap.putAll(createRuleMapUsingAttributeValues(results));
+        allEntryValues.putAll( results );
+        ruleMap.putAll( createRuleMapUsingAttributeValues( results ) );
     }
 
     public String getLdapObjectClassName()
@@ -101,59 +104,71 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
         return "nspmPasswordPolicy";
     }
 
-    public String getChallengeSetDN() {
-        final List<String> dnValues = allEntryValues.get(Attribute.CHALLENGE_SET_DN.getLdapAttribute());
-        return (dnValues != null && !dnValues.isEmpty()) ? dnValues.get(0) : "";
+    public String getChallengeSetDN()
+    {
+        final List<String> dnValues = allEntryValues.get( Attribute.CHALLENGE_SET_DN.getLdapAttribute() );
+        return ( dnValues != null && !dnValues.isEmpty() ) ? dnValues.get( 0 ) : "";
     }
 
-    public String getSourceDN() {
+    public String getSourceDN()
+    {
         return this.getEntryDN();
     }
 
-    public List<ChaiError> testPasswordForErrors(final String password) {
+    public List<ChaiError> testPasswordForErrors( final String password )
+    {
         //@todo implement this
-        throw new UnsupportedOperationException("not implemented");
+        throw new UnsupportedOperationException( "not implemented" );
     }
 
-    public PasswordRuleHelper getRuleHelper() {
-        return new GenericRuleHelper(this);
+    public PasswordRuleHelper getRuleHelper()
+    {
+        return new GenericRuleHelper( this );
     }
 
-    private static Map<String,String> createRuleMapUsingComplexityRules(final String input) {
-        final Map<String, String> returnMap = new HashMap<String,String>();
+    private static Map<String, String> createRuleMapUsingComplexityRules( final String input )
+    {
+        final Map<String, String> returnMap = new HashMap<>();
 
-        final NspmComplexityRules complexityRules = new NspmComplexityRules(input);
-        if (complexityRules.isMsComplexityPolicy()) {
-            returnMap.put(ChaiPasswordRule.ADComplexity.getKey(),String.valueOf(true));
+        final NspmComplexityRules complexityRules = new NspmComplexityRules( input );
+        if ( complexityRules.isMsComplexityPolicy() )
+        {
+            returnMap.put( ChaiPasswordRule.ADComplexity.getKey(), String.valueOf( true ) );
             return returnMap;
         }
 
-        returnMap.put(ChaiPasswordRule.NovellComplexityRules.getKey(),input);
+        returnMap.put( ChaiPasswordRule.NovellComplexityRules.getKey(), input );
         return returnMap;
     }
 
-    private static Map<String,String> createRuleMapUsingAttributeValues(final Map<String,List<String>> entryValues) {
-        final Map<String,String> returnMap = new HashMap<String,String>();
+    private static Map<String, String> createRuleMapUsingAttributeValues( final Map<String, List<String>> entryValues )
+    {
+        final Map<String, String> returnMap = new HashMap<>();
 
         // check if Complexity XML value is populated.
         {
-            final List<String> complexityValues = entryValues.get(Attribute.AD_COMPLEXITY_RULES.getLdapAttribute());
-            if (complexityValues != null && !complexityValues.isEmpty()) {
-                final String strValue = complexityValues.get(0);
-                returnMap.putAll(createRuleMapUsingComplexityRules(strValue));
+            final List<String> complexityValues = entryValues.get( Attribute.AD_COMPLEXITY_RULES.getLdapAttribute() );
+            if ( complexityValues != null && !complexityValues.isEmpty() )
+            {
+                final String strValue = complexityValues.get( 0 );
+                returnMap.putAll( createRuleMapUsingComplexityRules( strValue ) );
             }
         }
 
 
         // convert the standard attributes to chai rules
-        for (final ChaiPasswordRule rule : ChaiPasswordRule.values()) {
-            final Attribute attribute = Attribute.attributeForRule(rule);
-            if (attribute != null) {
-                returnMap.put(rule.getKey(),attribute.getDefaultValue());
-                if (attribute.getLdapAttribute() != null) {
-                    final List<String> ruleValues = entryValues.get(attribute.getLdapAttribute());
-                    if (ruleValues != null && !ruleValues.isEmpty()) {
-                        returnMap.put(rule.getKey(),ruleValues.get(0));
+        for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
+        {
+            final Attribute attribute = Attribute.attributeForRule( rule );
+            if ( attribute != null )
+            {
+                returnMap.put( rule.getKey(), attribute.getDefaultValue() );
+                if ( attribute.getLdapAttribute() != null )
+                {
+                    final List<String> ruleValues = entryValues.get( attribute.getLdapAttribute() );
+                    if ( ruleValues != null && !ruleValues.isEmpty() )
+                    {
+                        returnMap.put( rule.getKey(), ruleValues.get( 0 ) );
                     }
                 }
             }
@@ -161,26 +176,29 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
 
         //special read for multivalued attributes:
         {
-            final List<String> results = entryValues.get(Attribute.DISALLOWED_ATTRIBUTES.getLdapAttribute());
-            if (results != null) {
+            final List<String> results = entryValues.get( Attribute.DISALLOWED_ATTRIBUTES.getLdapAttribute() );
+            if ( results != null )
+            {
                 final List<String> cleanedResults = new ArrayList<String>();
-                for (ListIterator<String> iterator = results.listIterator(); iterator.hasNext(); ) {
-                    cleanedResults.add(iterator.next().replaceAll("[ :]", ""));
+                for ( ListIterator<String> iterator = results.listIterator(); iterator.hasNext(); )
+                {
+                    cleanedResults.add( iterator.next().replaceAll( "[ :]", "" ) );
                 }
-                final String normalizedValue = StringHelper.stringCollectionToString(cleanedResults,"\n");
-                returnMap.put(ChaiPasswordRule.DisallowedAttributes.getKey(),normalizedValue);
+                final String normalizedValue = StringHelper.stringCollectionToString( cleanedResults, "\n" );
+                returnMap.put( ChaiPasswordRule.DisallowedAttributes.getKey(), normalizedValue );
             }
         }
 
         // convert the options bitmask.
         {
-            final List<String> optionsValues = entryValues.get(Attribute.PASSWORD_POLICY_OPTIONS.getLdapAttribute());
-            if (optionsValues != null && !optionsValues.isEmpty()) {
-                final String optionsValue = optionsValues.get(0);
-                final int defaultOptionsValue = Integer.parseInt(Attribute.PASSWORD_POLICY_OPTIONS.getDefaultValue());
-                final int options = StringHelper.convertStrToInt(optionsValue,defaultOptionsValue);
-                final PolicyOptions policyOptions = new PolicyOptions(String.valueOf(options));
-                returnMap.put(ChaiPasswordRule.PolicyEnabled.getKey(),Boolean.toString(policyOptions.isPolicyEnabled()));
+            final List<String> optionsValues = entryValues.get( Attribute.PASSWORD_POLICY_OPTIONS.getLdapAttribute() );
+            if ( optionsValues != null && !optionsValues.isEmpty() )
+            {
+                final String optionsValue = optionsValues.get( 0 );
+                final int defaultOptionsValue = Integer.parseInt( Attribute.PASSWORD_POLICY_OPTIONS.getDefaultValue() );
+                final int options = StringHelper.convertStrToInt( optionsValue, defaultOptionsValue );
+                final PolicyOptions policyOptions = new PolicyOptions( String.valueOf( options ) );
+                returnMap.put( ChaiPasswordRule.PolicyEnabled.getKey(), Boolean.toString( policyOptions.isPolicyEnabled() ) );
             }
         }
 
@@ -188,16 +206,19 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
         return returnMap;
     }
 
-    public String getValue(final String key) {
-        return ruleMap.get(key);
+    public String getValue( final String key )
+    {
+        return ruleMap.get( key );
     }
 
-    public String getValue(final ChaiPasswordRule rule) {
-        return ruleMap.get(rule.getKey());
+    public String getValue( final ChaiPasswordRule rule )
+    {
+        return ruleMap.get( rule.getKey() );
     }
 
-    public Set<String> getKeys() {
-        return Collections.unmodifiableSet(ruleMap.keySet());
+    public Set<String> getKeys()
+    {
+        return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
     /**
@@ -205,25 +226,27 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
      *
      * @author Jason D. Rivard
      */
-    static class PolicyOptions implements Serializable {
+    static class PolicyOptions implements Serializable
+    {
         private int bitMask = 0;
 
         /**
          * Individual option values
          */
-        private enum Option {
-            REMOVE_NDS_HASH(0x01),
-            DO_NOT_SET_NDS(0x02),
-            DO_NOT_SET_SIMPLE(0x04),
-            ALLOW_SELF_RETRIEVAL(0x10),
-            ALLOW_ADMIN_RETRIEVAL(0x20),
-            ALLOW_AGENT_RETRIEVAL(0x40),
-            PASSWORD_ENABLED(0x100),
-            ADVANCED_POLICY_ENABLED(0x200);
+        private enum Option
+        {
+            REMOVE_NDS_HASH( 0x01 ),
+            DO_NOT_SET_NDS( 0x02 ),
+            DO_NOT_SET_SIMPLE( 0x04 ),
+            ALLOW_SELF_RETRIEVAL( 0x10 ),
+            ALLOW_ADMIN_RETRIEVAL( 0x20 ),
+            ALLOW_AGENT_RETRIEVAL( 0x40 ),
+            PASSWORD_ENABLED( 0x100 ),
+            ADVANCED_POLICY_ENABLED( 0x200 );
 
             private final int position;
 
-            Option(final int intValue)
+            Option( final int intValue )
             {
                 this.position = intValue;
             }
@@ -240,14 +263,14 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          *
          * @param intValue an int value of a bit mask.
          */
-        PolicyOptions(final String intValue)
+        PolicyOptions( final String intValue )
         {
-            bitMask = StringHelper.convertStrToInt(intValue, 0);
+            bitMask = StringHelper.convertStrToInt( intValue, 0 );
         }
 
-        private boolean getOption(final Option option)
+        private boolean getOption( final Option option )
         {
-            return ((bitMask & option.getPosition()) == option.getPosition());
+            return ( ( bitMask & option.getPosition() ) == option.getPosition() );
         }
 
         /**
@@ -257,7 +280,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isRemoveNdsHash()
         {
-            return getOption(Option.REMOVE_NDS_HASH);
+            return getOption( Option.REMOVE_NDS_HASH );
         }
 
         /**
@@ -267,7 +290,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isDoNotSetNds()
         {
-            return getOption(Option.DO_NOT_SET_NDS);
+            return getOption( Option.DO_NOT_SET_NDS );
         }
 
         /**
@@ -277,7 +300,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isDoNotSetSimple()
         {
-            return getOption(Option.DO_NOT_SET_SIMPLE);
+            return getOption( Option.DO_NOT_SET_SIMPLE );
         }
 
         /**
@@ -287,7 +310,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isAllowSelfRetrieval()
         {
-            return getOption(Option.ALLOW_SELF_RETRIEVAL);
+            return getOption( Option.ALLOW_SELF_RETRIEVAL );
         }
 
         /**
@@ -297,7 +320,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isAllowAdminRetrieval()
         {
-            return getOption(Option.ALLOW_ADMIN_RETRIEVAL);
+            return getOption( Option.ALLOW_ADMIN_RETRIEVAL );
         }
 
         /**
@@ -307,7 +330,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isAllowAgentRetrieval()
         {
-            return getOption(Option.ALLOW_AGENT_RETRIEVAL);
+            return getOption( Option.ALLOW_AGENT_RETRIEVAL );
         }
 
         /**
@@ -317,7 +340,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isPasswordEnabled()
         {
-            return getOption(Option.PASSWORD_ENABLED);
+            return getOption( Option.PASSWORD_ENABLED );
         }
 
         /**
@@ -327,7 +350,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
          */
         public boolean isPolicyEnabled()
         {
-            return getOption(Option.ADVANCED_POLICY_ENABLED);
+            return getOption( Option.ADVANCED_POLICY_ENABLED );
         }
 
         /**
@@ -339,22 +362,25 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy {
         {
             final StringBuilder sb = new StringBuilder();
 
-            for (final Option o : Option.values()) {
-                sb.append(o.toString());
-                sb.append(": ");
-                sb.append(this.getOption(o));
-                sb.append(", ");
+            for ( final Option o : Option.values() )
+            {
+                sb.append( o.toString() );
+                sb.append( ": " );
+                sb.append( this.getOption( o ) );
+                sb.append( ", " );
             }
 
-            if (sb.length() > 2) {
-                sb.delete(sb.length() - 2, sb.length());
+            if ( sb.length() > 2 )
+            {
+                sb.delete( sb.length() - 2, sb.length() );
             }
 
             return sb.toString();
         }
     }
 
-    public ChaiEntry getPolicyEntry() {
+    public ChaiEntry getPolicyEntry()
+    {
         return this;
     }
 }

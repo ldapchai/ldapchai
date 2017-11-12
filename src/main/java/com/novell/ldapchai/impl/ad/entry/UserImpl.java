@@ -49,7 +49,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
+class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
+{
 
     // @todo: replace with @UserAccountControl
     private static final int COMPUTED_ACCOUNT_CONTROL_ACCOUNT_ACTIVE = 0x0002;
@@ -58,101 +59,133 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     private static final int ADS_UF_DONT_EXPIRE_PASSWD = 0x10000;
     private static final String LDAP_SERVER_POLICY_HINTS_OID = "1.2.840.113556.1.4.2066";
 
-    UserImpl(final String userDN, final ChaiProvider chaiProvider)
+    UserImpl( final String userDN, final ChaiProvider chaiProvider )
     {
-        super(userDN, chaiProvider);
+        super( userDN, chaiProvider );
     }
 
-    public Set<ChaiGroup> getGroups() throws ChaiOperationException, ChaiUnavailableException {
+    public Set<ChaiGroup> getGroups()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
         final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
-        final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER_OF);
-        for (final String group : groups) {
-            returnGroups.add(getChaiProvider().getEntryFactory().createChaiGroup(group));
+        final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
+        for ( final String group : groups )
+        {
+            returnGroups.add( getChaiProvider().getEntryFactory().createChaiGroup( group ) );
         }
-        return Collections.unmodifiableSet(returnGroups);
+        return Collections.unmodifiableSet( returnGroups );
     }
 
-    public void addGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
-        theGroup.addAttribute("member",this.getEntryDN());
+    public void addGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        theGroup.addAttribute( "member", this.getEntryDN() );
     }
 
-    public ChaiPasswordPolicy getPasswordPolicy() throws ChaiUnavailableException, ChaiOperationException {
+    public ChaiPasswordPolicy getPasswordPolicy()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
 
-        final Map<String, String> policyMap = new LinkedHashMap<String, String>();
+        final Map<String, String> policyMap = new LinkedHashMap<>();
 
         // defaults for ad policy
-        policyMap.put(ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf(true));
-        policyMap.put(ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf(true));
-        policyMap.put(ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf(true));
+        policyMap.put( ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf( true ) );
+        policyMap.put( ChaiPasswordRule.AllowSpecial.getKey(), String.valueOf( true ) );
+        policyMap.put( ChaiPasswordRule.CaseSensitive.getKey(), String.valueOf( true ) );
 
         //read minimum password length from domain
-        final Matcher domainMatcher = Pattern.compile("(dc=[a-z0-9-]+[,]*)+", Pattern.CASE_INSENSITIVE).matcher(this.getEntryDN());
-        if (domainMatcher.find()) {
+        final Matcher domainMatcher = Pattern.compile( "(dc=[a-z0-9-]+[,]*)+", Pattern.CASE_INSENSITIVE ).matcher( this.getEntryDN() );
+        if ( domainMatcher.find() )
+        {
             final String domainDN = domainMatcher.group();
-            final String minPwdLength = this.getChaiProvider().readStringAttribute(domainDN, "minPwdLength");
-            if (minPwdLength != null && minPwdLength.length() > 0) {
-                policyMap.put(ChaiPasswordRule.MinimumLength.getKey(), minPwdLength);
+            final String minPwdLength = this.getChaiProvider().readStringAttribute( domainDN, "minPwdLength" );
+            if ( minPwdLength != null && minPwdLength.length() > 0 )
+            {
+                policyMap.put( ChaiPasswordRule.MinimumLength.getKey(), minPwdLength );
             }
         }
 
         // Read PSO policy object.
-        final String psoObject = this.readStringAttribute(ChaiConstant.ATTR_AD_PASSWORD_POLICY_RESULTANT_PSO);
-        if (psoObject != null && psoObject.length() > 0) {
-            final MsDSPasswordSettingsImpl msDSPasswordSetting = new MsDSPasswordSettingsImpl(psoObject,this.getChaiProvider());
-            for (final String loopKey : msDSPasswordSetting.getKeys()) {
-                policyMap.put(loopKey, msDSPasswordSetting.getValue(loopKey));
+        final String psoObject = this.readStringAttribute( ChaiConstant.ATTR_AD_PASSWORD_POLICY_RESULTANT_PSO );
+        if ( psoObject != null && psoObject.length() > 0 )
+        {
+            final MsDSPasswordSettingsImpl msDSPasswordSetting = new MsDSPasswordSettingsImpl( psoObject, this.getChaiProvider() );
+            for ( final String loopKey : msDSPasswordSetting.getKeys() )
+            {
+                policyMap.put( loopKey, msDSPasswordSetting.getValue( loopKey ) );
             }
         }
 
-        return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicy(policyMap);
+        return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicy( policyMap );
     }
 
-    public String readPassword() throws ChaiUnavailableException, ChaiOperationException {
-        throw new UnsupportedOperationException("ChaiUser#readPassword not implemented in ad-impl ldapChai API");
+    public String readPassword()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        throw new UnsupportedOperationException( "ChaiUser#readPassword not implemented in ad-impl ldapChai API" );
     }
 
-    public void removeGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
-        theGroup.deleteAttribute("member",this.getEntryDN());
+    public void removeGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        theGroup.deleteAttribute( "member", this.getEntryDN() );
     }
 
-    public boolean testPassword(final String passwordValue) throws ChaiUnavailableException, ChaiPasswordPolicyException {
-        throw new UnsupportedOperationException("ChaiUser#testPassword not implemented in ad-impl ldapChai API");
+    public boolean testPassword( final String passwordValue )
+            throws ChaiUnavailableException, ChaiPasswordPolicyException
+    {
+        throw new UnsupportedOperationException( "ChaiUser#testPassword not implemented in ad-impl ldapChai API" );
     }
 
-    public boolean testPasswordPolicy(final String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {
+    public boolean testPasswordPolicy( final String testPassword )
+            throws ChaiUnavailableException, ChaiPasswordPolicyException
+    {
         return false;
     }
 
     public void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute("lockoutTime","0");
+        this.writeStringAttribute( "lockoutTime", "0" );
     }
 
-    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+    public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         final String quotedPwd = '"' + newPassword + '"';
         final byte[] littleEndianEncodedPwd;
-        try {
-            littleEndianEncodedPwd = quotedPwd.getBytes("UTF-16LE");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("unexpected error, missing 'UTF-16LE' character encoder",e);
+        try
+        {
+            littleEndianEncodedPwd = quotedPwd.getBytes( "UTF-16LE" );
         }
-        final byte[][] multiBA = new byte[][] { littleEndianEncodedPwd };
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new IllegalStateException( "unexpected error, missing 'UTF-16LE' character encoder", e );
+        }
+        final byte[][] multiBA = new byte[][] {littleEndianEncodedPwd};
 
-        try {
-            if (enforcePasswordPolicy && this.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.AD_SET_POLICY_HINTS_ON_PW_SET)) {
-                final byte[] value = {48,(byte)132,0,0,0,3,2,1,1}; //0x1 berEncoded
-                final ChaiRequestControl[] controls = new ChaiRequestControl[] {new ChaiRequestControl(LDAP_SERVER_POLICY_HINTS_OID , true, value)};
-                chaiProvider.writeBinaryAttribute(this.getEntryDN(),"unicodePwd",multiBA,true,controls);
-            } else {
-                writeBinaryAttribute("unicodePwd",multiBA);
+        try
+        {
+            if ( enforcePasswordPolicy && this.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.AD_SET_POLICY_HINTS_ON_PW_SET ) )
+            {
+                //0x1 berEncoded
+                final byte[] value = {48, ( byte ) 132, 0, 0, 0, 3, 2, 1, 1 };
+                final ChaiRequestControl[] controls = new ChaiRequestControl[] {new ChaiRequestControl( LDAP_SERVER_POLICY_HINTS_OID, true, value )};
+                chaiProvider.writeBinaryAttribute( this.getEntryDN(), "unicodePwd", multiBA, true, controls );
             }
-        } catch (ChaiOperationException e) {
-            if (e.getErrorCode() == ChaiError.UNKNOWN) {
-                throw new ChaiOperationException(e.getMessage(), ChaiError.PASSWORD_BADPASSWORD);
-            } else {
+            else
+            {
+                writeBinaryAttribute( "unicodePwd", multiBA );
+            }
+        }
+        catch ( ChaiOperationException e )
+        {
+            if ( e.getErrorCode() == ChaiError.UNKNOWN )
+            {
+                throw new ChaiOperationException( e.getMessage(), ChaiError.PASSWORD_BADPASSWORD );
+            }
+            else
+            {
                 throw e;
             }
         }
@@ -162,10 +195,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
             throws ChaiUnavailableException, ChaiOperationException
     {
         // modern versions of ad have a (somewhat) sane way of checking account lockout; heaven forbid a boolean attribute.
-        final String computedBit = readStringAttribute("msDS-User-Account-Control-Computed");
-        if (computedBit != null && computedBit.length() > 0) {
-            final int intValue = Integer.parseInt(computedBit);
-            return ((intValue & COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED) == COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED);
+        final String computedBit = readStringAttribute( "msDS-User-Account-Control-Computed" );
+        if ( computedBit != null && computedBit.length() > 0 )
+        {
+            final int intValue = Integer.parseInt( computedBit );
+            return ( ( intValue & COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED ) == COMPUTED_ACCOUNT_CONTROL_UC_PASSWORD_EXPIRED );
         }
 
         return false;
@@ -176,42 +210,55 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     public final String readGivenName()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readStringAttribute(ATTR_GIVEN_NAME);
+        return this.readStringAttribute( ATTR_GIVEN_NAME );
     }
 
     public final Date readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Set<String> readAttributes = new HashSet<String>(Arrays.asList(new String[]{ATTR_LAST_LOGIN,ATTR_LAST_LOGIN_TIMESTAMP}));
-        final Map<String,String> readResults = this.readStringAttributes(readAttributes);
-        final Date lastLoginDate = readResults.containsKey(ATTR_LAST_LOGIN) ? ADEntries.convertWinEpochToDate(readResults.get(ATTR_LAST_LOGIN)) : null;
-        final Date lastLoginDateTimestamp = readResults.containsKey(ATTR_LAST_LOGIN_TIMESTAMP) ? ADEntries.convertWinEpochToDate(readResults.get(ATTR_LAST_LOGIN_TIMESTAMP)) : null;
-        if (lastLoginDate == null || lastLoginDateTimestamp == null) {
+        final Set<String> readAttributes = new HashSet<>( Arrays.asList( ATTR_LAST_LOGIN, ATTR_LAST_LOGIN_TIMESTAMP ) );
+        final Map<String, String> readResults = this.readStringAttributes( readAttributes );
+        final Date lastLoginDate = readResults.containsKey( ATTR_LAST_LOGIN ) ? ADEntries.convertWinEpochToDate( readResults.get( ATTR_LAST_LOGIN ) ) : null;
+        final Date lastLoginDateTimestamp = readResults.containsKey( ATTR_LAST_LOGIN_TIMESTAMP )
+                ? ADEntries.convertWinEpochToDate( readResults.get( ATTR_LAST_LOGIN_TIMESTAMP ) )
+                : null;
+        if ( lastLoginDate == null || lastLoginDateTimestamp == null )
+        {
             return lastLoginDate == null ? lastLoginDateTimestamp : lastLoginDate;
         }
-        return lastLoginDate.after(lastLoginDateTimestamp) ? lastLoginDate : lastLoginDateTimestamp;
+        return lastLoginDate.after( lastLoginDateTimestamp ) ? lastLoginDate : lastLoginDateTimestamp;
     }
 
-    public final void changePassword(final String oldPassword, final String newPassword)
-            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException {
+    public final void changePassword( final String oldPassword, final String newPassword )
+            throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
+    {
         final String quotedOldPwd = '"' + oldPassword + '"';
         final String quotedNewPwd = '"' + newPassword + '"';
         final byte[] littleEndianEncodedOldPwd;
         final byte[] littleEndianEncodedNewPwd;
-        try {
-            littleEndianEncodedOldPwd = quotedOldPwd.getBytes("UTF-16LE");
-            littleEndianEncodedNewPwd = quotedNewPwd.getBytes("UTF-16LE");
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException("unexpected error, missing 'UTF-16LE' character encoder",e);
+        try
+        {
+            littleEndianEncodedOldPwd = quotedOldPwd.getBytes( "UTF-16LE" );
+            littleEndianEncodedNewPwd = quotedNewPwd.getBytes( "UTF-16LE" );
+        }
+        catch ( UnsupportedEncodingException e )
+        {
+            throw new IllegalStateException( "unexpected error, missing 'UTF-16LE' character encoder", e );
         }
 
-        try {
-            replaceBinaryAttribute("unicodePwd", littleEndianEncodedOldPwd, littleEndianEncodedNewPwd);
-        } catch (ChaiOperationException e) {
-            if (e.getErrorCode() == ChaiError.UNKNOWN) {
-                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiError.PASSWORD_BADPASSWORD);
-            } else {
-                throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+        try
+        {
+            replaceBinaryAttribute( "unicodePwd", littleEndianEncodedOldPwd, littleEndianEncodedNewPwd );
+        }
+        catch ( ChaiOperationException e )
+        {
+            if ( e.getErrorCode() == ChaiError.UNKNOWN )
+            {
+                throw new ChaiPasswordPolicyException( e.getMessage(), ChaiError.PASSWORD_BADPASSWORD );
+            }
+            else
+            {
+                throw new ChaiPasswordPolicyException( e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
             }
         }
 
@@ -220,43 +267,62 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute("pwdLastSet", "0");
+        this.writeStringAttribute( "pwdLastSet", "0" );
     }
 
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
         // modern versions of ad have a (somewhat) sane way of checking account lockout; heaven forbid a boolean attribute.
-        final String computedBit = readStringAttribute("msDS-User-Account-Control-Computed");
-        if (computedBit != null && computedBit.length() > 0) {
-            final int intValue = Integer.parseInt(computedBit);
-            return ((intValue & COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT) == COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT);
+        final String computedBit = readStringAttribute( "msDS-User-Account-Control-Computed" );
+        if ( computedBit != null && computedBit.length() > 0 )
+        {
+            final int intValue = Integer.parseInt( computedBit );
+            return ( ( intValue & COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT ) == COMPUTED_ACCOUNT_CONTROL_UC_LOCKOUT );
         }
 
         // older ad versions have an insane way of checking account lockout.  what could possibly go wrong?
-        final Date lockoutTime = this.readDateAttribute("lockoutTime");  // read lockout time of user.
-        if (lockoutTime != null) {
+
+        // read lockout time of user.
+        final Date lockoutTime = this.readDateAttribute( "lockoutTime" );
+        if ( lockoutTime != null )
+        {
             ChaiEntry parentEntry = this.getParentEntry();
             long lockoutDurationMs = 0;
-            int recursionCount  = 0; // should never need this, but provided for sanity
-            while (lockoutDurationMs == 0 && parentEntry != null && recursionCount < 50) {
-                if (parentEntry.compareStringAttribute("objectClass","domainDNS")) { // find the domain dns parent entry of the user
-                    lockoutDurationMs = Long.parseLong(parentEntry.readStringAttribute("lockoutDuration")); // read the duration of lockouts from the domainDNS entry
-                    lockoutDurationMs = Math.abs(lockoutDurationMs); // why is it stored as a negative value?  who knows.
-                    lockoutDurationMs = lockoutDurationMs / 10000; // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak into the default 30 minute window a few nanoseconds early.  Thanks again MS.
+
+            // should never need this, but provided for sanity
+            int recursionCount = 0;
+
+            while ( lockoutDurationMs == 0 && parentEntry != null && recursionCount < 50 )
+            {
+                if ( parentEntry.compareStringAttribute( "objectClass", "domainDNS" ) )
+                {
+                    // find the domain dns parent entry of the user
+
+                    // read the duration of lockouts from the domainDNS entry
+                    lockoutDurationMs = Long.parseLong( parentEntry.readStringAttribute( "lockoutDuration" ) );
+
+                    // why is it stored as a negative value?  who knows.
+                    lockoutDurationMs = Math.abs( lockoutDurationMs );
+
+                    // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak
+                    // into the default 30 minute window a few nanoseconds early.  Thanks again MS.
+                    lockoutDurationMs = lockoutDurationMs / 10000;
                 }
                 parentEntry = parentEntry.getParentEntry();
                 recursionCount++;
             }
 
-            final Date futureUnlockTime = new Date(lockoutTime.getTime() + lockoutDurationMs);
+            final Date futureUnlockTime = new Date( lockoutTime.getTime() + lockoutDurationMs );
             return System.currentTimeMillis() <= futureUnlockTime.getTime();
         }
         return false;
     }
 
-    public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
-        return this.readDateAttribute("pwdLastSet");
+    public Date readPasswordModificationDate()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return this.readDateAttribute( "pwdLastSet" );
     }
 
     public Date readPasswordExpirationDate()
@@ -267,18 +333,21 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
                 "userAccountControl",
                 "msDS-UserPasswordExpiryTimeComputed",
         };
-        final Map<String,String> readAttrs = readStringAttributes(new HashSet<String>(Arrays.asList(attrsToRead)));
+        final Map<String, String> readAttrs = readStringAttributes( new HashSet<String>( Arrays.asList( attrsToRead ) ) );
 
-        final String computedValue = readAttrs.get("msDS-UserPasswordExpiryTimeComputed");
-        if (computedValue != null && computedValue.length() > 0) {
-            return ADEntries.convertWinEpochToDate(computedValue);
+        final String computedValue = readAttrs.get( "msDS-UserPasswordExpiryTimeComputed" );
+        if ( computedValue != null && computedValue.length() > 0 )
+        {
+            return ADEntries.convertWinEpochToDate( computedValue );
         }
 
-        final String uacStrValue = readAttrs.get("userAccountControl");
+        final String uacStrValue = readAttrs.get( "userAccountControl" );
 
-        if (uacStrValue != null && uacStrValue.length() > 0) {
-            final int intValue = StringHelper.convertStrToInt(uacStrValue,0);
-            if ((ADS_UF_DONT_EXPIRE_PASSWD & intValue) == ADS_UF_DONT_EXPIRE_PASSWD) {
+        if ( uacStrValue != null && uacStrValue.length() > 0 )
+        {
+            final int intValue = StringHelper.convertStrToInt( uacStrValue, 0 );
+            if ( ( ADS_UF_DONT_EXPIRE_PASSWD & intValue ) == ADS_UF_DONT_EXPIRE_PASSWD )
+            {
                 //user password does not expire
                 return null;
             }
@@ -287,37 +356,57 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
         // now read domain object
         long maxPwdAgeMs = 0;
         {
-            final String maxPwdAgeString = readDomainValue("maxPwdAge");
-            if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
-                long value = Long.parseLong(maxPwdAgeString);
-                value = Math.abs(value); // why is it stored as a negative value?  who knows.
-                value = value / 10000; // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak into the default 30 minute window a few nanoseconds early.  Thanks again MS.
+            final String maxPwdAgeString = readDomainValue( "maxPwdAge" );
+            if ( maxPwdAgeString != null && maxPwdAgeString.length() > 0 )
+            {
+                long value = Long.parseLong( maxPwdAgeString );
+
+                // why is it stored as a negative value?  who knows.
+                value = Math.abs( value );
+
+                // convert from 100 nanosecond intervals to milliseconds.  It's important that intruders don't sneak
+                // into the default 30 minute window a few nanoseconds early.  Thanks again MS.
+                value = value / 10000;
+
                 maxPwdAgeMs = value;
             }
         }
 
-        if (maxPwdAgeMs == 0) {
-            return null;  // passwords never expire according to the domain policy.
+        if ( maxPwdAgeMs == 0 )
+        {
+            // passwords never expire according to the domain policy.
+            return null;
         }
 
-        final String maxPwdAgeString = readAttrs.get("pwdLastSet");
-        if (maxPwdAgeString != null && maxPwdAgeString.length() > 0) {
-            final Date pwdLastSet = ADEntries.convertWinEpochToDate(maxPwdAgeString);
-            if (pwdLastSet != null) {
+        final String maxPwdAgeString = readAttrs.get( "pwdLastSet" );
+        if ( maxPwdAgeString != null && maxPwdAgeString.length() > 0 )
+        {
+            final Date pwdLastSet = ADEntries.convertWinEpochToDate( maxPwdAgeString );
+            if ( pwdLastSet != null )
+            {
                 final long pwExpireTimeMs = pwdLastSet.getTime() + maxPwdAgeMs;
-                return new Date(pwExpireTimeMs);
+                return new Date( pwExpireTimeMs );
             }
         }
 
         return null;
     }
 
-    private String readDomainValue(final String attribute) throws ChaiUnavailableException, ChaiOperationException {
+    private String readDomainValue( final String attribute )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         ChaiEntry parentEntry = this.getParentEntry();
-        int recursionCount  = 0; // should never need this, but provided for sanity
-        while (parentEntry != null && recursionCount < 50) {
-            if (parentEntry.compareStringAttribute("objectClass","domainDNS")) { // find the domain dns parent entry of the user
-                return parentEntry.readStringAttribute(attribute); // read the desired attribute.
+
+        // should never need this, but provided for sanity
+        int recursionCount = 0;
+        while ( parentEntry != null && recursionCount < 50 )
+        {
+            if ( parentEntry.compareStringAttribute( "objectClass", "domainDNS" ) )
+            {
+                // find the domain dns parent entry of the user
+
+                // read the desired attribute.
+                return parentEntry.readStringAttribute( attribute );
             }
             parentEntry = parentEntry.getParentEntry();
             recursionCount++;
@@ -326,28 +415,38 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     }
 
     @Override
-    public Date readDateAttribute(final String attributeName) throws ChaiUnavailableException, ChaiOperationException {
-        return ADEntries.readDateAttribute(this, attributeName);
+    public Date readDateAttribute( final String attributeName )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return ADEntries.readDateAttribute( this, attributeName );
     }
 
     @Override
-    public void writeDateAttribute(final String attributeName, final Date date) throws ChaiUnavailableException, ChaiOperationException {
-        ADEntries.writeDateAttribute(this, attributeName, date);
+    public void writeDateAttribute( final String attributeName, final Date date )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        ADEntries.writeDateAttribute( this, attributeName, date );
     }
 
     @Override
-    public String readGUID() throws ChaiOperationException, ChaiUnavailableException {
-        return ADEntries.readGUID(this);
+    public String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return ADEntries.readGUID( this );
     }
 
-    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
+    public boolean isAccountEnabled()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
         final String disabledUserSearchFilter = "(useraccountcontrol:1.2.840.113556.1.4.803:=2)";
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setFilter(disabledUserSearchFilter);
-        searchHelper.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
-        final Map<String, Map<String, String>> results = this.getChaiProvider().search(this.getEntryDN(),searchHelper);
-        for (final String resultDN : results.keySet()) {
-            if (resultDN != null && resultDN.equals(this.getEntryDN())) {
+        searchHelper.setFilter( disabledUserSearchFilter );
+        searchHelper.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+        final Map<String, Map<String, String>> results = this.getChaiProvider().search( this.getEntryDN(), searchHelper );
+        for ( final String resultDN : results.keySet() )
+        {
+            if ( resultDN != null && resultDN.equals( this.getEntryDN() ) )
+            {
                 return false;
             }
         }
@@ -355,12 +454,16 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser {
     }
 
 
-    public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
-        return this.readDateAttribute("accountExpires");
+    public Date readAccountExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return this.readDateAttribute( "accountExpires" );
     }
 
     @Override
-    public String readCanonicalDN() throws ChaiOperationException, ChaiUnavailableException {
-        return readStringAttribute("distinguishedName");
+    public String readCanonicalDN()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readStringAttribute( "distinguishedName" );
     }
 }

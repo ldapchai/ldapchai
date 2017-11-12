@@ -23,8 +23,10 @@ import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-class GenericChaiUser extends AbstractChaiUser implements ChaiUser {
-    GenericChaiUser(final String userDN, final ChaiProvider chaiProvider) {
-        super(userDN, chaiProvider);
+class GenericChaiUser extends AbstractChaiUser implements ChaiUser
+{
+    GenericChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    {
+        super( userDN, chaiProvider );
     }
 }

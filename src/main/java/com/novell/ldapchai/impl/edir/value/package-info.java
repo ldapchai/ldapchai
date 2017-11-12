@@ -19,6 +19,8 @@
 
 /**
  * Helper classes for reading and manipulating Novell eDirectory specific data values.
+ *
  * @author Jason D. Rivard
  */
+
 package com.novell.ldapchai.impl.edir.value;

@@ -4,66 +4,83 @@ import com.novell.ldapchai.cr.bean.AnswerBean;
 
 import java.io.Serializable;
 
-public class AnswerFactory {
-    private AnswerFactory() {
+public class AnswerFactory
+{
+    private AnswerFactory()
+    {
     }
 
-    public static Answer newAnswer(final AnswerConfiguration answerConfiguration, final String answerText) {
+    public static Answer newAnswer( final AnswerConfiguration answerConfiguration, final String answerText )
+    {
         final Answer.ImplementationFactory implementationFactory = answerConfiguration.getFormatType().getFactory();
-        return implementationFactory.newAnswer(answerConfiguration, answerText);
+        return implementationFactory.newAnswer( answerConfiguration, answerText );
     }
 
-    public static Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
+    public static Answer fromAnswerBean( final AnswerBean input, final String challengeText )
+    {
         final Answer.ImplementationFactory implementationFactory = input.getType().getFactory();
-        return implementationFactory.fromAnswerBean(input, challengeText);
+        return implementationFactory.fromAnswerBean( input, challengeText );
     }
 
-    public static Answer fromXml(final org.jdom2.Element element, final boolean caseInsensitive, final String challengeText) {
-        final String formatStr = element.getAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT).getValue();
+    public static Answer fromXml( final org.jdom2.Element element, final boolean caseInsensitive, final String challengeText )
+    {
+        final String formatStr = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT ).getValue();
         final Answer.FormatType respFormat;
-        if (formatStr != null && formatStr.length() > 0) {
-            respFormat = Answer.FormatType.valueOf(formatStr);
-        } else {
+        if ( formatStr != null && formatStr.length() > 0 )
+        {
+            respFormat = Answer.FormatType.valueOf( formatStr );
+        }
+        else
+        {
             respFormat = Answer.FormatType.TEXT;
         }
-        return respFormat.getFactory().fromXml(element, caseInsensitive, challengeText);
+        return respFormat.getFactory().fromXml( element, caseInsensitive, challengeText );
     }
 
-    public static class AnswerConfiguration implements Serializable {
+    public static class AnswerConfiguration implements Serializable
+    {
         public boolean caseInsensitive;
         public int hashCount;
         public Answer.FormatType formatType;
         public String challengeText;
 
-        public boolean isCaseInsensitive() {
+        public boolean isCaseInsensitive()
+        {
             return caseInsensitive;
         }
 
-        public void setCaseInsensitive(final boolean caseInsensitive) {
+        public void setCaseInsensitive( final boolean caseInsensitive )
+        {
             this.caseInsensitive = caseInsensitive;
         }
 
-        public int getHashCount() {
+        public int getHashCount()
+        {
             return hashCount;
         }
 
-        public void setHashCount(final int hashCount) {
+        public void setHashCount( final int hashCount )
+        {
             this.hashCount = hashCount;
         }
 
-        public Answer.FormatType getFormatType() {
+        public Answer.FormatType getFormatType()
+        {
             return formatType;
         }
 
-        public void setFormatType(final Answer.FormatType formatType) {
+        public void setFormatType( final Answer.FormatType formatType )
+        {
             this.formatType = formatType;
         }
 
-        public String getChallengeText() {
+        public String getChallengeText()
+        {
             return challengeText;
         }
 
-        public void setChallengeText(final String challengeText) {
+        public void setChallengeText( final String challengeText )
+        {
             this.challengeText = challengeText;
         }
     }

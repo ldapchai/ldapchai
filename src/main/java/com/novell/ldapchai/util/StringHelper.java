@@ -28,9 +28,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StringHelper {
+public class StringHelper
+{
 
-    private StringHelper() {
+    private StringHelper()
+    {
     }
 
     /**
@@ -41,12 +43,13 @@ public class StringHelper {
      * @param string value to test
      * @return true if the string resolves to a positive value.
      */
-    public static boolean convertStrToBoolean(final String string)
+    public static boolean convertStrToBoolean( final String string )
     {
-        return !(string == null || string.length() < 1) && ("true".equalsIgnoreCase(string) ||
-            "1".equalsIgnoreCase(string) ||
-            "yes".equalsIgnoreCase(string) ||
-            "y".equalsIgnoreCase(string));
+        return !( string == null || string.length() < 1 ) && ( "true".equalsIgnoreCase( string )
+                || "1".equalsIgnoreCase( string )
+                || "yes".equalsIgnoreCase( string )
+                || "y".equalsIgnoreCase( string )
+        );
     }
 
     /**
@@ -58,15 +61,19 @@ public class StringHelper {
      * @param defaultValue value to return in case of difficulting converting.
      * @return the int value contained in the string, otherwise the default value.
      */
-    public static int convertStrToInt(final String string, final int defaultValue)
+    public static int convertStrToInt( final String string, final int defaultValue )
     {
-        if (string == null) {
+        if ( string == null )
+        {
             return defaultValue;
         }
 
-        try {
-            return Integer.parseInt(string);
-        } catch (Exception e) {
+        try
+        {
+            return Integer.parseInt( string );
+        }
+        catch ( Exception e )
+        {
             return defaultValue;
         }
     }
@@ -80,15 +87,19 @@ public class StringHelper {
      * @param defaultValue value to return in case of difficulting converting.
      * @return the int value contained in the string, otherwise the default value.
      */
-    public static long convertStrToLong(final String string, final long defaultValue)
+    public static long convertStrToLong( final String string, final long defaultValue )
     {
-        if (string == null) {
+        if ( string == null )
+        {
             return defaultValue;
         }
 
-        try {
-            return Long.parseLong(string);
-        } catch (Exception e) {
+        try
+        {
+            return Long.parseLong( string );
+        }
+        catch ( Exception e )
+        {
             return defaultValue;
         }
     }
@@ -101,76 +112,89 @@ public class StringHelper {
      * @return a {@code List} of {@code String}s.  An emtpy list is returned if <i>inputString</i> is null.
      */
     public static List<String> tokenizeString(
-        final String inputString,
-        final String seperator
+            final String inputString,
+            final String seperator
     )
     {
-        if (inputString == null || inputString.length() < 1) {
+        if ( inputString == null || inputString.length() < 1 )
+        {
             return Collections.emptyList();
         }
 
         final List<String> values = new ArrayList<String>();
-        values.addAll(Arrays.asList(inputString.split(seperator)));
-        return Collections.unmodifiableList(values);
+        values.addAll( Arrays.asList( inputString.split( seperator ) ) );
+        return Collections.unmodifiableList( values );
     }
 
     public static Map<String, String> tokenizeString(
-        final String inputString,
-        final String seperator,
-        final String subSeperator
+            final String inputString,
+            final String seperator,
+            final String subSeperator
     )
     {
-        if (inputString == null || inputString.length() < 1) {
-            return new HashMap<String, String>();
+        if ( inputString == null || inputString.length() < 1 )
+        {
+            return new HashMap<>();
         }
 
-        final Map<String, String> returnProps = new LinkedHashMap<String, String>();
+        final Map<String, String> returnProps = new LinkedHashMap<>();
 
-        final List<String> values = tokenizeString(inputString, seperator);
-        for (final String loopValue : values) {
-            if (loopValue != null && loopValue.length() > 0) {
-                final int subSeperatorPosition = loopValue.indexOf(subSeperator);
-                if (subSeperatorPosition != -1) {
-                    final String key = loopValue.substring(0,subSeperatorPosition);
-                    final String value = loopValue.substring(subSeperatorPosition + 1);
-                    returnProps.put(key, value);
-                } else {
-                    returnProps.put(loopValue,"");
+        final List<String> values = tokenizeString( inputString, seperator );
+        for ( final String loopValue : values )
+        {
+            if ( loopValue != null && loopValue.length() > 0 )
+            {
+                final int subSeperatorPosition = loopValue.indexOf( subSeperator );
+                if ( subSeperatorPosition != -1 )
+                {
+                    final String key = loopValue.substring( 0, subSeperatorPosition );
+                    final String value = loopValue.substring( subSeperatorPosition + 1 );
+                    returnProps.put( key, value );
+                }
+                else
+                {
+                    returnProps.put( loopValue, "" );
                 }
             }
         }
         return returnProps;
     }
 
-    public static String stringCollectionToString(final Collection<String> c, final String separator) {
-        if (c == null || c.isEmpty()) {
+    public static String stringCollectionToString( final Collection<String> c, final String separator )
+    {
+        if ( c == null || c.isEmpty() )
+        {
             return "";
         }
 
         final String effectiveSeparator = separator == null
-            ? ", "
-            : separator;
+                ? ", "
+                : separator;
 
 
         final StringBuilder sb = new StringBuilder();
-        for (final String value : c) {
-            sb.append(value);
-            sb.append(effectiveSeparator);
+        for ( final String value : c )
+        {
+            sb.append( value );
+            sb.append( effectiveSeparator );
         }
-        sb.delete(sb.length() - effectiveSeparator.length(), sb.length());
+        sb.delete( sb.length() - effectiveSeparator.length(), sb.length() );
         return sb.toString();
     }
 
-    public static String stringMapToString(final Map<String,String> map, final String seperator) {
-        if (map == null) {
+    public static String stringMapToString( final Map<String, String> map, final String seperator )
+    {
+        if ( map == null )
+        {
             return "";
         }
 
-        final List<String> tempList = new ArrayList<String>();
-        for (final Map.Entry<String,String> entry : map.entrySet()) {
-            tempList.add(entry.getKey() + "=" + entry.getValue());
+        final List<String> tempList = new ArrayList<>();
+        for ( final Map.Entry<String, String> entry : map.entrySet() )
+        {
+            tempList.add( entry.getKey() + "=" + entry.getValue() );
         }
 
-        return stringCollectionToString(tempList, seperator);
+        return stringCollectionToString( tempList, seperator );
     }
 }

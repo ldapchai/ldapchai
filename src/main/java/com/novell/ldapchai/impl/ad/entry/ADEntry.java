@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.ad.entry;
 
-interface ADEntry {
+interface ADEntry
+{
 }

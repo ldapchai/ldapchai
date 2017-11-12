@@ -51,9 +51,10 @@ import java.util.Map;
  * Utility class for reading and writing challenge response sets too and from eDirectory.  The functionality in this class
  * is enabled regardless of the configuration setting {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS}.
  */
-public class NmasCrFactory {
+public class NmasCrFactory
+{
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(NmasCrFactory.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( NmasCrFactory.class );
 
 
     private static ChallengeSet readNmasAssignedChallengeSetPolicy(
@@ -64,35 +65,43 @@ public class NmasCrFactory {
     )
             throws ChaiUnavailableException, ChaiOperationException, ChaiValidationException
     {
-        if (challengeSetDN == null || challengeSetDN.length() < 1) {
-            LOGGER.trace("challengeSetDN is null, return null for readNmasAssignedChallengeSetPolicy()");
+        if ( challengeSetDN == null || challengeSetDN.length() < 1 )
+        {
+            LOGGER.trace( "challengeSetDN is null, return null for readNmasAssignedChallengeSetPolicy()" );
             return null;
         }
 
-        final List<Challenge> challenges = new ArrayList<Challenge>();
-        final ChaiEntry csSetEntry = provider.getEntryFactory().createChaiEntry(challengeSetDN);
+        final List<Challenge> challenges = new ArrayList<>();
+        final ChaiEntry csSetEntry = provider.getEntryFactory().createChaiEntry( challengeSetDN );
 
-        final Map<String,String> allValues = csSetEntry.readStringAttributes(Collections.<String>emptySet());
+        final Map<String, String> allValues = csSetEntry.readStringAttributes( Collections.emptySet() );
 
-        final String requiredQuestions = allValues.get("nsimRequiredQuestions");
-        final String randomQuestions = allValues.get("nsimRandomQuestions");
+        final String requiredQuestions = allValues.get( "nsimRequiredQuestions" );
+        final String randomQuestions = allValues.get( "nsimRandomQuestions" );
 
-        try {
-            if (requiredQuestions != null && requiredQuestions.length() > 0) {
-                challenges.addAll(NmasResponseSet.parseNmasPolicyXML(requiredQuestions, locale));
+        try
+        {
+            if ( requiredQuestions != null && requiredQuestions.length() > 0 )
+            {
+                challenges.addAll( NmasResponseSet.parseNmasPolicyXML( requiredQuestions, locale ) );
             }
-            if (randomQuestions != null && randomQuestions.length() > 0) {
-                challenges.addAll(NmasResponseSet.parseNmasPolicyXML(randomQuestions, locale));
+            if ( randomQuestions != null && randomQuestions.length() > 0 )
+            {
+                challenges.addAll( NmasResponseSet.parseNmasPolicyXML( randomQuestions, locale ) );
             }
-        } catch (JDOMException e) {
-            LOGGER.debug(e);
-        } catch (IOException e) {
-            LOGGER.debug(e);
+        }
+        catch ( JDOMException e )
+        {
+            LOGGER.debug( e );
+        }
+        catch ( IOException e )
+        {
+            LOGGER.debug( e );
         }
 
-        final int minRandQuestions = StringHelper.convertStrToInt(allValues.get("nsimNumberRandomQuestions"), 0);
+        final int minRandQuestions = StringHelper.convertStrToInt( allValues.get( "nsimNumberRandomQuestions" ), 0 );
 
-        return new ChaiChallengeSet(challenges, minRandQuestions, locale, identifer);
+        return new ChaiChallengeSet( challenges, minRandQuestions, locale, identifer );
     }
 
     /**
@@ -100,7 +109,7 @@ public class NmasCrFactory {
      * to the ChaiConfiguration found by looking at the ChaiProvider underlying the ChaiEntry.  For example,
      * the setting {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS} determines if NMAS calls
      * are used to discover a universal password c/r policy.
-     *
+     * <p>
      * This method is preferred over {@link #readAssignedChallengeSet(com.novell.ldapchai.ChaiUser)}, as it does not
      * require a (possibly unneccessary) call to read the user's assigned password policy.
      *
@@ -122,20 +131,24 @@ public class NmasCrFactory {
     {
         final String challengeSetDN;
 
-        try {
-            challengeSetDN = ((NspmPasswordPolicy)passwordPolicy).getChallengeSetDN();
-        } catch (ClassCastException e) {
-            LOGGER.trace("password policy is not an nmas password policy, unable to read challenge set policy");
+        try
+        {
+            challengeSetDN = ( ( NspmPasswordPolicy ) passwordPolicy ).getChallengeSetDN();
+        }
+        catch ( ClassCastException e )
+        {
+            LOGGER.trace( "password policy is not an nmas password policy, unable to read challenge set policy" );
             return null;
         }
 
-        if (challengeSetDN == null) {
-            LOGGER.trace("password policy does not have a challengeSetDN, return null for readAssignedChallengeSet()");
+        if ( challengeSetDN == null )
+        {
+            LOGGER.trace( "password policy does not have a challengeSetDN, return null for readAssignedChallengeSet()" );
             return null;
         }
 
-        final String identifier = ((NspmPasswordPolicy)passwordPolicy).readStringAttribute("nsimChallengeSetGUID");
-        return readNmasAssignedChallengeSetPolicy(provider, challengeSetDN, locale, identifier);
+        final String identifier = ( ( NspmPasswordPolicy ) passwordPolicy ).readStringAttribute( "nsimChallengeSetGUID" );
+        return readNmasAssignedChallengeSetPolicy( provider, challengeSetDN, locale, identifier );
     }
 
     /**
@@ -149,17 +162,18 @@ public class NmasCrFactory {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @throws ChaiValidationException  when there is a logical problem with the challenge set data, such as more randoms required then exist
      */
-    public static ChallengeSet readAssignedChallengeSet(final ChaiUser theUser, final Locale locale)
+    public static ChallengeSet readAssignedChallengeSet( final ChaiUser theUser, final Locale locale )
             throws ChaiUnavailableException, ChaiOperationException, ChaiValidationException
     {
         final ChaiPasswordPolicy passwordPolicy = theUser.getPasswordPolicy();
 
-        if (passwordPolicy == null) {
-            LOGGER.trace("user does not have an assigned password policy, return null for readAssignedChallengeSet()");
+        if ( passwordPolicy == null )
+        {
+            LOGGER.trace( "user does not have an assigned password policy, return null for readAssignedChallengeSet()" );
             return null;
         }
 
-        return readAssignedChallengeSet(theUser.getChaiProvider(), passwordPolicy, locale);
+        return readAssignedChallengeSet( theUser.getChaiProvider(), passwordPolicy, locale );
     }
 
 
@@ -174,40 +188,43 @@ public class NmasCrFactory {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @throws ChaiValidationException  when there is a logical problem with the challenge set data, such as more randoms required then exist
      */
-    public static ChallengeSet readAssignedChallengeSet(final ChaiUser theUser)
+    public static ChallengeSet readAssignedChallengeSet( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException, ChaiValidationException
     {
-        return readAssignedChallengeSet(theUser, Locale.getDefault());
+        return readAssignedChallengeSet( theUser, Locale.getDefault() );
     }
 
-    public static boolean writeResponseSet(final NmasResponseSet responseSet)
-            throws ChaiUnavailableException, ChaiOperationException {
+    public static boolean writeResponseSet( final NmasResponseSet responseSet )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         return responseSet.write();
     }
 
-    public static void clearResponseSet(final ChaiUser theUser)
-            throws ChaiUnavailableException, ChaiOperationException {
+    public static void clearResponseSet( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         final ChaiProvider provider = theUser.getChaiProvider();
 
         final DeleteLoginConfigRequest request = new DeleteLoginConfigRequest();
-        request.setObjectDN(theUser.getEntryDN());
-        request.setTag("ChallengeResponseQuestions");
-        request.setMethodID(NMASChallengeResponse.METHOD_ID);
-        request.setMethodIDLen(NMASChallengeResponse.METHOD_ID.length * 4);
+        request.setObjectDN( theUser.getEntryDN() );
+        request.setTag( "ChallengeResponseQuestions" );
+        request.setMethodID( NMASChallengeResponse.METHOD_ID );
+        request.setMethodIDLen( NMASChallengeResponse.METHOD_ID.length * 4 );
 
-        final DeleteLoginConfigResponse response = (DeleteLoginConfigResponse)provider.extendedOperation(request);
-        if (response != null && response.getNmasRetCode() != 0) {
+        final DeleteLoginConfigResponse response = ( DeleteLoginConfigResponse ) provider.extendedOperation( request );
+        if ( response != null && response.getNmasRetCode() != 0 )
+        {
             final String errorMsg = "nmas error clearing loginResponseConfig: " + response.getNmasRetCode();
-            LOGGER.debug(errorMsg);
-            throw new ChaiOperationException(errorMsg, ChaiError.UNKNOWN);
+            LOGGER.debug( errorMsg );
+            throw new ChaiOperationException( errorMsg, ChaiError.UNKNOWN );
         }
     }
 
 
-    public static NmasResponseSet readNmasResponseSet(final ChaiUser user)
+    public static NmasResponseSet readNmasResponseSet( final ChaiUser user )
             throws ChaiUnavailableException, ChaiValidationException
     {
-        return NmasResponseSet.readNmasUserResponseSet(user);
+        return NmasResponseSet.readNmasUserResponseSet( user );
     }
 
     public static NmasResponseSet newNmasResponseSet(

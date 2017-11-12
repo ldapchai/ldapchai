@@ -24,5 +24,6 @@ package com.novell.ldapchai.impl.edir.entry;
  *
  * @author Jason D. Rivard
  */
-public interface EdirEntry {
+public interface EdirEntry
+{
 }

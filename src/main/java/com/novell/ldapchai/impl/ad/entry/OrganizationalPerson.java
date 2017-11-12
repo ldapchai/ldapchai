@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.ad.entry;
 
-interface Organizational_Person extends Person {
+interface OrganizationalPerson extends Person
+{
 }

@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.edir.entry;
 
-public interface NdsLoginProperties extends Top {
+public interface NdsLoginProperties extends Top
+{
 }

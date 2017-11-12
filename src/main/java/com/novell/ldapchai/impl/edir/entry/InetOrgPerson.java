@@ -22,7 +22,8 @@ package com.novell.ldapchai.impl.edir.entry;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiUser;
 
-public interface InetOrgPerson extends OrganizationalPerson, ChaiUser {
+public interface InetOrgPerson extends OrganizationalPerson, ChaiUser
+{
 
     /**
      * Convenience LDAP attribute definition

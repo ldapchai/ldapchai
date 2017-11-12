@@ -6,14 +6,16 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
 
 @Deprecated
-public class ChaiFactory {
+public class ChaiFactory
+{
 
-    private ChaiFactory() {
+    private ChaiFactory()
+    {
     }
 
     /**
-     * Convenience method for {@link com.novell.ldapchai.provider.ChaiProviderFactory#quickProvider(String,String,String)}.
-     *
+     * Convenience method for {@link com.novell.ldapchai.provider.ChaiProviderFactory#quickProvider(String, String, String)}.
+     * <p>
      * Get a ChaiUser using a standard JNDI ChaiProvider with default settings.
      *
      * @param bindDN   ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
@@ -24,18 +26,18 @@ public class ChaiFactory {
      * @see com.novell.ldapchai.provider.ChaiProviderFactory#quickProvider (String, String, String)
      */
     @Deprecated
-    public static ChaiUser quickProvider(final String ldapURL, final String bindDN, final String password)
+    public static ChaiUser quickProvider( final String ldapURL, final String bindDN, final String password )
             throws ChaiUnavailableException
     {
-        return ChaiProviderFactory.newProviderFactory().quickProvider(ldapURL, bindDN, password);
+        return ChaiProviderFactory.newProviderFactory().quickProvider( ldapURL, bindDN, password );
     }
 
     @Deprecated
-    public static ChaiEntry createChaiEntry(final String entryDN, final ChaiProvider provider)
+    public static ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
             throws ChaiUnavailableException
     {
 
-        return provider.getEntryFactory().createChaiEntry(entryDN);
+        return provider.getEntryFactory().createChaiEntry( entryDN );
     }
 
     /**
@@ -47,10 +49,10 @@ public class ChaiFactory {
      * @return A valid {@code ChaiGroup}
      */
     @Deprecated
-    public static ChaiGroup createChaiGroup(final String groupDN, final ChaiProvider provider)
+    public static ChaiGroup createChaiGroup( final String groupDN, final ChaiProvider provider )
             throws ChaiUnavailableException
     {
-        return provider.getEntryFactory().createChaiGroup(groupDN);
+        return provider.getEntryFactory().createChaiGroup( groupDN );
     }
 
     /**
@@ -62,10 +64,10 @@ public class ChaiFactory {
      * @return A valid {@code ChaiUser}
      */
     @Deprecated
-    public static ChaiUser createChaiUser(final String userDN, final ChaiProvider provider)
+    public static ChaiUser createChaiUser( final String userDN, final ChaiProvider provider )
             throws ChaiUnavailableException
     {
-        return provider.getEntryFactory().createChaiUser(userDN);
+        return provider.getEntryFactory().createChaiUser( userDN );
     }
 
     /**
@@ -76,7 +78,7 @@ public class ChaiFactory {
      * @return A valid {@code ChaiUser}
      */
     @Deprecated
-    public static ErrorMap getErrorMap(final ChaiProvider provider)
+    public static ErrorMap getErrorMap( final ChaiProvider provider )
             throws ChaiUnavailableException
     {
         return provider.getEntryFactory().getErrorMap();
@@ -86,12 +88,12 @@ public class ChaiFactory {
      * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
      *
      * @param vendor A valid and functioning {@code ChaiProvider}.  The {@code ChaiProvider}'s ldap
-     *                 connection will be used by the {@code ChaiGroup}.
+     *               connection will be used by the {@code ChaiGroup}.
      * @return A valid {@code ChaiUser}
      */
     @Deprecated
-    public static ErrorMap getErrorMap(final ChaiProvider.DIRECTORY_VENDOR vendor)
+    public static ErrorMap getErrorMap( final ChaiProvider.DIRECTORY_VENDOR vendor )
     {
-        return ChaiEntryFactory.getErrorMap(vendor);
+        return ChaiEntryFactory.getErrorMap( vendor );
     }
 }

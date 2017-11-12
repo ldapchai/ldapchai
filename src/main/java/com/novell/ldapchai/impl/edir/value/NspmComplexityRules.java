@@ -34,181 +34,217 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NspmComplexityRules {
+public class NspmComplexityRules
+{
 
-    
+
     public static final NspmComplexityRules MS_COMPLEXITY_POLICY;
-    
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(ChaiEntryFactory.class);
+
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiEntryFactory.class );
 
     private List<Policy> policies = Collections.emptyList();
 
-    static {
-        final List<RuleSet> ruleSets = new ArrayList<RuleSet>();
+    static
+    {
+        final List<RuleSet> ruleSets = new ArrayList<>();
         {
-            final Map<Rule,String> rules = new HashMap<Rule,String>();
-            rules.put(Rule.MinPwdLen,"6");
-            rules.put(Rule.MaxPwdLen,"128");
-            final RuleSet ruleSet = new RuleSet(0, rules);
-            ruleSets.add(ruleSet);
+            final Map<Rule, String> rules = new HashMap<>();
+            rules.put( Rule.MinPwdLen, "6" );
+            rules.put( Rule.MaxPwdLen, "128" );
+            final RuleSet ruleSet = new RuleSet( 0, rules );
+            ruleSets.add( ruleSet );
         }
         {
-            final Map<Rule,String> rules = new HashMap<Rule,String>();
-            rules.put(Rule.MinUppercase,"1");
-            rules.put(Rule.MinLowercase,"1");
-            rules.put(Rule.MinSpecial,"1");
-            rules.put(Rule.MinNumeric,"1");
-            final RuleSet ruleSet = new RuleSet(1, rules);
-            ruleSets.add(ruleSet);
+            final Map<Rule, String> rules = new HashMap<>();
+            rules.put( Rule.MinUppercase, "1" );
+            rules.put( Rule.MinLowercase, "1" );
+            rules.put( Rule.MinSpecial, "1" );
+            rules.put( Rule.MinNumeric, "1" );
+            final RuleSet ruleSet = new RuleSet( 1, rules );
+            ruleSets.add( ruleSet );
         }
-        final List<Policy> policyList = new ArrayList<Policy>();
-        final Policy policy = new Policy(ruleSets);
-        policyList.add(policy);
-        MS_COMPLEXITY_POLICY = new NspmComplexityRules(policyList);
+        final List<Policy> policyList = new ArrayList<>();
+        final Policy policy = new Policy( ruleSets );
+        policyList.add( policy );
+        MS_COMPLEXITY_POLICY = new NspmComplexityRules( policyList );
     }
 
-    public NspmComplexityRules(final List<Policy> policies) {
-        if (policies == null) {
-            throw new NullPointerException("policies may not be null");
+    public NspmComplexityRules( final List<Policy> policies )
+    {
+        if ( policies == null )
+        {
+            throw new NullPointerException( "policies may not be null" );
         }
-        this.policies = Collections.unmodifiableList(policies);
+        this.policies = Collections.unmodifiableList( policies );
     }
 
-    public NspmComplexityRules(final String input) {
-        this.policies = readComplexityPoliciesFromXML(input);
+    public NspmComplexityRules( final String input )
+    {
+        this.policies = readComplexityPoliciesFromXML( input );
     }
 
-     private static List<Policy> readComplexityPoliciesFromXML(final String input) {
-         final List<Policy> returnList = new ArrayList<Policy>();
-         try {
-             final SAXBuilder builder = new SAXBuilder();
-             final Document doc = builder.build(new StringReader(input));
-             final Element rootElement = doc.getRootElement();
+    private static List<Policy> readComplexityPoliciesFromXML( final String input )
+    {
+        final List<Policy> returnList = new ArrayList<>();
+        try
+        {
+            final SAXBuilder builder = new SAXBuilder();
+            final Document doc = builder.build( new StringReader( input ) );
+            final Element rootElement = doc.getRootElement();
 
-             final List policyElements = rootElement.getChildren("Policy");
-             for (final Object policyNode : policyElements) {
-                 final Element policyElement = (Element)policyNode;
-                 final List<RuleSet> returnRuleSets = new ArrayList<RuleSet>();
-                 for (final Object ruleSetObjects : policyElement.getChildren("RuleSet")) {
-                     final Element loopRuleSet = (Element)ruleSetObjects;
-                     final Map<Rule,String> returnRules = new HashMap<Rule,String>();
-                     int violationsAllowed = 0;
+            final List policyElements = rootElement.getChildren( "Policy" );
+            for ( final Object policyNode : policyElements )
+            {
+                final Element policyElement = ( Element ) policyNode;
+                final List<RuleSet> returnRuleSets = new ArrayList<>();
+                for ( final Object ruleSetObjects : policyElement.getChildren( "RuleSet" ) )
+                {
+                    final Element loopRuleSet = ( Element ) ruleSetObjects;
+                    final Map<Rule, String> returnRules = new HashMap<>();
+                    int violationsAllowed = 0;
 
-                     final org.jdom2.Attribute violationsAttribute = loopRuleSet.getAttribute("ViolationsAllowed");
-                     if (violationsAttribute != null && violationsAttribute.getValue().length() > 0) {
-                         violationsAllowed = Integer.parseInt(violationsAttribute.getValue());
-                     }
+                    final org.jdom2.Attribute violationsAttribute = loopRuleSet.getAttribute( "ViolationsAllowed" );
+                    if ( violationsAttribute != null && violationsAttribute.getValue().length() > 0 )
+                    {
+                        violationsAllowed = Integer.parseInt( violationsAttribute.getValue() );
+                    }
 
-                     for (final Object ruleObject : loopRuleSet.getChildren("Rule")) {
-                         final Element loopRuleElement = (Element)ruleObject;
+                    for ( final Object ruleObject : loopRuleSet.getChildren( "Rule" ) )
+                    {
+                        final Element loopRuleElement = ( Element ) ruleObject;
 
-                         final List ruleAttributes = loopRuleElement.getAttributes();
-                         for (final Object attributeObject : ruleAttributes) {
-                             final org.jdom2.Attribute loopAttribute = (org.jdom2.Attribute)attributeObject;
+                        final List ruleAttributes = loopRuleElement.getAttributes();
+                        for ( final Object attributeObject : ruleAttributes )
+                        {
+                            final org.jdom2.Attribute loopAttribute = ( org.jdom2.Attribute ) attributeObject;
 
-                             final Rule rule = Rule.valueOf(loopAttribute.getName());
-                             final String value = loopAttribute.getValue();
-                             returnRules.put(rule, value);
-                         }
-                     }
-                     returnRuleSets.add(new RuleSet(violationsAllowed,returnRules));
-                 }
-                 returnList.add(new Policy(returnRuleSets));
-             }
-         } catch (JDOMException e) {
-             LOGGER.debug("error parsing stored response record: " + e.getMessage());
-         } catch (IOException e) {
-             LOGGER.debug("error parsing stored response record: " + e.getMessage());
-         } catch (NullPointerException e) {
-             LOGGER.debug("error parsing stored response record: " + e.getMessage());
-         } catch (IllegalArgumentException e) {
-             LOGGER.debug("error parsing stored response record: " + e.getMessage());
-         }
-         return returnList;
-     }
+                            final Rule rule = Rule.valueOf( loopAttribute.getName() );
+                            final String value = loopAttribute.getValue();
+                            returnRules.put( rule, value );
+                        }
+                    }
+                    returnRuleSets.add( new RuleSet( violationsAllowed, returnRules ) );
+                }
+                returnList.add( new Policy( returnRuleSets ) );
+            }
+        }
+        catch ( JDOMException e )
+        {
+            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
+        }
+        catch ( IOException e )
+        {
+            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
+        }
+        catch ( NullPointerException e )
+        {
+            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
+        }
+        catch ( IllegalArgumentException e )
+        {
+            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
+        }
+        return returnList;
+    }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return policies.hashCode();
     }
 
-    public List<Policy> getComplexityPolicies() {
+    public List<Policy> getComplexityPolicies()
+    {
         return policies;
     }
 
-    public boolean isMsComplexityPolicy() {
-        return MS_COMPLEXITY_POLICY.equals(this);
+    public boolean isMsComplexityPolicy()
+    {
+        return MS_COMPLEXITY_POLICY.equals( this );
     }
 
     @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ( o == null || getClass() != o.getClass() )
+        {
             return false;
         }
 
-        final NspmComplexityRules that = (NspmComplexityRules) o;
+        final NspmComplexityRules that = ( NspmComplexityRules ) o;
 
-        if (!policies.equals(that.policies)) {
+        if ( !policies.equals( that.policies ) )
+        {
             return false;
         }
 
         return true;
     }
 
-     public enum Rule {
-         MinPwdLen,
-         MaxPwdLen,
-         MinUppercase,
-         MaxUppercase,
-         MinLowercase,
-         MaxLowercase,
-         MinNumeric,
-         MaxNumeric,
-         MinSpecial,
-         MaxSpecial,
-         MaxRepeated,
-         MaxConsecutive,
-         MinUnique,
-         UppercaseFirstCharDisallowed,
-         UppercaseLastCharDisallowed,
-         LowercaseFirstCharDisallowed,
-         LowercaseLastCharDisallowed,
-         FirstCharNumericDisallowed,
-         LastCharNumericDisallowed,
-         FirstCharSpecialDisallowed,
-         LastCharSpecialDisallowed,
-         ExtendedCharDisallowed,
-     }
+    public enum Rule
+    {
+        MinPwdLen,
+        MaxPwdLen,
+        MinUppercase,
+        MaxUppercase,
+        MinLowercase,
+        MaxLowercase,
+        MinNumeric,
+        MaxNumeric,
+        MinSpecial,
+        MaxSpecial,
+        MaxRepeated,
+        MaxConsecutive,
+        MinUnique,
+        UppercaseFirstCharDisallowed,
+        UppercaseLastCharDisallowed,
+        LowercaseFirstCharDisallowed,
+        LowercaseLastCharDisallowed,
+        FirstCharNumericDisallowed,
+        LastCharNumericDisallowed,
+        FirstCharSpecialDisallowed,
+        LastCharSpecialDisallowed,
+        ExtendedCharDisallowed,
+    }
 
-    public static class Policy {
-         List<RuleSet> ruleSets;
+    public static class Policy
+    {
+        List<RuleSet> ruleSets;
 
-         public Policy(final List<RuleSet> ruleSets) {
-             if (ruleSets == null) {
-                 throw new NullPointerException("ruleSets may not be null");
-             }
-             this.ruleSets = Collections.unmodifiableList(ruleSets);
-         }
+        public Policy( final List<RuleSet> ruleSets )
+        {
+            if ( ruleSets == null )
+            {
+                throw new NullPointerException( "ruleSets may not be null" );
+            }
+            this.ruleSets = Collections.unmodifiableList( ruleSets );
+        }
 
-         public List<RuleSet> getComplexityRuleSets() {
-             return ruleSets;
-         }
+        public List<RuleSet> getComplexityRuleSets()
+        {
+            return ruleSets;
+        }
 
         @Override
-        public boolean equals(final Object o) {
-            if (this == o) {
+        public boolean equals( final Object o )
+        {
+            if ( this == o )
+            {
                 return true;
             }
-            if (o == null || getClass() != o.getClass()) {
+            if ( o == null || getClass() != o.getClass() )
+            {
                 return false;
             }
 
-            final Policy policy = (Policy) o;
+            final Policy policy = ( Policy ) o;
 
-            if (!ruleSets.equals(policy.ruleSets)) {
+            if ( !ruleSets.equals( policy.ruleSets ) )
+            {
                 return false;
             }
 
@@ -216,56 +252,68 @@ public class NspmComplexityRules {
         }
 
         @Override
-        public int hashCode() {
+        public int hashCode()
+        {
             return ruleSets.hashCode();
         }
     }
 
-     public static class RuleSet {
-         int violationsAllowed;
-         Map<Rule,String> complexityRules;
+    public static class RuleSet
+    {
+        int violationsAllowed;
+        Map<Rule, String> complexityRules;
 
-         public RuleSet(final int violationsAllowed, final Map<Rule, String> complexityRules) {
-             if (complexityRules == null) {
-                 throw new NullPointerException("complexityRules may not be null");
-             }
-             this.violationsAllowed = violationsAllowed;
-             this.complexityRules = Collections.unmodifiableMap(complexityRules);
-         }
+        public RuleSet( final int violationsAllowed, final Map<Rule, String> complexityRules )
+        {
+            if ( complexityRules == null )
+            {
+                throw new NullPointerException( "complexityRules may not be null" );
+            }
+            this.violationsAllowed = violationsAllowed;
+            this.complexityRules = Collections.unmodifiableMap( complexityRules );
+        }
 
-         public int getViolationsAllowed() {
-             return violationsAllowed;
-         }
+        public int getViolationsAllowed()
+        {
+            return violationsAllowed;
+        }
 
-         public Map<Rule, String> getComplexityRules() {
-             return complexityRules;
-         }
+        public Map<Rule, String> getComplexityRules()
+        {
+            return complexityRules;
+        }
 
-         @Override
-         public boolean equals(final Object o) {
-             if (this == o) {
-                 return true;
-             }
-             if (o == null || getClass() != o.getClass()) {
-                 return false;
-             }
+        @Override
+        public boolean equals( final Object o )
+        {
+            if ( this == o )
+            {
+                return true;
+            }
+            if ( o == null || getClass() != o.getClass() )
+            {
+                return false;
+            }
 
-             final RuleSet ruleSet = (RuleSet) o;
+            final RuleSet ruleSet = ( RuleSet ) o;
 
-             if (violationsAllowed != ruleSet.violationsAllowed) {
-                 return false;
-             }
-             if (complexityRules != null ? !complexityRules.equals(ruleSet.complexityRules) : ruleSet.complexityRules != null) {
-                 return false;
-             }
-             return true;
-         }
+            if ( violationsAllowed != ruleSet.violationsAllowed )
+            {
+                return false;
+            }
+            if ( complexityRules != null ? !complexityRules.equals( ruleSet.complexityRules ) : ruleSet.complexityRules != null )
+            {
+                return false;
+            }
+            return true;
+        }
 
-         @Override
-         public int hashCode() {
-             int result = violationsAllowed;
-             result = 31 * result + (complexityRules != null ? complexityRules.hashCode() : 0);
-             return result;
-         }
-     }
+        @Override
+        public int hashCode()
+        {
+            int result = violationsAllowed;
+            result = 31 * result + ( complexityRules != null ? complexityRules.hashCode() : 0 );
+            return result;
+        }
+    }
 }

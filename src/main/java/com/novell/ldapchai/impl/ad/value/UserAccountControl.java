@@ -21,16 +21,17 @@ package com.novell.ldapchai.impl.ad.value;
 
 import com.novell.ldapchai.util.StringHelper;
 
-public class UserAccountControl {
-    public enum UAC_BIT {
-        ACCOUNT_ACTIVE(0x2),
-        ACCOUNT_LOCKOUT(0x10),
-        PASSWORD_EXPIRED(0x800000),
-        PASSWORD_CANT_CHANGE(0x40),
-        DONT_EXPIRE_PASSWORD(0x10000),
-        ;
+public class UserAccountControl
+{
+    public enum UACBit
+    {
+        ACCOUNT_ACTIVE( 0x2 ),
+        ACCOUNT_LOCKOUT( 0x10 ),
+        PASSWORD_EXPIRED( 0x800000 ),
+        PASSWORD_CANT_CHANGE( 0x40 ),
+        DONT_EXPIRE_PASSWORD( 0x10000 ),;
 
-        UAC_BIT(final int bitValue)
+        UACBit( final int bitValue )
         {
             this.bitValue = bitValue;
         }
@@ -45,35 +46,43 @@ public class UserAccountControl {
 
     private final int uacValue;
 
-    public UserAccountControl(final String uacValue) {
-        this.uacValue = StringHelper.convertStrToInt(uacValue, 0);
+    public UserAccountControl( final String uacValue )
+    {
+        this.uacValue = StringHelper.convertStrToInt( uacValue, 0 );
     }
 
-    public UserAccountControl(final int uacValue) {
+    public UserAccountControl( final int uacValue )
+    {
         this.uacValue = uacValue;
     }
 
-    public boolean isAccountLockout() {
-        return isBit(UAC_BIT.ACCOUNT_LOCKOUT);
+    public boolean isAccountLockout()
+    {
+        return isBit( UACBit.ACCOUNT_LOCKOUT );
     }
 
-    public boolean isAccountActive() {
-        return isBit(UAC_BIT.ACCOUNT_ACTIVE);
+    public boolean isAccountActive()
+    {
+        return isBit( UACBit.ACCOUNT_ACTIVE );
     }
 
-    public boolean isPasswordCantChange() {
-        return isBit(UAC_BIT.PASSWORD_CANT_CHANGE);
+    public boolean isPasswordCantChange()
+    {
+        return isBit( UACBit.PASSWORD_CANT_CHANGE );
     }
 
-    public boolean isPasswordExpired() {
-        return isBit(UAC_BIT.PASSWORD_EXPIRED);
+    public boolean isPasswordExpired()
+    {
+        return isBit( UACBit.PASSWORD_EXPIRED );
     }
 
-    public boolean isPasswordNeverExpires() {
-        return isBit(UAC_BIT.PASSWORD_CANT_CHANGE);
+    public boolean isPasswordNeverExpires()
+    {
+        return isBit( UACBit.PASSWORD_CANT_CHANGE );
     }
 
-    public boolean isBit(final UAC_BIT uacBit) {
-        return (uacValue & uacBit.bitValue()) == uacBit.bitValue();
+    public boolean isBit( final UACBit uacBit )
+    {
+        return ( uacValue & uacBit.bitValue() ) == uacBit.bitValue();
     }
 }

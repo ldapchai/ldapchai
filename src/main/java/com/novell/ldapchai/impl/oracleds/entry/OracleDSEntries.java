@@ -27,33 +27,38 @@ import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 
 import java.util.Date;
 
-public class OracleDSEntries {
-    public static Date convertZuluToDate(final String dateString)
+public class OracleDSEntries
+{
+    public static Date convertZuluToDate( final String dateString )
     {
-        return EdirEntries.convertZuluToDate(dateString);
+        return EdirEntries.convertZuluToDate( dateString );
     }
 
-    public static String convertDateToZulu(final Date date)
+    public static String convertDateToZulu( final Date date )
     {
-        return EdirEntries.convertDateToZulu(date);
+        return EdirEntries.convertDateToZulu( date );
     }
 
-    static OracleDSPasswordPolicy readPasswordPolicy(final InetOrgPerson person)
+    static OracleDSPasswordPolicy readPasswordPolicy( final InetOrgPerson person )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        ChaiEntry searchEntry = new OracleDSEntry(person.getEntryDN(), person.getChaiProvider());
+        ChaiEntry searchEntry = new OracleDSEntry( person.getEntryDN(), person.getChaiProvider() );
         OracleDSEntry discoveredPolicy = null;
         int saftyCounter = 0;
 
-        while (saftyCounter < 50 && searchEntry != null && discoveredPolicy == null) {
+        while ( saftyCounter < 50 && searchEntry != null && discoveredPolicy == null )
+        {
             saftyCounter++;
-            if (searchEntry.isValid()) {
+            if ( searchEntry.isValid() )
+            {
                 final String pwdPolicySubentryValue = searchEntry.readStringAttribute(
-                        ChaiConstant.ATTR_ORACLEDS_PASSWORD_SUB_ENTRY);
-                if (pwdPolicySubentryValue != null && !pwdPolicySubentryValue.isEmpty()) {
-                    final OracleDSEntry policyEntry = new OracleDSEntry(pwdPolicySubentryValue,
-                            person.getChaiProvider());
-                    if (policyEntry.isValid()) {
+                        ChaiConstant.ATTR_ORACLEDS_PASSWORD_SUB_ENTRY );
+                if ( pwdPolicySubentryValue != null && !pwdPolicySubentryValue.isEmpty() )
+                {
+                    final OracleDSEntry policyEntry = new OracleDSEntry( pwdPolicySubentryValue,
+                            person.getChaiProvider() );
+                    if ( policyEntry.isValid() )
+                    {
                         discoveredPolicy = policyEntry;
                     }
                 }
@@ -61,12 +66,14 @@ public class OracleDSEntries {
             searchEntry = searchEntry.getParentEntry();
         }
 
-        if (discoveredPolicy != null) {
-            return new OracleDSPasswordPolicy(discoveredPolicy.getEntryDN(), person.getChaiProvider());
+        if ( discoveredPolicy != null )
+        {
+            return new OracleDSPasswordPolicy( discoveredPolicy.getEntryDN(), person.getChaiProvider() );
         }
 
-        final OracleDSPasswordPolicy defaultPolicy = new OracleDSPasswordPolicy("cn=Password Policy,cn=config", person.getChaiProvider());
-        if (defaultPolicy.isValid()) {
+        final OracleDSPasswordPolicy defaultPolicy = new OracleDSPasswordPolicy( "cn=Password Policy,cn=config", person.getChaiProvider() );
+        if ( defaultPolicy.isValid() )
+        {
             return defaultPolicy;
         }
 

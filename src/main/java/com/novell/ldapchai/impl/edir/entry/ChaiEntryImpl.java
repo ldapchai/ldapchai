@@ -22,14 +22,15 @@ package com.novell.ldapchai.impl.edir.entry;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-class ChaiEntryImpl extends TopImpl implements ChaiEntry {
+class ChaiEntryImpl extends TopImpl implements ChaiEntry
+{
     public String getLdapObjectClassName()
     {
         return "";
     }
 
-    ChaiEntryImpl(final String entryDN, final ChaiProvider chaiProvider)
+    ChaiEntryImpl( final String entryDN, final ChaiProvider chaiProvider )
     {
-        super(entryDN, chaiProvider);
+        super( entryDN, chaiProvider );
     }
 }

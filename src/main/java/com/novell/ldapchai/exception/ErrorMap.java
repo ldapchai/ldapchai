@@ -21,12 +21,13 @@ package com.novell.ldapchai.exception;
 
 import com.novell.ldapchai.provider.ChaiProvider;
 
-public interface ErrorMap {
+public interface ErrorMap
+{
     ChaiProvider.DIRECTORY_VENDOR forDirectoryVendor();
 
-    ChaiError errorForMessage(String message);
+    ChaiError errorForMessage( String message );
 
-    boolean isPermanent(String message);
+    boolean isPermanent( String message );
 
-    boolean isAuthenticationRelated(String message);
+    boolean isAuthenticationRelated( String message );
 }

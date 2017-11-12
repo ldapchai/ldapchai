@@ -28,16 +28,15 @@ import java.util.Set;
 
 /**
  * Represents an ldap user entry.
- *
+ * <p>
  * This interface should be the primary means by which the LDAP Chai API is used to interact with ldap user entries.
- *
+ * <p>
  * Instances of ChaiUser can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
  */
-public interface ChaiUser extends ChaiEntry {
-
-
+public interface ChaiUser extends ChaiEntry
+{
     /**
      * Convenience LDAP attribute definition
      */
@@ -142,20 +141,20 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see ChaiGroup#addMember(ChaiUser)
      */
-    void addGroupMembership(ChaiGroup theGroup)
+    void addGroupMembership( ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Changes this ChaiUser's password.  This uses the normal change password method in ldap (remove the old, add the new).
      * If the old password is not correct, or the new password does not meet the server's requirements, a ChaiOperationException exception
      * will be thrown.
-     *
+     * <p>
      * This method should only be used when the user is the one changing his or her *own* password.  For admin
      * password changes, use {@link #setPassword(String)}.
-     *
+     * <p>
      * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
      * will typically future date the expiration time during the change operation.
-     *
+     * <p>
      * It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
      * set.
      *
@@ -165,7 +164,7 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiUnavailableException    If the directory server(s) are unavailable
      * @see #setPassword(String)
      */
-    void changePassword(String oldPassword, String newPassword)
+    void changePassword( String oldPassword, String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;
 
     /**
@@ -192,7 +191,8 @@ public interface ChaiUser extends ChaiEntry {
      * Convenience method to find this ChaiUser's direct reports.  Evaluates the {@link #ATTR_DIRECT_REPORTS} attribute
      * and returns the equivalent ChaiUser.
      *
-     * @return A collection of ChaiUser instances that represent this ChaiUsers's direct reports.  If this ChaiUser does not have any direct reports, then an empty collection is retured.
+     * @return A collection of ChaiUser instances that represent this ChaiUsers's direct reports.
+     * If this ChaiUser does not have any direct reports, then an empty collection is returned.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -203,7 +203,8 @@ public interface ChaiUser extends ChaiEntry {
      * Convenience method to find this ChaiUser's group memberships.  Evaluates the {@link #ATTR_GROUP_MEMBERSHIP} attribute
      * and returns the equivalent ChaiGroups.
      *
-     * @return A collection of {@link ChaiGroup} instances that represent this ChaiUsers's direct reports.  If this ChaiUser does not have any group memberships, then an empty collection is retured.
+     * @return A collection of {@link ChaiGroup} instances that represent this ChaiUsers's direct reports.
+     * If this ChaiUser does not have any group memberships, then an empty collection is returned.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -323,54 +324,54 @@ public interface ChaiUser extends ChaiEntry {
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see com.novell.ldapchai.ChaiGroup#removeMember(ChaiUser)
      */
-    void removeGroupMembership(ChaiGroup theGroup)
+    void removeGroupMembership( ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Sets this ChaiUser's password.  This uses the normal administrative set password method in ldap.
      * If the old password is not correct, or the new password does not meet the server's requirements, a discriptive exception
      * will be thrown.
-     *
+     * <p>
      * This method should only be used for administrators setting a different user's password.  For self
-     * changes, use {@link #changePassword(String,String)}.
-     *
+     * changes, use {@link #changePassword(String, String)}.
+     * <p>
      * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
      * will typically mark the current date as the password expiration time during the set operation, causing the password to
      * be expired (and changed) for the user during the next authentication.
-     *
+     * <p>
      * It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
      * set.
      *
-     *
-     * @param newPassword A new password value that conforms to the users password policy
+     * @param newPassword           A new password value that conforms to the users password policy
      * @param enforcePasswordPolicy Indicates if the password policy should be enforced.  The ldap vendor may or may not
      *                              support this.
-     * @throws ChaiPasswordPolicyException If the new password does not meet the user's password policy
-     * @throws ChaiUnavailableException    If the directory server(s) are unavailable
+     * @throws ChaiPasswordPolicyException                          If the new password does not meet the user's password policy
+     * @throws ChaiUnavailableException                             If the directory server(s) are unavailable
      * @throws com.novell.ldapchai.exception.ChaiOperationException If there is an error while setting the password
-     * @see #changePassword(String,String)
+     * @see #changePassword(String, String)
      */
-    void setPassword(String newPassword, boolean enforcePasswordPolicy)
+    void setPassword( String newPassword, boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;
 
 
     /**
      * See {@link #setPassword(String, boolean)}. Sets enforcePasswordPolicy to false.
+     *
      * @param newPassword
-     * @throws ChaiUnavailableException     If the directory is unreachable
-     * @throws ChaiPasswordPolicyException  If the password policy is violated
-     * @throws ChaiOperationException       If some operational issue prevents the password from veing set.
+     * @throws ChaiUnavailableException    If the directory is unreachable
+     * @throws ChaiPasswordPolicyException If the password policy is violated
+     * @throws ChaiOperationException      If some operational issue prevents the password from veing set.
      */
-    void setPassword(String newPassword)
+    void setPassword( String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;
 
     /**
      * Test a users value for this ChaiUser's password.  Appropriate rights are required for this to work properly.  This call
      * generally only tests the password value itself, and not any other authentication meta attributes such as account
      * disabled, or other authentication restrictions.
-     *
+     * <p>
      * Thus, a succcessfull test does not neccessarily mean that an authentication (BIND) would work with this password.
-     *
+     * <p>
      * <i>Implementation Note:</i> Calling this method is essentially the same as calling {@link #compareStringAttribute(String USER_PASSWORD, String value)} and converting
      * {@code ChaiOperationalException} to {@code ChaiPasswordPolicyException}.
      *
@@ -378,25 +379,24 @@ public interface ChaiUser extends ChaiEntry {
      * @return true if password is correct.
      * @throws ChaiPasswordPolicyException If the password does not meet the user's password policy
      * @throws ChaiUnavailableException    If the directory server(s) are unavailable
-     * @see #changePassword(String,String)
+     * @see #changePassword(String, String)
      * @see #setPassword(String)
      */
-    boolean testPassword(String passwordValue)
+    boolean testPassword( String passwordValue )
             throws ChaiUnavailableException, ChaiPasswordPolicyException;
 
     /**
      * Test a new value for this ChaiUser's password.  This method does not cause a change or set to actually occur.  This
      * is useful before calling the {@link #setPassword(String)} or {@link #changePassword(String, String)} methods.
      *
-     *
      * @param testPassword A new password value that conforms to the users password policy
      * @return true if password meets the user's policy.  Never returns false (returns {@code ChaiPasswordPolicyException} instead)
      * @throws ChaiPasswordPolicyException If the password does not meet the user's password policy
      * @throws ChaiUnavailableException    If the directory server(s) are unavailable
-     * @see #changePassword(String,String)
+     * @see #changePassword(String, String)
      * @see #setPassword(String)
      */
-    boolean testPasswordPolicy(String testPassword)
+    boolean testPasswordPolicy( String testPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException;
 
     boolean isAccountEnabled()
@@ -428,7 +428,6 @@ public interface ChaiUser extends ChaiEntry {
      * incorrect login attempts.
      *
      * @return true if the account is in a locked state
-     *
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -439,7 +438,6 @@ public interface ChaiUser extends ChaiEntry {
      * Deprecated and replaced with {@link #isPasswordExpired()} due to the ambiguous name of the method.
      *
      * @return true if the account is in a locked state
-     *
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -452,12 +450,11 @@ public interface ChaiUser extends ChaiEntry {
      * the implementation may or may not be able to reliably read this value.
      *
      * @return Date of the user's last password modification time, or null if unable to read.
-     *
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     Date readPasswordModificationDate()
-        throws ChaiOperationException, ChaiUnavailableException;
+            throws ChaiOperationException, ChaiUnavailableException;
 
     /**
      * Read the user's account expiration date.  The implementation will attempt to read the user's defined or calculated
@@ -473,8 +470,8 @@ public interface ChaiUser extends ChaiEntry {
 
     /**
      * Checks if a user account is expired.
-     * @return true if the account is in a locked state
      *
+     * @return true if the account is in a locked state
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */

@@ -19,6 +19,7 @@
 
 /**
  * Components to maintain and manage the actual connection to the ldap directory.
+ *
  * @author Jason D. Rivard
  */
 

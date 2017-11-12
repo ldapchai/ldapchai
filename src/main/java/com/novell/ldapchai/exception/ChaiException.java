@@ -27,7 +27,8 @@ package com.novell.ldapchai.exception;
  * @author Jason D. Rivard
  * @see ChaiError
  */
-public class ChaiException extends Exception {
+public class ChaiException extends Exception
+{
 
 
     private final boolean permanent;
@@ -35,25 +36,28 @@ public class ChaiException extends Exception {
 
     private final ChaiError errorCode;
 
-    static ChaiException createChaiException(final String message)
+    static ChaiException createChaiException( final String message )
     {
-        final ChaiError detectedCode = ChaiErrors.getErrorForMessage(message);
+        final ChaiError detectedCode = ChaiErrors.getErrorForMessage( message );
 
-        if (ChaiErrors.isPermanent(message)) {
-            return new ChaiUnavailableException(message, detectedCode);
-        } else {
-            return new ChaiOperationException(message, detectedCode);
+        if ( ChaiErrors.isPermanent( message ) )
+        {
+            return new ChaiUnavailableException( message, detectedCode );
+        }
+        else
+        {
+            return new ChaiOperationException( message, detectedCode );
         }
     }
 
-    protected ChaiException(final String message, final ChaiError errorCode)
+    protected ChaiException( final String message, final ChaiError errorCode )
     {
-        this(message, errorCode, ChaiErrors.isPermanent(message), ChaiErrors.isAuthenticationRelated(message));
+        this( message, errorCode, ChaiErrors.isPermanent( message ), ChaiErrors.isAuthenticationRelated( message ) );
     }
 
-    public ChaiException(final String message, final ChaiError errorCode, final boolean permanent, final boolean authentication)
+    public ChaiException( final String message, final ChaiError errorCode, final boolean permanent, final boolean authentication )
     {
-        super(message);
+        super( message );
         this.permanent = permanent;
         this.authentication = authentication;
         this.errorCode = errorCode;

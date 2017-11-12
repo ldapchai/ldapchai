@@ -35,6 +35,7 @@ import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
 import com.novell.ldapchai.util.SearchHelper;
+import com.novell.ldapchai.util.StringHelper;
 import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoRequest;
 import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoResponse;
 
@@ -46,6 +47,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -54,15 +56,16 @@ import java.util.TimeZone;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
- *
+ * <p>
  * Generally, consumers of the LDAP Chai API should avoid calling these methods directly.  Where possible,
  * use the {@link com.novell.ldapchai.ChaiEntry} wrappers instead.
  *
  * @author Jason D. Rivard
  */
-public class EdirEntries {
+public class EdirEntries
+{
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(EdirEntries.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( EdirEntries.class );
 
     /**
      * Convert a Date to the Zulu String format.
@@ -71,34 +74,36 @@ public class EdirEntries {
      * @param date The Date to be converted
      * @return A string formated such as "199412161032Z".
      */
-    public static String convertDateToZulu(final Date date)
+    public static String convertDateToZulu( final Date date )
     {
-        if (date == null) {
+        if ( date == null )
+        {
             throw new NullPointerException();
         }
 
-        final SimpleDateFormat timeFormat = new SimpleDateFormat("yyyyMMddHHmmss'Z'");
-        timeFormat.setTimeZone(TimeZone.getTimeZone("Zulu"));
-        return timeFormat.format(date);
+        final SimpleDateFormat timeFormat = new SimpleDateFormat( "yyyyMMddHHmmss'Z'" );
+        timeFormat.setTimeZone( TimeZone.getTimeZone( "Zulu" ) );
+        return timeFormat.format( date );
     }
 
-    static boolean convertStrToBoolean(final String string)
+    static boolean convertStrToBoolean( final String string )
     {
-        return !(string == null || string.length() < 1) && ("true".equalsIgnoreCase(string) ||
-            "1".equalsIgnoreCase(string) ||
-            "yes".equalsIgnoreCase(string) ||
-            "y".equalsIgnoreCase(string));
+        return StringHelper.convertStrToBoolean( string );
     }
 
-    static int convertStrToInt(final String string, final int defaultValue)
+    static int convertStrToInt( final String string, final int defaultValue )
     {
-        if (string == null) {
+        if ( string == null )
+        {
             return defaultValue;
         }
 
-        try {
-            return Integer.parseInt(string);
-        } catch (Exception e) {
+        try
+        {
+            return Integer.parseInt( string );
+        }
+        catch ( Exception e )
+        {
             return defaultValue;
         }
     }
@@ -111,30 +116,33 @@ public class EdirEntries {
      * @return A Date object representing the string date
      * @throws IllegalArgumentException if dateString is incorrectly formatted
      */
-    public static Date convertZuluToDate(final String dateString)
+    public static Date convertZuluToDate( final String dateString )
     {
-        if (dateString == null) {
+        if ( dateString == null )
+        {
             throw new NullPointerException();
         }
 
-        if (dateString.length() < 15) {
-            throw new IllegalArgumentException("zulu date too short");
+        if ( dateString.length() < 15 )
+        {
+            throw new IllegalArgumentException( "zulu date too short" );
         }
 
-        if (!"Z".equalsIgnoreCase(String.valueOf(dateString.charAt(14)))) {
-            throw new IllegalArgumentException("zulu date must end in 'Z'");
+        if ( !"Z".equalsIgnoreCase( String.valueOf( dateString.charAt( 14 ) ) ) )
+        {
+            throw new IllegalArgumentException( "zulu date must end in 'Z'" );
         }
 
         // Zulu TimeZone is same as GMT or UTC
-        final Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Zulu"));
+        final Calendar cal = Calendar.getInstance( TimeZone.getTimeZone( "Zulu" ) );
 
-        cal.set(Calendar.YEAR, Integer.parseInt(dateString.substring(0, 4)));
-        cal.set(Calendar.MONTH, Integer.parseInt(dateString.substring(4, 6)) - 1);
-        cal.set(Calendar.DATE, Integer.parseInt(dateString.substring(6, 8)));
-        cal.set(Calendar.HOUR_OF_DAY, Integer.parseInt(dateString.substring(8, 10)));
-        cal.set(Calendar.MINUTE, Integer.parseInt(dateString.substring(10, 12)));
-        cal.set(Calendar.SECOND, Integer.parseInt(dateString.substring(12, 14)));
-        cal.set(Calendar.MILLISECOND, 0);
+        cal.set( Calendar.YEAR, Integer.parseInt( dateString.substring( 0, 4 ) ) );
+        cal.set( Calendar.MONTH, Integer.parseInt( dateString.substring( 4, 6 ) ) - 1 );
+        cal.set( Calendar.DATE, Integer.parseInt( dateString.substring( 6, 8 ) ) );
+        cal.set( Calendar.HOUR_OF_DAY, Integer.parseInt( dateString.substring( 8, 10 ) ) );
+        cal.set( Calendar.MINUTE, Integer.parseInt( dateString.substring( 10, 12 ) ) );
+        cal.set( Calendar.SECOND, Integer.parseInt( dateString.substring( 12, 14 ) ) );
+        cal.set( Calendar.MILLISECOND, 0 );
 
         return cal.getTime();
     }
@@ -150,30 +158,30 @@ public class EdirEntries {
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static ChaiGroup createGroup(final String parentDN, final String name, final ChaiProvider provider)
+    public static ChaiGroup createGroup( final String parentDN, final String name, final ChaiProvider provider )
             throws ChaiOperationException, ChaiUnavailableException
     {
         //Get a good CN for it
-        final String objectCN = findUniqueName(name, parentDN, provider);
+        final String objectCN = findUniqueName( name, parentDN, provider );
 
         //Concantonate the entryDN
         final StringBuilder entryDN = new StringBuilder();
-        entryDN.append("cn=");
-        entryDN.append(objectCN);
-        entryDN.append(',');
-        entryDN.append(parentDN);
+        entryDN.append( "cn=" );
+        entryDN.append( objectCN );
+        entryDN.append( ',' );
+        entryDN.append( parentDN );
 
         //First create the base group.
-        provider.createEntry(entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap());
+        provider.createEntry( entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap() );
 
         //Now build an ldapentry object to add attributes to it
-        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry(entryDN.toString());
+        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry( entryDN.toString() );
 
         //Add the description
-        theObject.writeStringAttribute(ChaiConstant.ATTR_LDAP_DESCRIPTION, name);
+        theObject.writeStringAttribute( ChaiConstant.ATTR_LDAP_DESCRIPTION, name );
 
         //Return the newly created group.
-        return provider.getEntryFactory().createChaiGroup(entryDN.toString());
+        return provider.getEntryFactory().createChaiGroup( entryDN.toString() );
     }
 
     /**
@@ -186,27 +194,30 @@ public class EdirEntries {
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static String findUniqueName(final String baseName, final String containerDN, final ChaiProvider provider)
+    public static String findUniqueName( final String baseName, final String containerDN, final ChaiProvider provider )
             throws ChaiOperationException, ChaiUnavailableException
     {
         char ch;
         final StringBuilder cnStripped = new StringBuilder();
 
         final String effectiveBaseName = baseName == null
-            ? ""
-            : baseName;
+                ? ""
+                : baseName;
 
         // First boil down the root name. Preserve only the alpha-numerics.
-        for (int i = 0; i < effectiveBaseName.length(); i++) {
-            ch = effectiveBaseName.charAt(i);
-            if (Character.isLetterOrDigit(ch)) {
-                cnStripped.append(ch);
+        for ( int i = 0; i < effectiveBaseName.length(); i++ )
+        {
+            ch = effectiveBaseName.charAt( i );
+            if ( Character.isLetterOrDigit( ch ) )
+            {
+                cnStripped.append( ch );
             }
         }
 
-        if (cnStripped.length() == 0) {
+        if ( cnStripped.length() == 0 )
+        {
             // Generate a random seed to runServer with, how about the current date
-            cnStripped.append(System.currentTimeMillis());
+            cnStripped.append( System.currentTimeMillis() );
         }
 
         // Now we have a base name, let's runServer testing it...
@@ -214,27 +225,36 @@ public class EdirEntries {
         StringBuilder filter;
 
         final Random randomNumber = new Random();
-        int counter = randomNumber.nextInt() % 1000; // Start with a random 3 digit number
+
+        // Start with a random 3 digit number
+        int counter = randomNumber.nextInt() % 1000;
         String stringCounter = null;
 
-        while (true) {
+        while ( true )
+        {
             // Initialize the String Buffer and Unique DN.
-            filter = new StringBuilder(64);
+            filter = new StringBuilder( 64 );
 
-            if (stringCounter != null) {
-                uniqueCN = cnStripped.append(stringCounter).toString();
-            } else {
+            if ( stringCounter != null )
+            {
+                uniqueCN = cnStripped.append( stringCounter ).toString();
+            }
+            else
+            {
                 uniqueCN = cnStripped.toString();
             }
-            filter.append("(").append(ChaiConstant.ATTR_LDAP_COMMON_NAME).append("=").append(uniqueCN).append(")");
+            filter.append( "(" ).append( ChaiConstant.ATTR_LDAP_COMMON_NAME ).append( "=" ).append( uniqueCN ).append( ")" );
 
-            final Map<String, Map<String,String>> results = provider.search(containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE);
-            if (results.size() == 0) {
+            final Map<String, Map<String, String>> results = provider.search( containerDN, filter.toString(), null, ChaiProvider.SEARCH_SCOPE.ONE );
+            if ( results.size() == 0 )
+            {
                 // No object found!
                 break;
-            } else {
+            }
+            else
+            {
                 // Increment it every time
-                stringCounter = Integer.toString(counter++);
+                stringCounter = Integer.toString( counter++ );
             }
         }
 
@@ -253,27 +273,29 @@ public class EdirEntries {
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException If the directory server(s) are unavailable
      */
-    public static ChaiUser createUser(final String userDN, final String sn, final ChaiProvider provider)
+    public static ChaiUser createUser( final String userDN, final String sn, final ChaiProvider provider )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Map<String,String> createAttributes = new HashMap<String, String>();
+        final Map<String, String> createAttributes = new HashMap<>();
 
-        createAttributes.put(ChaiConstant.ATTR_LDAP_SURNAME, sn);
+        createAttributes.put( ChaiConstant.ATTR_LDAP_SURNAME, sn );
 
-        provider.createEntry(userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes);
+        provider.createEntry( userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes );
 
         //lets create a user object
-        return provider.getEntryFactory().createChaiUser(userDN);
+        return provider.getEntryFactory().createChaiUser( userDN );
     }
 
-    private static ChaiEntry findPartitionRoot(final ChaiEntry theEntry)
+    private static ChaiEntry findPartitionRoot( final ChaiEntry theEntry )
             throws ChaiUnavailableException, ChaiOperationException
     {
         ChaiEntry loopEntry = theEntry;
 
-        while (loopEntry != null) {
-            final Set<String> objClasses = loopEntry.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_OBJECTCLASS);
-            if (objClasses.contains(ChaiConstant.OBJECTCLASS_BASE_LDAP_PARTITION)) {
+        while ( loopEntry != null )
+        {
+            final Set<String> objClasses = loopEntry.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_OBJECTCLASS );
+            if ( objClasses.contains( ChaiConstant.OBJECTCLASS_BASE_LDAP_PARTITION ) )
+            {
                 return loopEntry;
             }
             loopEntry = loopEntry.getParentEntry();
@@ -291,10 +313,10 @@ public class EdirEntries {
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
      * @see com.novell.ldapchai.ChaiUser#getPasswordPolicy()
      */
-    public static ChaiPasswordPolicy readPasswordPolicy(final ChaiUser theUser)
+    public static ChaiPasswordPolicy readPasswordPolicy( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        return UserPasswordPolicyReader.readPasswordPolicy(theUser);
+        return UserPasswordPolicyReader.readPasswordPolicy( theUser );
     }
 
     /**
@@ -312,30 +334,32 @@ public class EdirEntries {
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException If the ldap server(s) are not available
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
      */
-    public static void removeGroupMembership(final ChaiUser user, final ChaiGroup group)
+    public static void removeGroupMembership( final ChaiUser user, final ChaiGroup group )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        if (user == null) {
-            throw new NullPointerException("user cannot be null");
+        if ( user == null )
+        {
+            throw new NullPointerException( "user cannot be null" );
         }
 
-        if (group == null) {
-            throw new NullPointerException("group cannot be null");
+        if ( group == null )
+        {
+            throw new NullPointerException( "group cannot be null" );
         }
 
         //Delete the attribs off of the user
-        user.deleteAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, group.getEntryDN());
-        user.deleteAttribute(ChaiConstant.ATTR_LDAP_SECURITY_EQUALS, group.getEntryDN());
+        user.deleteAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, group.getEntryDN() );
+        user.deleteAttribute( ChaiConstant.ATTR_LDAP_SECURITY_EQUALS, group.getEntryDN() );
 
         //Delete the attribs off of the group
-        group.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, user.getEntryDN());
-        group.deleteAttribute(ChaiConstant.ATTR_LDAP_EQUIVALENT_TO_ME, user.getEntryDN());
+        group.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, user.getEntryDN() );
+        group.deleteAttribute( ChaiConstant.ATTR_LDAP_EQUIVALENT_TO_ME, user.getEntryDN() );
     }
 
     /**
      * Test the replication of an attribute.  It is left to the implementation to determine the means and criteria for
      * this operation.  Typically this method would be used just after a write operation in some type of time delayed loop.
-     *
+     * <p>
      * Typical implementations will do the following:
      * <ul>
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#readStringAttribute(String)} to read a value</li>
@@ -343,14 +367,14 @@ public class EdirEntries {
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#compareStringAttribute(String, String)} to to each server directly</li>
      * <li>return true if each server contacted has the same value, false if not</li>
      * </ul>
-     *
+     * <p>
      * Target servers that are unreachable or return errors are ignored, and do not influence the results. It is entirely
      * possible that no matter how many times this method is called, false will always be returned, so the caller should
      * take care not to repeat a test indefinitly.
-     *
+     * <p>
      * This operation is potentially expensive, as it may establish new LDAP level connections to each target server each
      * time it is invoked.
-     *
+     * <p>
      * The following sample shows how this method might be used.  There are a few important attributes of the sample:
      * <ul>
      * <li>Multiple ldap servers are specified</li>
@@ -360,12 +384,12 @@ public class EdirEntries {
      * <hr/><blockquote><pre>
      *   ChaiUser theUser =                                                                     // create a new chai user.
      *      VendorFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
-     *
+     * <p>
      *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
-     *
+     * <p>
      *   final int maximumWaitTime = 120 * 1000;                                                // maximum time to wait for replication
      *   final int pauseTime = 3 * 1000;                                                        // time between iterations
-     *
+     * <p>
      *   final long startTime = System.currentTimeMillis();                                     // timestamp of beginning of wait
      *   boolean replicated = false;
      *   while (System.currentTimeMillis() - startTime < maximumWaitTime) {                     // loop until
@@ -380,22 +404,23 @@ public class EdirEntries {
      *
      * @param chaiEntry A valid entry
      * @param attribute A valid attribute on the entry
-     * @param value The value to test for.  If {@code null}, a value is read from the active server
+     * @param value     The value to test for.  If {@code null}, a value is read from the active server
      * @return true if the attribute is the same on all servers
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If an error is encountered during the operation
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException If no directory servers are reachable
-     * @throws IllegalStateException    If the underlying connection is not in an available state
+     * @throws IllegalStateException                                  If the underlying connection is not in an available state
      */
-    public static boolean testAttributeReplication(final ChaiEntry chaiEntry, final String attribute, final String value)
+    public static boolean testAttributeReplication( final ChaiEntry chaiEntry, final String attribute, final String value )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final String effectiveValue = (value == null || value.length() < 1)
-            ? chaiEntry.readStringAttribute(attribute)
-            : value;
+        final String effectiveValue = ( value == null || value.length() < 1 )
+                ? chaiEntry.readStringAttribute( attribute )
+                : value;
 
 
-        if (effectiveValue == null) {
-            throw ChaiOperationException.forErrorMessage("unreadable to read test attribute from primary ChaiProvider");
+        if ( effectiveValue == null )
+        {
+            throw ChaiOperationException.forErrorMessage( "unreadable to read test attribute from primary ChaiProvider" );
         }
 
         final ChaiConfiguration chaiConfiguration = chaiEntry.getChaiProvider().getChaiConfiguration();
@@ -404,40 +429,53 @@ public class EdirEntries {
         int testCount = 0;
         int successCount = 0;
 
-        for (final String loopURL : ldapURLs) {
+        for ( final String loopURL : ldapURLs )
+        {
             ChaiProvider loopProvider = null;
-            try {
-                final ChaiConfiguration loopConfig = new ChaiConfiguration(chaiConfiguration);
-                loopConfig.setSetting(ChaiSetting.BIND_URLS, loopURL);
-                loopConfig.setSetting(ChaiSetting.FAILOVER_CONNECT_RETRIES, "1");
+            try
+            {
+                final ChaiConfiguration loopConfig = new ChaiConfiguration( chaiConfiguration );
+                loopConfig.setSetting( ChaiSetting.BIND_URLS, loopURL );
+                loopConfig.setSetting( ChaiSetting.FAILOVER_CONNECT_RETRIES, "1" );
 
-                loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider(loopConfig);
+                loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider( loopConfig );
 
-                if (loopProvider.compareStringAttribute(chaiEntry.getEntryDN(), attribute, effectiveValue)) {
+                if ( loopProvider.compareStringAttribute( chaiEntry.getEntryDN(), attribute, effectiveValue ) )
+                {
                     successCount++;
                 }
 
                 testCount++;
-            } catch (ChaiUnavailableException e) {
+            }
+            catch ( ChaiUnavailableException e )
+            {
                 //disregard
-            } catch (ChaiOperationException e) {
+            }
+            catch ( ChaiOperationException e )
+            {
                 //disregard
-            } finally {
-                try {
+            }
+            finally
+            {
+                try
+                {
                     loopProvider.close();
-                } catch (Exception e) {
+                }
+                catch ( Exception e )
+                {
                     //already closed, whatever.
                 }
             }
         }
 
-        if (LOGGER.isDebugEnabled()) {
+        if ( LOGGER.isDebugEnabled() )
+        {
             final StringBuilder debugMsg = new StringBuilder();
-            debugMsg.append("testReplication for ").append(chaiEntry).append(":").append(attribute);
-            debugMsg.append(" ").append(testCount).append(" up,");
-            debugMsg.append(" ").append(ldapURLs.size() - testCount).append(" down,");
-            debugMsg.append(" ").append(successCount).append(" in sync");
-            LOGGER.debug(debugMsg);
+            debugMsg.append( "testReplication for " ).append( chaiEntry ).append( ":" ).append( attribute );
+            debugMsg.append( " " ).append( testCount ).append( " up," );
+            debugMsg.append( " " ).append( ldapURLs.size() - testCount ).append( " down," );
+            debugMsg.append( " " ).append( successCount ).append( " in sync" );
+            LOGGER.debug( debugMsg );
         }
 
         return testCount > 0 && testCount == successCount;
@@ -458,121 +496,143 @@ public class EdirEntries {
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException If the ldap server(s) are not available
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation
      */
-    public static void writeGroupMembership(final ChaiUser user, final ChaiGroup group)
+    public static void writeGroupMembership( final ChaiUser user, final ChaiGroup group )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        if (user == null) {
-            throw new NullPointerException("user cannot be null");
+        if ( user == null )
+        {
+            throw new NullPointerException( "user cannot be null" );
         }
 
-        if (group == null) {
-            throw new NullPointerException("group cannot be null");
+        if ( group == null )
+        {
+            throw new NullPointerException( "group cannot be null" );
         }
 
-        user.addAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, group.getEntryDN());
-        user.addAttribute(ChaiConstant.ATTR_LDAP_SECURITY_EQUALS, group.getEntryDN());
+        user.addAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, group.getEntryDN() );
+        user.addAttribute( ChaiConstant.ATTR_LDAP_SECURITY_EQUALS, group.getEntryDN() );
 
-        group.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, user.getEntryDN());
-        group.addAttribute(ChaiConstant.ATTR_LDAP_EQUIVALENT_TO_ME, user.getEntryDN());
+        group.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, user.getEntryDN() );
+        group.addAttribute( ChaiConstant.ATTR_LDAP_EQUIVALENT_TO_ME, user.getEntryDN() );
     }
 
     private EdirEntries()
     {
     }
 
-    private static final class UserPasswordPolicyReader {
+    private static final class UserPasswordPolicyReader
+    {
         private static final Set<String> TRADITIONAL_PASSWORD_ATTRIBUTES;
         private static final SearchHelper NSPM_ENTRY_SEARCH_HELPER = new SearchHelper();
 
-        static {
+        static
+        {
             {
-                final Set<String> tempSet = new HashSet<String>();
-                tempSet.add(ChaiConstant.ATTR_LDAP_PASSWORD_MINIMUM_LENGTH);
-                tempSet.add(ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_INTERVAL);
-                tempSet.add(ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_UNIQUE_REQUIRED);
-                TRADITIONAL_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet(tempSet);
+                final Set<String> tempSet = new HashSet<>();
+                tempSet.add( ChaiConstant.ATTR_LDAP_PASSWORD_MINIMUM_LENGTH );
+                tempSet.add( ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_INTERVAL );
+                tempSet.add( ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_PASSWORD_UNIQUE_REQUIRED );
+                TRADITIONAL_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet( tempSet );
             }
 
-            final Set<String> nspm_password_attributes;
+            final Set<String> nspmPasswordAttributes;
             {
-                final Set<String> tempSet = new HashSet<String>();
-                for (final NspmPasswordPolicy.Attribute attr : NspmPasswordPolicy.Attribute.values()) {
-                    tempSet.add(attr.getLdapAttribute());
+                final Set<String> tempSet = new HashSet<>();
+                for ( final NspmPasswordPolicy.Attribute attr : NspmPasswordPolicy.Attribute.values() )
+                {
+                    tempSet.add( attr.getLdapAttribute() );
                 }
-                nspm_password_attributes = Collections.unmodifiableSet(tempSet);
+                nspmPasswordAttributes = Collections.unmodifiableSet( tempSet );
             }
 
             {
-                NSPM_ENTRY_SEARCH_HELPER.setSearchScope(ChaiProvider.SEARCH_SCOPE.BASE);
-                NSPM_ENTRY_SEARCH_HELPER.setAttributes(nspm_password_attributes);
+                NSPM_ENTRY_SEARCH_HELPER.setSearchScope( ChaiProvider.SEARCH_SCOPE.BASE );
+                NSPM_ENTRY_SEARCH_HELPER.setAttributes( nspmPasswordAttributes );
             }
         }
 
 
-        static ChaiPasswordPolicy readPasswordPolicy(final ChaiUser theUser)
+        static ChaiPasswordPolicy readPasswordPolicy( final ChaiUser theUser )
                 throws ChaiUnavailableException, ChaiOperationException
         {
             ChaiPasswordPolicy pwordPolicy = DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicy();
 
             boolean usedUniversalPolicy = false;
 
-            try {
+            try
+            {
                 // fetch the user's associated password policy
-                final ChaiEntry policyEntry = findNspmPolicyForUser(theUser);
-                if (policyEntry != null) {
-                    pwordPolicy = new NspmPasswordPolicyImpl(policyEntry.getEntryDN(),policyEntry.getChaiProvider());
+                final ChaiEntry policyEntry = findNspmPolicyForUser( theUser );
+                if ( policyEntry != null )
+                {
+                    pwordPolicy = new NspmPasswordPolicyImpl( policyEntry.getEntryDN(), policyEntry.getChaiProvider() );
 
                     // check to see if the advanced rules on the password policy are "enabled"
-                    if (pwordPolicy.getRuleHelper().isPolicyEnabled()) {
+                    if ( pwordPolicy.getRuleHelper().isPolicyEnabled() )
+                    {
                         // we've got a policy, and rules are enabled, now read the policy.
-                        LOGGER.trace("using active universal password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN());
+                        LOGGER.trace( "using active universal password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN() );
                         usedUniversalPolicy = true;
-                    } else {
-                        LOGGER.debug("ignoring unenabled nspm password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN());
+                    }
+                    else
+                    {
+                        LOGGER.debug( "ignoring unenabled nspm password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN() );
                     }
                 }
-            } catch (ChaiOperationException e) {
-                LOGGER.error("ldap error reading universal password policy: " + e.getMessage());
+            }
+            catch ( ChaiOperationException e )
+            {
+                LOGGER.error( "ldap error reading universal password policy: " + e.getMessage() );
                 throw e;
             }
 
             // if there is no universal password policy then fall back to reading user object attrs
-            if (!usedUniversalPolicy) {
-                try {
-                    pwordPolicy = readTraditionalPasswordRules(theUser);
-                    LOGGER.trace("read traditional (non-nmas) password attributes from user entry " + theUser.getEntryDN());
-                } catch (ChaiOperationException e) {
-                    LOGGER.error("ldap error reading traditional password policy: " + e.getMessage());
+            if ( !usedUniversalPolicy )
+            {
+                try
+                {
+                    pwordPolicy = readTraditionalPasswordRules( theUser );
+                    LOGGER.trace( "read traditional (non-nmas) password attributes from user entry " + theUser.getEntryDN() );
+                }
+                catch ( ChaiOperationException e )
+                {
+                    LOGGER.error( "ldap error reading traditional password policy: " + e.getMessage() );
                 }
             }
 
             return pwordPolicy;
         }
 
-        private static ChaiEntry findNspmPolicyForUser(final ChaiUser theUser)
+        private static ChaiEntry findNspmPolicyForUser( final ChaiUser theUser )
                 throws ChaiUnavailableException, ChaiOperationException
         {
-            final boolean useNmasSetting = theUser.getChaiProvider().getChaiConfiguration().getBooleanSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS);
+            final boolean useNmasSetting = theUser.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.EDIRECTORY_ENABLE_NMAS );
             final ChaiEntryFactory chaiEntryFactory = theUser.getChaiProvider().getEntryFactory();
 
-            if (useNmasSetting) {
+            if ( useNmasSetting )
+            {
                 final GetPwdPolicyInfoRequest request = new GetPwdPolicyInfoRequest();
-                request.setObjectDN(theUser.getEntryDN());
-                final ExtendedResponse response = theUser.getChaiProvider().extendedOperation(request);
-                if (response != null) {
-                    final GetPwdPolicyInfoResponse polcyInfoResponse = (GetPwdPolicyInfoResponse) response;
+                request.setObjectDN( theUser.getEntryDN() );
+                final ExtendedResponse response = theUser.getChaiProvider().extendedOperation( request );
+                if ( response != null )
+                {
+                    final GetPwdPolicyInfoResponse polcyInfoResponse = ( GetPwdPolicyInfoResponse ) response;
                     final String policyDN = polcyInfoResponse.getPwdPolicyDNStr();
-                    if (policyDN != null) {
-                        return chaiEntryFactory.createChaiEntry(policyDN);
+                    if ( policyDN != null )
+                    {
+                        return chaiEntryFactory.createChaiEntry( policyDN );
                     }
                 }
                 return null;
-            } else {
+            }
+            else
+            {
                 // look at user object first
                 {
-                    final String policyDN = theUser.readStringAttribute("nspmPasswordPolicyDN");
-                    if (policyDN != null && policyDN.length() > 0) {
-                        return chaiEntryFactory.createChaiEntry(policyDN);
+                    final String policyDN = theUser.readStringAttribute( "nspmPasswordPolicyDN" );
+                    if ( policyDN != null && policyDN.length() > 0 )
+                    {
+                        return chaiEntryFactory.createChaiEntry( policyDN );
                     }
                 }
 
@@ -580,22 +640,27 @@ public class EdirEntries {
 
                 // look at parent next
                 {
-                    if (parentObject != null) {
-                        final String policyDN = parentObject.readStringAttribute("nspmPasswordPolicyDN");
-                        if (policyDN != null && policyDN.length() > 0) {
-                            return chaiEntryFactory.createChaiEntry(policyDN);
+                    if ( parentObject != null )
+                    {
+                        final String policyDN = parentObject.readStringAttribute( "nspmPasswordPolicyDN" );
+                        if ( policyDN != null && policyDN.length() > 0 )
+                        {
+                            return chaiEntryFactory.createChaiEntry( policyDN );
                         }
                     }
                 }
 
                 // look at partition root
                 {
-                    if (parentObject != null) {
-                        final ChaiEntry partitonRoot = findPartitionRoot(parentObject);
-                        if (partitonRoot != null) {
-                            final String policyDN = partitonRoot.readStringAttribute("nspmPasswordPolicyDN");
-                            if (policyDN != null && policyDN.length() > 0) {
-                                return chaiEntryFactory.createChaiEntry(policyDN);
+                    if ( parentObject != null )
+                    {
+                        final ChaiEntry partitonRoot = findPartitionRoot( parentObject );
+                        if ( partitonRoot != null )
+                        {
+                            final String policyDN = partitonRoot.readStringAttribute( "nspmPasswordPolicyDN" );
+                            if ( policyDN != null && policyDN.length() > 0 )
+                            {
+                                return chaiEntryFactory.createChaiEntry( policyDN );
                             }
                         }
                     }
@@ -603,13 +668,15 @@ public class EdirEntries {
 
                 // look at policy object
                 {
-                    final ChaiEntry securityContainer = chaiEntryFactory.createChaiEntry("cn=Security");
-                    final String loginPolicyDN = securityContainer.readStringAttribute("sASLoginPolicyDN");
-                    if (loginPolicyDN != null && loginPolicyDN.length() > 0) {
-                        final ChaiEntry loginPolicy = chaiEntryFactory.createChaiEntry(loginPolicyDN);
-                        final String policyDN = loginPolicy.readStringAttribute("nspmPasswordPolicyDN");
-                        if (policyDN != null && policyDN.length() > 0) {
-                            return chaiEntryFactory.createChaiEntry(policyDN);
+                    final ChaiEntry securityContainer = chaiEntryFactory.createChaiEntry( "cn=Security" );
+                    final String loginPolicyDN = securityContainer.readStringAttribute( "sASLoginPolicyDN" );
+                    if ( loginPolicyDN != null && loginPolicyDN.length() > 0 )
+                    {
+                        final ChaiEntry loginPolicy = chaiEntryFactory.createChaiEntry( loginPolicyDN );
+                        final String policyDN = loginPolicy.readStringAttribute( "nspmPasswordPolicyDN" );
+                        if ( policyDN != null && policyDN.length() > 0 )
+                        {
+                            return chaiEntryFactory.createChaiEntry( policyDN );
                         }
                     }
                 }
@@ -619,7 +686,7 @@ public class EdirEntries {
 
         /**
          * Reads and applys the user's traditional (non-UP) password rules to the policy.
-         *
+         * <p>
          * If the user does not have an associated universal password policy, this
          * method can be used to read the old style password rules.
          *
@@ -628,35 +695,38 @@ public class EdirEntries {
          * @throws ChaiUnavailableException If the ldap server(s) are not available
          * @throws ChaiOperationException   If there is an error during the operation
          */
-        private static ChaiPasswordPolicy readTraditionalPasswordRules(final ChaiUser theUser)
+        private static ChaiPasswordPolicy readTraditionalPasswordRules( final ChaiUser theUser )
                 throws ChaiUnavailableException, ChaiOperationException
         {
-            final Map<String,String> values = theUser.readStringAttributes(TRADITIONAL_PASSWORD_ATTRIBUTES);
+            final Map<String, String> values = theUser.readStringAttributes( TRADITIONAL_PASSWORD_ATTRIBUTES );
 
-            final int minLength = convertStrToInt(values.get("passwordMinimumLength"), 0);
-            final int expireInterval = convertStrToInt(values.get("passwordExpirationInterval"), 0);
-            final boolean uniqueRequired = convertStrToBoolean(values.get("passwordUniqueRequired"));
+            final int minLength = convertStrToInt( values.get( "passwordMinimumLength" ), 0 );
+            final int expireInterval = convertStrToInt( values.get( "passwordExpirationInterval" ), 0 );
+            final boolean uniqueRequired = convertStrToBoolean( values.get( "passwordUniqueRequired" ) );
 
-            final Map<ChaiPasswordRule, String> policyMap = new HashMap<ChaiPasswordRule, String>();
-            policyMap.put(ChaiPasswordRule.MaximumLength, String.valueOf(16));  // default for legacy passwords;
-            policyMap.put(ChaiPasswordRule.MinimumLength, String.valueOf(minLength));
-            policyMap.put(ChaiPasswordRule.ExpirationInterval, String.valueOf(expireInterval));
-            policyMap.put(ChaiPasswordRule.UniqueRequired, String.valueOf(uniqueRequired));
+            final Map<ChaiPasswordRule, String> policyMap = new LinkedHashMap<>();
+
+            // default for legacy passwords;
+            policyMap.put( ChaiPasswordRule.MaximumLength, String.valueOf( 16 ) );
+
+            policyMap.put( ChaiPasswordRule.MinimumLength, String.valueOf( minLength ) );
+            policyMap.put( ChaiPasswordRule.ExpirationInterval, String.valueOf( expireInterval ) );
+            policyMap.put( ChaiPasswordRule.UniqueRequired, String.valueOf( uniqueRequired ) );
 
             //other defaults for non up-policy.
-            policyMap.put(ChaiPasswordRule.AllowNumeric, String.valueOf(true));
-            policyMap.put(ChaiPasswordRule.AllowSpecial, String.valueOf(true));
-            policyMap.put(ChaiPasswordRule.CaseSensitive, String.valueOf(false));
+            policyMap.put( ChaiPasswordRule.AllowNumeric, String.valueOf( true ) );
+            policyMap.put( ChaiPasswordRule.AllowSpecial, String.valueOf( true ) );
+            policyMap.put( ChaiPasswordRule.CaseSensitive, String.valueOf( false ) );
 
-            return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicyByRule(policyMap);
+            return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicyByRule( policyMap );
         }
     }
 
-    static String readGuid(final ChaiEntry entry)
+    static String readGuid( final ChaiEntry entry )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final byte[] st = entry.getChaiProvider().readMultiByteAttribute(entry.getEntryDN(),"guid")[0];
-        final BigInteger bigInt = new BigInteger(1,st);
-        return bigInt.toString(16);
+        final byte[] st = entry.getChaiProvider().readMultiByteAttribute( entry.getEntryDN(), "guid" )[0];
+        final BigInteger bigInt = new BigInteger( 1, st );
+        return bigInt.toString( 16 );
     }
 }

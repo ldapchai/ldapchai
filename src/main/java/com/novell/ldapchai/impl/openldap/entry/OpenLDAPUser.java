@@ -38,40 +38,48 @@ import java.util.Set;
 public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
 {
 
-    public OpenLDAPUser(final String userDN, final ChaiProvider chaiProvider) {
-        super(userDN, chaiProvider);
+    public OpenLDAPUser( final String userDN, final ChaiProvider chaiProvider )
+    {
+        super( userDN, chaiProvider );
     }
 
     public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
         final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
-        final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER_OF);
-        for (final String group : groups) {
-            returnGroups.add(chaiProvider.getEntryFactory().createChaiGroup(group));
+        final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
+        for ( final String group : groups )
+        {
+            returnGroups.add( chaiProvider.getEntryFactory().createChaiGroup( group ) );
         }
-        return Collections.unmodifiableSet(returnGroups);
+        return Collections.unmodifiableSet( returnGroups );
     }
 
-    public void addGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
-        theGroup.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    public void addGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        theGroup.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
-    public void removeGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
-        theGroup.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    public void removeGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        theGroup.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
     @Override
     public Date readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final Date passwordChangedTime = this.readDateAttribute(ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME);
-        if (passwordChangedTime != null && this.getPasswordPolicy() != null) {
-            final String expirationInterval = this.getPasswordPolicy().getValue(ChaiPasswordRule.ExpirationInterval);
-            if (expirationInterval != null && expirationInterval.trim().length() > 0) {
-                final long expInt = Long.parseLong(expirationInterval) * 1000L;
+        final Date passwordChangedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME );
+        if ( passwordChangedTime != null && this.getPasswordPolicy() != null )
+        {
+            final String expirationInterval = this.getPasswordPolicy().getValue( ChaiPasswordRule.ExpirationInterval );
+            if ( expirationInterval != null && expirationInterval.trim().length() > 0 )
+            {
+                final long expInt = Long.parseLong( expirationInterval ) * 1000L;
                 final long pwExpireTimeMs = passwordChangedTime.getTime() + expInt;
-                return new Date(pwExpireTimeMs);
+                return new Date( pwExpireTimeMs );
             }
         }
 
@@ -84,86 +92,101 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
     {
         final Date passwordExpiration = this.readPasswordExpirationDate();
         return passwordExpiration != null
-                && new Date().after(passwordExpiration)
-                || readBooleanAttribute(ChaiConstant.ATTR_OPENLDAP_PASSWORD_RESET);
+                && new Date().after( passwordExpiration )
+                || readBooleanAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_RESET );
     }
 
     @Override
-    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+    public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration()));
-        } catch (javax.naming.NamingException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            getChaiProvider().extendedOperation( new OpenLDAPModifyPasswordRequest( this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration() ) );
+        }
+        catch ( javax.naming.NamingException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
         }
     }
 
     @Override
-    public void changePassword(final String oldPassword, final String newPassword)
+    public void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            getChaiProvider().extendedOperation(new OpenLDAPModifyPasswordRequest(this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration()));
-        } catch (javax.naming.NamingException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            getChaiProvider().extendedOperation( new OpenLDAPModifyPasswordRequest( this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration() ) );
         }
-    }
-    
-    @Override
-    public void unlockPassword() throws ChaiOperationException, ChaiUnavailableException {
-        this.deleteAttribute(ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME, null);
+        catch ( javax.naming.NamingException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+        }
     }
 
     @Override
-    public boolean isPasswordLocked() throws ChaiOperationException, ChaiUnavailableException {
-        final Date passwordAccountLockedTime = this.readDateAttribute(ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME);
+    public void unlockPassword()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        this.deleteAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME, null );
+    }
+
+    @Override
+    public boolean isPasswordLocked()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final Date passwordAccountLockedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME );
         return passwordAccountLockedTime != null
-                && new Date().after(passwordAccountLockedTime);
+                && new Date().after( passwordAccountLockedTime );
     }
 
     @Override
     public Date readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readDateAttribute(ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME);
+        return this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME );
     }
 
     @Override
-    public Date readDateAttribute(final String attributeName)
+    public Date readDateAttribute( final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final String value = readStringAttribute(attributeName);
-        return value != null ? OpenLDAPEntries.convertZuluToDate(value) : null;
+        final String value = readStringAttribute( attributeName );
+        return value != null ? OpenLDAPEntries.convertZuluToDate( value ) : null;
     }
 
     @Override
-    public void writeDateAttribute(final String attributeName, final Date date)
+    public void writeDateAttribute( final String attributeName, final Date date )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        if (date == null) {
+        if ( date == null )
+        {
             return;
         }
 
-        final String dateString = OpenLDAPEntries.convertDateToZulu(date);
-        writeStringAttribute(attributeName, dateString);
+        final String dateString = OpenLDAPEntries.convertDateToZulu( date );
+        writeStringAttribute( attributeName, dateString );
     }
 
     @Override
     public ChaiPasswordPolicy getPasswordPolicy()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        return OpenLDAPEntries.readPasswordPolicy(this);
+        return OpenLDAPEntries.readPasswordPolicy( this );
     }
 
     @Override
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute(ChaiConstant.ATTR_OPENLDAP_PASSWORD_RESET, "TRUE");
+        this.writeStringAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_RESET, "TRUE" );
     }
 }

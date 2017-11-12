@@ -20,4 +20,5 @@
 /**
  * Helper classes for reading and manipulating generic (unknown) ldap directory.
  */
+
 package com.novell.ldapchai.impl.generic.entry;

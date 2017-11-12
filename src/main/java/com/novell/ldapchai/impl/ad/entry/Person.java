@@ -19,5 +19,6 @@
 
 package com.novell.ldapchai.impl.ad.entry;
 
-interface Person extends Top {
+interface Person extends Top
+{
 }

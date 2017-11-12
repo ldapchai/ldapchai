@@ -31,176 +31,216 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiUser} interface.
- *
+ * <p>
  * Clients looking to obtain a {@code ChaiUser} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
  *
  * @author Jason D. Rivard
  */
 
-public abstract class AbstractChaiUser extends AbstractChaiEntry implements ChaiUser {
+public abstract class AbstractChaiUser extends AbstractChaiEntry implements ChaiUser
+{
     /**
-     * This construtor is used to instantiate an ChaiUserImpl instance representing an inetOrgPerson user object in ldap.
+     * This constructor is used to instantiate an ChaiUserImpl instance representing an inetOrgPerson user object in ldap.
      *
      * @param userDN       The DN of the user
      * @param chaiProvider Helper to connect to LDAP.
      */
-    public AbstractChaiUser(final String userDN, final ChaiProvider chaiProvider)
+    public AbstractChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
-        super(userDN, chaiProvider);
+        super( userDN, chaiProvider );
     }
 
     public final ChaiUser getAssistant()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final String mgrDN = this.readStringAttribute(ATTR_MANAGER);
-        if (mgrDN == null) {
+        final String mgrDN = this.readStringAttribute( ATTR_MANAGER );
+        if ( mgrDN == null )
+        {
             return null;
         }
-        return getChaiProvider().getEntryFactory().createChaiUser(mgrDN);
+        return getChaiProvider().getEntryFactory().createChaiUser( mgrDN );
     }
 
     public final Set<ChaiUser> getDirectReports()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Set<String> reportDNs = this.readMultiStringAttribute(ATTR_MANAGER);
-        final Set<ChaiUser> reports = new HashSet<ChaiUser>(reportDNs.size());
-        for (final String reporteeDN : reportDNs) {
-            reports.add(getChaiProvider().getEntryFactory().createChaiUser(reporteeDN));
+        final Set<String> reportDNs = this.readMultiStringAttribute( ATTR_MANAGER );
+        final Set<ChaiUser> reports = new LinkedHashSet<>( reportDNs.size() );
+        for ( final String reporteeDN : reportDNs )
+        {
+            reports.add( getChaiProvider().getEntryFactory().createChaiUser( reporteeDN ) );
         }
-        return Collections.unmodifiableSet(reports);
+        return Collections.unmodifiableSet( reports );
     }
 
     public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
-        final Set<String> groups = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP);
-        for (final String group : groups) {
-            returnGroups.add(getChaiProvider().getEntryFactory().createChaiGroup(group));
+        final Set<ChaiGroup> returnGroups = new LinkedHashSet<>();
+        final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP );
+        for ( final String group : groups )
+        {
+            returnGroups.add( getChaiProvider().getEntryFactory().createChaiGroup( group ) );
         }
-        return Collections.unmodifiableSet(returnGroups);
+        return Collections.unmodifiableSet( returnGroups );
     }
 
     public final ChaiUser getManager()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final String mgrDN = this.readStringAttribute(ATTR_MANAGER);
-        if (mgrDN == null) {
+        final String mgrDN = this.readStringAttribute( ATTR_MANAGER );
+        if ( mgrDN == null )
+        {
             return null;
         }
-        return getChaiProvider().getEntryFactory().createChaiUser(mgrDN);
+        return getChaiProvider().getEntryFactory().createChaiUser( mgrDN );
     }
 
 
-    public boolean testPassword(final String password)
+    public boolean testPassword( final String password )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
-        try {
-            return this.compareStringAttribute(ATTR_PASSWORD, password);
-        } catch (ChaiOperationException e) {
-            throw new ChaiPasswordPolicyException(e.getMessage(), ChaiErrors.getErrorForMessage(e.getMessage()));
+        try
+        {
+            return this.compareStringAttribute( ATTR_PASSWORD, password );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw new ChaiPasswordPolicyException( e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
         }
     }
 
     public final String readSurname()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readStringAttribute(ATTR_SURNAME);
+        return this.readStringAttribute( ATTR_SURNAME );
     }
 
     public String readUsername()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readStringAttribute(ATTR_COMMON_NAME);
+        return this.readStringAttribute( ATTR_COMMON_NAME );
     }
 
-    public void addGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
-        this.addAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, theGroup.getEntryDN());
-        theGroup.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    public void addGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        this.addAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, theGroup.getEntryDN() );
+        theGroup.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
-    public void removeGroupMembership(final ChaiGroup theGroup) throws ChaiOperationException, ChaiUnavailableException {
-        this.deleteAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, theGroup.getEntryDN());
-        theGroup.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN());
+    public void removeGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        this.deleteAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, theGroup.getEntryDN() );
+        theGroup.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
     public String readGivenName()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readStringAttribute(ATTR_GIVEN_NAME);
+        return this.readStringAttribute( ATTR_GIVEN_NAME );
     }
 
-    public void setPassword(final String newPassword)
+    public void setPassword( final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        this.setPassword(newPassword, false);
+        this.setPassword( newPassword, false );
     }
 
-    public void setPassword(final String newPassword, final boolean enforcePasswordPolicy)
+    public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            writeStringAttribute( ATTR_PASSWORD, newPassword );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
         }
     }
 
-    public void changePassword(final String oldPassword, final String newPassword)
+    public void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
-        try {
-            writeStringAttribute(ATTR_PASSWORD, newPassword);
-        } catch (ChaiOperationException e) {
-            throw ChaiPasswordPolicyException.forErrorMessage(e.getMessage());
+        try
+        {
+            writeStringAttribute( ATTR_PASSWORD, newPassword );
+        }
+        catch ( ChaiOperationException e )
+        {
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
         }
     }
 
-    public void expirePassword() throws ChaiOperationException, ChaiUnavailableException {
+    public void expirePassword()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
     }
 
-    public ChaiPasswordPolicy getPasswordPolicy() throws ChaiUnavailableException, ChaiOperationException {
+    public ChaiPasswordPolicy getPasswordPolicy()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         return null;
     }
 
-    public boolean isPasswordExpired() throws ChaiUnavailableException, ChaiOperationException {
+    public boolean isPasswordExpired()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         return false;
     }
 
-    public Date readLastLoginTime() throws ChaiOperationException, ChaiUnavailableException {
+    public Date readLastLoginTime()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
         return null;
     }
 
-    public String readPassword() throws ChaiUnavailableException, ChaiOperationException {
+    public String readPassword()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         return null;
     }
 
-    public Date readPasswordExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+    public Date readPasswordExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         return null;
     }
 
-    public boolean testPasswordPolicy(final String testPassword) throws ChaiUnavailableException, ChaiPasswordPolicyException {
+    public boolean testPasswordPolicy( final String testPassword )
+            throws ChaiUnavailableException, ChaiPasswordPolicyException
+    {
         return true;
     }
 
-    public void unlockPassword() throws ChaiOperationException, ChaiUnavailableException {
+    public void unlockPassword()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
     }
 
-    public boolean isPasswordLocked() throws ChaiOperationException, ChaiUnavailableException {
+    public boolean isPasswordLocked()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
         return false;
     }
 
-    public Date readPasswordModificationDate() throws ChaiOperationException, ChaiUnavailableException {
+    public Date readPasswordModificationDate()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
         return null;
     }
 
-    public boolean isAccountEnabled() throws ChaiOperationException, ChaiUnavailableException {
-        return !readBooleanAttribute(ATTR_LOGIN_DISABLED);
+    public boolean isAccountEnabled()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return !readBooleanAttribute( ATTR_LOGIN_DISABLED );
     }
 
     public void unlock()
@@ -215,12 +255,16 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return this.isPasswordLocked();
     }
 
-    public Date readAccountExpirationDate() throws ChaiUnavailableException, ChaiOperationException {
+    public Date readAccountExpirationDate()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
         return null;
     }
 
-    public boolean isAccountExpired() throws ChaiOperationException, ChaiUnavailableException {
+    public boolean isAccountExpired()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
         final Date accountExpirationDate = readAccountExpirationDate();
-        return accountExpirationDate != null && accountExpirationDate.before(new Date());
+        return accountExpirationDate != null && accountExpirationDate.before( new Date() );
     }
 }

@@ -24,16 +24,16 @@ import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 
-public interface GroupOfNames extends Top, ChaiGroup {
+public interface GroupOfNames extends Top, ChaiGroup
+{
     String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP;
 
-    
 
     /**
      * Identifies if the group is dynamic or not.
-     *
+     * <p>
      * <i>Implementation Note:<i/> This method is functionally equivalent to calling
-     * {@link #compareStringAttribute(String ATTR_OBJECT_CLASS,String OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP)}
+     * {@link #compareStringAttribute(String ATTR_OBJECT_CLASS, String OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP)}
      *
      * @return true if the group is dynamic
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation

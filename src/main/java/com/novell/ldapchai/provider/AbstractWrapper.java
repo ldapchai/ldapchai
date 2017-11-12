@@ -27,13 +27,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
-abstract class AbstractWrapper implements InvocationHandler {
+abstract class AbstractWrapper implements InvocationHandler
+{
 
 
-
-
-
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger(AbstractWrapper.class);
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractWrapper.class );
     protected ChaiProviderImplementor realProvider;
 
     /**
@@ -50,48 +48,61 @@ abstract class AbstractWrapper implements InvocationHandler {
             throws Exception
     {
         //check to make sure watchdog ise enabled;
-        final boolean isEnabled = Boolean.parseBoolean(chaiProvider.getChaiConfiguration().getSetting(enableSetting));
-        if (!isEnabled) {
+        final boolean isEnabled = Boolean.parseBoolean( chaiProvider.getChaiConfiguration().getSetting( enableSetting ) );
+        if ( !isEnabled )
+        {
             final String errorStr = "attempt to obtain " + wrapperClass.getName() + " wrapper when not enabled in chaiConfiguration";
-            LOGGER.warn(errorStr);
-            throw new IllegalStateException(errorStr);
+            LOGGER.warn( errorStr );
+            throw new IllegalStateException( errorStr );
         }
 
-        if (Proxy.isProxyClass(chaiProvider.getClass()) && wrapperClass.isInstance(chaiProvider)) {
-            LOGGER.warn("attempt to obtain " + wrapperClass.getName() + " wrapper for already wrapped ChaiProvider.");
+        if ( Proxy.isProxyClass( chaiProvider.getClass() ) && wrapperClass.isInstance( chaiProvider ) )
+        {
+            LOGGER.warn( "attempt to obtain " + wrapperClass.getName() + " wrapper for already wrapped ChaiProvider." );
             return chaiProvider;
         }
 
-        try {
-            final Constructor constructor = wrapperClass.getConstructor(ChaiProviderImplementor.class.getClass());
-            final InvocationHandler wrapper = (InvocationHandler) constructor.newInstance(chaiProvider);
-            final Object wrappedProvider = Proxy.newProxyInstance(chaiProvider.getClass().getClassLoader(), chaiProvider.getClass().getInterfaces(), wrapper);
-            return (ChaiProviderImplementor) wrappedProvider;
-        } catch (Exception e) {
-            LOGGER.fatal("Chai internal error, no appropriate constructor for " + wrapperClass.getCanonicalName(), e);
+        try
+        {
+            final Constructor constructor = wrapperClass.getConstructor( ChaiProviderImplementor.class.getClass() );
+            final InvocationHandler wrapper = ( InvocationHandler ) constructor.newInstance( chaiProvider );
+            final Object wrappedProvider = Proxy.newProxyInstance( chaiProvider.getClass().getClassLoader(), chaiProvider.getClass().getInterfaces(), wrapper );
+            return ( ChaiProviderImplementor ) wrappedProvider;
+        }
+        catch ( Exception e )
+        {
+            LOGGER.fatal( "Chai internal error, no appropriate constructor for " + wrapperClass.getCanonicalName(), e );
         }
 
-        throw new Exception("Chai internal error, unable to create wrapper for " + wrapperClass.getCanonicalName());
+        throw new Exception( "Chai internal error, unable to create wrapper for " + wrapperClass.getCanonicalName() );
     }
 
-    static Object invoker(final ChaiProvider provider, final Method m, final Object[] args)
+    static Object invoker( final ChaiProvider provider, final Method m, final Object[] args )
             throws Exception
     {
-        try {
+        try
+        {
             // try to invoke the method.
-            return m.invoke(provider, args);
-        } catch (IllegalAccessException e) {
+            return m.invoke( provider, args );
+        }
+        catch ( IllegalAccessException e )
+        {
             final String errorMsg = "unexpected api error";
-            LOGGER.warn(errorMsg, e);
-            throw new IllegalStateException(errorMsg);
-        } catch (InvocationTargetException e) {
+            LOGGER.warn( errorMsg, e );
+            throw new IllegalStateException( errorMsg );
+        }
+        catch ( InvocationTargetException e )
+        {
             final Throwable realThrowable = e.getCause();
-            if (realThrowable instanceof Exception) {
-                throw (Exception) realThrowable;
-            } else {
+            if ( realThrowable instanceof Exception )
+            {
+                throw ( Exception ) realThrowable;
+            }
+            else
+            {
                 final String errorMsg = "unexpected api error";
-                LOGGER.warn(errorMsg, e);
-                throw new IllegalStateException(errorMsg);
+                LOGGER.warn( errorMsg, e );
+                throw new IllegalStateException( errorMsg );
             }
         }
     }

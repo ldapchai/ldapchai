@@ -20,4 +20,5 @@
 /**
  * Helper classes for reading and manipulating Microsoft Active Directory specific entries.
  */
+
 package com.novell.ldapchai.impl.ad.entry;

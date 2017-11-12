@@ -27,58 +27,64 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
-* A complete implementation of {@code ChaiGroup} interface.
-*
-* Clients looking to obtain a {@code ChaiGroup} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
-*
+ * A complete implementation of {@code ChaiGroup} interface.
+ * <p>
+ * Clients looking to obtain a {@code ChaiGroup} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
+ *
  * @author Jason D. Rivard
-*/
-public abstract class AbstractChaiGroup extends AbstractChaiEntry implements ChaiGroup {
-    
+ */
+public abstract class AbstractChaiGroup extends AbstractChaiEntry implements ChaiGroup
+{
+
     /**
-     * This construtor is used to instantiate an ChaiUserImpl instance representing an inetOrgPerson user object in ldap.
+     * This constructor is used to instantiate an ChaiUserImpl instance representing an inetOrgPerson user object in ldap.
      *
-     * @param groupDN       The DN of the user
+     * @param groupDN      The DN of the user
      * @param chaiProvider Helper to connect to LDAP.
      */
-    public AbstractChaiGroup(final String groupDN, final ChaiProvider chaiProvider)
+    public AbstractChaiGroup( final String groupDN, final ChaiProvider chaiProvider )
     {
-        super(groupDN, chaiProvider);
+        super( groupDN, chaiProvider );
     }
 
     public Set<ChaiUser> getMembers()
             throws ChaiOperationException, ChaiUnavailableException
     {
         // Search for the User DN object.
-        final Set<String> memberDNs = this.readMultiStringAttribute(ChaiConstant.ATTR_LDAP_MEMBER);
+        final Set<String> memberDNs = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER );
 
         // Search for the User DN object.
-        final Set<ChaiUser> returnSet = new HashSet<ChaiUser>(memberDNs.size());
+        final Set<ChaiUser> returnSet = new LinkedHashSet<>( memberDNs.size() );
 
-        for (final String userDN : memberDNs) {
+        for ( final String userDN : memberDNs )
+        {
             // Create the ChaiUserImpl object and add it to the ArrayList.
-            returnSet.add(getChaiProvider().getEntryFactory().createChaiUser(userDN));
+            returnSet.add( getChaiProvider().getEntryFactory().createChaiUser( userDN ) );
         }
-        return Collections.unmodifiableSet(returnSet);
+        return Collections.unmodifiableSet( returnSet );
     }
 
     public String readGroupName()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return this.readStringAttribute(ChaiConstant.ATTR_LDAP_DESCRIPTION);
+        return this.readStringAttribute( ChaiConstant.ATTR_LDAP_DESCRIPTION );
     }
 
-    public void addMember(final ChaiUser theUser) throws ChaiUnavailableException, ChaiOperationException {
-        this.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN());
-        theUser.addAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, this.getEntryDN());
+    public void addMember( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        this.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
+        theUser.addAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, this.getEntryDN() );
     }
 
-    public void removeMember(final ChaiUser theUser) throws ChaiUnavailableException, ChaiOperationException {
-        this.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN());
-        theUser.deleteAttribute(ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, this.getEntryDN());
+    public void removeMember( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        this.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
+        theUser.deleteAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, this.getEntryDN() );
     }
 }

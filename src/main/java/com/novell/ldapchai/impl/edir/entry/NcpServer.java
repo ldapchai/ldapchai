@@ -21,6 +21,7 @@ package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiConstant;
 
-public interface NcpServer extends Server {
+public interface NcpServer extends Server
+{
     String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASS_LDAP_SERVER;
 }

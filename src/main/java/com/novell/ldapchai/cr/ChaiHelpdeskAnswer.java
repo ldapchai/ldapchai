@@ -32,106 +32,127 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-class ChaiHelpdeskAnswer implements HelpdeskAnswer {
+class ChaiHelpdeskAnswer implements HelpdeskAnswer
+{
     private final String challengeText;
     private final String answer;
 
-    ChaiHelpdeskAnswer(final String answer, final String challengeText) {
-        if (answer == null || answer.length() < 1) {
-            throw new IllegalArgumentException("missing answer text");
+    ChaiHelpdeskAnswer( final String answer, final String challengeText )
+    {
+        if ( answer == null || answer.length() < 1 )
+        {
+            throw new IllegalArgumentException( "missing answer text" );
         }
 
         this.answer = answer;
         this.challengeText = challengeText;
     }
 
-    public String answerText() {
+    public String answerText()
+    {
         return answer;
     }
 
-    public Element toXml() throws ChaiOperationException {
-        final Element answerElement = new Element(ChaiResponseSet.XML_NODE_ANSWER_VALUE);
-        answerElement.setText(encryptValue(answer, challengeText));
-        answerElement.setAttribute(ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.HELPDESK.toString());
+    public Element toXml()
+            throws ChaiOperationException
+    {
+        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        answerElement.setText( encryptValue( answer, challengeText ) );
+        answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.HELPDESK.toString() );
         return answerElement;
     }
 
-    public boolean testAnswer(final String testResponse) {
-        if (testResponse == null) {
+    public boolean testAnswer( final String testResponse )
+    {
+        if ( testResponse == null )
+        {
             return false;
         }
 
-        return answer.equalsIgnoreCase(testResponse);
+        return answer.equalsIgnoreCase( testResponse );
     }
 
-    private static String encryptValue(final String value, final String key)
+    private static String encryptValue( final String value, final String key )
             throws ChaiOperationException
     {
-        try {
-            if (value == null || value.length() < 1) {
+        try
+        {
+            if ( value == null || value.length() < 1 )
+            {
                 return "";
             }
 
-            final SecretKey secretKey = makeKey(key);
-            final Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters());
-            final byte[] encrypted = cipher.doFinal(value.getBytes());
-            return Base64.encodeBytes(encrypted, Base64.URL_SAFE | Base64.GZIP);
-        } catch (Exception e) {
+            final SecretKey secretKey = makeKey( key );
+            final Cipher cipher = Cipher.getInstance( "AES" );
+            cipher.init( Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters() );
+            final byte[] encrypted = cipher.doFinal( value.getBytes() );
+            return Base64.encodeBytes( encrypted, Base64.URL_SAFE | Base64.GZIP );
+        }
+        catch ( Exception e )
+        {
             final String errorMsg = "unexpected error performing helpdesk answer crypt operation: " + e.getMessage();
-            throw new ChaiOperationException(errorMsg,ChaiError.CHAI_INTERNAL_ERROR);
+            throw new ChaiOperationException( errorMsg, ChaiError.CHAI_INTERNAL_ERROR );
         }
     }
 
-    private static String decryptValue(final String value, final String key)
+    private static String decryptValue( final String value, final String key )
     {
-        try {
-            if (value == null || value.length() < 1) {
+        try
+        {
+            if ( value == null || value.length() < 1 )
+            {
                 return "";
             }
 
-            final SecretKey secretKey = makeKey(key);
-            final byte[] decoded = Base64.decode(value, Base64.URL_SAFE | Base64.GZIP);
-            final Cipher cipher = Cipher.getInstance("AES");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            final byte[] decrypted = cipher.doFinal(decoded);
-            return new String(decrypted);
-        } catch (Exception e) {
+            final SecretKey secretKey = makeKey( key );
+            final byte[] decoded = Base64.decode( value, Base64.URL_SAFE | Base64.GZIP );
+            final Cipher cipher = Cipher.getInstance( "AES" );
+            cipher.init( Cipher.DECRYPT_MODE, secretKey );
+            final byte[] decrypted = cipher.doFinal( decoded );
+            return new String( decrypted );
+        }
+        catch ( Exception e )
+        {
             final String errorMsg = "unexpected error performing helpdesk answer decrypt operation: " + e.getMessage();
-            throw new IllegalArgumentException(errorMsg);
+            throw new IllegalArgumentException( errorMsg );
         }
     }
 
-    private static SecretKey makeKey(final String text)
+    private static SecretKey makeKey( final String text )
             throws NoSuchAlgorithmException, UnsupportedEncodingException
     {
-        final MessageDigest md = MessageDigest.getInstance("SHA1");
-        md.update(text.getBytes("iso-8859-1"), 0, text.length());
+        final MessageDigest md = MessageDigest.getInstance( "SHA1" );
+        md.update( text.getBytes( "iso-8859-1" ), 0, text.length() );
         final byte[] key = new byte[16];
-        System.arraycopy(md.digest(), 0, key, 0, 16);
-        return new SecretKeySpec(key, "AES");
+        System.arraycopy( md.digest(), 0, key, 0, 16 );
+        return new SecretKeySpec( key, "AES" );
     }
 
-    public AnswerBean asAnswerBean() {
+    public AnswerBean asAnswerBean()
+    {
         final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType(FormatType.HELPDESK);
-        answerBean.setAnswerText(answer);
+        answerBean.setType( FormatType.HELPDESK );
+        answerBean.setAnswerText( answer );
         return answerBean;
     }
 
-    static class ChaiHelpdeskAnswerFactory implements ImplementationFactory {
-        public Answer newAnswer(final AnswerFactory.AnswerConfiguration answerConfiguration, final String answerText) {
-            return new ChaiHelpdeskAnswer(answerText, answerConfiguration.getChallengeText());
+    static class ChaiHelpdeskAnswerFactory implements ImplementationFactory
+    {
+        public Answer newAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answerText )
+        {
+            return new ChaiHelpdeskAnswer( answerText, answerConfiguration.getChallengeText() );
         }
 
-        public Answer fromAnswerBean(final AnswerBean input, final String challengeText) {
-            return new ChaiHelpdeskAnswer(input.answerText, challengeText);
+        public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
+        {
+            return new ChaiHelpdeskAnswer( input.answerText, challengeText );
         }
 
-        public ChaiHelpdeskAnswer fromXml(final Element element, final boolean caseInsensitive, final String challengeText) {
+        public ChaiHelpdeskAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        {
             final String hashedAnswer = element.getText();
-            final String answerValue = decryptValue(hashedAnswer, challengeText);
-            return new ChaiHelpdeskAnswer(answerValue,challengeText);
+            final String answerValue = decryptValue( hashedAnswer, challengeText );
+            return new ChaiHelpdeskAnswer( answerValue, challengeText );
         }
 
     }

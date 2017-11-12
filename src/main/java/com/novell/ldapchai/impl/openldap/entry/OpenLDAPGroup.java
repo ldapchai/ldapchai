@@ -27,16 +27,22 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-class OpenLDAPGroup extends AbstractChaiGroup implements ChaiGroup {
-    OpenLDAPGroup(final String groupDN, final ChaiProvider chaiProvider) {
-        super(groupDN, chaiProvider);
+class OpenLDAPGroup extends AbstractChaiGroup implements ChaiGroup
+{
+    OpenLDAPGroup( final String groupDN, final ChaiProvider chaiProvider )
+    {
+        super( groupDN, chaiProvider );
     }
 
-    public void addMember(final ChaiUser theUser) throws ChaiUnavailableException, ChaiOperationException {
-        this.addAttribute(ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN());
+    public void addMember( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        this.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
     }
 
-    public void removeMember(final ChaiUser theUser) throws ChaiUnavailableException, ChaiOperationException {
-        this.deleteAttribute(ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN());
+    public void removeMember( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        this.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
     }
 }
