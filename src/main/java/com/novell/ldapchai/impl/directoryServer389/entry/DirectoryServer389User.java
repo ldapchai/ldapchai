@@ -26,7 +26,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-import java.util.Date;
+import java.time.Instant;
 
 class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
 {
@@ -65,7 +65,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
     }
 
     @Override
-    public Date readPasswordExpirationDate()
+    public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return readDateAttribute( ATTR_PASSWORD_EXPIRE_TIME );
@@ -75,9 +75,9 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
     public boolean isPasswordExpired()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final Date expireDate = readPasswordExpirationDate();
+        final Instant expireDate = readPasswordExpirationDate();
 
-        return expireDate == null ? false : expireDate.before( new Date() );
+        return expireDate == null ? false : expireDate.isBefore( Instant.now() );
 
     }
 
@@ -90,7 +90,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
         // Only attempt to remove the attribute if it already
         // exists to avoid exceptions trying to remove a
         // non-existent attribute
-        final Date unlockDate = readDateAttribute( "accountUnlockTime" );
+        final Instant unlockDate = readDateAttribute( "accountUnlockTime" );
         if ( unlockDate != null )
         {
             this.deleteAttribute( "accountUnlockTime", null );
@@ -101,13 +101,13 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Date unlockDate = readDateAttribute( "accountUnlockTime" );
+        final Instant unlockDate = readDateAttribute( "accountUnlockTime" );
         if ( unlockDate == null )
         {
             return false;
         }
 
-        return unlockDate.after( new Date() );
+        return unlockDate.isAfter( Instant.now() );
     }
 
     public void expirePassword()

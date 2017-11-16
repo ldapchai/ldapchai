@@ -24,7 +24,7 @@ import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -262,7 +262,7 @@ public interface ChaiUser extends ChaiEntry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    Date readLastLoginTime()
+    Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -293,7 +293,7 @@ public interface ChaiUser extends ChaiEntry
      * @throws ChaiOperationException        If there is an error during the operation
      * @throws ChaiUnavailableException      If the directory server(s) are unavailable
      */
-    Date readPasswordExpirationDate()
+    Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
@@ -454,7 +454,7 @@ public interface ChaiUser extends ChaiEntry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    Date readPasswordModificationDate()
+    Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
@@ -466,7 +466,7 @@ public interface ChaiUser extends ChaiEntry
      * @throws ChaiOperationException        If there is an error during the operation
      * @throws ChaiUnavailableException      If the directory server(s) are unavailable
      */
-    Date readAccountExpirationDate()
+    Instant readAccountExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**

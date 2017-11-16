@@ -25,28 +25,12 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
-import java.util.Date;
-
 class TopImpl extends AbstractChaiEntry implements ChaiEntry
 {
 
     TopImpl( final String entryDN, final ChaiProvider chaiProvider )
     {
         super( entryDN, chaiProvider );
-    }
-
-    @Override
-    public Date readDateAttribute( final String attributeName )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        return ADEntries.readDateAttribute( this, attributeName );
-    }
-
-    @Override
-    public void writeDateAttribute( final String attributeName, final Date date )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        ADEntries.writeDateAttribute( this, attributeName, date );
     }
 
     @Override

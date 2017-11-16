@@ -29,8 +29,8 @@ import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.provider.ChaiProvider;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -196,7 +196,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return false;
     }
 
-    public Date readLastLoginTime()
+    public Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return null;
@@ -208,7 +208,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return null;
     }
 
-    public Date readPasswordExpirationDate()
+    public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return null;
@@ -231,7 +231,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return false;
     }
 
-    public Date readPasswordModificationDate()
+    public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return null;
@@ -255,7 +255,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return this.isPasswordLocked();
     }
 
-    public Date readAccountExpirationDate()
+    public Instant readAccountExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return null;
@@ -264,7 +264,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     public boolean isAccountExpired()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Date accountExpirationDate = readAccountExpirationDate();
-        return accountExpirationDate != null && accountExpirationDate.before( new Date() );
+        final Instant accountExpirationDate = readAccountExpirationDate();
+        return accountExpirationDate != null && accountExpirationDate.isBefore( Instant.now() );
     }
 }

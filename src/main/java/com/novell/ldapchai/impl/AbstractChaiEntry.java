@@ -24,7 +24,6 @@ import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.provider.SearchScope;
@@ -35,10 +34,10 @@ import net.iharder.Base64;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -456,25 +455,23 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         chaiProvider.replaceBinaryAttribute( this.entryDN, attributeName, oldValue, newValue );
     }
 
-    public Date readDateAttribute( final String attributeName )
+    public Instant readDateAttribute( final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
         final String value = this.readStringAttribute( attributeName );
-        if ( value != null && !"0".equalsIgnoreCase( value ) )
-        {
-            return EdirEntries.convertZuluToDate( value );
-        }
-        return null;
+
+        return getChaiProvider().getDirectoryVendor().getVendorFactory().stringToInstant( value );
     }
 
-    public void writeDateAttribute( final String attributeName, final Date date )
+    public void writeDateAttribute( final String attributeName, final Instant instant )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        if ( date == null )
+        if ( instant == null )
         {
-            throw new NullPointerException( "date cannot be null" );
+            throw new NullPointerException( "instant cannot be null" );
         }
-        writeStringAttribute( attributeName, EdirEntries.convertDateToZulu( date ) );
+        final String strValue = getChaiProvider().getDirectoryVendor().getVendorFactory().instantToString( instant );
+        writeStringAttribute( attributeName, strValue );
     }
 
     public String readGUID()

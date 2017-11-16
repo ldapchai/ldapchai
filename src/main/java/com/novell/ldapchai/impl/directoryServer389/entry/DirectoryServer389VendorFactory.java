@@ -25,9 +25,11 @@ import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
+import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -102,5 +104,17 @@ public class DirectoryServer389VendorFactory implements VendorFactory
         }
 
         return false;
+    }
+
+    @Override
+    public Instant stringToInstant( final String input )
+    {
+        return EdirEntries.convertZuluToInstant( input );
+    }
+
+    @Override
+    public String instantToString( final Instant input )
+    {
+        return EdirEntries.convertInstantToZulu( input );
     }
 }

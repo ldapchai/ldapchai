@@ -42,8 +42,8 @@ import com.novell.security.nmas.jndi.ldap.ext.SetPwdRequest;
 import com.novell.security.nmas.jndi.ldap.ext.SetPwdResponse;
 
 import javax.naming.ldap.ExtendedResponse;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -250,8 +250,8 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         final String petExpireString = userAttrs.get( ATTR_PASSWORD_EXPIRE_TIME );
         if ( petExpireString != null && petExpireString.length() > 0 )
         {
-            final Date expireDate = EdirEntries.convertZuluToDate( petExpireString );
-            final long diff = expireDate.getTime() - System.currentTimeMillis();
+            final Instant expireDate = EdirEntries.convertZuluToInstant( petExpireString );
+            final long diff = expireDate.toEpochMilli() - System.currentTimeMillis();
             if ( diff <= 0 )
             {
                 LOGGER.debug( "user " + getEntryDN() + " password expired " + diff + " seconds ago (" + expireDate + ", marking as expired" );
@@ -262,7 +262,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return false;
     }
 
-    public final Date readLastLoginTime()
+    public final Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute( ATTR_LAST_LOGIN );
@@ -324,15 +324,15 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return readBooleanAttribute( "lockedByIntruder" );
     }
 
-    public Date readPasswordExpirationDate()
+    public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        Date returnDate = readDateAttribute( ATTR_PASSWORD_EXPIRE_TIME );
+        Instant returnDate = readDateAttribute( ATTR_PASSWORD_EXPIRE_TIME );
         if ( returnDate == null )
         {
             if ( isPasswordExpired() )
             {
-                returnDate = new Date();
+                returnDate = Instant.now();
             }
         }
         return returnDate;
@@ -351,14 +351,14 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return !readBooleanAttribute( ATTR_LOGIN_DISABLED );
     }
 
-    public Date readPasswordModificationDate()
+    public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute( "pwdChangedTime" );
     }
 
     @Override
-    public Date readAccountExpirationDate()
+    public Instant readAccountExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return readDateAttribute( "loginExpirationTime" );

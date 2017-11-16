@@ -375,17 +375,17 @@ public class ChaiUtility
 
         for ( final String loopURL : ldapURLs )
         {
-            final ChaiConfiguration loopConfig = new ChaiConfiguration( chaiConfiguration );
-            loopConfig.setSetting( ChaiSetting.BIND_URLS, loopURL );
+            final ChaiConfiguration.ChaiConfigurationBuilder builder = ChaiConfiguration.builder( chaiConfiguration );
+            builder.setSetting( ChaiSetting.BIND_URLS, loopURL );
             if ( additionalSettings != null )
             {
                 for ( final Map.Entry<ChaiSetting, String> entry : additionalSettings.entrySet() )
                 {
                     final String value = entry.getValue();
-                    loopConfig.setSetting( entry.getKey(), value );
+                    builder.setSetting( entry.getKey(), value );
                 }
             }
-            returnProviders.add( loopConfig );
+            returnProviders.add( builder.build() );
         }
 
         return returnProviders;
@@ -471,9 +471,8 @@ public class ChaiUtility
     public static ChaiEntry getRootDSE( final ChaiProvider provider )
             throws ChaiUnavailableException
     {
-        final ChaiConfiguration rootDSEChaiConfig = new ChaiConfiguration( provider.getChaiConfiguration() );
-        final String ldapUrls = rootDSEChaiConfig.getSetting( ChaiSetting.BIND_URLS );
-        final String[] splitUrls = ldapUrls.split( ChaiConfiguration.LDAP_URL_SEPARATOR_REGEX_PATTERN );
+        final List<String> splitUrls = provider.getChaiConfiguration().bindURLsAsList();
+
         final StringBuilder newUrlConfig = new StringBuilder();
 
         boolean currentURLsHavePath = false;
@@ -490,7 +489,10 @@ public class ChaiUtility
             newUrlConfig.append( "," );
         }
 
-        rootDSEChaiConfig.setSetting( ChaiSetting.BIND_URLS, newUrlConfig.toString() );
+        final ChaiConfiguration rootDSEChaiConfig = ChaiConfiguration.builder( provider.getChaiConfiguration() )
+                .setSetting( ChaiSetting.BIND_URLS, newUrlConfig.toString() )
+                .build();
+
         final ChaiProvider rootDseProvider = currentURLsHavePath
                 ? provider.getProviderFactory().newProvider( rootDSEChaiConfig )
                 : provider;

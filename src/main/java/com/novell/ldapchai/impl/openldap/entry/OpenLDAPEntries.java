@@ -27,21 +27,22 @@ import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.util.Date;
+import java.time.Instant;
+
 
 public class OpenLDAPEntries
 {
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( OpenLDAPEntries.class );
 
-    public static Date convertZuluToDate( final String dateString )
+    public static Instant convertZuluToDate( final String dateString )
     {
-        return EdirEntries.convertZuluToDate( dateString );
+        return EdirEntries.convertZuluToInstant( dateString );
     }
 
-    public static String convertDateToZulu( final Date date )
+    public static String convertDateToZulu( final Instant date )
     {
-        return EdirEntries.convertDateToZulu( date );
+        return EdirEntries.convertInstantToZulu( date );
     }
 
     static OpenLDAPPasswordPolicy readPasswordPolicy( final OpenLDAPUser person )

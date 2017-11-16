@@ -25,7 +25,6 @@ import com.novell.ldapchai.provider.ChaiSetting;
 import javax.naming.SizeLimitExceededException;
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 
 /**
@@ -36,8 +35,9 @@ import java.nio.charset.Charset;
  * @see javax.naming.ldap.ExtendedRequest
  */
 public class OpenLDAPModifyPasswordRequest
-        implements ExtendedRequest, Serializable
+        implements ExtendedRequest
 {
+    private static final long serialVersionUID = 1L;
 
     /**
      * The OID of the modify password extended operation
@@ -63,7 +63,7 @@ public class OpenLDAPModifyPasswordRequest
      */
     private String modifyPassword;
 
-    private final ChaiConfiguration chaiConfiguration;
+    private final transient ChaiConfiguration chaiConfiguration;
 
     /**
      * Creates a new <code>OpenLDAPUser</code> instance.

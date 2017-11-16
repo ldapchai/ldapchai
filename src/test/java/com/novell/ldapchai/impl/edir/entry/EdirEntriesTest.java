@@ -2,55 +2,50 @@ package com.novell.ldapchai.impl.edir.entry;
 
 
 import org.hamcrest.core.IsNull;
+import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Date;
+import java.time.Instant;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
+
 public class EdirEntriesTest {
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldReturnExceptionWhenConvertZuluToDateValueIsToShort() throws Exception {
-
-        try {
-            EdirEntries.convertZuluToDate("01234567890123");
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("zulu date too short"));
-            throw e;
-        }
+    public void shouldReturnExceptionWhenConvertZuluToDateValueIsToShort()
+    {
+        EdirEntries.convertZuluToInstant("01234567890123");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldReturnExceptionWhenConvertZuluToDateValueDoesNotHaveZAtChar14() throws Exception {
-        try {
-            EdirEntries.convertZuluToDate("012345678901234");
-        } catch (IllegalArgumentException e) {
-            assertThat(e.getMessage(), is("zulu date must end in 'Z'"));
-            throw e;
-        }
+        EdirEntries.convertZuluToInstant("012345678901234");
     }
 
-    @Test
-    public void shouldReturnExceptionWhenConvertZuluToDateValueDoesHaveZAtChar14ButIsLonger() throws Exception {
-        Date d = EdirEntries.convertZuluToDate("20150101000000Z9");
-        assertThat(d.getTime(), is(1420070400000L));
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldReturnExceptionWhenConvertZuluToDateValueDoesHaveZAtChar14ButIsLonger()
+            throws Exception
+    {
+        EdirEntries.convertZuluToInstant( "20150101000000Z9" );
     }
 
     @Test(expected = NullPointerException.class)
     public void shouldReturnExceptionWhenConvertZuluToDateValueIsNull() throws Exception {
-        try {
-            EdirEntries.convertZuluToDate(null);
-        } catch (NullPointerException e) {
-            assertThat(e.getMessage(), is(IsNull.nullValue()));
-            throw e;
-        }
+        EdirEntries.convertZuluToInstant(null);
     }
 
     @Test
-    public void shouldReturnDateWhenConvertZuluToDateValueIsCorrect() throws Exception {
-        Date d = EdirEntries.convertZuluToDate("20150402010745Z");
-        assertThat(d.getTime(), is(1427936865000L));
+    public void shouldReturnInstantWhenConvertZuluToInstantValueIsCorrect() throws Exception {
+        Instant d = EdirEntries.convertZuluToInstant("20150402010745Z");
+        assertThat(d.toEpochMilli(), is(1427936865000L));
+    }
+
+    @Test
+    public void shouldReturnStringWhenConvertInstantToStringIsCorrect() throws Exception {
+        final Instant input = Instant.ofEpochMilli( 1427936865000L );
+        final String zuluTimestamp = EdirEntries.convertInstantToZulu( input );
+        Assert.assertEquals(zuluTimestamp, "20150402010745Z");
     }
 }

@@ -26,7 +26,7 @@ import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.SearchHelper;
 
 import java.net.InetAddress;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -205,7 +205,7 @@ public interface ChaiEntry
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    Date readDateAttribute( String attributeName )
+    Instant readDateAttribute( String attributeName )
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
@@ -395,10 +395,11 @@ public interface ChaiEntry
      * Write an attribute with timestamp value.  Automatically converts the {@code Date} object to a timestamp.
      *
      * @param attributeName Name of the attribute to read.  Date must be in Zulu string format.
+     * @param instant
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
-    void writeDateAttribute( String attributeName, Date date )
+    void writeDateAttribute( String attributeName, Instant instant )
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**

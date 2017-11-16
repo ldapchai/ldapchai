@@ -24,6 +24,7 @@ import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -82,5 +83,17 @@ public class OracleDSVendorFactory implements VendorFactory
         }
 
         return false;
+    }
+
+    @Override
+    public Instant stringToInstant( final String input )
+    {
+        return OracleDSEntries.convertZuluToDate( input );
+    }
+
+    @Override
+    public String instantToString( final Instant input )
+    {
+        return OracleDSEntries.convertDateToZulu( input );
     }
 }

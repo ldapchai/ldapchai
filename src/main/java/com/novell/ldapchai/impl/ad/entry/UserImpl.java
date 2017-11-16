@@ -40,9 +40,9 @@ import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
 
 import java.io.UnsupportedEncodingException;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -214,20 +214,26 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         return this.readStringAttribute( ATTR_GIVEN_NAME );
     }
 
-    public final Date readLastLoginTime()
+    public final Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
         final Set<String> readAttributes = new HashSet<>( Arrays.asList( ATTR_LAST_LOGIN, ATTR_LAST_LOGIN_TIMESTAMP ) );
         final Map<String, String> readResults = this.readStringAttributes( readAttributes );
-        final Date lastLoginDate = readResults.containsKey( ATTR_LAST_LOGIN ) ? ADEntries.convertWinEpochToDate( readResults.get( ATTR_LAST_LOGIN ) ) : null;
-        final Date lastLoginDateTimestamp = readResults.containsKey( ATTR_LAST_LOGIN_TIMESTAMP )
+        final Instant lastLoginDate = readResults.containsKey( ATTR_LAST_LOGIN )
+                ? ADEntries.convertWinEpochToDate( readResults.get( ATTR_LAST_LOGIN ) )
+                : null;
+        final Instant lastLoginDateTimestamp = readResults.containsKey( ATTR_LAST_LOGIN_TIMESTAMP )
                 ? ADEntries.convertWinEpochToDate( readResults.get( ATTR_LAST_LOGIN_TIMESTAMP ) )
                 : null;
+
         if ( lastLoginDate == null || lastLoginDateTimestamp == null )
         {
             return lastLoginDate == null ? lastLoginDateTimestamp : lastLoginDate;
         }
-        return lastLoginDate.after( lastLoginDateTimestamp ) ? lastLoginDate : lastLoginDateTimestamp;
+
+        return lastLoginDate.isAfter( lastLoginDateTimestamp )
+                ? lastLoginDate
+                : lastLoginDateTimestamp;
     }
 
     public final void changePassword( final String oldPassword, final String newPassword )
@@ -285,7 +291,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         // older ad versions have an insane way of checking account lockout.  what could possibly go wrong?
 
         // read lockout time of user.
-        final Date lockoutTime = this.readDateAttribute( "lockoutTime" );
+        final Instant lockoutTime = this.readDateAttribute( "lockoutTime" );
         if ( lockoutTime != null )
         {
             ChaiEntry parentEntry = this.getParentEntry();
@@ -314,19 +320,19 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
                 recursionCount++;
             }
 
-            final Date futureUnlockTime = new Date( lockoutTime.getTime() + lockoutDurationMs );
-            return System.currentTimeMillis() <= futureUnlockTime.getTime();
+            final Instant futureUnlockTime = Instant.ofEpochMilli( lockoutTime.toEpochMilli() + lockoutDurationMs );
+            return System.currentTimeMillis() <= futureUnlockTime.toEpochMilli();
         }
         return false;
     }
 
-    public Date readPasswordModificationDate()
+    public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute( "pwdLastSet" );
     }
 
-    public Date readPasswordExpirationDate()
+    public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         final String[] attrsToRead = new String[] {
@@ -382,11 +388,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         final String maxPwdAgeString = readAttrs.get( "pwdLastSet" );
         if ( maxPwdAgeString != null && maxPwdAgeString.length() > 0 )
         {
-            final Date pwdLastSet = ADEntries.convertWinEpochToDate( maxPwdAgeString );
+            final Instant pwdLastSet = ADEntries.convertWinEpochToDate( maxPwdAgeString );
             if ( pwdLastSet != null )
             {
-                final long pwExpireTimeMs = pwdLastSet.getTime() + maxPwdAgeMs;
-                return new Date( pwExpireTimeMs );
+                final long pwExpireTimeMs = pwdLastSet.toEpochMilli() + maxPwdAgeMs;
+                return Instant.ofEpochMilli( pwExpireTimeMs );
             }
         }
 
@@ -416,20 +422,6 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
     }
 
     @Override
-    public Date readDateAttribute( final String attributeName )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        return ADEntries.readDateAttribute( this, attributeName );
-    }
-
-    @Override
-    public void writeDateAttribute( final String attributeName, final Date date )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        ADEntries.writeDateAttribute( this, attributeName, date );
-    }
-
-    @Override
     public String readGUID()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -455,7 +447,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
     }
 
 
-    public Date readAccountExpirationDate()
+    public Instant readAccountExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return this.readDateAttribute( "accountExpires" );

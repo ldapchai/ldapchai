@@ -304,8 +304,9 @@ class FailOverWrapper implements InvocationHandler
         {
             for ( final String loopUrl : chaiConfig.bindURLsAsList() )
             {
-                final ChaiConfiguration loopConfig = new ChaiConfiguration( chaiConfig );
-                loopConfig.setSetting( ChaiSetting.BIND_URLS, loopUrl );
+                final ChaiConfiguration loopConfig = ChaiConfiguration.builder( chaiConfig )
+                        .setSetting( ChaiSetting.BIND_URLS, loopUrl )
+                        .build();
                 providerSlots.add( new ProviderSlot( loopConfig, loopUrl ) );
             }
 

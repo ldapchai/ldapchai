@@ -24,8 +24,8 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 
 import java.math.BigInteger;
+import java.time.Instant;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
@@ -50,31 +50,36 @@ public class ADEntries
      * Convert a Date to the Zulu String format.
      * See the <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk5701.html">eDirectory Time attribute syntax definition</a> for more details.
      *
-     * @param date The Date to be converted
+     * @param instant The Date to be converted
      * @return A string formated such as "199412161032Z".
      */
-    public static String convertDateToWinEpoch( final Date date )
+    public static String convertDateToWinEpoch( final Instant instant )
     {
-        if ( date == null )
+        if ( instant == null )
         {
             throw new NullPointerException( "date must be non-null" );
         }
 
-        final long inputAsMs = date.getTime();
+        final long inputAsMs = instant.toEpochMilli();
         final long inputAsADMs = inputAsMs - AD_EPOCH_OFFSET_MS;
         final long inputAsADNs = inputAsADMs * 10000;
 
         return String.valueOf( inputAsADNs );
     }
 
-    public static Date convertWinEpochToDate( final String dateString )
+    public static Instant convertWinEpochToDate( final String input )
     {
-        if ( dateString == null )
+        if ( input == null )
         {
             return null;
         }
 
-        final long timestampAsNs = Long.parseLong( dateString );
+        if ( "0".equals( input ) )
+        {
+            return null;
+        }
+
+        final long timestampAsNs = Long.parseLong( input );
         if ( timestampAsNs <= 0 )
         {
             return null;
@@ -89,23 +94,8 @@ public class ADEntries
             return null;
         }
 
-        return new Date( timestampAsJavaMs );
+        return Instant.ofEpochMilli( timestampAsJavaMs );
     }
-
-    static Date readDateAttribute( final ChaiEntry chaiEntry, final String attributeName )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final String attrValue = chaiEntry.readStringAttribute( attributeName );
-        return attrValue == null ? null : ADEntries.convertWinEpochToDate( attrValue );
-    }
-
-    static void writeDateAttribute( final ChaiEntry chaiEntry, final String attributeName, final Date date )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final String attrValue = convertDateToWinEpoch( date );
-        chaiEntry.writeStringAttribute( attributeName, attrValue );
-    }
-
 
     static String readGUID( final ChaiEntry entry )
             throws ChaiOperationException, ChaiUnavailableException

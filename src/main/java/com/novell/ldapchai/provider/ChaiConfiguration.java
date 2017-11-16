@@ -23,136 +23,51 @@ import com.novell.ldapchai.util.StringHelper;
 
 import javax.net.ssl.X509TrustManager;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Enumeration;
+
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 /**
  * LDAP Chai API configuration settings.  This class represents the primary means
- * of controling Chai behavior.  Instances of {@code ChaiConfiguration} are semi-mutable.
- * Once instantiated, the setters may be called to modify the instance.  However, once {@link #lock()} is
- * called, all setters will throw an {@link IllegalStateException}.
- * <p>
- * When a {@code ChaiConfiguration} instance is used to configure a new ChaiProvider
- * instance, it is automatically locked.  Thus, a {@link ChaiProvider}'s configuration can not be modifed
- * once it is used to create a {@link ChaiProvider}.
- * <p>
- * This class is <i>cloneable</i> and clones are created in an unlocked state.
+ * of controlling Chai behavior.
  *
  * @author Jason D. Rivard
  * @see ChaiSetting
  */
-public class ChaiConfiguration implements Serializable
+public class ChaiConfiguration
 {
     // comma <or> space (regex)
     public static final String LDAP_URL_SEPARATOR_REGEX_PATTERN = ",| ";
 
-    private static final Properties DEFAULT_SETTINGS = new Properties();
+    private static final Map<String, String> DEFAULT_SETTINGS;
 
-    private static final long serialVersionUID = 1L;
-
-    private Serializable implementationConfiguration;
-    private transient volatile boolean locked;
-    private Properties settings = new Properties( DEFAULT_SETTINGS );
-    private transient X509TrustManager[] trustManager = null;
+    private final Serializable implementationConfiguration;
+    private final Map<String, String> settings;
+    private final X509TrustManager[] trustManager;
 
     static
     {
+        final Map<String, String> settings = new LinkedHashMap<>();
         for ( final ChaiSetting s : ChaiSetting.values() )
         {
-            DEFAULT_SETTINGS.put( s.getKey(), s.getDefaultValue() );
+            settings.put( s.getKey(), s.getDefaultValue() );
         }
+        DEFAULT_SETTINGS = Collections.unmodifiableMap( settings );
     }
 
-    /**
-     * Get a properties containing the default settings used by a newly constructed {@code ChaiConfiguration}.
-     *
-     * @return The default settings.
-     */
-    public static Properties getDefaultSettings()
+    private ChaiConfiguration(
+            final Serializable implementationConfiguration,
+            final Map<String, String> settings,
+            final X509TrustManager[] trustManager
+    )
     {
-        final Properties propCopy = new Properties();
-        propCopy.putAll( DEFAULT_SETTINGS );
-        return propCopy;
-    }
-
-    /**
-     * Construct a default {@code ChaiConfiguration}
-     */
-    public ChaiConfiguration()
-    {
-    }
-
-    /**
-     * Construct a default {@code ChaiConfiguration}
-     *
-     * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
-     * @param bindPassword password for the bind DN.
-     * @param ldapURLs     an ordered list fo ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
-     */
-    public ChaiConfiguration( final List<String> ldapURLs, final String bindDN, final String bindPassword )
-    {
-        this.setSetting( ChaiSetting.BIND_PASSWORD, bindPassword );
-        this.setSetting( ChaiSetting.BIND_DN, bindDN );
-
-        {
-            final StringBuilder sb = new StringBuilder();
-            for ( final String s : ldapURLs )
-            {
-                sb.append( s );
-                sb.append( "," );
-            }
-            this.setSetting( ChaiSetting.BIND_URLS, sb.toString() );
-        }
-    }
-
-    /**
-     * Construct a new configuration based on the input configuration settings, including the bind DN, password and ldap URLs.  The
-     * new instance will be unlocked, regardless of the lock status of the input configuratio.
-     */
-    public ChaiConfiguration( final ChaiConfiguration existingConfiguration )
-    {
-        final Properties newSettings = new Properties();
-        for ( final Enumeration keyEnum = existingConfiguration.settings.propertyNames(); keyEnum.hasMoreElements(); )
-        {
-            final String keyName = ( String ) keyEnum.nextElement();
-            newSettings.setProperty( keyName, existingConfiguration.settings.getProperty( keyName ) );
-        }
-        settings = newSettings;
-
-        trustManager = existingConfiguration.trustManager;
-        implementationConfiguration = existingConfiguration.implementationConfiguration;
-        locked = false;
-    }
-
-
-    /**
-     * Set a single settings.  Each setting is avalable in the {@link ChaiSetting} enumeration.
-     *
-     * @param setting the setting to set
-     * @param value   the value to set
-     * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
-     * @throws IllegalArgumentException if the value is not syntactically correct
-     * @see ChaiSetting#validateValue(String)
-     */
-    public ChaiConfiguration setSetting( final ChaiSetting setting, final String value )
-    {
-        checkLock();
-        setting.validateValue( value );
-        this.settings.setProperty( setting.getKey(), value == null ? setting.getDefaultValue() : value );
-        return this;
-    }
-
-
-    private void checkLock()
-    {
-        if ( locked )
-        {
-            throw new IllegalStateException( "configuration locked" );
-        }
+        this.implementationConfiguration = implementationConfiguration;
+        this.settings = settings;
+        this.trustManager = trustManager == null ? null : Arrays.copyOf( trustManager, trustManager.length );
     }
 
     /**
@@ -162,11 +77,21 @@ public class ChaiConfiguration implements Serializable
      * @param bindPassword password for the bind DN.
      * @param ldapURL      ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
      */
-    public ChaiConfiguration( final String ldapURL, final String bindDN, final String bindPassword )
+    public static ChaiConfiguration newConfiguration( final String ldapURL, final String bindDN, final String bindPassword )
     {
-        this.setSetting( ChaiSetting.BIND_PASSWORD, bindPassword );
-        this.setSetting( ChaiSetting.BIND_DN, bindDN );
-        this.setSetting( ChaiSetting.BIND_URLS, ldapURL );
+        return new ChaiConfigurationBuilder( ldapURL, bindDN, bindPassword ).build();
+    }
+
+    /**
+     * Construct a default {@code ChaiConfiguration}
+     *
+     * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
+     * @param bindPassword password for the bind DN.
+     * @param ldapURLs      ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
+     */
+    public static ChaiConfiguration newConfiguration( final List<String> ldapURLs, final String bindDN, final String bindPassword )
+    {
+        return new ChaiConfigurationBuilder( ldapURLs, bindDN, bindPassword ).build();
     }
 
     /**
@@ -180,16 +105,6 @@ public class ChaiConfiguration implements Serializable
     }
 
     /**
-     * Indicates the lock status of this {@code ChaiConfiguration}.
-     *
-     * @return true if this ChaiConfiguration is locked
-     */
-    public boolean isLocked()
-    {
-        return locked;
-    }
-
-    /**
      * Returns a string value suitable for debugging.  Sensitive values such as passwords are
      * not included.
      *
@@ -197,10 +112,9 @@ public class ChaiConfiguration implements Serializable
      */
     public String toString()
     {
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
         sb.append( ChaiConfiguration.class.getSimpleName() );
         sb.append( ": " );
-        sb.append( "locked=" ).append( locked );
         sb.append( " settings: {" );
 
         for ( final ChaiSetting s : ChaiSetting.values() )
@@ -219,7 +133,10 @@ public class ChaiConfiguration implements Serializable
         }
 
         //remove the last ", " from the buffer
-        sb = new StringBuilder( sb.toString().replaceAll( ", $", "" ) );
+        if ( sb.toString().endsWith( ", " ) )
+        {
+            sb.delete( sb.length() - 2, sb.length() );
+        }
 
         sb.append( "}" );
 
@@ -234,7 +151,7 @@ public class ChaiConfiguration implements Serializable
      */
     public String getSetting( final ChaiSetting setting )
     {
-        return settings.getProperty( setting.getKey() );
+        return settings.get( setting.getKey() );
     }
 
     /**
@@ -249,7 +166,6 @@ public class ChaiConfiguration implements Serializable
         return StringHelper.convertStrToBoolean( settingValue );
     }
 
-
     /**
      * Returns an immutable list of the ldap URLs.
      *
@@ -257,14 +173,13 @@ public class ChaiConfiguration implements Serializable
      */
     public List<String> bindURLsAsList()
     {
-        final List<String> results = new ArrayList<>();
-        results.addAll( Arrays.asList( getSetting( ChaiSetting.BIND_URLS ).split( LDAP_URL_SEPARATOR_REGEX_PATTERN ) ) );
-        return Collections.unmodifiableList( results );
+        final List<String> splitUrls = Arrays.asList( getSetting( ChaiSetting.BIND_URLS ).split( LDAP_URL_SEPARATOR_REGEX_PATTERN ) );
+        return Collections.unmodifiableList( splitUrls );
     }
 
     String getBindPassword()
     {
-        return settings.getProperty( ChaiSetting.BIND_PASSWORD.getKey() );
+        return settings.get( ChaiSetting.BIND_PASSWORD.getKey() );
     }
 
     int getIntSetting( final ChaiSetting name )
@@ -303,72 +218,168 @@ public class ChaiConfiguration implements Serializable
         return trustManager == null ? null : Arrays.copyOf( trustManager, trustManager.length );
     }
 
-    /**
-     * Lock this {@code ChaiConfiguration}.  Once locked, all of the setter methods will throw an {@link IllegalStateException}.
-     * In order to be locked, both an implementation class and implementation configuration must be set.
-     */
-    public void lock()
+    public static ChaiConfigurationBuilder builder()
     {
-        if ( getSetting( ChaiSetting.PROVIDER_IMPLEMENTATION ).length() < 1 )
+        return new ChaiConfigurationBuilder(  );
+    }
+
+    public static ChaiConfigurationBuilder builder(
+            final String ldapURLs,
+            final String bindDN,
+            final String bindPassword
+    )
+    {
+        return new ChaiConfigurationBuilder( ldapURLs, bindDN, bindPassword );
+    }
+
+    public static ChaiConfigurationBuilder builder(
+            final List<String> ldapURLs,
+            final String bindDN,
+            final String bindPassword
+    )
+    {
+        return new ChaiConfigurationBuilder( ldapURLs, bindDN, bindPassword );
+    }
+
+    public static ChaiConfigurationBuilder builder( final ChaiConfiguration chaiConfiguration )
+    {
+        return new ChaiConfigurationBuilder( chaiConfiguration );
+    }
+
+    public static class ChaiConfigurationBuilder
+    {
+        private Serializable implementationConfiguration = null;
+        private Map<String, String> settings = new LinkedHashMap<>( DEFAULT_SETTINGS );
+        private X509TrustManager[] trustManager = null;
+
+        private ChaiConfigurationBuilder()
         {
-            throw new IllegalStateException( "implementation class is required to lock configuration" );
         }
-        locked = true;
-    }
 
-    /**
-     * Set an object to be used for the {@link ChaiProvider} implementation to be used for its configuration.  Depending
-     * on the implementation, this could be any type of object such as a Properties, Map, or even an implementation specific object.
-     * <p>
-     * When used with the default provider, {@code JNDIProviderImpl}, this object must be a {@link java.util.Hashtable} environment as specified by the
-     * {@link javax.naming.ldap.InitialLdapContext}.
-     *
-     * @param implementationConfiguration an object suitable to be used as a configuration for whatever {@code ChaiProvider} implementation is to be used.
-     * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
-     */
-    public ChaiConfiguration setImplementationConfiguration( final Serializable implementationConfiguration )
-    {
-        checkLock();
-        this.implementationConfiguration = implementationConfiguration;
-        return this;
-    }
-
-    /**
-     * Add a TrustManager to be used when connecting to ssl ldap servers.
-     *
-     * @param trustManager A serializable trustmanager to be used for connecting to ldap servers.
-     * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
-     */
-    public ChaiConfiguration setTrustManager( final X509TrustManager[] trustManager )
-    {
-        checkLock();
-        this.trustManager = trustManager == null ? null : Arrays.copyOf( trustManager, trustManager.length );
-        return this;
-    }
-
-    /**
-     * Set the settings in the {@code ChaiConfiguration}.  Each setting key is available as a constant publicly defined by
-     * ChaiConfiguration.   The default settings are available in {@link #getDefaultSettings()}.
-     *
-     * @param settings a Properties containing settings to be used by the provider.  If a setting is missing in the
-     *                 supplied Properties, the current setting will be unchanged.
-     */
-    public void setSettings( final Properties settings )
-    {
-        checkLock();
-        final ChaiConfiguration tempConfig = new ChaiConfiguration();
-        for ( final Object key : settings.keySet() )
+        /**
+         * Construct a default {@code ChaiConfiguration}
+         *
+         * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
+         * @param bindPassword password for the bind DN.
+         * @param ldapURLs     an ordered list fo ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
+         */
+        private ChaiConfigurationBuilder( final String ldapURLs, final String bindDN, final String bindPassword )
         {
-            final ChaiSetting setting = ChaiSetting.forKey( key.toString() );
-            if ( setting != null )
+            this( Collections.singletonList( ldapURLs ), bindDN, bindPassword );
+        }
+
+        /**
+         * Construct a default {@code ChaiConfiguration}
+         *
+         * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
+         * @param bindPassword password for the bind DN.
+         * @param ldapURLs     an ordered list fo ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
+         */
+        private ChaiConfigurationBuilder( final List<String> ldapURLs, final String bindDN, final String bindPassword )
+        {
+            setSetting( ChaiSetting.BIND_PASSWORD, bindPassword );
+            setSetting( ChaiSetting.BIND_DN, bindDN );
+
             {
-                tempConfig.setSetting( setting, settings.getProperty( key.toString() ) );
+                final StringBuilder sb = new StringBuilder();
+                for ( final String s : ldapURLs )
+                {
+                    sb.append( s );
+                    sb.append( "," );
+                }
+                this.setSetting( ChaiSetting.BIND_URLS, sb.toString() );
             }
         }
 
-        final Properties newProps = new Properties();
-        newProps.putAll( this.settings );
-        newProps.putAll( tempConfig.settings );
-        this.settings = newProps;
+        /**
+         * Construct a new configuration based on the input configuration settings, including the bind DN, password and ldap URLs.  The
+         * new instance will be unlocked, regardless of the lock status of the input configuration.
+         */
+        public ChaiConfigurationBuilder( final ChaiConfiguration existingConfiguration )
+        {
+            settings = new LinkedHashMap<>( existingConfiguration.settings );
+            trustManager = existingConfiguration.trustManager;
+            implementationConfiguration = existingConfiguration.implementationConfiguration;
+        }
+
+        /**
+         * Set an object to be used for the {@link ChaiProvider} implementation to be used for its configuration.  Depending
+         * on the implementation, this could be any type of object such as a Properties, Map, or even an implementation specific object.
+         * <p>
+         * When used with the default provider, {@code JNDIProviderImpl}, this object must be a {@link java.util.Hashtable} environment as specified by the
+         * {@link javax.naming.ldap.InitialLdapContext}.
+         *
+         * @param implementationConfiguration an object suitable to be used as a configuration for whatever {@code ChaiProvider} implementation is to be used.
+         * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
+         */
+        public ChaiConfigurationBuilder setImplementationConfiguration( final Serializable implementationConfiguration )
+        {
+            this.implementationConfiguration = implementationConfiguration;
+            return this;
+        }
+
+        /**
+         * Add a TrustManager to be used when connecting to ssl ldap servers.
+         *
+         * @param trustManager A serializable trustmanager to be used for connecting to ldap servers.
+         * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
+         */
+        public ChaiConfigurationBuilder setTrustManager( final X509TrustManager[] trustManager )
+        {
+            this.trustManager = trustManager == null ? null : Arrays.copyOf( trustManager, trustManager.length );
+            return this;
+        }
+
+        /**
+         * Set the settings in the {@code ChaiConfiguration}.  Each setting key is available as a constant publicly defined by
+         * ChaiConfiguration.   The default settings are available in {@link #getDefaultSettings()}.
+         *
+         * @param settings a Properties containing settings to be used by the provider.  If a setting is missing in the
+         *                 supplied Properties, the current setting will be unchanged.
+         */
+        public ChaiConfigurationBuilder setSettings( final Properties settings )
+        {
+            for ( final Map.Entry<Object, Object> entry : settings.entrySet() )
+            {
+                final String key = (String) entry.getKey();
+                final ChaiSetting setting = ChaiSetting.forKey( key );
+                if ( setting != null )
+                {
+                    final String value = (String) entry.getValue();
+                    setSetting( setting, value );
+                }
+            }
+            return this;
+        }
+
+        public ChaiConfigurationBuilder setSettings( final Map<ChaiSetting, String> settings )
+        {
+            for ( final Map.Entry<ChaiSetting, String> entry : settings.entrySet() )
+            {
+                    setSetting( entry.getKey(), entry.getValue() );
+            }
+            return this;
+        }
+
+        /**
+         * Set a single settings.  Each setting is available in the {@link ChaiSetting} enumeration.
+         *
+         * @param setting the setting to set
+         * @param value   the value to set
+         * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
+         * @throws IllegalArgumentException if the value is not syntactically correct
+         * @see ChaiSetting#validateValue(String)
+         */
+        public ChaiConfigurationBuilder setSetting( final ChaiSetting setting, final String value )
+        {
+            setting.validateValue( value );
+            this.settings.put( setting.getKey(), value == null ? setting.getDefaultValue() : value );
+            return this;
+        }
+
+        public ChaiConfiguration build()
+        {
+            return new ChaiConfiguration( implementationConfiguration, settings, trustManager );
+        }
     }
 }

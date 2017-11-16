@@ -30,8 +30,8 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -68,18 +68,18 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
     }
 
     @Override
-    public Date readPasswordExpirationDate()
+    public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final Date passwordChangedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME );
+        final Instant passwordChangedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME );
         if ( passwordChangedTime != null && this.getPasswordPolicy() != null )
         {
             final String expirationInterval = this.getPasswordPolicy().getValue( ChaiPasswordRule.ExpirationInterval );
             if ( expirationInterval != null && expirationInterval.trim().length() > 0 )
             {
                 final long expInt = Long.parseLong( expirationInterval ) * 1000L;
-                final long pwExpireTimeMs = passwordChangedTime.getTime() + expInt;
-                return new Date( pwExpireTimeMs );
+                final long pwExpireTimeMs = passwordChangedTime.toEpochMilli() + expInt;
+                return Instant.ofEpochMilli( pwExpireTimeMs );
             }
         }
 
@@ -90,9 +90,9 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
     public boolean isPasswordExpired()
             throws ChaiUnavailableException, ChaiOperationException
     {
-        final Date passwordExpiration = this.readPasswordExpirationDate();
+        final Instant passwordExpiration = this.readPasswordExpirationDate();
         return passwordExpiration != null
-                && new Date().after( passwordExpiration )
+                && Instant.now().isAfter( passwordExpiration )
                 || readBooleanAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_RESET );
     }
 
@@ -143,37 +143,16 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Date passwordAccountLockedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME );
+        final Instant passwordAccountLockedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME );
         return passwordAccountLockedTime != null
-                && new Date().after( passwordAccountLockedTime );
+                && Instant.now().isAfter( passwordAccountLockedTime );
     }
 
     @Override
-    public Date readPasswordModificationDate()
+    public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_CHANGED_TIME );
-    }
-
-    @Override
-    public Date readDateAttribute( final String attributeName )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        final String value = readStringAttribute( attributeName );
-        return value != null ? OpenLDAPEntries.convertZuluToDate( value ) : null;
-    }
-
-    @Override
-    public void writeDateAttribute( final String attributeName, final Date date )
-            throws ChaiUnavailableException, ChaiOperationException
-    {
-        if ( date == null )
-        {
-            return;
-        }
-
-        final String dateString = OpenLDAPEntries.convertDateToZulu( date );
-        writeStringAttribute( attributeName, dateString );
     }
 
     @Override

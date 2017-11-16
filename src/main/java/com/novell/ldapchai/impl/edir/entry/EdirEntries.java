@@ -42,10 +42,14 @@ import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoResponse;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -53,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.TimeZone;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
@@ -65,26 +68,61 @@ import java.util.TimeZone;
  */
 public class EdirEntries
 {
+    private static final DateTimeFormatter EDIR_TIMESTAMP_FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern( "yyyyMMddHHmmss'Z'" )
+            .toFormatter();
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( EdirEntries.class );
 
     /**
-     * Convert a Date to the Zulu String format.
+     * Convert a Instant to the Zulu String format.
      * See the <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk5701.html">eDirectory Time attribute syntax definition</a> for more details.
      *
-     * @param date The Date to be converted
-     * @return A string formated such as "199412161032Z".
+     * @param instant The Date to be converted
+     * @return A string formatted such as "199412161032Z".
      */
-    public static String convertDateToZulu( final Date date )
+    public static String convertInstantToZulu( final Instant instant )
     {
-        if ( date == null )
+        if ( instant == null )
         {
             throw new NullPointerException();
         }
 
-        final SimpleDateFormat timeFormat = new SimpleDateFormat( "yyyyMMddHHmmss'Z'" );
-        timeFormat.setTimeZone( TimeZone.getTimeZone( "Zulu" ) );
-        return timeFormat.format( date );
+        try
+        {
+            return EDIR_TIMESTAMP_FORMATTER.format( instant.atZone( ZoneOffset.UTC ) );
+        }
+        catch ( DateTimeParseException e )
+        {
+            throw new IllegalArgumentException( "unable to format zulu time-string: " + e.getMessage() );
+        }
+    }
+
+    /**
+     * Convert the commonly used eDirectory zulu time string to java Date object.
+     * See the <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk5701.html">eDirectory Time attribute syntax definition</a> for more details.
+     *
+     * @param input a date string in the format of "yyyyMMddHHmmss'Z'", for example "19941216103200Z"
+     * @return A Date object representing the string date
+     * @throws IllegalArgumentException if dateString is incorrectly formatted
+     */
+    public static Instant convertZuluToInstant( final String input )
+    {
+        if ( input == null )
+        {
+            throw new NullPointerException();
+        }
+
+        try
+        {
+            final LocalDateTime localDateTime = LocalDateTime.parse( input, EDIR_TIMESTAMP_FORMATTER );
+            final ZonedDateTime zonedDateTime = localDateTime.atZone( ZoneOffset.UTC );
+            return Instant.from( zonedDateTime );
+        }
+        catch ( DateTimeParseException e )
+        {
+            throw new IllegalArgumentException( "unable to parse zulu time-string: " + e.getMessage() );
+        }
     }
 
     static boolean convertStrToBoolean( final String string )
@@ -107,45 +145,6 @@ public class EdirEntries
         {
             return defaultValue;
         }
-    }
-
-    /**
-     * Convert the commonly used eDirectory zulu time string to java Date object.
-     * See the <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk5701.html">eDirectory Time attribute syntax definition</a> for more details.
-     *
-     * @param dateString a date string in the format of "yyyyMMddHHmmss'Z'", for example "19941216103200Z"
-     * @return A Date object representing the string date
-     * @throws IllegalArgumentException if dateString is incorrectly formatted
-     */
-    public static Date convertZuluToDate( final String dateString )
-    {
-        if ( dateString == null )
-        {
-            throw new NullPointerException();
-        }
-
-        if ( dateString.length() < 15 )
-        {
-            throw new IllegalArgumentException( "zulu date too short" );
-        }
-
-        if ( !"Z".equalsIgnoreCase( String.valueOf( dateString.charAt( 14 ) ) ) )
-        {
-            throw new IllegalArgumentException( "zulu date must end in 'Z'" );
-        }
-
-        // Zulu TimeZone is same as GMT or UTC
-        final Calendar cal = Calendar.getInstance( TimeZone.getTimeZone( "Zulu" ) );
-
-        cal.set( Calendar.YEAR, Integer.parseInt( dateString.substring( 0, 4 ) ) );
-        cal.set( Calendar.MONTH, Integer.parseInt( dateString.substring( 4, 6 ) ) - 1 );
-        cal.set( Calendar.DATE, Integer.parseInt( dateString.substring( 6, 8 ) ) );
-        cal.set( Calendar.HOUR_OF_DAY, Integer.parseInt( dateString.substring( 8, 10 ) ) );
-        cal.set( Calendar.MINUTE, Integer.parseInt( dateString.substring( 10, 12 ) ) );
-        cal.set( Calendar.SECOND, Integer.parseInt( dateString.substring( 12, 14 ) ) );
-        cal.set( Calendar.MILLISECOND, 0 );
-
-        return cal.getTime();
     }
 
     /**
@@ -435,9 +434,10 @@ public class EdirEntries
             ChaiProvider loopProvider = null;
             try
             {
-                final ChaiConfiguration loopConfig = new ChaiConfiguration( chaiConfiguration );
-                loopConfig.setSetting( ChaiSetting.BIND_URLS, loopURL );
-                loopConfig.setSetting( ChaiSetting.FAILOVER_CONNECT_RETRIES, "1" );
+                final ChaiConfiguration loopConfig = ChaiConfiguration.builder( chaiConfiguration )
+                        .setSetting( ChaiSetting.BIND_URLS, loopURL )
+                        .setSetting( ChaiSetting.FAILOVER_CONNECT_RETRIES, "1" )
+                        .build();
 
                 loopProvider = chaiEntry.getChaiProvider().getProviderFactory().newProvider( loopConfig );
 

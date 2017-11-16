@@ -30,7 +30,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,7 +59,7 @@ class WatchdogWrapper implements InvocationHandler
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogWrapper.class );
 
-    private final WatchdogManager watchdogManager = new WatchdogManager();
+    private final WatchdogService watchdogService = new WatchdogService();
 
     // the real provider and it's associated configuration
     private volatile ChaiProvider realProvider;
@@ -173,7 +173,7 @@ class WatchdogWrapper implements InvocationHandler
             settings = new Settings( watchdogFrequency, operationTimeout, idleTimeout );
         }
 
-        watchdogManager.registerInstance( this );
+        watchdogService.registerInstance( this );
 
         checkForPwExpiration();
     }
@@ -220,7 +220,7 @@ class WatchdogWrapper implements InvocationHandler
         super.finalize();
 
         //safegaurd, this should be done in #handleClient
-        watchdogManager.deRegisterInstance( this );
+        watchdogService.deRegisterInstance( this );
     }
 
     public Object invoke(
@@ -339,7 +339,7 @@ class WatchdogWrapper implements InvocationHandler
                 this.realProvider.close();
             }
             wdStatus = STATUS.IDLE;
-            watchdogManager.deRegisterInstance( this );
+            watchdogService.deRegisterInstance( this );
         }
     }
 
@@ -361,7 +361,7 @@ class WatchdogWrapper implements InvocationHandler
                 this.realProvider.close();
             }
             wdStatus = STATUS.IDLE;
-            watchdogManager.deRegisterInstance( this );
+            watchdogService.deRegisterInstance( this );
         }
     }
 
@@ -372,7 +372,7 @@ class WatchdogWrapper implements InvocationHandler
         {
             realProvider.close();
         }
-        watchdogManager.deRegisterInstance( this );
+        watchdogService.deRegisterInstance( this );
     }
 
     private synchronized void reopenRealProvider()
@@ -427,16 +427,15 @@ class WatchdogWrapper implements InvocationHandler
 
         lastBeginTimestamp = System.currentTimeMillis();
         wdStatus = STATUS.ACTIVE;
-        watchdogManager.registerInstance( this );
+        watchdogService.registerInstance( this );
     }
 
-    private class WatchdogManager
+    private class WatchdogService
     {
         private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
 
-        private final Map<WatchdogWrapper, Object> activeWrappers = new ConcurrentHashMap<>();
+        private final Set<WatchdogWrapper> activeWrappers = ConcurrentHashMap.newKeySet();
 
-        final Object filler = new Object();
         final Lock lock = new ReentrantLock();
 
         /**
@@ -446,7 +445,7 @@ class WatchdogWrapper implements InvocationHandler
 
         private void registerInstance( final WatchdogWrapper wdWrapper )
         {
-            activeWrappers.put( wdWrapper, filler );
+            activeWrappers.add( wdWrapper );
             checkTimer();
         }
 
@@ -512,8 +511,8 @@ class WatchdogWrapper implements InvocationHandler
         {
             public void run()
             {
-                final Collection<WatchdogWrapper> copyCollection = new HashSet<WatchdogWrapper>();
-                copyCollection.addAll( activeWrappers.keySet() );
+                final Collection<WatchdogWrapper> copyCollection = new HashSet<>();
+                copyCollection.addAll( activeWrappers );
 
                 for ( final WatchdogWrapper wdWrapper : copyCollection )
                 {

@@ -49,19 +49,22 @@ public class AdvancedConnection {
 
 
         // allocate a new ChaiConfiguration
-        ChaiConfiguration chaiConfig = new ChaiConfiguration(ldapURL, ldapBindDN, ldapBindPW);
+        ChaiConfiguration chaiConfig = ChaiConfiguration.builder(ldapURL, ldapBindDN, ldapBindPW)
 
-        // set the chai challenge/response engine to use the 'title' attribute to store its data.
-        chaiConfig.setSetting(ChaiSetting.CR_CHAI_STORAGE_ATTRIBUTE,"title");
+                // set the chai challenge/response engine to use the 'title' attribute to store its data.
+                .setSetting(ChaiSetting.CR_CHAI_STORAGE_ATTRIBUTE,"title")
 
-        // disable ldap server fail-over
-        chaiConfig.setSetting(ChaiSetting.WATCHDOG_ENABLE,"false");
+                // disable ldap server fail-over
+                .setSetting(ChaiSetting.WATCHDOG_ENABLE,"false")
 
-        // set the chai config to blind trust any SSL certificate
-        chaiConfig.setSetting(ChaiSetting.PROMISCUOUS_SSL,"true");
+                // set the chai config to blind trust any SSL certificate
+                .setSetting(ChaiSetting.PROMISCUOUS_SSL,"true")
 
-        // enable NMAS security mode.
-        chaiConfig.setSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS,"true");
+                // enable NMAS security mode.
+                .setSetting(ChaiSetting.EDIRECTORY_ENABLE_NMAS,"true")
+
+                // build the configuration
+                .build();
 
 
         try {

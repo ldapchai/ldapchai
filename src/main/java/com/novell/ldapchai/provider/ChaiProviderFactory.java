@@ -33,7 +33,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
 
 /**
@@ -145,14 +144,8 @@ public final class ChaiProviderFactory
     public ChaiProvider newProvider( final String ldapURL, final String bindDN, final String password )
             throws ChaiUnavailableException
     {
-        final ChaiConfiguration chaiConfig = new ChaiConfiguration();
-        final Properties settings = ChaiConfiguration.getDefaultSettings();
-        settings.putAll( System.getProperties() );
-        chaiConfig.setSettings( settings );
-        chaiConfig.setSetting( ChaiSetting.BIND_URLS, ldapURL );
-        chaiConfig.setSetting( ChaiSetting.BIND_DN, bindDN );
-        chaiConfig.setSetting( ChaiSetting.BIND_PASSWORD, password );
-        chaiConfig.setSetting( ChaiSetting.PROVIDER_IMPLEMENTATION, JNDIProviderImpl.class.getName() );
+
+        final ChaiConfiguration chaiConfig = ChaiConfiguration.builder( ldapURL, bindDN, password ).build();
         return newProvider( chaiConfig );
     }
 
@@ -169,8 +162,6 @@ public final class ChaiProviderFactory
     public ChaiProvider newProvider( final ChaiConfiguration chaiConfiguration )
             throws ChaiUnavailableException
     {
-        chaiConfiguration.lock();
-
         ChaiProviderImplementor providerImpl;
         try
         {

@@ -26,6 +26,7 @@ import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -90,5 +91,17 @@ public class EDirectoryVendorFactory implements VendorFactory
         }
 
         return false;
+    }
+
+    @Override
+    public Instant stringToInstant( final String input )
+    {
+        return EdirEntries.convertZuluToInstant( input );
+    }
+
+    @Override
+    public String instantToString( final Instant input )
+    {
+        return EdirEntries.convertInstantToZulu( input );
     }
 }

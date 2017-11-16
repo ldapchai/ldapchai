@@ -25,18 +25,18 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 
-import java.util.Date;
+import java.time.Instant;
 
 public class OracleDSEntries
 {
-    public static Date convertZuluToDate( final String dateString )
+    public static Instant convertZuluToDate( final String dateString )
     {
-        return EdirEntries.convertZuluToDate( dateString );
+        return EdirEntries.convertZuluToInstant( dateString );
     }
 
-    public static String convertDateToZulu( final Date date )
+    public static String convertDateToZulu( final Instant date )
     {
-        return EdirEntries.convertDateToZulu( date );
+        return EdirEntries.convertInstantToZulu( date );
     }
 
     static OracleDSPasswordPolicy readPasswordPolicy( final InetOrgPerson person )
