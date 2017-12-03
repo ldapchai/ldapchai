@@ -44,17 +44,17 @@ public class DirectoryServer389VendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
-    public ChaiUser createChaiUser( final String entryDN, final ChaiProvider provider )
+    public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
         return new DirectoryServer389User( entryDN, provider );
     }
 
-    public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
+    public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
         return new DirectoryServer389Group( entryDN, provider );
     }
 
-    public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
+    public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
         return new DirectoryServer389Entry( entryDN, provider );
     }

@@ -18,9 +18,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiException;
+import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderFactory;
 
 /**
  * LDAP Chai API
@@ -31,9 +32,16 @@ import com.novell.ldapchai.exception.ChaiException;
  */
 public class SimpleConnection {
 
+    private final ChaiProviderFactory chaiProviderFactory = ChaiProviderFactory.newProviderFactory();
+
     public static void main(final String[] args) throws ChaiException {
+
+        final ChaiProviderFactory chaiProviderFactory = ChaiProviderFactory.newProviderFactory();
+
+        final ChaiProvider chaiProvider = chaiProviderFactory.newProvider( "ldap://ldaphost:389","cn=admin,ou=ou,o=o","password" );
+
         // create a provider using the quick chai factory
-        final ChaiUser user = ChaiFactory.quickProvider("ldap://ldaphost:389","cn=admin,ou=ou,o=o","novell");
+        final ChaiUser user = chaiProvider.getEntryFactory().newChaiUser("cn=admin,ou=ou,o=o" );
 
         // read the value of the bindDN's cn attribute, and print it to stdout.
         final String cnValue = user.readStringAttribute("cn");

@@ -14,11 +14,11 @@ import java.util.Set;
 
 public interface VendorFactory
 {
-    ChaiUser createChaiUser( String entryDN, ChaiProvider provider );
+    ChaiUser newChaiUser( String entryDN, ChaiProvider provider );
 
-    ChaiGroup createChaiGroup( String entryDN, ChaiProvider provider );
+    ChaiGroup newChaiGroup( String entryDN, ChaiProvider provider );
 
-    ChaiEntry createChaiEntry( String entryDN, ChaiProvider provider );
+    ChaiEntry newChaiEntry( String entryDN, ChaiProvider provider );
 
     DirectoryVendor getDirectoryVendor();
 

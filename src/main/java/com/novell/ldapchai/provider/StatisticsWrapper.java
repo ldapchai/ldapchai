@@ -27,6 +27,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -117,7 +119,14 @@ class StatisticsWrapper implements InvocationHandler
 
         try
         {
-            return method.invoke( realProvider, args );
+            final Object returnObj = method.invoke( realProvider, args );
+
+            if ( method.getName().equals( "init" ) )
+            {
+                statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.BIND_COUNT );
+            }
+
+            return returnObj;
         }
         catch ( InvocationTargetException e )
         {
@@ -144,14 +153,14 @@ class StatisticsWrapper implements InvocationHandler
     static class StatsBean implements ProviderStatistics
     {
 
-        private final Map<IncrementerStatistic, AtomicInteger> incrementorMap = new ConcurrentHashMap<>();
+        private final Map<IncrementerStatistic, AtomicInteger> incrementerMap = new ConcurrentHashMap<>();
         private final Map<TimestampStatistic, Instant> timestampMap = new ConcurrentHashMap<>();
 
         StatsBean()
         {
             for ( final IncrementerStatistic statistic : IncrementerStatistic.values() )
             {
-                incrementorMap.put( statistic, new AtomicInteger( 0 ) );
+                incrementerMap.put( statistic, new AtomicInteger( 0 ) );
             }
             for ( final TimestampStatistic statistic : TimestampStatistic.values() )
             {
@@ -161,7 +170,7 @@ class StatisticsWrapper implements InvocationHandler
 
         public long getIncrementorStatistic( final IncrementerStatistic statistic )
         {
-            return incrementorMap.get( statistic ).get();
+            return incrementerMap.get( statistic ).get();
         }
 
         public Instant getTimestampStatistic( final TimestampStatistic timestampStatistic )
@@ -171,12 +180,30 @@ class StatisticsWrapper implements InvocationHandler
 
         void incrementStatistic( final IncrementerStatistic incrementerStatistic )
         {
-            incrementorMap.get( incrementerStatistic ).incrementAndGet();
+            incrementerMap.get( incrementerStatistic ).incrementAndGet();
         }
 
         void markTimestampStatistic( final TimestampStatistic timestampStatistic )
         {
             timestampMap.put( timestampStatistic, Instant.now() );
+        }
+
+        @Override
+        public Map<String, String> allStatistics()
+        {
+            final Map<String, String> outputMap = new LinkedHashMap<>(  );
+
+            for ( final IncrementerStatistic stat : IncrementerStatistic.values() )
+            {
+                outputMap.put( stat.name(), String.valueOf( incrementerMap.get( stat ) ) );
+            }
+
+            for ( final TimestampStatistic stat : TimestampStatistic.values() )
+            {
+                outputMap.put( stat.name(), String.valueOf( timestampMap.get( stat ) ) );
+            }
+
+            return Collections.unmodifiableMap( outputMap );
         }
     }
 }

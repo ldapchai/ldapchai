@@ -87,13 +87,13 @@ public class ChaiUtility
         provider.createEntry( entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap() );
 
         //Now build an ldapentry object to add attributes to it
-        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry( entryDN.toString() );
+        final ChaiEntry theObject = provider.getEntryFactory().newChaiEntry( entryDN.toString() );
 
         //Add the description
         theObject.writeStringAttribute( ChaiConstant.ATTR_LDAP_DESCRIPTION, name );
 
         //Return the newly created group.
-        return provider.getEntryFactory().createChaiGroup( entryDN.toString() );
+        return provider.getEntryFactory().newChaiGroup( entryDN.toString() );
     }
 
     /**
@@ -195,7 +195,7 @@ public class ChaiUtility
         provider.createEntry( userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes );
 
         //lets create a user object
-        return provider.getEntryFactory().createChaiUser( userDN );
+        return provider.getEntryFactory().newChaiUser( userDN );
     }
 
     /**
@@ -500,6 +500,6 @@ public class ChaiUtility
         // can not call the VendorFactory here, because VendorFactory in turn calls this method to get the
         // directory vendor.  Instead, we will go directly to the Generic VendorFactory
         final GenericEntryFactory genericEntryFactory = new GenericEntryFactory();
-        return genericEntryFactory.createChaiEntry( "", rootDseProvider );
+        return genericEntryFactory.newChaiEntry( "", rootDseProvider );
     }
 }

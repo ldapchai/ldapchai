@@ -38,12 +38,13 @@ public class CreateUser {
     public static void main(final String[] args) {
         String ldapURL =      "ldap://ldaphost:389";
         String ldapBindDN =   "cn=admin,ou=ou,o=o";
-        String ldapBindPW =   "novell";
+        String ldapBindPW =   "password";
 
         // create a provider using the standard JNDI factory.
         ChaiProvider provider = null;
         try {
-            provider = ChaiProviderFactory.createProvider(ldapURL,ldapBindDN,ldapBindPW);
+            final ChaiProviderFactory chaiProviderFactory = ChaiProviderFactory.newProviderFactory();
+            provider = chaiProviderFactory.newProvider(ldapURL,ldapBindDN,ldapBindPW);
         } catch (ChaiUnavailableException e) {
             System.out.println("LDAP error while connecting: " + e);
             System.exit(-1);

@@ -33,7 +33,6 @@ import java.util.Map;
  */
 public interface ChaiProviderImplementor extends ChaiProvider
 {
-
     /**
      * Current status of the {@code ChaiProvider} instance.
      */

@@ -19,7 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiErrors;
 import com.novell.ldapchai.exception.ChaiException;
@@ -27,12 +26,17 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -80,12 +84,19 @@ import java.util.Map;
  */
 public final class ChaiProviderFactory
 {
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiProviderFactory.class.getName() );
 
-    private static final ChaiProviderFactory SINGLETON = new ChaiProviderFactory();
+    private final Map<ChaiProviderFactorySetting, String> chaiProviderFactorySettingStringMap;
 
-    private final CentralService centralService = new CentralService();
+    private ChaiProviderFactory( final Map<ChaiProviderFactorySetting, String> chaiProviderFactorySettingStringMap )
+    {
+        this.chaiProviderFactorySettingStringMap = Collections.unmodifiableMap( chaiProviderFactorySettingStringMap );
+        this.centralService = new CentralService( this );
+    }
+
+    private final CentralService centralService;
+
+    private boolean closed = false;
 
     /**
      * Maintains the global chai provider statistics.  All {@code com.novell.ldapchai.provider.ChaiProvider} instances
@@ -100,39 +111,6 @@ public final class ChaiProviderFactory
     }
 
     /**
-     * Create a {@code ChaiUser} using a standard JNDI ChaiProvider.  If access to the ChaiProvider is also required, it can be had
-     * using the {@link com.novell.ldapchai.ChaiUser#getChaiProvider()} method of the returned ChaiUser instance.
-     *
-     * @param bindDN   ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
-     * @param password password for the bind DN.
-     * @param ldapURL  ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i> (multiple addresses can be specified by comma seperating)
-     * @return A {@code ChaiUser} instance of the bindDN with an underlying ChaiProvider connected using the supplied parameters.
-     * @throws ChaiUnavailableException If the directory server(s) are not reachable.
-     * @see com.novell.ldapchai.ChaiFactory#quickProvider(String, String, String)
-     */
-    @Deprecated
-    public static ChaiUser quickProvider( final String ldapURL, final String bindDN, final String password )
-            throws ChaiUnavailableException
-    {
-        final ChaiProvider provider = createProvider( ldapURL, bindDN, password );
-        return provider.getEntryFactory().createChaiUser( bindDN );
-    }
-
-    @Deprecated
-    public static ChaiProvider createProvider( final String ldapURL, final String bindDN, final String password )
-            throws ChaiUnavailableException
-    {
-        return SINGLETON.newProvider( ldapURL, bindDN, password );
-    }
-
-    @Deprecated
-    public static ChaiProvider createProvider( final ChaiConfiguration chaiConfiguration )
-            throws ChaiUnavailableException
-    {
-        return SINGLETON.newProvider( chaiConfiguration );
-    }
-
-    /**
      * Create a {@code ChaiProvider} using a standard (default) JNDI ChaiProvider.
      *
      * @param bindDN   ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
@@ -144,7 +122,6 @@ public final class ChaiProviderFactory
     public ChaiProvider newProvider( final String ldapURL, final String bindDN, final String password )
             throws ChaiUnavailableException
     {
-
         final ChaiConfiguration chaiConfig = ChaiConfiguration.builder( ldapURL, bindDN, password ).build();
         return newProvider( chaiConfig );
     }
@@ -162,6 +139,14 @@ public final class ChaiProviderFactory
     public ChaiProvider newProvider( final ChaiConfiguration chaiConfiguration )
             throws ChaiUnavailableException
     {
+        return newProviderImpl( chaiConfiguration );
+    }
+
+    ChaiProviderImplementor newProviderImpl( final ChaiConfiguration chaiConfiguration )
+            throws ChaiUnavailableException
+    {
+        checkStatus();
+
         ChaiProviderImplementor providerImpl;
         try
         {
@@ -201,6 +186,8 @@ public final class ChaiProviderFactory
         }
 
         providerImpl = addProviderWrappers( providerImpl );
+
+        getCentralService().registerProvider( providerImpl );
 
         return providerImpl;
     }
@@ -242,7 +229,7 @@ public final class ChaiProviderFactory
         return providerImpl;
     }
 
-    static ChaiProviderImplementor addProviderWrappers( final ChaiProviderImplementor providerImpl )
+    ChaiProviderImplementor addProviderWrappers( final ChaiProviderImplementor providerImpl )
     {
         final ChaiConfiguration chaiConfiguration = providerImpl.getChaiConfiguration();
 
@@ -262,7 +249,7 @@ public final class ChaiProviderFactory
         if ( enableWatchdog && !( outputProvider instanceof WatchdogWrapper ) )
         {
             LOGGER.trace( "adding WatchdogWrapper to provider instance" );
-            outputProvider = WatchdogWrapper.forProvider( outputProvider );
+            outputProvider = WatchdogWrapper.forProvider( this, outputProvider );
         }
 
         if ( enableWireTrace && !( outputProvider instanceof WireTraceWrapper ) )
@@ -296,7 +283,7 @@ public final class ChaiProviderFactory
      * @param theProvider The provider to be "wrapped" in a synchronized provider.
      * @return A synchronized view of the specified provider
      */
-    public static ChaiProvider synchronizedProvider( final ChaiProvider theProvider )
+    private static ChaiProvider synchronizedProvider( final ChaiProvider theProvider )
     {
         if ( theProvider instanceof SynchronizedProvider )
         {
@@ -311,16 +298,20 @@ public final class ChaiProviderFactory
         }
     }
 
-
-    private ChaiProviderFactory()
-    {
-    }
-
     public static ChaiProviderFactory newProviderFactory()
     {
-        return new ChaiProviderFactory();
+        return new ChaiProviderFactory( ChaiProviderFactorySetting.getDefaultSettings() );
     }
 
+    public static ChaiProviderFactory newProviderFactory( final Map<ChaiProviderFactorySetting, String> settings )
+    {
+        final Map<ChaiProviderFactorySetting, String> effectiveSettings = new LinkedHashMap<>( ChaiProviderFactorySetting.getDefaultSettings() );
+        if ( settings != null )
+        {
+            effectiveSettings.putAll( settings );
+        }
+        return new ChaiProviderFactory( Collections.unmodifiableMap( effectiveSettings ) );
+    }
 
     private static class SynchronizedProvider implements InvocationHandler
     {
@@ -362,17 +353,53 @@ public final class ChaiProviderFactory
         }
     }
 
+    public Map<ChaiProviderFactorySetting, String> getChaiProviderFactorySettings()
+    {
+        return Collections.unmodifiableMap( chaiProviderFactorySettingStringMap );
+    }
+
     CentralService getCentralService()
     {
         return centralService;
     }
 
+    public Set<ChaiProvider> activeProviders()
+    {
+        return getCentralService().activeProviders();
+    }
+
+    public void close()
+    {
+        this.closed = true;
+        for ( final ChaiProvider chaiProvider : activeProviders() )
+        {
+            chaiProvider.close();
+        }
+    }
+
+    private void checkStatus()
+    {
+        if ( this.closed )
+        {
+            throw new IllegalStateException( "ChaiProviderFactory instance is closed, new providers can not be created" );
+        }
+
+    }
 
     static class CentralService
     {
+        private final WatchdogService watchdogService;
+
         private final StatisticsWrapper.StatsBean globalStats = new StatisticsWrapper.StatsBean();
 
         private final Map<ChaiConfiguration, DirectoryVendor> vendorCacheMap = new LinkedHashMap<>();
+
+        private final Set<WeakReference<ChaiProviderImplementor>> activeProviders = ConcurrentHashMap.newKeySet();
+
+        private CentralService( final ChaiProviderFactory chaiProviderFactory )
+        {
+            watchdogService = new WatchdogService( chaiProviderFactory );
+        }
 
         void addVendorCache( final ChaiConfiguration chaiConfiguration, final DirectoryVendor vendor )
         {
@@ -388,6 +415,44 @@ public final class ChaiProviderFactory
         {
             return globalStats;
         }
+
+        WatchdogService getWatchdogService()
+        {
+            return watchdogService;
+        }
+
+        private Set<ChaiProvider> activeProviders()
+        {
+            final Set<ChaiProvider> returnSet = new HashSet<>( );
+            for ( final WeakReference<ChaiProviderImplementor> reference : activeProviders )
+            {
+                final ChaiProviderImplementor implementor = reference.get();
+                if ( implementor != null )
+                {
+                    returnSet.add( implementor );
+                }
+            }
+            return Collections.unmodifiableSet( returnSet );
+        }
+
+        private void registerProvider( final ChaiProviderImplementor chaiProviderImplementor )
+        {
+            final WeakReference<ChaiProviderImplementor> reference = new WeakReference<>( chaiProviderImplementor );
+            activeProviders.add( reference );
+        }
+
+        void deRegisterProvider( final ChaiProviderImplementor chaiProviderImplementor )
+        {
+            for ( final WeakReference<ChaiProviderImplementor> reference : activeProviders )
+            {
+                final ChaiProviderImplementor implementor = reference.get();
+                if ( implementor == chaiProviderImplementor )
+                {
+                    activeProviders.remove( reference );
+                }
+            }
+        }
+
     }
 }
 

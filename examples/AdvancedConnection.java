@@ -18,8 +18,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-import com.novell.ldapchai.ChaiEntryFactory;
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
@@ -45,7 +43,7 @@ public class AdvancedConnection {
         // connection parameters
         String ldapURL =      "ldap://ldaphost:389";
         String ldapBindDN =   "cn=admin,ou=ou,o=o";
-        String ldapBindPW =   "novell";
+        String ldapBindPW =   "password";
 
 
         // allocate a new ChaiConfiguration
@@ -68,11 +66,14 @@ public class AdvancedConnection {
 
 
         try {
-            // create a ChaiProvider
-            ChaiProvider provider = ChaiProviderFactory.createProvider(chaiConfig);
+            // create a ChaiProviderFactory;
+            ChaiProviderFactory chaiProviderFactory = ChaiProviderFactory.newProviderFactory();
 
             // create a ChaiProvider
-            ChaiUser bindUser = ChaiFactory.createChaiUser(ldapBindDN,provider);
+            ChaiProvider provider = chaiProviderFactory.newProvider(chaiConfig);
+
+            // create a ChaiProvider
+            ChaiUser bindUser = provider.getEntryFactory().newChaiUser(ldapBindDN);
 
             // read the user's last name.
             String surname = bindUser.readStringAttribute(ChaiUser.ATTR_SURNAME);

@@ -55,11 +55,11 @@ public final class ChaiEntryFactory
      * @param entryDN A valid ldap entry DN (Distinguished Name) of an entry
      * @return A valid {@code ChaiEntry}
      */
-    public ChaiEntry createChaiEntry( final String entryDN )
+    public ChaiEntry newChaiEntry( final String entryDN )
             throws ChaiUnavailableException
     {
         final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
-        return entryFactory.createChaiEntry( entryDN, getChaiProvider() );
+        return entryFactory.newChaiEntry( entryDN, getChaiProvider() );
     }
 
     /**
@@ -68,11 +68,11 @@ public final class ChaiEntryFactory
      * @param groupDN A valid ldap entry DN (Distinguished Name) of an entry
      * @return A valid {@code ChaiGroup}
      */
-    public ChaiGroup createChaiGroup( final String groupDN )
+    public ChaiGroup newChaiGroup( final String groupDN )
             throws ChaiUnavailableException
     {
         final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
-        return entryFactory.createChaiGroup( groupDN, getChaiProvider() );
+        return entryFactory.newChaiGroup( groupDN, getChaiProvider() );
     }
 
     /**
@@ -81,11 +81,11 @@ public final class ChaiEntryFactory
      * @param userDN A valid ldap entry DN (Distinguished Name) of an entry
      * @return A valid {@code ChaiUser}
      */
-    public ChaiUser createChaiUser( final String userDN )
+    public ChaiUser newChaiUser( final String userDN )
             throws ChaiUnavailableException
     {
         final VendorFactory entryFactory = getChaiProvider().getDirectoryVendor().getVendorFactory();
-        return entryFactory.createChaiUser( userDN, getChaiProvider() );
+        return entryFactory.newChaiUser( userDN, getChaiProvider() );
     }
 
     /**
@@ -120,7 +120,7 @@ public final class ChaiEntryFactory
         this.chaiProvider = chaiProvider;
     }
 
-    public static ChaiEntryFactory createChaiFactory( final ChaiProvider chaiProvider )
+    public static ChaiEntryFactory newChaiFactory( final ChaiProvider chaiProvider )
     {
         return new ChaiEntryFactory( chaiProvider );
     }

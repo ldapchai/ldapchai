@@ -206,7 +206,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
 
         for ( final String dn : results.keySet() )
         {
-            returnSet.add( getChaiProvider().getEntryFactory().createChaiEntry( dn ) );
+            returnSet.add( getChaiProvider().getEntryFactory().newChaiEntry( dn ) );
         }
         return returnSet;
     }
@@ -219,7 +219,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         {
             return null;
         }
-        return getChaiProvider().getEntryFactory().createChaiEntry( parentDNString );
+        return getChaiProvider().getEntryFactory().newChaiEntry( parentDNString );
     }
 
     private static String getParentDNString( final String inputDN )
@@ -401,7 +401,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
 
         for ( final String dn : results.keySet() )
         {
-            resultSet.add( getChaiProvider().getEntryFactory().createChaiEntry( dn ) );
+            resultSet.add( getChaiProvider().getEntryFactory().newChaiEntry( dn ) );
         }
         return resultSet;
     }
@@ -459,6 +459,11 @@ public abstract class AbstractChaiEntry implements ChaiEntry
             throws ChaiUnavailableException, ChaiOperationException
     {
         final String value = this.readStringAttribute( attributeName );
+
+        if ( value == null || value.isEmpty() )
+        {
+            return null;
+        }
 
         return getChaiProvider().getDirectoryVendor().getVendorFactory().stringToInstant( value );
     }

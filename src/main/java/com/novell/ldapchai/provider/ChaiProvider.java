@@ -168,7 +168,7 @@ public interface ChaiProvider
 
 
     /**
-     * Get the configruation object used with this provider.
+     * Get the configuration object used with this provider.
      *
      * @return A locked copy of the working {@code ChaiConfiguration}
      */
@@ -176,7 +176,7 @@ public interface ChaiProvider
 
 
     /**
-     * Retreive the statistics of the provider.
+     * Retrieve the statistics of the provider.
      *
      * @return a bean containing statistics of the provider, or null if statistics tracking is not enabled.
      * @see ChaiSetting#STATISTICS_ENABLE
@@ -458,6 +458,10 @@ public interface ChaiProvider
      */
     ChaiProviderFactory getProviderFactory();
 
+    /**
+     *
+     * @return
+     */
     ChaiEntryFactory getEntryFactory();
 }
 

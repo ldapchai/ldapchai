@@ -28,12 +28,7 @@ import com.novell.ldapchai.util.ChaiLogger;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,11 +40,9 @@ import java.util.concurrent.locks.ReentrantLock;
  * @see com.novell.ldapchai.provider.ChaiSetting#WATCHDOG_ENABLE
  * @see com.novell.ldapchai.provider.ChaiSetting#WATCHDOG_IDLE_TIMEOUT
  * @see com.novell.ldapchai.provider.ChaiSetting#WATCHDOG_OPERATION_TIMEOUT
- * @see com.novell.ldapchai.provider.ChaiSetting#WATCHDOG_CHECK_FREQUENCY
  */
 class WatchdogWrapper implements InvocationHandler
 {
-
     private enum STATUS
     {
         ACTIVE,
@@ -59,16 +52,22 @@ class WatchdogWrapper implements InvocationHandler
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogWrapper.class );
 
-    private final WatchdogService watchdogService = new WatchdogService();
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
+    private final int counter = ID_COUNTER.getAndIncrement();
 
     // the real provider and it's associated configuration
-    private volatile ChaiProvider realProvider;
-    private final ChaiProvider originalProvider;
-    private final ChaiConfiguration originalProviderConfig;
+    private volatile ChaiProviderImplementor realProvider;
 
-    private static class Settings
+    private final ChaiConfiguration originalProviderConfig;
+    private final ChaiProviderFactory chaiProviderFactory;
+    private final WatchdogService watchdogService;
+
+    private final Lock statusChangeLock = new ReentrantLock( );
+
+    private boolean allowDisconnect;
+
+    static class Settings
     {
-        private long watchdogFrequency = Integer.parseInt( ChaiSetting.WATCHDOG_CHECK_FREQUENCY.getDefaultValue() );
         private int operationTimeout = Integer.parseInt( ChaiSetting.WATCHDOG_OPERATION_TIMEOUT.getDefaultValue() );
         private int idleTimeout = Integer.parseInt( ChaiSetting.WATCHDOG_IDLE_TIMEOUT.getDefaultValue() );
 
@@ -76,16 +75,10 @@ class WatchdogWrapper implements InvocationHandler
         {
         }
 
-        private Settings( final long watchdogFrequency, final int operationTimeout, final int idleTimeout )
+        private Settings( final int operationTimeout, final int idleTimeout )
         {
-            this.watchdogFrequency = watchdogFrequency;
             this.operationTimeout = operationTimeout;
             this.idleTimeout = idleTimeout;
-        }
-
-        public long getWatchdogFrequency()
-        {
-            return watchdogFrequency;
         }
 
         public int getOperationTimeout()
@@ -97,29 +90,24 @@ class WatchdogWrapper implements InvocationHandler
         {
             return idleTimeout;
         }
-
-        public void setIdleTimeout( final int idleTimeout )
-        {
-            this.idleTimeout = idleTimeout;
-        }
     }
 
     private Settings settings = new Settings();
 
     /**
-     * number of outsanding ldap operations.  If the value is non-zero, then the provider is considered "in-use"
+     * number of outstanding ldap operations.  If the value is non-zero, then the provider is considered "in-use"
      */
     private final AtomicInteger outstandingOperations = new AtomicInteger( 0 );
 
     /**
      * last time an ldap operation was initiated
      */
-    private volatile long lastBeginTimestamp = System.currentTimeMillis();
+    private volatile Instant lastBeginTime = Instant.now();
 
     /**
      * last time an ldap operation was completed
      */
-    private volatile long lastFinishTimestamp = System.currentTimeMillis();
+    private volatile Instant lastFinishTime = Instant.now();
 
     /**
      * current wdStatus of this WatchdogWrapper
@@ -133,6 +121,7 @@ class WatchdogWrapper implements InvocationHandler
      * @return a wrapped {@code ChaiProvider} instance.
      */
     static ChaiProviderImplementor forProvider(
+            final ChaiProviderFactory chaiProviderFactory,
             final ChaiProviderImplementor chaiProvider
     )
     {
@@ -154,37 +143,40 @@ class WatchdogWrapper implements InvocationHandler
         return ( ChaiProviderImplementor ) Proxy.newProxyInstance(
                 chaiProvider.getClass().getClassLoader(),
                 chaiProvider.getClass().getInterfaces(),
-                new WatchdogWrapper( chaiProvider ) );
+                new WatchdogWrapper( chaiProvider, chaiProviderFactory ) );
     }
 
 
     private WatchdogWrapper(
-            final ChaiProviderImplementor realProvider
+            final ChaiProviderImplementor realProvider,
+            final ChaiProviderFactory chaiProviderFactory
     )
     {
-        this.originalProvider = realProvider;
         this.realProvider = realProvider;
         this.originalProviderConfig = realProvider.getChaiConfiguration();
 
         {
-            final int watchdogFrequency = Integer.parseInt( originalProviderConfig.getSetting( ChaiSetting.WATCHDOG_CHECK_FREQUENCY ) );
             final int operationTimeout = Integer.parseInt( originalProviderConfig.getSetting( ChaiSetting.WATCHDOG_OPERATION_TIMEOUT ) );
             final int idleTimeout = Integer.parseInt( originalProviderConfig.getSetting( ChaiSetting.WATCHDOG_IDLE_TIMEOUT ) );
-            settings = new Settings( watchdogFrequency, operationTimeout, idleTimeout );
+            settings = new Settings( operationTimeout, idleTimeout );
         }
 
+        this.chaiProviderFactory = chaiProviderFactory;
+        this.watchdogService = chaiProviderFactory.getCentralService().getWatchdogService();
         watchdogService.registerInstance( this );
 
-        checkForPwExpiration();
+        allowDisconnect = !checkForPwExpiration( realProvider );
     }
 
-    private void checkForPwExpiration()
+    private static boolean checkForPwExpiration(
+            final ChaiProvider chaiProvider
+    )
 
     {
-        final boolean doPwExpCheck = realProvider.getChaiConfiguration().getBooleanSetting( ChaiSetting.WATCHDOG_DISABLE_IF_PW_EXPIRED );
+        final boolean doPwExpCheck = chaiProvider.getChaiConfiguration().getBooleanSetting( ChaiSetting.WATCHDOG_DISABLE_IF_PW_EXPIRED );
         if ( !doPwExpCheck )
         {
-            return;
+            return false;
         }
 
         LOGGER.trace( "checking for user password expiration to adjust watchdog timeout" );
@@ -192,8 +184,8 @@ class WatchdogWrapper implements InvocationHandler
         boolean userPwExpired;
         try
         {
-            final String bindUserDN = realProvider.getChaiConfiguration().getSetting( ChaiSetting.BIND_DN );
-            final ChaiUser bindUser = realProvider.getEntryFactory().createChaiUser( bindUserDN );
+            final String bindUserDN = chaiProvider.getChaiConfiguration().getSetting( ChaiSetting.BIND_DN );
+            final ChaiUser bindUser = chaiProvider.getEntryFactory().newChaiUser( bindUserDN );
             userPwExpired = bindUser.isPasswordExpired();
         }
         catch ( ChaiException e )
@@ -205,28 +197,17 @@ class WatchdogWrapper implements InvocationHandler
         if ( userPwExpired )
         {
             LOGGER.info( "connection user account password is currently expired.  Disabling watchdog timeout." );
-            settings.setIdleTimeout( Integer.MAX_VALUE );
+            return true;
         }
-        else
-        {
-            settings.setIdleTimeout( realProvider.getChaiConfiguration().getIntSetting( ChaiSetting.WATCHDOG_IDLE_TIMEOUT ) );
-        }
-    }
 
-    @SuppressWarnings( value = "NoFinalizer" )
-    protected void finalize()
-            throws Throwable
-    {
-        super.finalize();
-
-        //safegaurd, this should be done in #handleClient
-        watchdogService.deRegisterInstance( this );
+        return false;
     }
 
     public Object invoke(
             final Object proxy,
             final Method method,
-            final Object[] args )
+            final Object[] args
+    )
             throws Throwable
     {
         // before performing any operation, check to see what the current watchdog wdStatus is.
@@ -244,24 +225,26 @@ class WatchdogWrapper implements InvocationHandler
             }
         }
 
-
-        final boolean isLdap = method.getAnnotation( ChaiProviderImplementor.LdapOperation.class ) != null;
-
-        if ( wdStatus == STATUS.CLOSED || !isLdap )
+        if ( method.getName().equals( "getProviderFactory" ) )
         {
-            return AbstractWrapper.invoker( originalProvider, method, args );
+            return chaiProviderFactory;
+        }
+
+        if ( method.getName().equals( "getIdentifier" ) )
+        {
+            return getIdentifier();
         }
 
         final Object returnObject;
         try
         {
             outstandingOperations.incrementAndGet();
-            lastBeginTimestamp = System.currentTimeMillis();
+            lastBeginTime = Instant.now();
 
             if ( wdStatus == STATUS.IDLE )
             {
                 reopenRealProvider();
-                lastBeginTimestamp = System.currentTimeMillis();
+                lastBeginTime = Instant.now();
             }
 
             returnObject = AbstractWrapper.invoker( realProvider, method, args );
@@ -285,45 +268,59 @@ class WatchdogWrapper implements InvocationHandler
         finally
         {
             outstandingOperations.decrementAndGet();
-            lastFinishTimestamp = System.currentTimeMillis();
+            lastFinishTime = Instant.now();
         }
 
 
         if ( "setPassword".equals( method.getName() ) )
         {
-            checkForPwExpiration();
+            allowDisconnect = !checkForPwExpiration( realProvider );
         }
 
         return returnObject;
     }
 
-    private synchronized void checkStatus()
+    void checkStatus()
     {
-        if ( wdStatus == STATUS.ACTIVE )
+        try
         {
-            // if current wdStatus us normal, then check to see if timed out
-            if ( outstandingOperations.get() > 0 )
+            statusChangeLock.lock();
+
+            if ( wdStatus == STATUS.ACTIVE )
             {
-                // check for operation timeout if we have outstanding
-                final long operationDuration = System.currentTimeMillis() - lastBeginTimestamp;
-                if ( operationDuration > settings.getOperationTimeout() )
+                // if current wdStatus us normal, then check to see if timed out
+                if ( outstandingOperations.get() > 0 )
                 {
-                    handleOperationTimeout();
+                    // check for operation timeout if we have outstanding
+                    final long operationDuration = Instant.now().toEpochMilli() - lastBeginTime.toEpochMilli();
+                    if ( operationDuration > settings.getOperationTimeout() )
+                    {
+                        handleOperationTimeout();
+                    }
                 }
-            }
-            else
-            {
-                final long idleDuration = System.currentTimeMillis() - lastFinishTimestamp;
-                if ( idleDuration > settings.getIdleTimeout() )
+                else
                 {
-                    handleIdleTimeout();
+                    final long idleDuration = Instant.now().toEpochMilli() - lastFinishTime.toEpochMilli();
+                    if ( idleDuration > settings.getIdleTimeout() )
+                    {
+                        handleIdleTimeout();
+                    }
                 }
             }
         }
+        finally
+        {
+            statusChangeLock.unlock();
+        }
     }
 
-    private synchronized void handleOperationTimeout()
+    private void handleOperationTimeout()
     {
+        if ( !allowDisconnect )
+        {
+            return;
+        }
+
         final StringBuilder sb = new StringBuilder();
         sb.append( "ldap operation timeout detected, discarding questionable connection" );
         if ( realProvider != null )
@@ -332,19 +329,22 @@ class WatchdogWrapper implements InvocationHandler
             sb.append( realProvider.toString() );
         }
         LOGGER.warn( sb.toString() );
-        synchronized ( this )
+
+        if ( realProvider != null )
         {
-            if ( realProvider != null )
-            {
-                this.realProvider.close();
-            }
-            wdStatus = STATUS.IDLE;
-            watchdogService.deRegisterInstance( this );
+            this.realProvider.close();
         }
+        wdStatus = STATUS.IDLE;
+        watchdogService.deRegisterInstance( this );
     }
 
-    private synchronized void handleIdleTimeout()
+    private void handleIdleTimeout()
     {
+        if ( !allowDisconnect )
+        {
+            return;
+        }
+
         final StringBuilder sb = new StringBuilder();
         sb.append( "ldap idle timeout detected, closing ldap connection" );
         if ( realProvider != null )
@@ -354,28 +354,35 @@ class WatchdogWrapper implements InvocationHandler
         }
 
         LOGGER.debug( sb.toString() );
-        synchronized ( this )
-        {
-            if ( realProvider != null )
-            {
-                this.realProvider.close();
-            }
-            wdStatus = STATUS.IDLE;
-            watchdogService.deRegisterInstance( this );
-        }
-    }
 
-    private synchronized void handleClientCloseRequest()
-    {
-        wdStatus = STATUS.CLOSED;
         if ( realProvider != null )
         {
-            realProvider.close();
+            this.realProvider.close();
         }
+        wdStatus = STATUS.IDLE;
         watchdogService.deRegisterInstance( this );
     }
 
-    private synchronized void reopenRealProvider()
+    private void handleClientCloseRequest()
+    {
+        try
+        {
+            statusChangeLock.lock();
+
+            wdStatus = STATUS.CLOSED;
+            if ( realProvider != null )
+            {
+                realProvider.close();
+            }
+            watchdogService.deRegisterInstance( this );
+        }
+        finally
+        {
+            statusChangeLock.unlock();
+        }
+    }
+
+    private void reopenRealProvider()
             throws Exception
     {
         if ( wdStatus != STATUS.IDLE )
@@ -384,10 +391,9 @@ class WatchdogWrapper implements InvocationHandler
         }
 
         {
-            final StringBuilder sb = new StringBuilder();
-            sb.append( "reopening ldap connection for " );
-            sb.append( originalProviderConfig.getSetting( ChaiSetting.BIND_DN ) );
-            LOGGER.debug( sb.toString() );
+            final String msg = "reopening ldap connection for "
+                    + originalProviderConfig.getSetting( ChaiSetting.BIND_DN );
+            LOGGER.debug( msg );
         }
 
         // if old provider exists, try to close it first.
@@ -399,10 +405,9 @@ class WatchdogWrapper implements InvocationHandler
             }
             catch ( Exception e )
             {
-                final StringBuilder sb = new StringBuilder();
-                sb.append( "error during pre-close connection for " );
-                sb.append( originalProviderConfig.getSetting( ChaiSetting.BIND_DN ) );
-                LOGGER.debug( sb.toString() );
+                final String msg = "error during pre-close connection for "
+                        + originalProviderConfig.getSetting( ChaiSetting.BIND_DN );
+                LOGGER.debug( msg );
             }
             finally
             {
@@ -412,7 +417,7 @@ class WatchdogWrapper implements InvocationHandler
 
         try
         {
-            realProvider = realProvider.getProviderFactory().newProvider( originalProviderConfig );
+            realProvider = chaiProviderFactory.newProviderImpl( originalProviderConfig );
         }
         catch ( Exception e )
         {
@@ -425,131 +430,21 @@ class WatchdogWrapper implements InvocationHandler
             throw e;
         }
 
-        lastBeginTimestamp = System.currentTimeMillis();
+        lastBeginTime = Instant.now();
         wdStatus = STATUS.ACTIVE;
         watchdogService.registerInstance( this );
     }
 
-    private class WatchdogService
-    {
-        private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
-
-        private final Set<WatchdogWrapper> activeWrappers = ConcurrentHashMap.newKeySet();
-
-        final Lock lock = new ReentrantLock();
-
-        /**
-         * timer instance used to watch all the outstanding providers
-         */
-        private volatile Timer watchDogTimer = null;
-
-        private void registerInstance( final WatchdogWrapper wdWrapper )
-        {
-            activeWrappers.add( wdWrapper );
-            checkTimer();
-        }
-
-        private void deRegisterInstance( final WatchdogWrapper wdWrapper )
-        {
-            activeWrappers.remove( wdWrapper );
-        }
-
-        /**
-         * Regulate the timer.  This is important because the timer task creates its own thread,
-         * and if the task isn't cleaned up, there could be a thread leak.
-         */
-        private void checkTimer()
-        {
-            try
-            {
-                lock.lock();
-
-                if ( watchDogTimer == null )
-                {
-                    // if there is NOT an active timer
-                    if ( !activeWrappers.isEmpty() )
-                    {
-                        // if there are active providers.
-                        LOGGER.debug( "starting up " + THREAD_NAME + ", " + settings.getWatchdogFrequency() + "ms check frequency" );
-
-                        // create a new timer
-                        watchDogTimer = new Timer( THREAD_NAME, true );
-                        watchDogTimer.schedule( new WatchdogTask(), settings.getWatchdogFrequency(), settings.getWatchdogFrequency() );
-                    }
-                }
-            }
-            finally
-            {
-                lock.unlock();
-            }
-        }
-
-        private void checkProvider( final WatchdogWrapper wdWrapper )
-        {
-            try
-            {
-                if ( wdWrapper != null )
-                {
-                    wdWrapper.checkStatus();
-                }
-            }
-            catch ( Exception e )
-            {
-                final StringBuilder sb = new StringBuilder();
-                sb.append( "error during watchdog provider idle check: " );
-                sb.append( e.getMessage() );
-                if ( wdWrapper.realProvider != null )
-                {
-                    sb.append( " for " );
-                    sb.append( wdWrapper.toString() );
-                }
-                LOGGER.warn( sb );
-            }
-        }
-
-        private class WatchdogTask extends TimerTask implements Runnable
-        {
-            public void run()
-            {
-                final Collection<WatchdogWrapper> copyCollection = new HashSet<>();
-                copyCollection.addAll( activeWrappers );
-
-                for ( final WatchdogWrapper wdWrapper : copyCollection )
-                {
-                    try
-                    {
-                        checkProvider( wdWrapper );
-                    }
-                    catch ( Throwable e )
-                    {
-                        LOGGER.error( "error during watchdog timer check: " + e.getMessage() );
-                    }
-                }
-
-                if ( copyCollection.isEmpty() )
-                {
-                    // if there are no active providers
-                    LOGGER.debug( "exiting " + THREAD_NAME + ", no connections requiring monitoring are in use" );
-                    try
-                    {
-                        lock.lock();
-
-                        // kill the timer.
-                        watchDogTimer.cancel();
-                        watchDogTimer = null;
-                    }
-                    finally
-                    {
-                        lock.unlock();
-                    }
-                }
-
-            }
-        }
-    }
-
     public boolean isIdle()
     {
-        return STATUS.IDLE.equals( wdStatus );
+        return STATUS.IDLE == wdStatus;
+    }
+
+    public String getIdentifier()
+    {
+        final ChaiProviderImplementor copiedProvider = realProvider;
+        return counter
+                + ( copiedProvider == null ? ".x" : "." + copiedProvider.getIdentifier() );
+
     }
 }

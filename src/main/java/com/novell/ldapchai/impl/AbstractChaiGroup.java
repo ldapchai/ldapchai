@@ -63,7 +63,7 @@ public abstract class AbstractChaiGroup extends AbstractChaiEntry implements Cha
         for ( final String userDN : memberDNs )
         {
             // Create the ChaiUserImpl object and add it to the ArrayList.
-            returnSet.add( getChaiProvider().getEntryFactory().createChaiUser( userDN ) );
+            returnSet.add( getChaiProvider().getEntryFactory().newChaiUser( userDN ) );
         }
         return Collections.unmodifiableSet( returnSet );
     }

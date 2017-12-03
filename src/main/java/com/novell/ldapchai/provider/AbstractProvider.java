@@ -58,7 +58,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     private DirectoryVendor cachedDirectoryVendor;
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
-    private int counter = ID_COUNTER.getAndIncrement();
+    private final int counter = ID_COUNTER.getAndIncrement();
 
 
     static String methodToDebugStr( final Method theMethod, final Object... parameters )
@@ -156,6 +156,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     public void close()
     {
         this.state = ConnectionState.CLOSED;
+        this.providerFactory.getCentralService().deRegisterProvider( this );
     }
 
     public ChaiConfiguration getChaiConfiguration()
@@ -683,7 +684,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     public ChaiEntryFactory getEntryFactory()
     {
-        return ChaiEntryFactory.createChaiFactory( this );
+        return ChaiEntryFactory.newChaiFactory( this );
     }
 
     protected ChaiProviderInputValidator getInputValidator()

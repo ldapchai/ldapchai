@@ -175,13 +175,13 @@ public class EdirEntries
         provider.createEntry( entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap() );
 
         //Now build an ldapentry object to add attributes to it
-        final ChaiEntry theObject = provider.getEntryFactory().createChaiEntry( entryDN.toString() );
+        final ChaiEntry theObject = provider.getEntryFactory().newChaiEntry( entryDN.toString() );
 
         //Add the description
         theObject.writeStringAttribute( ChaiConstant.ATTR_LDAP_DESCRIPTION, name );
 
         //Return the newly created group.
-        return provider.getEntryFactory().createChaiGroup( entryDN.toString() );
+        return provider.getEntryFactory().newChaiGroup( entryDN.toString() );
     }
 
     /**
@@ -283,7 +283,7 @@ public class EdirEntries
         provider.createEntry( userDN, ChaiConstant.OBJECTCLASS_BASE_LDAP_USER, createAttributes );
 
         //lets create a user object
-        return provider.getEntryFactory().createChaiUser( userDN );
+        return provider.getEntryFactory().newChaiUser( userDN );
     }
 
     private static ChaiEntry findPartitionRoot( final ChaiEntry theEntry )
@@ -621,7 +621,7 @@ public class EdirEntries
                     final String policyDN = polcyInfoResponse.getPwdPolicyDNStr();
                     if ( policyDN != null )
                     {
-                        return chaiEntryFactory.createChaiEntry( policyDN );
+                        return chaiEntryFactory.newChaiEntry( policyDN );
                     }
                 }
                 return null;
@@ -633,7 +633,7 @@ public class EdirEntries
                     final String policyDN = theUser.readStringAttribute( "nspmPasswordPolicyDN" );
                     if ( policyDN != null && policyDN.length() > 0 )
                     {
-                        return chaiEntryFactory.createChaiEntry( policyDN );
+                        return chaiEntryFactory.newChaiEntry( policyDN );
                     }
                 }
 
@@ -646,7 +646,7 @@ public class EdirEntries
                         final String policyDN = parentObject.readStringAttribute( "nspmPasswordPolicyDN" );
                         if ( policyDN != null && policyDN.length() > 0 )
                         {
-                            return chaiEntryFactory.createChaiEntry( policyDN );
+                            return chaiEntryFactory.newChaiEntry( policyDN );
                         }
                     }
                 }
@@ -661,7 +661,7 @@ public class EdirEntries
                             final String policyDN = partitonRoot.readStringAttribute( "nspmPasswordPolicyDN" );
                             if ( policyDN != null && policyDN.length() > 0 )
                             {
-                                return chaiEntryFactory.createChaiEntry( policyDN );
+                                return chaiEntryFactory.newChaiEntry( policyDN );
                             }
                         }
                     }
@@ -669,15 +669,15 @@ public class EdirEntries
 
                 // look at policy object
                 {
-                    final ChaiEntry securityContainer = chaiEntryFactory.createChaiEntry( "cn=Security" );
+                    final ChaiEntry securityContainer = chaiEntryFactory.newChaiEntry( "cn=Security" );
                     final String loginPolicyDN = securityContainer.readStringAttribute( "sASLoginPolicyDN" );
                     if ( loginPolicyDN != null && loginPolicyDN.length() > 0 )
                     {
-                        final ChaiEntry loginPolicy = chaiEntryFactory.createChaiEntry( loginPolicyDN );
+                        final ChaiEntry loginPolicy = chaiEntryFactory.newChaiEntry( loginPolicyDN );
                         final String policyDN = loginPolicy.readStringAttribute( "nspmPasswordPolicyDN" );
                         if ( policyDN != null && policyDN.length() > 0 )
                         {
-                            return chaiEntryFactory.createChaiEntry( policyDN );
+                            return chaiEntryFactory.newChaiEntry( policyDN );
                         }
                     }
                 }

@@ -39,17 +39,17 @@ public class ADVendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new ADErrorMap();
 
-    public User createChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    public User newChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
         return new UserImpl( userDN, chaiProvider );
     }
 
-    public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
+    public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
         return new GroupImpl( entryDN, provider );
     }
 
-    public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
+    public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
         return new TopImpl( entryDN, provider );
     }

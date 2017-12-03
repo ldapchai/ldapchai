@@ -72,7 +72,7 @@ public class NmasCrFactory
         }
 
         final List<Challenge> challenges = new ArrayList<>();
-        final ChaiEntry csSetEntry = provider.getEntryFactory().createChaiEntry( challengeSetDN );
+        final ChaiEntry csSetEntry = provider.getEntryFactory().newChaiEntry( challengeSetDN );
 
         final Map<String, String> allValues = csSetEntry.readStringAttributes( Collections.emptySet() );
 

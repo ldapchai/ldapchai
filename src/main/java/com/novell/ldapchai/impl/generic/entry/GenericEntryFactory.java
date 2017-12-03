@@ -40,17 +40,17 @@ public class GenericEntryFactory implements VendorFactory
 
     private static ErrorMap errorMap;
 
-    public ChaiUser createChaiUser( final String entryDN, final ChaiProvider provider )
+    public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
         return new GenericChaiUser( entryDN, provider );
     }
 
-    public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
+    public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
         return new GenericChaiGroup( entryDN, provider );
     }
 
-    public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
+    public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
         return new GenericChaiEntry( entryDN, provider );
     }

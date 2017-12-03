@@ -19,16 +19,18 @@
 
 package com.novell.ldapchai.provider;
 
-import java.io.Serializable;
 import java.time.Instant;
+import java.util.Map;
 
 /**
- * Tracks the statistics for a {@link ChaiProvider}.  For a list of available statistics, see {@link com.novell.ldapchai.provider.ProviderStatistics.Statistic}.
+ * Tracks the statistics for a {@link ChaiProvider}.  For a list of available statistics, see
+ * {@link com.novell.ldapchai.provider.ProviderStatistics.IncrementerStatistic} and
+ * {@link com.novell.ldapchai.provider.ProviderStatistics.TimestampStatistic}.
  *
  * @author Jason D. Rivard
  * @see com.novell.ldapchai.provider.ChaiSetting#STATISTICS_ENABLE
  */
-public interface ProviderStatistics extends Serializable
+public interface ProviderStatistics
 {
 
     /**
@@ -51,9 +53,14 @@ public interface ProviderStatistics extends Serializable
         SEARCH_COUNT,
 
         /**
-         * Total number of ldap operations operations
+         * Total number of ldap operations
          */
         OPERATION_COUNT,
+
+        /**
+         * Total number of ldap bind operations
+         */
+        BIND_COUNT,
 
         /**
          * Total number of ldap unavailable exceptions thrown
@@ -90,5 +97,11 @@ public interface ProviderStatistics extends Serializable
     long getIncrementorStatistic( IncrementerStatistic statistic );
 
     Instant getTimestampStatistic( TimestampStatistic statistic );
+
+    /**
+     * Generate a string key/value map with all statistics suitable for debug logging.
+     * @return
+     */
+    Map<String, String> allStatistics();
 
 }

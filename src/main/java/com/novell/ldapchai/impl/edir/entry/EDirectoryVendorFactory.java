@@ -45,17 +45,17 @@ public class EDirectoryVendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
-    public InetOrgPerson createChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    public InetOrgPerson newChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
         return new InetOrgPersonImpl( userDN, chaiProvider );
     }
 
-    public GroupOfNames createChaiGroup( final String userDN, final ChaiProvider chaiProvider )
+    public GroupOfNames newChaiGroup( final String userDN, final ChaiProvider chaiProvider )
     {
         return new GroupOfNamesImpl( userDN, chaiProvider );
     }
 
-    public ChaiEntry createChaiEntry( final String userDN, final ChaiProvider chaiProvider )
+    public ChaiEntry newChaiEntry( final String userDN, final ChaiProvider chaiProvider )
     {
         return new ChaiEntryImpl( userDN, chaiProvider );
     }

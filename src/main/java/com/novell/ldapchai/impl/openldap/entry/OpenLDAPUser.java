@@ -50,7 +50,7 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
         for ( final String group : groups )
         {
-            returnGroups.add( chaiProvider.getEntryFactory().createChaiGroup( group ) );
+            returnGroups.add( chaiProvider.getEntryFactory().newChaiGroup( group ) );
         }
         return Collections.unmodifiableSet( returnGroups );
     }

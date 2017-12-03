@@ -63,7 +63,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         {
             return null;
         }
-        return getChaiProvider().getEntryFactory().createChaiUser( mgrDN );
+        return getChaiProvider().getEntryFactory().newChaiUser( mgrDN );
     }
 
     public final Set<ChaiUser> getDirectReports()
@@ -73,7 +73,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         final Set<ChaiUser> reports = new LinkedHashSet<>( reportDNs.size() );
         for ( final String reporteeDN : reportDNs )
         {
-            reports.add( getChaiProvider().getEntryFactory().createChaiUser( reporteeDN ) );
+            reports.add( getChaiProvider().getEntryFactory().newChaiUser( reporteeDN ) );
         }
         return Collections.unmodifiableSet( reports );
     }
@@ -85,7 +85,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP );
         for ( final String group : groups )
         {
-            returnGroups.add( getChaiProvider().getEntryFactory().createChaiGroup( group ) );
+            returnGroups.add( getChaiProvider().getEntryFactory().newChaiGroup( group ) );
         }
         return Collections.unmodifiableSet( returnGroups );
     }
@@ -98,7 +98,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         {
             return null;
         }
-        return getChaiProvider().getEntryFactory().createChaiUser( mgrDN );
+        return getChaiProvider().getEntryFactory().newChaiUser( mgrDN );
     }
 
 

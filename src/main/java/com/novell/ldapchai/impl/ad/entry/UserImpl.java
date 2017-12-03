@@ -72,7 +72,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
         for ( final String group : groups )
         {
-            returnGroups.add( getChaiProvider().getEntryFactory().createChaiGroup( group ) );
+            returnGroups.add( getChaiProvider().getEntryFactory().newChaiGroup( group ) );
         }
         return Collections.unmodifiableSet( returnGroups );
     }

@@ -246,20 +246,6 @@ public enum ChaiSetting
      */
     WATCHDOG_DISABLE_IF_PW_EXPIRED( "chai.watchdog.disableIfPwExpired", "true", true, Validator.BOOLEAN_VALIDATOR ),
 
-    /**
-     * The frequency that watchdog timeouts are checked (in ms).  The watchdog implementation is only guarenteed
-     * to check timeouts at this frequency.  This will have a direct impact on the enforcement of timeouts.  For
-     * example, if the idle timeout is 30 seconds, and the frequency is 30 seconds, then connections may actually
-     * be able to remain idle between 30 and 60 seconds.
-     * <p>
-     * Note that this setting MUST be set before any ChaiProvider instances are created.
-     * <p>
-     * <table border="0">
-     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.watchdog.frequency</td></tr>
-     * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
-     * </table>
-     */
-    WATCHDOG_CHECK_FREQUENCY( "chai.connection.watchdog.frequency", "1000", true, Validator.INTEGER_VALIDATOR ),
 
     /**
      * Sets the Chai Provider to use a promiscuous SSL socket factory when making ldaps connections.  By default
@@ -644,7 +630,7 @@ public enum ChaiSetting
         this.validator.validate( value );
     }
 
-    private interface Validator extends Serializable
+    interface Validator extends Serializable
     {
         void validate( String value );
 

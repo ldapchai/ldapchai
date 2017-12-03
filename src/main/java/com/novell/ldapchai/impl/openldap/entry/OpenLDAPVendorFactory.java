@@ -40,17 +40,17 @@ public class OpenLDAPVendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
-    public ChaiUser createChaiUser( final String entryDN, final ChaiProvider provider )
+    public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
         return new OpenLDAPUser( entryDN, provider );
     }
 
-    public ChaiGroup createChaiGroup( final String entryDN, final ChaiProvider provider )
+    public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
         return new OpenLDAPGroup( entryDN, provider );
     }
 
-    public ChaiEntry createChaiEntry( final String entryDN, final ChaiProvider provider )
+    public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
         return new OpenLDAPEntry( entryDN, provider );
     }

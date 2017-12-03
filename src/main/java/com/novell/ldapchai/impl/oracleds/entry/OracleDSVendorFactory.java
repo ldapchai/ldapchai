@@ -36,17 +36,17 @@ public class OracleDSVendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new OracleDSErrorMap();
 
-    public InetOrgPerson createChaiUser( final String userDN, final ChaiProvider chaiProvider )
+    public InetOrgPerson newChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
         return new InetOrgPerson( userDN, chaiProvider );
     }
 
-    public GroupOfUniqueNames createChaiGroup( final String userDN, final ChaiProvider chaiProvider )
+    public GroupOfUniqueNames newChaiGroup( final String userDN, final ChaiProvider chaiProvider )
     {
         return new GroupOfUniqueNames( userDN, chaiProvider );
     }
 
-    public OracleDSEntry createChaiEntry( final String userDN, final ChaiProvider chaiProvider )
+    public OracleDSEntry newChaiEntry( final String userDN, final ChaiProvider chaiProvider )
     {
         return new OracleDSEntry( userDN, chaiProvider );
     }

@@ -18,11 +18,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-import com.novell.ldapchai.ChaiFactory;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiException;
+import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderFactory;
 
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class ReadUserData {
     public static void main(final String[] args) {
         String ldapURL =      "ldap://ldaphost:389";
         String ldapBindDN =   "cn=admin,ou=ou,o=o";
-        String ldapBindPW =   "novell";
+        String ldapBindPW =   "password";
 
         if (args.length == 3) {
             ldapURL = args[0];
@@ -47,8 +48,13 @@ public class ReadUserData {
         }
 
         try {
+            // create provider factory
+            final ChaiProviderFactory chaiProviderFactory = ChaiProviderFactory.newProviderFactory();
+
             // create a provider using the standard JNDI factory.
-            ChaiUser user = ChaiFactory.quickProvider(ldapURL,ldapBindDN,ldapBindPW);
+            ChaiProvider chaiProvider = chaiProviderFactory.newProvider(ldapURL,ldapBindDN,ldapBindPW);
+
+            ChaiUser user = chaiProvider.getEntryFactory().newChaiUser( ldapBindDN );
 
             // read the value of the bindDN's cn attribute, and print it to stdout.
             Map<String,String> allUserAttributes = user.readStringAttributes(null);
