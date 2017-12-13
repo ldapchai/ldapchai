@@ -100,23 +100,24 @@ class WatchdogWrapper implements InvocationHandler
     private final AtomicInteger outstandingOperations = new AtomicInteger( 0 );
 
     /**
-     * last time an ldap operation was initiated
+     * last time an ldap operation was initiated.
      */
     private volatile Instant lastBeginTime = Instant.now();
 
     /**
-     * last time an ldap operation was completed
+     * last time an ldap operation was completed.
      */
     private volatile Instant lastFinishTime = Instant.now();
 
     /**
-     * current wdStatus of this WatchdogWrapper
+     * current wdStatus of this WatchdogWrapper.
      */
     private volatile STATUS wdStatus = STATUS.ACTIVE;
 
     /**
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.
      *
+     * @param chaiProviderFactory the factory used to create the provider
      * @param chaiProvider a pre-existing {@code ChaiProvider}
      * @return a wrapped {@code ChaiProvider} instance.
      */

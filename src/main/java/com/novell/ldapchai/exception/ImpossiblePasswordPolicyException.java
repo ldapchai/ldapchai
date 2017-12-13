@@ -21,9 +21,8 @@ package com.novell.ldapchai.exception;
 
 /**
  * Indicates that the policy is not possible to fulfill.  For example, if the
- * policy's minimum length is larger then the maximum length
- * <p>
- * The contents of the message will include a brief english discription of the
+ * policy's minimum length is larger then the maximum length.  The contents of
+ * the message will include a brief english description of the
  * error, suitable for debugging.
  *
  * @author Jason D. Rivard
@@ -32,7 +31,7 @@ public class ImpossiblePasswordPolicyException extends RuntimeException
 {
 
     /**
-     * Enumeration of problems with a password policy
+     * Enumeration of problems with a password policy.
      */
     public enum ErrorEnum
     {

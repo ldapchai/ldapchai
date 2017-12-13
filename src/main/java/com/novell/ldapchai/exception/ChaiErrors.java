@@ -27,7 +27,6 @@ import com.novell.ldapchai.provider.DirectoryVendor;
  */
 public final class ChaiErrors
 {
-
     private ChaiErrors()
     {
     }
@@ -48,8 +47,9 @@ public final class ChaiErrors
     }
 
     /**
-     * Indicates if the error is related to authentication
+     * Indicates if the error is related to authentication.
      *
+     * @param message error message debug text
      * @return true if the error is defined as being related to authentication.
      */
     static boolean isAuthenticationRelated ( final String message )
@@ -67,15 +67,16 @@ public final class ChaiErrors
     }
 
     /**
-     * Indicates if the error is deemed permanent or temporary.
-     * <p>
-     * Permanent errors are those that, if retried, the error would most likely
-     * occur indefinitely.  This would generally include any error that if repeated against
-     * a different server, the error returned would be the same.
-     * <p>
-     * Fail-over mechanisms use this indication to decide if an operation that
-     * generated an error should be retried.
+     * <p>Indicates if the error is deemed permanent or temporary.</p>
      *
+     * <p>Permanent errors are those that, if retried, the error would most likely
+     * occur indefinitely.  This would generally include any error that if repeated against
+     * a different server, the error returned would be the same.</p>
+     *
+     * <p>Fail-over mechanisms use this indication to decide if an operation that
+     * generated an error should be retried.</p>
+     *
+     * @param message error message debug text
      * @return true if the error is defined as permanent
      */
     static boolean isPermanent ( final String message )

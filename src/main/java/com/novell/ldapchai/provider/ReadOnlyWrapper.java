@@ -29,7 +29,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
 /**
- * Read only wrapper
+ * Read only wrapper.
  *
  * @author Jason D. Rivard
  * @see com.novell.ldapchai.provider.ChaiSetting#READONLY

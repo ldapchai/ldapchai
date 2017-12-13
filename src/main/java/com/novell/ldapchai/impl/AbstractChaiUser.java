@@ -36,8 +36,7 @@ import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiUser} interface.
- * <p>
- * Clients looking to obtain a {@code ChaiUser} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
+ * Clients looking to obtain a {@code ChaiUser} instance should look to {@link com.novell.ldapchai.ChaiEntryFactory}.
  *
  * @author Jason D. Rivard
  */
@@ -241,12 +240,6 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
             throws ChaiOperationException, ChaiUnavailableException
     {
         return !readBooleanAttribute( ATTR_LOGIN_DISABLED );
-    }
-
-    public void unlock()
-            throws ChaiOperationException, ChaiUnavailableException
-    {
-        this.unlockPassword();
     }
 
     public boolean isLocked()

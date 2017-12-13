@@ -71,11 +71,12 @@ public class ChaiConfiguration
     }
 
     /**
-     * Construct a default {@code ChaiConfiguration}
+     * Construct a default {@code ChaiConfiguration}.
      *
      * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
      * @param bindPassword password for the bind DN.
      * @param ldapURL      ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
+     * @return a new configuration instance.
      */
     public static ChaiConfiguration newConfiguration( final String ldapURL, final String bindDN, final String bindPassword )
     {
@@ -83,13 +84,18 @@ public class ChaiConfiguration
     }
 
     /**
-     * Construct a default {@code ChaiConfiguration}
+     * Construct a default {@code ChaiConfiguration}.
      *
      * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
      * @param bindPassword password for the bind DN.
      * @param ldapURLs      ldap server and port in url format, example: <i>ldap://127.0.0.1:389</i>
+     * @return A new {@code ChaiConfiguration} instance.
      */
-    public static ChaiConfiguration newConfiguration( final List<String> ldapURLs, final String bindDN, final String bindPassword )
+    public static ChaiConfiguration newConfiguration(
+            final List<String> ldapURLs,
+            final String bindDN,
+            final String bindPassword
+    )
     {
         return new ChaiConfigurationBuilder( ldapURLs, bindDN, bindPassword ).build();
     }
@@ -103,6 +109,10 @@ public class ChaiConfiguration
     {
         return implementationConfiguration;
     }
+
+    /**
+     *
+     */
 
     /**
      * Returns a string value suitable for debugging.  Sensitive values such as passwords are
@@ -144,7 +154,7 @@ public class ChaiConfiguration
     }
 
     /**
-     * Get an individual setting value
+     * Get an individual setting value.
      *
      * @param setting the setting to return
      * @return the value or the default value if no value exists.
@@ -155,7 +165,7 @@ public class ChaiConfiguration
     }
 
     /**
-     * Get an individual setting value and test it as a boolean
+     * Get an individual setting value and test it as a boolean.
      *
      * @param setting the setting to return
      * @return the value or the default value if no value exists.
@@ -257,7 +267,7 @@ public class ChaiConfiguration
         }
 
         /**
-         * Construct a default {@code ChaiConfiguration}
+         * Construct a default {@code ChaiConfiguration}.
          *
          * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
          * @param bindPassword password for the bind DN.
@@ -269,7 +279,7 @@ public class ChaiConfiguration
         }
 
         /**
-         * Construct a default {@code ChaiConfiguration}
+         * Construct a default {@code ChaiConfiguration}.
          *
          * @param bindDN       ldap bind DN, in ldap fully qualified syntax.  Also used as the DN of the returned ChaiUser.
          * @param bindPassword password for the bind DN.
@@ -294,6 +304,8 @@ public class ChaiConfiguration
         /**
          * Construct a new configuration based on the input configuration settings, including the bind DN, password and ldap URLs.  The
          * new instance will be unlocked, regardless of the lock status of the input configuration.
+         *
+         * @param existingConfiguration A configuration instance to copy from.
          */
         public ChaiConfigurationBuilder( final ChaiConfiguration existingConfiguration )
         {
@@ -303,11 +315,11 @@ public class ChaiConfiguration
         }
 
         /**
-         * Set an object to be used for the {@link ChaiProvider} implementation to be used for its configuration.  Depending
-         * on the implementation, this could be any type of object such as a Properties, Map, or even an implementation specific object.
-         * <p>
-         * When used with the default provider, {@code JNDIProviderImpl}, this object must be a {@link java.util.Hashtable} environment as specified by the
-         * {@link javax.naming.ldap.InitialLdapContext}.
+         * <p>Set an object to be used for the {@link ChaiProvider} implementation to be used for its configuration.  Depending
+         * on the implementation, this could be any type of object such as a Properties, Map, or even an implementation specific object.</p>
+         *
+         * <p>When used with the default provider, {@code JNDIProviderImpl}, this object must be a {@link java.util.Hashtable} environment as specified by the
+         * {@link javax.naming.ldap.InitialLdapContext}.</p>
          *
          * @param implementationConfiguration an object suitable to be used as a configuration for whatever {@code ChaiProvider} implementation is to be used.
          * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
@@ -321,7 +333,7 @@ public class ChaiConfiguration
         /**
          * Add a TrustManager to be used when connecting to ssl ldap servers.
          *
-         * @param trustManager A serializable trustmanager to be used for connecting to ldap servers.
+         * @param trustManager A serializable {@link X509TrustManager} to be used for connecting to ldap servers.
          * @return this instance of the {@link ChaiConfiguration} to facilitate chaining
          */
         public ChaiConfigurationBuilder setTrustManager( final X509TrustManager[] trustManager )
@@ -332,10 +344,11 @@ public class ChaiConfiguration
 
         /**
          * Set the settings in the {@code ChaiConfiguration}.  Each setting key is available as a constant publicly defined by
-         * ChaiConfiguration.   The default settings are available in {@link #getDefaultSettings()}.
+         * ChaiConfiguration.
          *
          * @param settings a Properties containing settings to be used by the provider.  If a setting is missing in the
          *                 supplied Properties, the current setting will be unchanged.
+         * @return This builder instance.
          */
         public ChaiConfigurationBuilder setSettings( final Properties settings )
         {
@@ -356,7 +369,7 @@ public class ChaiConfiguration
         {
             for ( final Map.Entry<ChaiSetting, String> entry : settings.entrySet() )
             {
-                    setSetting( entry.getKey(), entry.getValue() );
+                setSetting( entry.getKey(), entry.getValue() );
             }
             return this;
         }

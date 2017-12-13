@@ -49,7 +49,7 @@ public final class ChaiCrFactory
 
 
     /**
-     * Constant used to indicate user supplied question
+     * Constant used to indicate user supplied question.
      */
     public static final String USER_SUPPLIED_QUESTION = "%user%";
 
@@ -268,14 +268,14 @@ public final class ChaiCrFactory
 
     /**
      * Read the user's configured ResponseSet from the directory.
-     * <p>
-     * A caller would typically use the returned {@code ResponseSet} for testing responses by calling the ResponseSet's
-     * {@link ResponseSet#test(java.util.Map<com.novell.ldapchai.cr.Challenge,java.lang.String>)} method.
+     * A caller would typically use the returned {@code ResponseSet} for testing responses by calling
+     * {@link ResponseSet#test(Map)}.
      *
      * @param user ChaiUser to read responses for
      * @return A valid ResponseSet if found, otherwise null.
-     * @throws ChaiUnavailableException                              If the directory server(s) are unavailable
-     * @throws com.novell.ldapchai.exception.ChaiValidationException when there is a logical problem with the response set data, such as more randoms required then exist
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     * @throws ChaiOperationException   If an error is encountered during the operation
+     * @throws ChaiValidationException when there is a logical problem with the response set data, such as more randoms required then exist
      */
     public static ChaiResponseSet readChaiResponseSet( final ChaiUser user )
             throws ChaiUnavailableException, ChaiValidationException, ChaiOperationException

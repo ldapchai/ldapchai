@@ -28,17 +28,18 @@ import com.novell.ldapchai.util.ChaiLogger;
 
 
 /**
- * Factory for {@link ChaiEntry} and its subclasses.  Instances are returned based
+ * <p>Factory for {@link ChaiEntry} and its subclasses.  Instances are returned based
  * on the supplied {@link ChaiProvider}'s settings and state.   In particular,
  * {@link com.novell.ldapchai.provider.ChaiProvider#getDirectoryVendor()} is called, and
- * an implementing class appropriate for the vendor type is used.
- * </p>
- * For clarity the "create"
- * methods in this class create <i>instances</i> of {@code ChaiEntry}.  They do not
- * actualy create a new entry in the ldap directory.
- * <p>
+ * an implementing class appropriate for the vendor type is used.</p>
+ *
+ * <p>For clarity the "new" methods in this class create <i>instances</i> of {@code ChaiEntry}.  They
+ * do not create a new entry in the ldap directory.</p>
+ *
  * {@code ChaiProvider} instances can be obtained using the
- * {@link com.novell.ldapchai.provider.ChaiProviderFactory} factory.
+ * {@link com.novell.ldapchai.provider.ChaiProviderFactory} factory, but typically it's more expedient
+ * to obtain a {@code {@link ChaiEntryFactory}} by using
+ * {@link ChaiProvider#getEntryFactory()}.
  *
  * @author Jason D. Rivard
  */
@@ -54,6 +55,7 @@ public final class ChaiEntryFactory
      *
      * @param entryDN A valid ldap entry DN (Distinguished Name) of an entry
      * @return A valid {@code ChaiEntry}
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     public ChaiEntry newChaiEntry( final String entryDN )
             throws ChaiUnavailableException
@@ -67,6 +69,7 @@ public final class ChaiEntryFactory
      *
      * @param groupDN A valid ldap entry DN (Distinguished Name) of an entry
      * @return A valid {@code ChaiGroup}
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     public ChaiGroup newChaiGroup( final String groupDN )
             throws ChaiUnavailableException
@@ -80,6 +83,7 @@ public final class ChaiEntryFactory
      *
      * @param userDN A valid ldap entry DN (Distinguished Name) of an entry
      * @return A valid {@code ChaiUser}
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     public ChaiUser newChaiUser( final String userDN )
             throws ChaiUnavailableException
@@ -92,6 +96,7 @@ public final class ChaiEntryFactory
      * Returns a {@code ChaiUser} instance representing the supplied <i>userDN</i>.
      *
      * @return A valid {@code ChaiUser}
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     public ErrorMap getErrorMap()
             throws ChaiUnavailableException
@@ -106,6 +111,7 @@ public final class ChaiEntryFactory
      * @param vendor A valid and functioning {@code ChaiProvider}.  The {@code ChaiProvider}'s ldap
      *               connection will be used by the {@code ChaiGroup}.
      * @return A valid {@code ChaiUser}
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     public ErrorMap getErrorMap( final DirectoryVendor vendor )
             throws ChaiUnavailableException

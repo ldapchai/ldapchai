@@ -44,22 +44,21 @@ import java.util.Set;
 
 
 /**
- * An immutable class describing a user password policy.  {@code nspmPasswordPolicyImpl} features directly
- * map to features and options that are part of the Universal Password policy object (ldap class <i>nspmPasswordPolicyImpl</i>).
- * <p>
- * {@code nspmPasswordPolicyImpl} instances are backed by a {@link java.util.Properties} keymap.  The key
+ * <p>An immutable class describing a user password policy.  {@code nspmPasswordPolicyImpl} features directly
+ * map to features and options that are part of the Universal Password policy object (ldap class <i>nspmPasswordPolicyImpl</i>).</p>
+ *
+ * <p>{@code nspmPasswordPolicyImpl} instances are backed by a {@link java.util.Properties} keymap.  The key
  * values are all defined as public fields of {@code PasswordPolicy}.  Each of these keys are
- * the attribute names found on a ldap <i>nspmPasswordPolicyImpl</i> entry.
- * <p>
- * This class contains no mechanisms to contact an ldap directory.  Specifically,
+ * the attribute names found on a ldap <i>nspmPasswordPolicyImpl</i> entry.</p>
+ *
+ * <p>This class contains no mechanisms to contact an ldap directory.  Specifically,
  * it does not hold a {@link com.novell.ldapchai.provider.ChaiProvider} reference.  {@code nspmPasswordPolicyImpl} instances
  * do hold a <i>sourceDN</i> attribute, however this is for reference use only.  {@code nspmPasswordPolicyImpl} instances
- * do not use the <i>sourceDN</i> value themselves.
- * <p>
+ * do not use the <i>sourceDN</i> value themselves.</p>
+ *
  * <i>Notes for implementors:</i>
- * <p>
- * This class is designed to be subclassed for feature enhancements.  Subclasses can add their own
- * settings to the properties environment.
+ * <p>This class is designed to be subclassed for feature enhancements.  Subclasses can add their own
+ * settings to the properties environment.</p>
  *
  * @author Jason D. Rivard
  */
@@ -232,7 +231,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         private int bitMask = 0;
 
         /**
-         * Individual option values
+         * Individual option values.
          */
         private enum Option
         {
@@ -275,7 +274,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x01, On set password request the NDS password hash will be removed by SPM
+         * 0x01, On set password request the NDS password hash will be removed by SPM.
          *
          * @return true if the bit is set
          */
@@ -285,7 +284,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x02, On set password request the NDS password hash will not be set by SPM
+         * 0x02, On set password request the NDS password hash will not be set by SPM.
          *
          * @return true if the bit is set
          */
@@ -295,7 +294,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x04, On set password request the SpanShapeRenderer.Simple password will not be set by SPM
+         * 0x04, On set password request the SpanShapeRenderer. Simple password will not be set by SPM.
          *
          * @return true if the bit is set
          */
@@ -305,7 +304,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x10, Allow password retrieval by self
+         * 0x10, Allow password retrieval by self.
          *
          * @return true if the bit is set
          */
@@ -315,7 +314,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x20, Allow password retrieval by admin
+         * 0x20, Allow password retrieval by admin.
          *
          * @return true if the bit is set
          */
@@ -325,7 +324,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x40, Allow password retrieval by password agents
+         * 0x40, Allow password retrieval by password agents.
          *
          * @return true if the bit is set
          */
@@ -335,7 +334,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x100, Password enabled
+         * 0x100, Password enabled.
          *
          * @return true if the bit is set
          */
@@ -345,7 +344,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * 0x200, Advanced password policy enabled
+         * 0x200, Advanced password policy enabled.
          *
          * @return true if the bit is set
          */
@@ -355,7 +354,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
 
         /**
-         * String representation, suitable for debugging
+         * String representation, suitable for debugging.
          *
          * @return a String useful for debugging
          */

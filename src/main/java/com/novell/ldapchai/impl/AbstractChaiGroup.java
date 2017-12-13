@@ -32,8 +32,7 @@ import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiGroup} interface.
- * <p>
- * Clients looking to obtain a {@code ChaiGroup} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
+ * Clients looking to obtain a {@code ChaiGroup} instance should look to {@link com.novell.ldapchai.ChaiEntryFactory}.
  *
  * @author Jason D. Rivard
  */

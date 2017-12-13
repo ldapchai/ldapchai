@@ -57,13 +57,10 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * JLDAP {@code ChaiProvider} implementation.  This
- * class wraps the JLDAP api at <a href="http://www.openldap.org/jldap/">OpenLDAP</a>.
- * <p>
- * Instances can be obtained using {@link ChaiProviderFactory}.
- * <p>
- * The current implementation does not support fail-over.  If multiple LDAP urls are specified
- * in the configuration, only the first one is used.
+ * <p>JLDAP {@code ChaiProvider} implementation.  This
+ * class wraps the JLDAP api at <a href="http://www.openldap.org/jldap/">OpenLDAP JLDAP API</a></p>
+ *
+ * <p>Instances can be obtained using {@link ChaiProviderFactory}.</p>
  *
  * @author Jason D. Rivard
  */
@@ -176,7 +173,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         super.close();
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public boolean compareStringAttribute( final String entryDN, final String attribute, final String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -194,8 +191,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void createEntry( final String entryDN, final String baseObjectClass, final Map<String, String> stringAttributes )
             throws ChaiOperationException
     {
@@ -203,8 +200,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         this.createEntry( entryDN, Collections.singleton( baseObjectClass ), stringAttributes );
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void createEntry( final String entryDN, final Set<String> baseObjectClasses, final Map<String, String> stringAttributes )
             throws ChaiOperationException
     {
@@ -232,8 +229,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void deleteEntry( final String entryDN )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -250,8 +247,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void deleteStringAttributeValue( final String entryDN, final String attribute, final String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -271,7 +268,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public ExtendedResponse extendedOperation( final ExtendedRequest request )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -308,7 +305,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return null;
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public byte[][] readMultiByteAttribute( final String entryDN, final String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -327,7 +324,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public Set<String> readMultiStringAttribute( final String entryDN, final String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -353,7 +350,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public String readStringAttribute( final String entryDN, final String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -363,7 +360,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return readStringAttributes( entryDN, Collections.singleton( attribute ) ).get( attribute );
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public Map<String, String> readStringAttributes( final String entryDN, final Set<String> attributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -389,8 +386,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void replaceStringAttribute( final String entryDN, final String attributeName, final String oldValue, final String newValue )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -413,7 +410,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public Map<String, Map<String, String>> search( final String baseDN, final SearchHelper searchHelper )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -438,7 +435,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return returnMap;
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -453,7 +450,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return search( baseDN, searchHelper );
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public Map<String, Map<String, List<String>>> searchMultiValues(
             final String baseDN,
             final SearchHelper searchHelper )
@@ -465,7 +462,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return searchImpl( baseDN, searchHelper, false );
     }
 
-    @ChaiProviderImplementor.LdapOperation
+    @ChaiProvider.LdapOperation
     public Map<String, Map<String, List<String>>> searchMultiValues(
             final String baseDN,
             final String filter,
@@ -484,16 +481,16 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         return searchImpl( baseDN, searchHelper, false );
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void writeBinaryAttribute( final String entryDN, final String attribute, final byte[][] values, final boolean overwrite )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         writeBinaryAttribute( entryDN, attribute, values, overwrite, null );
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void writeBinaryAttribute(
             final String entryDN,
             final String attribute,
@@ -533,8 +530,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void replaceBinaryAttribute( final String entryDN, final String attribute, final byte[] oldValue, final byte[] newValue )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -557,8 +554,8 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
     }
 
-    @ChaiProviderImplementor.LdapOperation
-    @ChaiProviderImplementor.ModifyOperation
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
     public void writeStringAttribute( final String entryDN, final String attribute, final Set<String> values, final boolean overwrite )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {

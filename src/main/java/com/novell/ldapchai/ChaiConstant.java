@@ -26,21 +26,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
- * Constants used by the Chai API. In general, it is encouraged to use the
- * constants defined here for attribute names instead of arbitrary strings. For
- * example: <h3>Discouraged</h3>
- * <p>
- * <pre>
- * chaiUser.readStringAttribute(&quot;givenName&quot;);
- * </pre>
- * <p>
- * <h3>Recommended</h3>
- * <p>
- * <pre>
- * chaiUser.readStringAttribute(ChaiConstant.ATTR_LDAP_GIVEN_NAME);
- * </pre>
- * <p>
- * See the Constant Field Definitions for a list of actual values.
+ * Constants used by the Chai API.
  *
  * @author Jason D. Rivard
  */
@@ -49,27 +35,27 @@ public interface ChaiConstant
 
 
     /**
-     * Attribute name to define the Object Class
+     * Attribute name to define the Object Class.
      */
     String ATTR_LDAP_OBJECTCLASS = "objectClass";
 
     /**
-     * Attribute name to define the CN
+     * Attribute name to define the CN.
      */
     String ATTR_LDAP_COMMON_NAME = "cn";
 
     /**
-     * Attribute name to define the UID or uniqueID
+     * Attribute name to define the UID or uniqueID.
      */
     String ATTR_LDAP_UID = "uid";
 
     /**
-     * Attribute name to define the Company Name
+     * Attribute name to define the Company Name.
      */
     String ATTR_LDAP_DESCRIPTION = "description";
 
     /**
-     * Attribute name to define the user password (Write Only)
+     * Attribute name to define the user password (Write Only).
      */
     String ATTR_LDAP_USER_PASSWORD = "userPassword";
 
@@ -79,32 +65,32 @@ public interface ChaiConstant
     String ATTR_LDAP_PASSWORD_EXPIRE_TIME = "passwordExpirationTime";
 
     /**
-     * Attribute name to define the user's password expiration interval
+     * Attribute name to define the user's password expiration interval.
      */
     String ATTR_LDAP_PASSWORD_EXPIRE_INTERVAL = "passwordExpirationInterval";
 
     /**
-     * Attribute name to define the user's minimum allowed password length
+     * Attribute name to define the user's minimum allowed password length.
      */
     String ATTR_LDAP_PASSWORD_MINIMUM_LENGTH = "passwordMinimumLength";
 
     /**
-     * Attribute name to define the first name
+     * Attribute name to define the first name.
      */
     String ATTR_LDAP_GIVEN_NAME = "givenName";
 
     /**
-     * Attribute name to define the last name
+     * Attribute name to define the last name.
      */
     String ATTR_LDAP_SURNAME = "sn";
 
     /**
-     * Attribute name to define the (middle) initials
+     * Attribute name to define the (middle) initials.
      */
     String ATTR_LDAP_INITIAL = "initials";
 
     /**
-     * Attribute name to define the email of the user
+     * Attribute name to define the email of the user.
      */
     String ATTR_LDAP_EMAIL = "mail";
 
@@ -120,32 +106,32 @@ public interface ChaiConstant
     String ATTR_LDAP_ASSISTANT = "assistant";
 
     /**
-     * Attribute name to define the group membership
+     * Attribute name to define the group membership.
      */
     String ATTR_LDAP_GROUP_MEMBERSHIP = "groupMembership";
 
     /**
-     * Attribute name to define security equality
+     * Attribute name to define security equality.
      */
     String ATTR_LDAP_SECURITY_EQUALS = "securityEquals";
 
     /**
-     * login grace remaining count *
+     * login grace remaining count.
      */
     String ATTR_LDAP_LOGIN_GRACE_REMAINING = "loginGraceRemaining";
 
     /**
-     * login grace limit
+     * login grace limit.
      */
     String ATTR_LDAP_LOGIN_GRACE_LIMIT = "loginGraceLimit";
 
     /**
-     * login intruder attempts
+     * login intruder attempts.
      */
     String ATTR_LDAP_LOGIN_INTRUDER_ATTEMPTS = "loginIntruderAttempts";
 
     /**
-     * login intruder reset time
+     * login intruder reset time.
      */
     String ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME = "loginIntruderResetTime";
 
@@ -155,7 +141,7 @@ public interface ChaiConstant
     String ATTR_LDAP_CITY = "physicalDeliveryOfficeName";
 
     /**
-     * Last time user logged in
+     * Last time user logged in.
      */
     String ATTR_LDAP_LAST_LOGIN_TIME = "loginTime";
 
@@ -175,37 +161,37 @@ public interface ChaiConstant
     String ATTR_LPAP_POSTAL_CODE = "postalCode";
 
     /**
-     * Attribute name to define the date format
+     * Attribute name to define the date format.
      */
     String ATTR_LDAP_PREFERRED_LANGUAGE = "preferredLanguage";
 
     /**
-     * Attribute name to define the date format
+     * Attribute name to define the date format.
      */
     String ATTR_LDAP_TIMEZONE = "Timezone";
 
     /**
-     * Attribute name to define the Telephone Number
+     * Attribute name to define the Telephone Number.
      */
     String ATTR_LDAP_TELEPHONE_NUMBER = "telephoneNumber";
 
     /**
-     * Attribute name to define the Workforce ID
+     * Attribute name to define the Workforce ID.
      */
     String ATTR_LDAP_WORFORCE_ID = "workforceID";
 
     /**
-     * Attribute name to define the Fax number
+     * Attribute name to define the Fax number.
      */
     String ATTR_LDAP_FACSIMILE_NUMBER = "facsimileTelephoneNumber";
 
     /**
-     * Attribute name to define the Mobile number
+     * Attribute name to define the Mobile number.
      */
     String ATTR_LDAP_MOBILE_NUMBER = "mobile";
 
     /**
-     * Attribute name to define the pager number
+     * Attribute name to define the pager number.
      */
     String ATTR_LDAP_PAGER_NUMBER = "pager";
 
@@ -232,28 +218,28 @@ public interface ChaiConstant
     String ATTR_LDAP_LOCKED_BY_INTRUDER = "lockedByIntruder";
 
     /**
-     * RBAC schema
+     * RBAC schema.
      */
     String ATTR_EDIR_ROLE_OCCUPANT = "roleOccupant";
 
     // eDirectory operational attributes (probably read ony)
     /**
-     * Creator of an object
+     * Creator of an object.
      */
     String ATTR_EDIR_CREATORS_NAME = "creatorsName";
 
     /**
-     * Timestamp of when the object was created
+     * Timestamp of when the object was created.
      */
     String ATTR_EDIR_CREATE_TIMESTAMP = "createTimestamp";
 
     /**
-     * Last modifier of an object
+     * Last modifier of an object.
      */
     String ATTR_EDIR_MODIFIED_NAME = "modifiersName";
 
     /**
-     * Timestamp of when the object was last modified
+     * Timestamp of when the object was last modified.
      */
     String ATTR_EDIR_MODIFIED_TIMESTAMP = "modifyTimestamp";
 

@@ -46,8 +46,7 @@ import java.util.Set;
 
 /**
  * A complete implementation of {@code ChaiEntry} interface.
- * <p>
- * Clients looking to obtain a {@code ChaiEntry} instance should look to {@link com.novell.ldapchai.ChaiFactory}.
+ * Clients looking to obtain a {@code ChaiEntry} instance should look to {@link com.novell.ldapchai.ChaiEntryFactory}.
  *
  * @author Jason D. Rivard
  */
@@ -96,7 +95,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
     protected ChaiProvider chaiProvider;
 
     /**
-     * Standard constructor
+     * Standard constructor.
      *
      * @param entryDN      ldap DN in String format
      * @param chaiProvider an active {@code ChaiProvider} instance
@@ -246,7 +245,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return parentDN.toString();
     }
 
-    public final boolean isValid()
+    public final boolean exists()
     {
         try
         {
@@ -258,7 +257,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         }
         catch ( Exception e )
         {
-            LOGGER.trace( "error during isValid check of '" + this.getEntryDN() + "', error: " + e.getMessage() );
+            LOGGER.trace( "error during exists check of '" + this.getEntryDN() + "', error: " + e.getMessage() );
         }
 
         return false;

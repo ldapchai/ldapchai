@@ -47,16 +47,11 @@ import java.util.Set;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
- * <p>
- * Generally, consumers of the LDAP Chai API should avoid calling these methods directly.  Where possible,
- * use the {@link com.novell.ldapchai.ChaiEntry} wrappers instead.
  *
  * @author Jason D. Rivard
  */
-public class ChaiUtility
+public final class ChaiUtility
 {
-
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiUtility.class );
 
     /**
@@ -84,7 +79,7 @@ public class ChaiUtility
         entryDN.append( parentDN );
 
         //First create the base group.
-        provider.createEntry( entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.<String, String>emptyMap() );
+        provider.createEntry( entryDN.toString(), ChaiConstant.OBJECTCLASS_BASE_LDAP_GROUP, Collections.emptyMap() );
 
         //Now build an ldapentry object to add attributes to it
         final ChaiEntry theObject = provider.getEntryFactory().newChaiEntry( entryDN.toString() );
@@ -202,7 +197,7 @@ public class ChaiUtility
      * Convert to an LDIF format.  Useful for debugging or other purposes
      *
      * @param theEntry A valid {@code ChaiEntry}
-     * @return A string containing a properly formated LDIF view of the entry.
+     * @return A string containing a properly formatted LDIF view of the entry.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -234,50 +229,65 @@ public class ChaiUtility
     }
 
     /**
-     * Test the replication of an attribute.  It is left to the implementation to determine the means and criteria for
+     * <p>Test the replication of an attribute.  It is left to the implementation to determine the means and criteria for
      * this operation.  Typically this method would be used just after a write operation in some type of time delayed loop.
-     * <p>
-     * Typical implementations will do the following:
+     * This method does not write any data to the directory.</p>
+     *
+     * <p>Typical implementations will do the following:</p>
      * <ul>
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#readStringAttribute(String)} to read a value</li>
      * <li>establish an LDAP connection to all known replicas</li>
      * <li>issue {@link com.novell.ldapchai.ChaiEntry#compareStringAttribute(String, String)} to to each server directly</li>
      * <li>return true if each server contacted has the same value, false if not</li>
      * </ul>
-     * <p>
-     * Target servers that are unreachable or return errors are ignored, and do not influence the results. It is entirely
+     *
+     * <p>Target servers that are unreachable or return errors are ignored, and do not influence the results. It is entirely
      * possible that no matter how many times this method is called, false will always be returned, so the caller should
-     * take care not to repeat a test indefinitly.
-     * <p>
-     * This operation is potentially expensive, as it may establish new LDAP level connections to each target server each
-     * time it is invoked.
-     * <p>
-     * The following sample shows how this method might be used.  There are a few important attributes of the sample:
+     * take care not to repeat a test indefinitely.</p>
+     *
+     * <p>This operation is potentially expensive, as it may establish new LDAP level connections to each target server each
+     * time it is invoked.</p>
+     *
+     * <p>The following sample shows how this method might be used.  There are a few important attributes of the sample:</p>
      * <ul>
      * <li>Multiple ldap servers are specified</li>
      * <li>There is a pause time between each replication check (the test can be expensive)</li>
      * <li>There is a timeout period (the test may never successfully complete)</li>
      * </ul>
-     * <hr/><blockquote><pre>
-     *   ChaiUser theUser =                                                                     // create a new chai user.
-     *      VendorFactory.quickProvider("ldap://ldaphost,ldap://ldaphost2","cn=admin,ou=ou,o=o","novell");
-     * <p>
-     *   theUser.writeStringAttributes("description","testValue" + (new Random()).nextInt());    // write a random value to an attribute
-     * <p>
-     *   final int maximumWaitTime = 120 * 1000;                                                // maximum time to wait for replication
-     *   final int pauseTime = 3 * 1000;                                                        // time between iterations
-     * <p>
-     *   final long startTime = System.currentTimeMillis();                                     // timestamp of beginning of wait
-     *   boolean replicated = false;
-     *   while (System.currentTimeMillis() - startTime < maximumWaitTime) {                     // loop until
-     *       try { Thread.sleep(pauseTime); } catch (InterruptedException e)  {}                // sleep between iterations
-     *       replicated = ChaiUtility.testAttributeReplication(theUser,"description",null);     // check if data replicated yet
-     *       if (replicated) {
-     *           break;                                                                         // break if data has replicated
-     *       }
-     *   }
-     *   System.out.println("Attribute replication successful: " + replicated);                 // report success
-     * </pre></blockquote><hr/>
+     * <p><b>Example Usage:</b></p>
+     * <pre>
+     * // write a timestamp value to an attribute
+     * theUser.writeStringAttributes("description","testValue" + Instant.now().toString());
+     *
+     * // maximum time to wait for replication
+     * final int maximumWaitTime = 120 * 1000;
+     *
+     *  // time between iterations
+     * final int pauseTime = 3 * 1000;
+     *
+     * // timestamp of beginning of wait
+     * final long startTime = System.currentTimeMillis();
+     *
+     * boolean replicated = false;
+     *
+     * // loop until
+     * while (System.currentTimeMillis() - startTime &lt; maximumWaitTime) {
+     *
+     *    // sleep between iterations
+     *    try { Thread.sleep(pauseTime); } catch (InterruptedException e)  {}
+     *
+     *    // check if data replicated yet
+     *    replicated = ChaiUtility.testAttributeReplication(theUser,"description",null);
+     *
+     *    // break if data has replicated
+     *    if (replicated) {
+     *        break;
+     *    }
+     * }
+     *
+     * // report success
+     * System.out.println("Attribute replication successful: " + replicated);
+     * </pre>
      *
      * @param chaiEntry A valid entry
      * @param attribute A valid attribute on the entry
@@ -430,7 +440,7 @@ public class ChaiUtility
     }
 
     /**
-     * Determines the vendor of a the ldap directory by reading RootDSE attributes
+     * Determines the vendor of a the ldap directory by reading RootDSE attributes.
      *
      * @param rootDSE A valid entry
      * @return the proper directory vendor, or {@link DirectoryVendor#GENERIC} if the vendor can not be determined.

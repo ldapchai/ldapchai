@@ -26,8 +26,7 @@ import java.util.Set;
 
 /**
  * Represents an ldap group entry.
- * <p>
- * Instances of ChaiGroup can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
+ * Instances of ChaiGroup can be obtained by using {@link com.novell.ldapchai.ChaiEntryFactory}.
  *
  * @author Jason D. Rivard
  */
@@ -36,12 +35,12 @@ public interface ChaiGroup extends ChaiEntry
 
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_GROUP_NAME = ChaiConstant.ATTR_LDAP_DESCRIPTION;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_AUXCLASS_DYNAMIC = ChaiConstant.OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP;
 

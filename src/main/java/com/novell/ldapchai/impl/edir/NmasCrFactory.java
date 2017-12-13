@@ -105,13 +105,13 @@ public class NmasCrFactory
     }
 
     /**
-     * Read the theUser's configured ChallengeSet from the directory.  Operations are performed according
+     * <p>Read the theUser's configured ChallengeSet from the directory.  Operations are performed according
      * to the ChaiConfiguration found by looking at the ChaiProvider underlying the ChaiEntry.  For example,
      * the setting {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS} determines if NMAS calls
-     * are used to discover a universal password c/r policy.
-     * <p>
-     * This method is preferred over {@link #readAssignedChallengeSet(com.novell.ldapchai.ChaiUser)}, as it does not
-     * require a (possibly unneccessary) call to read the user's assigned password policy.
+     * are used to discover a universal password c/r policy.</p>
+     *
+     * <p>This method is preferred over {@link #readAssignedChallengeSet(com.novell.ldapchai.ChaiUser)}, as it does not
+     * require a (possibly unnecessary) call to read the user's assigned password policy.</p>
      *
      * @param provider       provider used for ldap communication
      * @param passwordPolicy the policy to examine to find a challenge set.
@@ -152,8 +152,7 @@ public class NmasCrFactory
     }
 
     /**
-     * A convenience wrapper for {@link #readAssignedChallengeSet(com.novell.ldapchai.provider.ChaiProvider, com.novell.ldapchai.ChaiPasswordPolicy)}.  This
-     * method will first read the user's password policy using {@link com.novell.ldapchai.ChaiUser#getPasswordPolicy()},
+     * This method will first read the user's assigned password challenge set policy.
      *
      * @param theUser ChaiUser to read policy for
      * @param locale  Desired locale
@@ -178,9 +177,7 @@ public class NmasCrFactory
 
 
     /**
-     * A convenience wrapper for {@link #readAssignedChallengeSet(com.novell.ldapchai.provider.ChaiProvider, com.novell.ldapchai.ChaiPasswordPolicy)}.  This
-     * method will first read the user's password policy using {@link com.novell.ldapchai.ChaiUser#getPasswordPolicy()},
-     * and use the default locale.
+     * This method will first read the user's assigned password challenge set policy.
      *
      * @param theUser ChaiUser to read policy for
      * @return A valid ChallengeSet if found, otherwise null.

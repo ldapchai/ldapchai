@@ -20,10 +20,10 @@
 package com.novell.ldapchai;
 
 /**
- * A list of rules available for the password policy.   The underlying ldap service may or may not
- * provide values for each of these rules.  By convention, rules with a value of "0" are considered non-applicable.
- * <p>
- * Most {@link ChaiPasswordPolicy} implementations will override the defaults listed here.
+ * <p>A list of rules available for the password policy.   The underlying ldap service may or may not
+ * provide values for each of these rules.  By convention, rules with a value of "0" are considered non-applicable.</p>
+ *
+ * <p>Most {@link ChaiPasswordPolicy} implementations will override the defaults listed here.</p>
  *
  * @author Jason D. Rivard
  */
@@ -97,18 +97,18 @@ public enum ChaiPasswordRule
     AllowAdminChange( "chai.pwrule.allowAdminChange", RuleType.BOOLEAN, "true" ),
 
     /**
-     * A list of disallowed values that may not appear in the password.
+     * <p>A list of disallowed values that may not appear in the password.
      * Weather or not these values are case sensitive or support any type
-     * of wild-card or other matching patterns is left to the backing implementation.
-     * <p>
-     * Values are stored as seperated by a newline character ({@code '\n'}).
+     * of wild-card or other matching patterns is left to the backing implementation.</p>
+     *
+     * <p>Values are stored as seperated by a newline character ({@code '\n'}).</p>
      */
     DisallowedValues( "chai.pwrule.disallowedValues", RuleType.OTHER, "" ),
 
     /**
-     * A list of disallowed attributes that may not appear in the password.
-     * <p>
-     * Values are stored as seperated by a newline character ({@code '\n'}).
+     * <p>A list of disallowed attributes that may not appear in the password.</p>
+     *
+     * <p>Values are stored as seperated by a newline character ({@code '\n'}).</p>
      */
     DisallowedAttributes( "chai.pwrule.disallowedAttributes", RuleType.OTHER, "" ),;
     private final RuleType ruleType;

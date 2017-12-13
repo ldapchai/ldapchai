@@ -8,29 +8,23 @@ public final class GetPwdResponse extends java.lang.Object implements javax.nami
 
 	private static final long serialVersionUID = 1L;
 
-	/** Empty implementation */
 	GetPwdResponse(java.lang.String p0, byte[] p1, int p2, int p3) throws javax.naming.NamingException {
 		super();
 	}
 
-	/** Empty implementation */
 	public java.lang.String getID() {
 		return null;
 	}
 
-	/** Empty implementation */
 	public byte[] getEncodedValue() {
 		return null;
 	}
 
-	/** Empty implementation */
 	public int getNmasRetCode() {
 		return 0;
 	}
 
-	/** Empty implementation */
 	public java.lang.String getPwdStr() {
 		return null;
 	}
-
 }

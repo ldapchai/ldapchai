@@ -27,9 +27,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * An immutable representation of an eDirectory DirXML-Attribute value.
- * <p>
- * <b>Example value in ldap representation:</b>
+ * <p>An immutable representation of an eDirectory DirXML-Attribute value.</p>
+ *
+ * <p><b>Example value in ldap representation:</b></p>
  * <pre>
  * cn=driver1,cn=DriverSet,ou=orgUnit,o=org#1#USER_ID=1,table=USERS,schema=IDM
  *                 |                        |                |
@@ -52,26 +52,27 @@ public class DirXMLAssociation implements Serializable
     public enum State
     {
         /**
-         * 0
+         * 0.
          */
         DISABLED( 0 ),
+
         /**
-         * 1
+         * 1.
          */
         PROCESSED( 1 ),
 
         /**
-         * 2
+         * 2.
          */
         PENDING( 2 ),
 
         /**
-         * 3
+         * 3.
          */
         MANUAL( 3 ),
 
         /**
-         * 4
+         * 4.
          */
         MIGRATE( 4 ),;
 
@@ -83,7 +84,7 @@ public class DirXMLAssociation implements Serializable
         }
 
         /**
-         * Returns the numerical value of the state
+         * Returns the numerical value of the state.
          *
          * @return numerical value of the state
          */
@@ -182,7 +183,7 @@ public class DirXMLAssociation implements Serializable
     }
 
     /**
-     * DN of the driver the assoication is referring to
+     * DN of the driver the association is referring to.
      *
      * @return String in ldap DN format
      */
@@ -192,7 +193,7 @@ public class DirXMLAssociation implements Serializable
     }
 
     /**
-     * State of the association
+     * State of the association.
      *
      * @return state of the association
      */

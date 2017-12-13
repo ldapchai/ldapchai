@@ -25,7 +25,7 @@ class WatchdogService
     private final Lock serviceThreadLock = new ReentrantLock();
 
     /**
-     * timer instance used to watch all the outstanding providers
+     * timer instance used to watch all the outstanding providers.
      */
     private volatile Timer watchDogTimer = null;
 

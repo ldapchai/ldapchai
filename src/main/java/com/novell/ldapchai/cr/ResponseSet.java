@@ -30,17 +30,17 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * A representation of the responses part of challenge/response set.  {@code RespnseSet}s include an embedded {@link com.novell.ldapchai.cr.ChallengeSet}.
+ * <p>A representation of the responses part of challenge/response set.  {@code RespnseSet}s include an embedded {@link com.novell.ldapchai.cr.ChallengeSet}.
  * This means that a full copy of the challenges are embedded at the response set, and a seperate challenge set instance
- * is not required to test responses.
- * <p>
- * Response sets are associated to a user.
- * <p>
- * The underlying implementation may pull all response information into memory at time of
+ * is not required to test responses.</p>
+ *
+ * <p>Response sets are associated to a user.</p>
+ *
+ * <p>The underlying implementation may pull all response information into memory at time of
  * creation, or there may be directory communication required for operation of methods on this
- * interface.
- * <p>
- * Instances of {@code ResponseSet} can be created or read using {@link ChaiCrFactory}.
+ * interface.</p>
+ *
+ * <p>Instances of {@code ResponseSet} can be created or read using {@link ChaiCrFactory}.</p>
  *
  * @author Jason D. Rivard
  */
@@ -56,9 +56,10 @@ public interface ResponseSet
 
     /**
      * Get a {@link com.novell.ldapchai.cr.ChallengeSet} that governs the responses
-     * in this ChallengeSet
+     * in this ChallengeSet.
      *
      * @return Get the ChallengeSet embedded in this ResponseSet.
+     * @throws ChaiValidationException if a data validation issue occurs during the operation.
      */
     ChallengeSet getChallengeSet()
             throws ChaiValidationException;
@@ -67,11 +68,11 @@ public interface ResponseSet
             throws ChaiValidationException;
 
     /**
-     * Tests the {@code ResponseSet} to see if it meets the requirements of the supplied {@link com.novell.ldapchai.cr.ChallengeSet}.
-     * This method does not test any response values.
-     * <p>
-     * A typical use case for this method is to validate if an existing, stored {@code com.novell.ldapchai.cr.ResponseSet} of
-     * a user satisfies a current {@code com.novell.ldapchai.cr.ChallengeSet} policy.
+     * <p>Tests the {@code ResponseSet} to see if it meets the requirements of the supplied {@link com.novell.ldapchai.cr.ChallengeSet}.
+     * This method does not test any response values.</p>
+     *
+     * <p>A typical use case for this method is to validate if an existing, stored {@code com.novell.ldapchai.cr.ResponseSet} of
+     * a user satisfies a current {@code com.novell.ldapchai.cr.ChallengeSet} policy.</p>
      *
      * @param challengeSet A valid {@code ChallengeSet}
      * @return true if this {@code ResponseSet} meets the requirements of the challenge set.
@@ -86,16 +87,17 @@ public interface ResponseSet
      * doesn't support a string representation.
      *
      * @return The string representation of this {@code ResponseSet}
+     * @throws ChaiOperationException   If there is an error during the write operation
      * @throws UnsupportedOperationException if the implementation does not support a string view of the response set.
      */
     String stringValue()
             throws UnsupportedOperationException, ChaiOperationException;
 
     /**
-     * Test the returned response set.
-     * <p>
-     * <b>Note:</b> There is no implementation (yet) for testing NMAS response sets.  Attempting
-     * to test an NMAS ResponseSet will throw an {@link UnsupportedOperationException}.
+     * <p>Test the returned response set.</p>
+     *
+     * <p><b>Note:</b> There is no implementation (yet) for testing NMAS response sets.  Attempting
+     * to test an NMAS ResponseSet will throw an {@link UnsupportedOperationException}.</p>
      *
      * @param responseTest a map containing {@code Challenge}s as keys and String response values to use for testing.
      * @return true if the responses pass the test
@@ -133,7 +135,7 @@ public interface ResponseSet
      * to be used by helpdesk administrators.  The answers can be used to help verify the identity of users when authenticating
      * over the phone to a helpdesk or other 3rd party.
      *
-     * @return
+     * @return a list of helpdesk challenge responses.
      */
 
     Map<Challenge, String> getHelpdeskResponses();

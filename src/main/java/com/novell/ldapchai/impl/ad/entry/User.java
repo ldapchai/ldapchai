@@ -24,7 +24,7 @@ import com.novell.ldapchai.ChaiUser;
 interface User extends OrganizationalPerson, ChaiUser
 {
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_LAST_LOGIN = "lastLogon";
 

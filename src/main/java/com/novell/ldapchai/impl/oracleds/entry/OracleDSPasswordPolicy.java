@@ -120,10 +120,10 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         }
 
         /**
-         * The string key value used in this {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicyImpl} object's backing {@code Properties}.
-         * Typically the same as {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute#getLdapAttribute()}, but this is not gaurenteed
+         * The string key value used in this {@code OracleDSPasswordPolicy} object's backing {@code Properties}.
+         * Typically the same as {@link #getLdapAttribute()}, but this is not guaranteed.
          *
-         * @return A String useful for managing a map of {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute} values.
+         * @return A String useful for managing a map of {@code OracleDSPasswordPolicy} values.
          */
         public String getKey()
         {
@@ -132,7 +132,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
 
         /**
          * The appropriate ldap attribute name of the attribute.
-         * Typically the same as {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute#getKey()}, but this is not gaurenteed
+         * Typically the same as {@link #getKey()}, but this is not guaranteed
          *
          * @return An ldap attribute name
          */
@@ -142,7 +142,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         }
 
         /**
-         * Default value used by a {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicyImpl} for this attribute
+         * Default value used by a {@link OracleDSPasswordPolicy} for this attribute.
          *
          * @return The String value of the default value
          */
@@ -157,17 +157,24 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         public enum TYPE
         {
             /**
-             * An integer representing a maximum limit of a value
-             */MAX,
+             * An integer representing a maximum limit of a value.
+             */
+            MAX,
+
             /**
-             * An integer representing a minimum limit of a value
-             */MIN,
+             * An integer representing a minimum limit of a value.
+             */
+            MIN,
+
             /**
-             * An boolean representing an on/off value
-             */BOOLEAN,
+             * An boolean representing an on/off value.
+             */
+            BOOLEAN,
+
             /**
-             * Some other type of value
-             */OTHER
+             * Some other type of value.
+             */
+            OTHER,
         }
 
         public static Attribute attributeForRule( final ChaiPasswordRule rule )

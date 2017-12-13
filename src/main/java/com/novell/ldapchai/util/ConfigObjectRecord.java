@@ -30,34 +30,36 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * Represents a config object record stored in eDirectory used for holding complex data types.
+ * <p>Represents a config object record stored in eDirectory used for holding complex data types.
  * Config object records are comprised of guids and a payload.  The payload is typically an XML document
- * but can be any data type representable as a string (and potentially even binary data).
- * <p>
- * Config object records, or CORs are useful for storing blobs, xml documents, and even access control lists.
- * <p>
- * CORs should be stored on a multi-valued case-ignore-string attribute.  Mutiple CORs can be written to a single attribute value.  The
- * {@code ConfigObjectRecord} class is capable of distinguishing the appropriate COR based on the supplied guids.
- * <p>
- * The guid values are used to tie a COR on one entry to a remote entry.  For some use cases, it is useful to think
+ * but can be any data type representable as a string.</p>
+ *
+ * <p>Config object records, or CORs are useful for storing blobs, xml documents, and even access control lists.</p>
+ *
+ * <p>CORs should be stored on a multi-valued case-ignore-string attribute.  Multiple CORs can be written to a single attribute value.  The
+ * {@code ConfigObjectRecord} class is capable of distinguishing the appropriate COR based on the supplied guids.</p>
+ *
+ * <p>The guid values are used to tie a COR on one entry to a remote entry.  For some use cases, it is useful to think
  * of a COR as a sort of advanced DN attribute.  It indicates a relationship to another entry, however it is also possible
- * to add aditional information about the remote object reference.  This information can be used to describe the conditions
- * of the relationship.
- * <p>
- * <h4>Format</h4><pre>
+ * to add additional information about the remote object reference.  This information can be used to describe the conditions
+ * of the relationship.</p>
+ *
+ * <p><b>Format</b></p>
+ * <pre>
  * +------+-------+-------+---------------------------+
  * | TYPE | GUID1 | GUID2 | PAYLOAD                   |
  * +------+-------+-------+---------------------------+
- * </pre><h4>Example</h4>
+ * </pre>
+ * <p><b>Example</b></p>
  * <pre>
  * 0002#{3F2504E0-4F89-11D3-9A0C-0305E82C3301}#.#&lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;config"&gt;...&lt;/config&gt;
  * </pre>
- * <p>
- * <table border="1">
- * <tr><td>{@link #getRecordType() TYPE}</td><td>Indicates the TYPE of data resting in the payload.  By convention, a four character string integer such as "0001" is used.</tr>
- * <tr><td>{@link #getGuid1() GUID1}</td><td> Optional value for the GUID of a related object</tr>
- * <tr><td>{@link #getGuid2() GUID2}</td><td> Optional value for the GUID of a second related object</tr>
- * <tr><td>{@link #getPayload() PAYLOAD}</td><td> Payload value.  Typically in XML format, but any String is permitted.</tr>
+ * <table border="1"><caption>Record Components</caption>
+ * <tr><td>{@link #getRecordType() TYPE}</td><td>Indicates the TYPE of data resting in the payload.
+ * By convention, a four character string integer such as "0001" is used.</td></tr>
+ * <tr><td>{@link #getGuid1() GUID1}</td><td> Optional value for the GUID of a related object</td></tr>
+ * <tr><td>{@link #getGuid2() GUID2}</td><td> Optional value for the GUID of a second related object</td></tr>
+ * <tr><td>{@link #getPayload() PAYLOAD}</td><td> Payload value.  Typically in XML format, but any String is permitted.</td></tr>
  * </table>
  *
  * @author Jason D. Rivard
@@ -237,14 +239,14 @@ public class ConfigObjectRecord
     }
 
     /**
-     * No argument private constructor
+     * No argument private constructor.
      */
     private ConfigObjectRecord()
     {
     }
 
     /**
-     * Return the GUID1 value for this {@code ConfigObjectRecord}
+     * Return the GUID1 value for this {@code ConfigObjectRecord}.
      *
      * @return string value of GUID1
      */
@@ -254,7 +256,7 @@ public class ConfigObjectRecord
     }
 
     /**
-     * Return the GUID2 value for this {@code ConfigObjectRecord}
+     * Return the GUID2 value for this {@code ConfigObjectRecord}.
      *
      * @return string value of GUID2
      */
@@ -264,7 +266,7 @@ public class ConfigObjectRecord
     }
 
     /**
-     * Return the payload for this {@code ConfigObjectRecord}
+     * Return the payload for this {@code ConfigObjectRecord}.
      *
      * @return string value of the payload
      */
@@ -274,7 +276,7 @@ public class ConfigObjectRecord
     }
 
     /**
-     * Return the record type identifier for this {@code ConfigObjectRecord}
+     * Return the record type identifier for this {@code ConfigObjectRecord}.
      *
      * @return string value of the record type
      */
@@ -286,7 +288,7 @@ public class ConfigObjectRecord
     /**
      * Updates the payload both in the directory and in the object instance.  When updating the directory
      * this method will determine if the entry already exists (same record type and guid values) and replace it
-     * or it will add a new entry if it doesnt already exist.
+     * or it will add a new entry if it doesn't already exist.
      *
      * @param payload A string containing the payload to store.
      * @throws ChaiOperationException   If there is an error during the operation

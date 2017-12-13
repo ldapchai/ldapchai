@@ -41,8 +41,6 @@ import java.util.Set;
  */
 public class SearchHelper implements Serializable
 {
-
-
     public static final String DEFAULT_FILTER = "(objectClass=*)";
     public static final SearchScope DEFAULT_SCOPE = SearchScope.SUBTREE;
     public static final int DEFAULT_TIMEOUT = 0;
@@ -291,7 +289,7 @@ public class SearchHelper implements Serializable
     }
 
     /**
-     * Current LDAP search filter
+     * Current LDAP search filter.
      *
      * @return String representation of filter in RFC2254 format.
      */
@@ -311,7 +309,7 @@ public class SearchHelper implements Serializable
     }
 
     /**
-     * Current scope of the search operation
+     * Current scope of the search operation.
      *
      * @return A valid SEARCH_SCOPE of Base, One or Subtree
      */
@@ -321,7 +319,7 @@ public class SearchHelper implements Serializable
     }
 
     /**
-     * Set the scipe of the search operation
+     * Set the scipe of the search operation.
      *
      * @param searchScope A valid SEARCH_SCOPE of Base, One or Subtree
      */
@@ -421,7 +419,7 @@ public class SearchHelper implements Serializable
     }
 
     /**
-     * Set the filter to {@link #DEFAULT_FILTER}
+     * Set the filter to {@link #DEFAULT_FILTER}.
      */
     public void clearFilter()
     {
@@ -430,14 +428,14 @@ public class SearchHelper implements Serializable
 
     /**
      * Set up an AND filter for each map key and value.  Consider the following example.
-     * <h4>Example Values</h4>
-     * <table border="1">
+     *
+     * <table border="1"><caption>Example Values</caption>
      * <tr><td><b>Attribute</b></td><td><b>Value</b></td></tr>
      * <tr><td>givenName</td><td>John</td></tr>
      * <tr><td>sn</td><td>Smith</td></tr>
      * </table>
-     * <h4>Result</h4>
-     * <pre>(&(givenName=John)(sn=Smith))</pre>
+     * <p><i>Result</i></p>
+     * <code>(&amp;(givenName=John)(sn=Smith))</code>
      *
      * @param nameValuePairs A valid list of attribute to name pairs
      */
@@ -489,7 +487,7 @@ public class SearchHelper implements Serializable
     }
 
     /**
-     * Convenience wrapper for {@link #setFilterAnd(java.util.Map)}
+     * Convenience wrapper for {@link #setFilterAnd(java.util.Map)}.
      *
      * @param nameValuePairs A valid map of name=value pairs.
      * @see #setFilterAnd(java.util.Map)
@@ -501,7 +499,7 @@ public class SearchHelper implements Serializable
             throw new NullPointerException();
         }
 
-        final Map<String, String> newMap = new HashMap<String, String>();
+        final Map<String, String> newMap = new HashMap<>();
         for ( Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); )
         {
             final String name = ( String ) enumer.nextElement();
@@ -512,13 +510,13 @@ public class SearchHelper implements Serializable
 
     /**
      * Set up an exists filter for attribute name.  Consider the following example.
-     * <h4>Example Values</h4>
-     * <table border="1">
+     *
+     * <table border="1"><caption>Example Values</caption>
      * <tr><td><b>Value</b></td></tr>
      * <tr><td>givenName</td></tr>
      * </table>
-     * <h4>Result</h4>
-     * <pre>(givenName=*)</pre>
+     * <p><i>Result</i></p>
+     * <code>(givenName=*)</code>
      *
      * @param attributeName A valid attribute name
      */
@@ -533,14 +531,14 @@ public class SearchHelper implements Serializable
 
     /**
      * Set up an exists filter for attribute name.  Consider the following example.
-     * <h4>Example Values</h4>
-     * <table border="1">
+     *
+     * <table border="1"><caption>Example Values</caption>
      * <tr><td><b>Value</b></td></tr>
      * <tr><td>givenName</td></tr>
      * <tr><td>sn</td></tr>
      * </table>
-     * <h4>Result</h4>
-     * <pre>(&(givenName=*)(sn=*))</pre>
+     * <p><i>Result</i></p>
+     * <code>(&amp;(givenName=*)(sn=*))</code>
      *
      * @param attributeNames A valid set of attribute names
      */
@@ -563,13 +561,13 @@ public class SearchHelper implements Serializable
 
     /**
      * Set up a not exists filter for an attribute name and value pair.
-     * <h4>Example Values</h4>
-     * <table border="1">
+     *
+     * <table border="1"><caption>Example Values</caption>
      * <tr><td><b>Attribute</b></td><td><b>Value</b></td></tr>
      * <tr><td>givenName</td><td>John</td></tr>
      * </table>
-     * <h4>Result</h4>
-     * <pre>(!(givenName=John))</pre>
+     * <p><i>Result</i></p>
+     * <code>(!(givenName=John))</code>
      *
      * @param attributeName A valid attribute name
      * @param value         A value that, if it exists, will cause the object to be excluded from the result set.
@@ -582,13 +580,13 @@ public class SearchHelper implements Serializable
 
     /**
      * Set up a standard filter attribute name and value pair.
-     * <b>Example Values</b>
-     * <table border="1">
+     *
+     * <table border="1"><caption>Example Values</caption>
      * <tr><td><b>Attribute</b></td><td><b>Value</b></td></tr>
      * <tr><td>givenName</td><td>John</td></tr>
      * </table>
-     * <h4>Result</h4>
-     * <pre>(givenName=John)</pre>
+     * <p><i>Result</i></p>
+     * <code>(givenName=John)</code>
      *
      * @param attributeName A valid attribute name
      * @param value         A value that, if it exists, will cause the object to be included in result set.
@@ -600,14 +598,14 @@ public class SearchHelper implements Serializable
 
     /**
      * Set up an OR filter for each map key and value.  Consider the following example.
-     * <b>Example Values</b>
-     * <table border="1">
+     *
+     * <table border="1"><caption>Example Values</caption>
      * <tr><td><b>Attribute</b></td><td><b>Value</b></td></tr>
      * <tr><td>givenName</td><td>John</td></tr>
      * <tr><td>sn</td><td>Smith</td></tr>
      * </table>
-     * <h4>Result</h4>
-     * <pre>(|(givenName=John)(sn=Smith))</pre>
+     * <p><i>Result</i></p>
+     * <code>(|(givenName=John)(sn=Smith))</code>
      *
      * @param nameValuePairs A valid list of attribute to name pairs
      */
@@ -632,7 +630,7 @@ public class SearchHelper implements Serializable
     }
 
     /**
-     * Convenience wrapper for {@link #setFilterOr(java.util.Map)}
+     * Convenience wrapper for {@link #setFilterOr(java.util.Map)}.
      *
      * @param nameValuePairs A valid map of name=value pairs.
      * @see #setFilterOr(java.util.Map)
@@ -644,7 +642,7 @@ public class SearchHelper implements Serializable
             throw new NullPointerException();
         }
 
-        final Map<String, String> newMap = new HashMap<String, String>();
+        final Map<String, String> newMap = new HashMap<>();
         for ( Enumeration enumer = nameValuePairs.propertyNames(); enumer.hasMoreElements(); )
         {
             final String name = ( String ) enumer.nextElement();

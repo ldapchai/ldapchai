@@ -24,10 +24,10 @@ import com.novell.ldapchai.cr.bean.ChallengeBean;
 import java.io.Serializable;
 
 /**
- * Challenge data object, containing all the properties defined by a challenge.
- * <p>
- * Instances of {@code Challenge} can be generated using {@link ChaiCrFactory}.
- * <p>
+ * <p>Challenge data object, containing all the properties defined by a challenge.</p>
+ *
+ * <p>Instances of {@code Challenge} can be generated using {@link ChaiCrFactory}.</p>
+ *
  * {@code Challenge}s are mutable until they are locked.  Once locked, setters will throw an illegal state exception.
  *
  * @author Jason D. Rivard
@@ -62,7 +62,7 @@ public interface Challenge extends Serializable
      * by the user.
      *
      * @return true if the question is defined by the administrator, false if defined
-     * by the user.
+     *     by the user.
      */
     boolean isAdminDefined();
 

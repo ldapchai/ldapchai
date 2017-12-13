@@ -7,22 +7,18 @@ package com.novell.security.nmas.jndi.ldap.ext;
 public final class PwdPolicyCheckResponse extends java.lang.Object implements javax.naming.ldap.ExtendedResponse {
 	private static final long serialVersionUID = 1L;
 
-	/** Empty implementation */
 	PwdPolicyCheckResponse(java.lang.String p0, byte[] p1, int p2, int p3) throws javax.naming.NamingException {
 		super();
 	}
 
-	/** Empty implementation */
 	public java.lang.String getID() {
 		return null;
 	}
 
-	/** Empty implementation */
 	public byte[] getEncodedValue() {
 		return null;
 	}
 
-	/** Empty implementation */
 	public int getNmasRetCode() {
 		return 0;
 	}

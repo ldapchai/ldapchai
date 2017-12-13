@@ -55,7 +55,7 @@ public class OpenLDAPEntries
         while ( safetyCounter < 50 && searchEntry != null && discoveredPolicy == null )
         {
             safetyCounter++;
-            if ( searchEntry.isValid() )
+            if ( searchEntry.exists() )
             {
                 final String pwdPolicySubentryValue = searchEntry.readStringAttribute(
                         ChaiConstant.ATTR_OPENLDAP_PASSWORD_SUB_ENTRY );
@@ -64,7 +64,7 @@ public class OpenLDAPEntries
                 {
                     final OpenLDAPEntry policyEntry = new OpenLDAPEntry( pwdPolicySubentryValue,
                             person.getChaiProvider() );
-                    if ( policyEntry.isValid() )
+                    if ( policyEntry.exists() )
                     {
                         discoveredPolicy = policyEntry;
                     }
@@ -78,12 +78,12 @@ public class OpenLDAPEntries
             return new OpenLDAPPasswordPolicy( discoveredPolicy.getEntryDN(), person.getChaiProvider() );
         }
 
-        final String passwordPolicyDn = person.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.PASSWORD_POLICY_DN );
+        final String passwordPolicyDn = person.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.OPENLDAP_PASSWORD_POLICY_DN );
         LOGGER.debug( "passwordPolicyDn = " + passwordPolicyDn );
         if ( passwordPolicyDn != null && passwordPolicyDn.trim().length() > 0 )
         {
             final OpenLDAPPasswordPolicy defaultPolicy = new OpenLDAPPasswordPolicy( passwordPolicyDn, person.getChaiProvider() );
-            if ( defaultPolicy.isValid() )
+            if ( defaultPolicy.exists() )
             {
                 return defaultPolicy;
             }

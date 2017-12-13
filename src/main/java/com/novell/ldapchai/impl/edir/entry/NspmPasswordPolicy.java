@@ -26,10 +26,10 @@ import com.novell.ldapchai.ChaiPasswordRule;
 public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
 {
     /**
-     * Return the source of the challenge set policy information
+     * Return the source of the challenge set policy information.
      *
      * @return A string with the ldap syntax DN of the policy.  May be null if the policy was
-     * not read from ldap.
+     *     not read from ldap.
      */
     String getSourceDN();
 
@@ -111,7 +111,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
                 ChaiPasswordRule.MaximumNumeric ),
 
         /**
-         * Maximum number of times a special (non alphanumeric) character may appear in the password
+         * Maximum number of times a special (non alphanumeric) character may appear in the password.
          */
         MAX_SPECIAL(
                 TYPE.MAX,
@@ -394,7 +394,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
 
 
         /**
-         * AD 2003 Complexity Policy
+         * AD 2003 Complexity Policy.
          */
         AD_COMPLEXITY_RULES(
                 TYPE.OTHER,
@@ -402,7 +402,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
                 "",
                 null ),
         /**
-         * AD 2008 Complexity Policy
+         * AD 2008 Complexity Policy.
          */
         AD_2008_COMPLEXITY(
                 TYPE.BOOLEAN,
@@ -411,7 +411,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
                 ChaiPasswordRule.ADComplexity2008 ),
 
         /**
-         * AD 2008 Complexity Policy
+         * AD 2008 Complexity Policy.
          */
         AD_COMPLEXITY_MAX_VIOLATION(
                 TYPE.MAX,
@@ -466,7 +466,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
 
         /**
          * The appropriate ldap attribute name of the attribute.
-         * Typically the same as {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute#getKey()}, but this is not gaurenteed
+         * Typically the same as {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute#getKey()}, but this is not guaranteed
          *
          * @return An ldap attribute name
          */
@@ -476,7 +476,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
         }
 
         /**
-         * Default value used by a {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicyImpl} for this attribute
+         * Default value used by a {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicyImpl} for this attribute.
          *
          * @return The String value of the default value
          */

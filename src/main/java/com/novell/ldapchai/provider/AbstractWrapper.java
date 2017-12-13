@@ -38,6 +38,8 @@ abstract class AbstractWrapper implements InvocationHandler
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.
      *
      * @param chaiProvider a pre-existing {@code ChaiProvider}
+     * @param enableSetting setting to mark if watchdog is enabled
+     * @param wrapperClass chai provider wrapper
      * @return a wrapped {@code ChaiProvider} instance.
      */
     protected static ChaiProviderImplementor factoryImpl(

@@ -215,9 +215,9 @@ class FailOverWrapper implements InvocationHandler
 
 
     /**
-     * The rotatation machine manages which URL is currently active.  It does this by
-     * setting up a "Slot" for each of the avilable URLs.  Visually it might look something
-     * like this:
+     * <p>The rotation machine manages which URL is currently active.  It does this by
+     * setting up a "Slot" for each of the available URLs.  Visually it might look something
+     * like this:</p>
      * <pre>
      *     Slot#   ProviderSlot instance       state
      *   +-------+--------------------------+----------+
@@ -228,21 +228,21 @@ class FailOverWrapper implements InvocationHandler
      *   |   2   | URL #3, config, provider |  null    |
      *   +-------+--------------------------+----------+
      * </pre>
-     * The machine keeps track of a which slot is "active".  If the machie is informed that the
+     * <p>The machine keeps track of a which slot is "active".  If the machie is informed that the
      * current provider is broken, the machine will advance the active marker to the next slot
-     * and attempt to make it's provider active.  All other slots will have their provider's inactived.
-     * <p>
-     * If a slot other than #0 is active for a duration longer than the
+     * and attempt to make it's provider active.  All other slots will have their provider's inactivated.</p>
+     *
+     * <p>If a slot other than #0 is active for a duration longer than the
      * {@link com.novell.ldapchai.provider.FailOverWrapper.FailOverSettings#getMinFailBackTime()}, the
-     * machine will rotate back to slot #0 then next time it is accessed.
-     * <p>
-     * For any given unique urlList used in the settings, a global (static) "last known good" cache is maintained
+     * machine will rotate back to slot #0 then next time it is accessed.</p>
+     *
+     * <p>For any given unique urlList used in the settings, a global (static) "last known good" cache is maintained
      * with the last known good slot.  In this way, if a new provider is created, it will start with a good
      * slot instead of the dead "0"th slot.  This makes initial connection times much faster in cases
-     * where the 0th slot is a consistently dead server.
-     * <p>
-     * Despite the last known good cache, every rotation machine maintains an unrelated state.  The cache
-     * is only used for setting the initial slot used when a new rotation machine is created.
+     * where the 0th slot is a consistently dead server.</p>
+     *
+     * <p>Despite the last known good cache, every rotation machine maintains an unrelated state.  The cache
+     * is only used for setting the initial slot used when a new rotation machine is created.</p>
      */
     private static class RotationMachine
     {

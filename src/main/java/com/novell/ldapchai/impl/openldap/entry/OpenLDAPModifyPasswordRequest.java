@@ -40,26 +40,26 @@ public class OpenLDAPModifyPasswordRequest
     private static final long serialVersionUID = 1L;
 
     /**
-     * The OID of the modify password extended operation
+     * The OID of the modify password extended operation.
      */
     public static final String LDAP_EXOP_X_MODIFY_PASSWD =
             "1.3.6.1.4.1.4203.1.11.1";
     /**
-     * The BER tag for the modify password dn entry
+     * The BER tag for the modify password dn entry.
      */
     private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_ID =
             ( byte ) 0x80;
     /**
-     * The BER tag for the modify password new password entry
+     * The BER tag for the modify password new password entry.
      */
     private static final byte LDAP_TAG_EXOP_X_MODIFY_PASSWD_NEW =
             ( byte ) 0x82;
     /**
-     * The dn we want to change
+     * The dn we want to change.
      */
     private String modifyDn;
     /**
-     * The password to change to
+     * The password to change to.
      */
     private String modifyPassword;
 
@@ -70,6 +70,7 @@ public class OpenLDAPModifyPasswordRequest
      *
      * @param dn       the dn whose password is to change
      * @param password the new password
+     * @param chaiConfiguration appropriate chaiConfiguration
      * @throws NullPointerException                    if dn or password is null
      * @throws javax.naming.SizeLimitExceededException when the dn or password
      *                                                 is too long
@@ -185,7 +186,7 @@ public class OpenLDAPModifyPasswordRequest
      * @param offset   the offset
      * @param length   the length of the response
      * @return returns null as the modify password operation doesn't
-     * generate a response.
+     *     generate a response.
      */
     public ExtendedResponse createExtendedResponse(
             final String id,

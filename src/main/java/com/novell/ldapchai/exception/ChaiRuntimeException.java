@@ -20,7 +20,7 @@
 package com.novell.ldapchai.exception;
 
 /**
- * General non-checked runtime exception thrown by Chai
+ * General non-checked runtime exception thrown by Chai.
  */
 public class ChaiRuntimeException extends RuntimeException
 {

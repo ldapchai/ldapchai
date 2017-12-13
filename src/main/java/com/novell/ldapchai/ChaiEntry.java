@@ -32,18 +32,18 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * {@code ChaiEntry} instances represent ldap entries.  Most other {@code Chai*} interfaces in this package inherit from
+ * <p>{@code ChaiEntry} instances represent ldap entries.  Most other {@code Chai*} interfaces in this package inherit from
  * {@code ChaiEntry}. Each instance wraps a ldap distinguished name (DN) value that it then uses for all subsequent operations.  Methods are
  * provided to easily access or modify attributes of the entry, as well as to find related objects.  Clients can consume
- * {@code ChaiEntry} instances as if they were beans backed by some persistent store.
- * <p>
- * This interface is extended by several sub-interfaces that provide added functionality for specific
- * entry types such as users and groups.
- * <p>
- * This interface and its sub-interfaces are intended to be the primary interface that callers to the
- * LDAP Chai API reference in their code.
- * <p>
- * Instances of ChaiEntry can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
+ * {@code ChaiEntry} instances as if they were beans backed by some persistent store.</p>
+ *
+ * <p>This interface is extended by several sub-interfaces that provide added functionality for specific
+ * entry types such as users and groups.</p>
+ *
+ * <p>This interface and its sub-interfaces are intended to be the primary interface that callers to the
+ * LDAP Chai API reference in their code.</p>
+ *
+ * <p>Instances of ChaiEntry can be obtained by using {@link com.novell.ldapchai.ChaiEntryFactory}.</p>
  *
  * @author Jason D. Rivard
  */
@@ -52,12 +52,12 @@ public interface ChaiEntry
 {
 
     /**
-     * Writes an additional attribute value to an attribute on an ldap entry.  This operation
+     * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
-     * supplied value will be set.
-     * <p>
-     * Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
+     * supplied value will be set.</p>
+     *
+     * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.</p>
      *
      * @param attributeName  A valid attribute for the entry
      * @param attributeValue A string value to be added to the ldap entry
@@ -71,9 +71,9 @@ public interface ChaiEntry
      * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
      * supplied value will be set.</p>
-     * <p>
+     *
      * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
-     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.
+     * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.</p>
      *
      * @param attributeName   A valid attribute for the entry
      * @param attributeValues A set of string values to be added to the ldap entry
@@ -87,7 +87,7 @@ public interface ChaiEntry
      * <p>Writes an additional attribute value to an attribute on an ldap entry.  This operation
      * will not overwrite any existing values.  If the attribute has no values already, the
      * supplied value will be set.</p>
-     * <p>
+     *
      * <p>Duplicate values are not permitted by ldap.  An attempt to add duplicate values will
      * result in an {@link ChaiOperationException} with {@link com.novell.ldapchai.exception.ChaiError}.</p>
      *
@@ -133,9 +133,9 @@ public interface ChaiEntry
     ChaiProvider getChaiProvider();
 
     /**
-     * Finds any decendents of this entry in the ldap heirarchy
+     * Finds any descendants of this entry in the ldap hierarchy.
      *
-     * @return A set of all decendents.  If no decendants are found, an empty set is returned.
+     * @return A set of all descendants.  If no descendants are found, an empty set is returned.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -143,7 +143,7 @@ public interface ChaiEntry
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * Gets the ldap DN of the object this ChaiEntry instance is representing
+     * Gets the ldap DN of the object this ChaiEntry instance is representing.
      *
      * @return DN of the object.
      */
@@ -153,18 +153,21 @@ public interface ChaiEntry
      * Finds the parent entry of this instance's entry in the directory.
      *
      * @return An ChaiEntryImpl representing the parent entry.  If there is no parent, then null is returned.
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     ChaiEntry getParentEntry()
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * Indicates if the instance of this object actually references a live object in the directory.  If any error
-     * happens during this operation (such as a ChaiUnavailableException is thrown), the error is swallowed and
-     * false is returned.
+     * Indicates if the instance of this object actually references a live object in the directory.
      *
      * @return true if the object exists in the directory.
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+
      */
-    boolean isValid();
+    boolean exists()
+            throws ChaiUnavailableException;
 
     /**
      * A convince method for reading boolean values from the ldap directory.  Note that ldap booleans actually
@@ -180,14 +183,14 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Read the canonical distinguish name (DN). This
+     * <p>Read the canonical distinguish name (DN). This
      * method will issue an LDAP search operation to retrieve the DN value of the the entry
      * as defined by the LDAP server.  The returned value may differ from {@link ChaiEntry#getEntryDN()}
      * in terms of case, spacing, or other syntax differences, however they should resolve to the
-     * same entry by the ldap server.
-     * <p>
-     * Canonical values are particularly useful when storing in a collection, as you
-     * can guarantee that two entries are the same by comparing the literal string value of the DN.
+     * same entry by the ldap server.</p>
+     *
+     * <p>Canonical values are particularly useful when storing in a collection, as you
+     * can guarantee that two entries are the same by comparing the literal string value of the DN.</p>
      *
      * @return The canonical DN of the object, as returned by the LDAP server
      * @throws ChaiOperationException   If there is an error during the operation
@@ -234,12 +237,12 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Retreives an attribute value from the LDAP entry represented by the
+     * <p>Retrieves an attribute value from the LDAP entry represented by the
      * instance of this class.  If the attribute syntax is not a string, the value will be
-     * converted to a string.
-     * <p>
-     * Callers of this method should use the values specified in the {@link ChaiConstant} class
-     * when possible.
+     * converted to a string.</p>
+     *
+     * <p>Callers of this method should use the values specified in the {@link ChaiConstant} class
+     * when possible.</p>
      *
      * @param attributeName The name of the atttribute
      * @return Values of the attribute selected.
@@ -262,7 +265,7 @@ public interface ChaiEntry
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * Convienence method to read this ChaiEntry instance's {@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_OBJECTCLASS} attribute.
+     * Convenience method to read this ChaiEntry instance's {@link com.novell.ldapchai.ChaiConstant#ATTR_LDAP_OBJECTCLASS} attribute.
      *
      * @return The value(s) of the attribute, or null if no value
      * @throws ChaiOperationException   If there is an error during the operation
@@ -272,13 +275,13 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Retrieves an attribute value from the LDAP entry represented by the
+     * <p>Retrieves an attribute value from the LDAP entry represented by the
      * instance of this class.  If the attribute has multiple values then only a single value
      * is returned.  If the attribute does not have a string syntax, the value will be converted
-     * to a string.
-     * <p>
-     * Callers of this method should use the values specified in the {@link ChaiConstant} class
-     * when possible.
+     * to a string.</p>
+     *
+     * <p>Callers of this method should use the values specified in the {@link ChaiConstant} class
+     * when possible.</p>
      *
      * @param attributeName The name of the attribute
      * @return Value of the attributeName attribute
@@ -290,11 +293,11 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Read an array of specified attributes.  If any of the attributes has multiple values, only the first value
+     * <p>Read an array of specified attributes.  If any of the attributes has multiple values, only the first value
      * returned by the directory is returned.  If the attribute does not have a string syntax, the value will be converted
-     * to a string.
-     * <p>
-     * Callers of this method are encouraged to use the values specified in {@link ChaiConstant} when possible for attribute names.
+     * to a string.</p>
+     *
+     * <p>Callers of this method are encouraged to use the values specified in {@link ChaiConstant} when possible for attribute names.</p>
      *
      * @param attributes Valid  attributes on the object.
      * @return A map containing the result of the read
@@ -323,10 +326,10 @@ public interface ChaiEntry
 
     /**
      * Perform an ldap search using this entry as the search root.  A subtree search is implied, and no attribute values
-     * are requested.  The result is a collection of {@code ChaiEntry} instances that can then be further minipulated.
+     * are requested.  The result is a collection of {@code ChaiEntry} instances that can then be further manipulated.
      *
      * @param filter A valid RFC2254 ldap search filter
-     * @return Set<ChaiEntry>           ChaiEntry objects that mean the search criteria
+     * @return Set                       ChaiEntry objects that mean the search criteria
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
@@ -336,15 +339,15 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Perform an ldap search using this entry as the search root.  A {@link com.novell.ldapchai.util.SearchHelper} is required
+     * <p>Perform an ldap search using this entry as the search root.  A {@link com.novell.ldapchai.util.SearchHelper} is required
      * and its values are used to perform the search.  The result is a collection of {@code ChaiEntry} instances that
-     * can then be further minipulated.
-     * <p>
-     * Note, although the {@code SearchHelper} can specify return attributes, the attributes are not requested using
-     * this search method.  Instead, the result ChaiEntries can be used to read attribute values.
+     * can then be further manipulated.</p>
+     *
+     * <p>Note, although the {@code SearchHelper} can specify return attributes, the attributes are not requested using
+     * this search method.  Instead, the result ChaiEntries can be used to read attribute values.</p>
      *
      * @param searchHelper A search helper instance
-     * @return Set<ChaiEntry>           ChaiEntry objects that mean the search criteria
+     * @return Set                      ChaiEntry objects that mean the search criteria
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
@@ -360,7 +363,7 @@ public interface ChaiEntry
      *
      * @param filter      A valid RFC2254 ldap search filter
      * @param searchScope The scope to use during the search operation
-     * @return Set<ChaiEntry>           ChaiEntry objects that mean the search criteria
+     * @return Set                      ChaiEntry objects that mean the search criteria
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      * @see com.novell.ldapchai.provider.ChaiProvider#search(String, com.novell.ldapchai.util.SearchHelper)
@@ -381,7 +384,7 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Removes all existing values, if any, and sets the new values
+     * Removes all existing values, if any, and sets the new values.
      *
      * @param attributeName   Name of the attribute
      * @param attributeValues New values for the attribute
@@ -394,8 +397,8 @@ public interface ChaiEntry
     /**
      * Write an attribute with timestamp value.  Automatically converts the {@code Date} object to a timestamp.
      *
-     * @param attributeName Name of the attribute to read.  Date must be in Zulu string format.
-     * @param instant
+     * @param attributeName Name of the attribute to read.
+     * @param instant value to write.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -437,7 +440,7 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Replace an existing an attriubte value with a new value.  This operation is useful for manipulating
+     * Replace an existing an attribute value with a new value.  This operation is useful for manipulating
      * multi-valued attributes, and is less expensive then first deleting an existing value and then adding
      * a new value.
      *
@@ -452,12 +455,12 @@ public interface ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Read a GUID (Globally Unique Identifier) from the entry.  Chai will attempt to use vendor-specific
+     * <p>Read a GUID (Globally Unique Identifier) from the entry.  Chai will attempt to use vendor-specific
      * attributes for the entry.  Many vendor implementations store GUID values as binary, or octet-length
-     * syntax so this method will automatically convert to a string format of some type, typically a hex or base64 string.
-     * <p>
-     * Thus, the value returned by this method can be assumed to be unique per entry and reliably read across
-     * time, however the value may not be easily reversable to the original vendor format.
+     * syntax so this method will automatically convert to a string format of some type, typically a hex or base64 string.</p>
+     *
+     * <p>Thus, the value returned by this method can be assumed to be unique per entry and reliably read across
+     * time, however the value may not be easily reversible to the original vendor format.</p>
      *
      * @return Value of the entry's vendor-specific GUID format in some type of string format, or null if not available
      * @throws ChaiOperationException        If there is an error during the operation

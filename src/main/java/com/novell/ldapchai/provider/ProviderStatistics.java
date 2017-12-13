@@ -39,31 +39,32 @@ public interface ProviderStatistics
     enum IncrementerStatistic
     {
         /**
-         * Number of read operations
+         * Number of read operations.
          */
         READ_COUNT,
+
         /**
-         * Number of modify operations
+         * Number of modify operations.
          */
         MODIFY_COUNT,
 
         /**
-         * Number of search operations
+         * Number of search operations.
          */
         SEARCH_COUNT,
 
         /**
-         * Total number of ldap operations
+         * Total number of ldap operations.
          */
         OPERATION_COUNT,
 
         /**
-         * Total number of ldap bind operations
+         * Total number of ldap bind operations.
          */
         BIND_COUNT,
 
         /**
-         * Total number of ldap unavailable exceptions thrown
+         * Total number of ldap unavailable exceptions thrown.
          */
         UNAVAILABLE_COUNT,
 
@@ -91,7 +92,7 @@ public interface ProviderStatistics
     /**
      * Get an individual statistic.
      *
-     * @param statistic requested statistc
+     * @param statistic requested statistic
      * @return the string value of the statistic, typically a number or timestamp.
      */
     long getIncrementorStatistic( IncrementerStatistic statistic );
@@ -100,7 +101,7 @@ public interface ProviderStatistics
 
     /**
      * Generate a string key/value map with all statistics suitable for debug logging.
-     * @return
+     * @return a string map suitable for debug logging.
      */
     Map<String, String> allStatistics();
 

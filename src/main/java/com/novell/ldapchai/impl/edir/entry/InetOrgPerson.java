@@ -20,17 +20,26 @@
 package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 
 public interface InetOrgPerson extends OrganizationalPerson, ChaiUser
 {
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_LAST_LOGIN = ChaiConstant.ATTR_LDAP_LAST_LOGIN_TIME;
 
 
     String OBJECT_CLASS_VALUE = ChaiConstant.OBJECTCLASS_BASE_LDAP_USER;
 
+    @Override
+    default ChaiPasswordPolicy getPasswordPolicy()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return null;
+    }
 }

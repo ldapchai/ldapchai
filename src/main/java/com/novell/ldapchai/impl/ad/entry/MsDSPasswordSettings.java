@@ -113,10 +113,10 @@ public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy
         }
 
         /**
-         * The string key value used in this {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicyImpl} object's backing {@code Properties}.
-         * Typically the same as {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute#getLdapAttribute()}, but this is not gaurenteed
+         * The string key value used in this {@link MsDSPasswordSettings} object's backing {@code Properties}.
+         * Typically the same as {@link #getLdapAttribute()}, but this is not guaranteed
          *
-         * @return A String useful for managing a map of {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute} values.
+         * @return A String useful for managing a map of {@link MsDSPasswordSettings} values.
          */
         public String getKey()
         {
@@ -125,7 +125,7 @@ public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy
 
         /**
          * The appropriate ldap attribute name of the attribute.
-         * Typically the same as {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy.Attribute#getKey()}, but this is not gaurenteed
+         * Typically the same as {@link #getKey()}, but this is not guaranteed
          *
          * @return An ldap attribute name
          */
@@ -135,7 +135,7 @@ public interface MsDSPasswordSettings extends Top, ChaiPasswordPolicy
         }
 
         /**
-         * Default value used by a {@link com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicyImpl} for this attribute
+         * Default value used by for this attribute.
          *
          * @return The String value of the default value
          */

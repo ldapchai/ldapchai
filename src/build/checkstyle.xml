@@ -58,7 +58,6 @@
     <module name="NewlineAtEndOfFile"/>
 
     <module name="TreeWalker">
-
         <property name="cacheFile" value="target/checkstyle.cache"/>
 
         <!-- required for SuppressWarningsFilter (and other Suppress* rules not used here) -->
@@ -294,6 +293,14 @@
         <module name="UpperEll"/>
         <module name="PackageDeclaration"/>
         <module name="NoClone"/>
+
+        <!-- javadoc -->
+        <module name="JavadocParagraph"/>
+        <module name="AtclauseOrder"/>
+        <module name="JavadocStyle"/>
+        <module name="JavadocTagContinuationIndentation"/>
+        <module name="NonEmptyAtclauseDescription"/>
+        <module name="SingleLineJavadoc"/>
     </module>
 
     <!-- Support @SuppressWarnings (added in Checkstyle 5.7) -->

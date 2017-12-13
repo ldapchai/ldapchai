@@ -10,7 +10,6 @@ public final class NMASChallengeResponse extends java.lang.Object {
 	public static final java.lang.String CHALLENGE_RESPONSE_QUESTIONS_TAG = null;
 	public static final java.lang.String CHALLENGE_RESPONSE_DATA_TAG = null;
 
-	/** Empty implementation */
 	public NMASChallengeResponse() {
 		super();
 	}

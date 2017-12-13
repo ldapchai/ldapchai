@@ -49,7 +49,7 @@ public class OracleDSEntries
         while ( saftyCounter < 50 && searchEntry != null && discoveredPolicy == null )
         {
             saftyCounter++;
-            if ( searchEntry.isValid() )
+            if ( searchEntry.exists() )
             {
                 final String pwdPolicySubentryValue = searchEntry.readStringAttribute(
                         ChaiConstant.ATTR_ORACLEDS_PASSWORD_SUB_ENTRY );
@@ -57,7 +57,7 @@ public class OracleDSEntries
                 {
                     final OracleDSEntry policyEntry = new OracleDSEntry( pwdPolicySubentryValue,
                             person.getChaiProvider() );
-                    if ( policyEntry.isValid() )
+                    if ( policyEntry.exists() )
                     {
                         discoveredPolicy = policyEntry;
                     }
@@ -72,7 +72,7 @@ public class OracleDSEntries
         }
 
         final OracleDSPasswordPolicy defaultPolicy = new OracleDSPasswordPolicy( "cn=Password Policy,cn=config", person.getChaiProvider() );
-        if ( defaultPolicy.isValid() )
+        if ( defaultPolicy.exists() )
         {
             return defaultPolicy;
         }

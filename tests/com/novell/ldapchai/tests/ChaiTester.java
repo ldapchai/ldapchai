@@ -50,7 +50,7 @@ public class ChaiTester extends TestCase {
     {
         final ChaiEntry testContainer = TestHelper.createTestContainer();
         final ChaiUser testUser;
-        final ChaiConfiguration chaiConfig = new ChaiConfiguration("ldaps://ldaphost:636", "cn=admin,ou=ou,o=o", "novell");
+        final ChaiConfiguration chaiConfig = new ChaiConfiguration("ldaps://ldaphost:636", "cn=admin,ou=ou,o=o", "password");
         {    // create provider and test user.
             chaiConfig.setSetting(ChaiSetting.PROMISCUOUS_SSL, "true");
             final ChaiProvider provider = ChaiProviderFactory.createProvider(chaiConfig);

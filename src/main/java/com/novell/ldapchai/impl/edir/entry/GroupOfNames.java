@@ -30,10 +30,10 @@ public interface GroupOfNames extends Top, ChaiGroup
 
 
     /**
-     * Identifies if the group is dynamic or not.
-     * <p>
-     * <i>Implementation Note:<i/> This method is functionally equivalent to calling
-     * {@link #compareStringAttribute(String ATTR_OBJECT_CLASS, String OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP)}
+     * <p>Identifies if the group is dynamic or not.</p>
+     *
+     * <p><i>Implementation Note:</i> This method is functionally equivalent to calling
+     * {@link #compareStringAttribute(String ATTR_OBJECT_CLASS, String OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP)}</p>
      *
      * @return true if the group is dynamic
      * @throws com.novell.ldapchai.exception.ChaiOperationException   If there is an error during the operation

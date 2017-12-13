@@ -29,107 +29,105 @@ import java.util.Set;
 
 /**
  * Represents an ldap user entry.
- * <p>
  * This interface should be the primary means by which the LDAP Chai API is used to interact with ldap user entries.
- * <p>
- * Instances of ChaiUser can be obtained by using {@link com.novell.ldapchai.ChaiFactory}.
+ * Instances of ChaiUser can be obtained by using {@link com.novell.ldapchai.ChaiEntryFactory}.
  *
  * @author Jason D. Rivard
  */
 public interface ChaiUser extends ChaiEntry
 {
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_COMMON_NAME = ChaiConstant.ATTR_LDAP_COMMON_NAME;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_UID = ChaiConstant.ATTR_LDAP_UID;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_GIVEN_NAME = ChaiConstant.ATTR_LDAP_GIVEN_NAME;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_SURNAME = ChaiConstant.ATTR_LDAP_SURNAME;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_INITIAL = ChaiConstant.ATTR_LDAP_INITIAL;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_PASSWORD = ChaiConstant.ATTR_LDAP_USER_PASSWORD;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_EMAIL = ChaiConstant.ATTR_LDAP_EMAIL;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_PASSWORD_MINIMUM_LENGTH = ChaiConstant.ATTR_LDAP_PASSWORD_MINIMUM_LENGTH;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_LOGIN_DISABLED = ChaiConstant.ATTR_LDAP_LOGIN_DISABLED;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_INTRUDER_RESET_TIME = ChaiConstant.ATTR_LDAP_LOGIN_INTRUDER_RESET_TIME;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_LOCKED_BY_INTRUDER = ChaiConstant.ATTR_LDAP_LOCKED_BY_INTRUDER;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_PASSWORD_EXPIRE_INTERVAL = ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_INTERVAL;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_PASSWORD_EXPIRE_TIME = ChaiConstant.ATTR_LDAP_PASSWORD_EXPIRE_TIME;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_MANAGER = ChaiConstant.ATTR_LDAP_MANAGER;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_ASSISTANT = ChaiConstant.ATTR_LDAP_ASSISTANT;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_DIRECT_REPORTS = ChaiConstant.ATTR_LDAP_DIRECT_REPORTS;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_GROUP_MEMBERSHIP = ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_TELEPHONE = ChaiConstant.ATTR_LDAP_TELEPHONE_NUMBER;
 
     /**
-     * Convenience LDAP attribute definition
+     * Convenience LDAP attribute definition.
      */
     String ATTR_WORKFORCEID = ChaiConstant.ATTR_LDAP_WORFORCE_ID;
 
@@ -146,18 +144,18 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Changes this ChaiUser's password.  This uses the normal change password method in ldap (remove the old, add the new).
+     * <p>Changes this ChaiUser's password.  This uses the normal change password method in ldap (remove the old, add the new).
      * If the old password is not correct, or the new password does not meet the server's requirements, a ChaiOperationException exception
-     * will be thrown.
-     * <p>
-     * This method should only be used when the user is the one changing his or her *own* password.  For admin
-     * password changes, use {@link #setPassword(String)}.
-     * <p>
-     * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
-     * will typically future date the expiration time during the change operation.
-     * <p>
-     * It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
-     * set.
+     * will be thrown.</p>
+     *
+     * <p>This method should only be used when the user is the one changing his or her *own* password.  For admin
+     * password changes, use {@link #setPassword(String)}.</p>
+     *
+     * <p>This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
+     * will typically future date the expiration time during the change operation.</p>
+     *
+     * <p>It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
+     * set.</p>
      *
      * @param oldPassword Old password value, must be correct or the ldap directory will prohibt the change
      * @param newPassword A new password value that conforms to the users password policy
@@ -193,7 +191,7 @@ public interface ChaiUser extends ChaiEntry
      * and returns the equivalent ChaiUser.
      *
      * @return A collection of ChaiUser instances that represent this ChaiUsers's direct reports.
-     * If this ChaiUser does not have any direct reports, then an empty collection is returned.
+     *     If this ChaiUser does not have any direct reports, then an empty collection is returned.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -205,7 +203,7 @@ public interface ChaiUser extends ChaiEntry
      * and returns the equivalent ChaiGroups.
      *
      * @return A collection of {@link ChaiGroup} instances that represent this ChaiUsers's direct reports.
-     * If this ChaiUser does not have any group memberships, then an empty collection is returned.
+     *     If this ChaiUser does not have any group memberships, then an empty collection is returned.
      * @throws ChaiOperationException   If there is an error during the operation
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
@@ -224,9 +222,7 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Retreive this ChaiUser's password policy.  The implementation evaluates both
-     * Universal Password policies as well as legacy policy settings to determine
-     * the password policy.
+     * Retrieve this ChaiUser's password policy.
      *
      * @return a valid password policy for the user.
      * @throws ChaiOperationException   If there is an error during the operation
@@ -246,7 +242,7 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * Convienence method to read this ChaiUser instance's {@link #ATTR_GIVEN_NAME} attribute.
+     * Convenience method to read this ChaiUser instance's {@link #ATTR_GIVEN_NAME} attribute.
      *
      * @return The value of the attribute, or null if no value
      * @throws ChaiOperationException   If there is an error during the operation
@@ -266,14 +262,7 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Retrieve the user's current password.  This method is likely to fail if a variety of conditions are not met:
-     * <ol>
-     * <li>The connection to the server is SSL</li>
-     * <li>The ChaiProvider's {@link com.novell.ldapchai.provider.ChaiSetting#EDIRECTORY_ENABLE_NMAS}
-     * is set to true.
-     * <li>The user entry's assigned password policy supports user or admin retrieval of passwords
-     * <li>The connection has rights to retrieve the password</li>
-     * </ol>
+     * Retrieve the user's current password.  This method may or may not work depending on directory vendor type and policy.
      *
      * @return the users password
      * @throws UnsupportedOperationException If the configuration of the provider is not suitable for retrieving passwords.
@@ -286,7 +275,6 @@ public interface ChaiUser extends ChaiEntry
     /**
      * Read the user's password expiration date.  The implementation will attempt to read the user's defined or calculated
      * password date.
-     * <ol>
      *
      * @return the date at which the password is expired, or the current time if the password is expired but a date cannot be determined
      * @throws UnsupportedOperationException If the configuration of the provider is not suitable for retreiving passwords.
@@ -297,7 +285,7 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiUnavailableException, ChaiOperationException;
 
     /**
-     * Convienence method to read this ChaiUser instance's {@link #ATTR_SURNAME} attribute.
+     * Convenience method to read this ChaiUser instance's {@link #ATTR_SURNAME} attribute.
      *
      * @return The value of the attribute, or null if no value
      * @throws ChaiOperationException   If there is an error during the operation
@@ -307,7 +295,7 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Convienence method to read this ChaiUser instance's {@link #ATTR_COMMON_NAME} attribute.
+     * Convenience method to read this ChaiUser instance's {@link #ATTR_COMMON_NAME} attribute.
      *
      * @return The value of the attribute, or null if no value
      * @throws ChaiOperationException   If there is an error during the operation
@@ -329,19 +317,19 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**
-     * Sets this ChaiUser's password.  This uses the normal administrative set password method in ldap.
-     * If the old password is not correct, or the new password does not meet the server's requirements, a discriptive exception
-     * will be thrown.
-     * <p>
-     * This method should only be used for administrators setting a different user's password.  For self
-     * changes, use {@link #changePassword(String, String)}.
-     * <p>
-     * This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
+     * <p>Sets this ChaiUser's password.  This uses the normal administrative set password method in ldap.
+     * If the old password is not correct, or the new password does not meet the server's requirements, a descriptive exception
+     * will be thrown.</p>
+     *
+     * <p>This method should only be used for administrators setting a different user's password.  For self
+     * changes, use {@link #changePassword(String, String)}.</p>
+     *
+     * <p>This method does <i>not</i> directly set the users password expiration time attribute, but the ldap directory
      * will typically mark the current date as the password expiration time during the set operation, causing the password to
-     * be expired (and changed) for the user during the next authentication.
-     * <p>
-     * It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
-     * set.
+     * be expired (and changed) for the user during the next authentication.</p>
+     *
+     * <p>It would be prudent to check the password first using the {@link #testPasswordPolicy(String)} method before attempting the password
+     * set.</p>
      *
      * @param newPassword           A new password value that conforms to the users password policy
      * @param enforcePasswordPolicy Indicates if the password policy should be enforced.  The ldap vendor may or may not
@@ -358,7 +346,7 @@ public interface ChaiUser extends ChaiEntry
     /**
      * See {@link #setPassword(String, boolean)}. Sets enforcePasswordPolicy to false.
      *
-     * @param newPassword
+     * @param newPassword                  The new password value
      * @throws ChaiUnavailableException    If the directory is unreachable
      * @throws ChaiPasswordPolicyException If the password policy is violated
      * @throws ChaiOperationException      If some operational issue prevents the password from veing set.
@@ -367,14 +355,13 @@ public interface ChaiUser extends ChaiEntry
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException;
 
     /**
-     * Test a users value for this ChaiUser's password.  Appropriate rights are required for this to work properly.  This call
+     * <p>Test a users value for this ChaiUser's password.  Appropriate rights are required for this to work properly.  This call
      * generally only tests the password value itself, and not any other authentication meta attributes such as account
-     * disabled, or other authentication restrictions.
-     * <p>
-     * Thus, a succcessfull test does not neccessarily mean that an authentication (BIND) would work with this password.
-     * <p>
+     * disabled, or other authentication restrictions.</p>
+     *
+     * <p>Thus, a successful test does not necessarily mean that an authentication (BIND) would work with this password.
      * <i>Implementation Note:</i> Calling this method is essentially the same as calling {@link #compareStringAttribute(String USER_PASSWORD, String value)} and converting
-     * {@code ChaiOperationalException} to {@code ChaiPasswordPolicyException}.
+     * {@code ChaiOperationalException} to {@code ChaiPasswordPolicyException}.</p>
      *
      * @param passwordValue A new password to be tested against the ldap directory
      * @return true if password is correct.
@@ -400,6 +387,13 @@ public interface ChaiUser extends ChaiEntry
     boolean testPasswordPolicy( String testPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException;
 
+    /**
+     * Determine if the user's account is enabled or disabled.
+     *
+     * @return true if enabled.
+     * @throws ChaiOperationException   If there is an error during the operation
+     * @throws ChaiUnavailableException If the directory server(s) are unavailable
+     */
     boolean isAccountEnabled()
             throws ChaiOperationException, ChaiUnavailableException;
 
@@ -411,16 +405,6 @@ public interface ChaiUser extends ChaiEntry
      * @throws ChaiUnavailableException If the directory server(s) are unavailable
      */
     void unlockPassword()
-            throws ChaiOperationException, ChaiUnavailableException;
-
-    /**
-     * Deprecated and replaced with {@link #unlockPassword()} due to the ambiguous name of the method.
-     *
-     * @throws ChaiOperationException   If there is an error during the operation
-     * @throws ChaiUnavailableException If the directory server(s) are unavailable
-     */
-    @Deprecated
-    void unlock()
             throws ChaiOperationException, ChaiUnavailableException;
 
     /**

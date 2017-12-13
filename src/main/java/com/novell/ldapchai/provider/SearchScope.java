@@ -6,18 +6,18 @@ package com.novell.ldapchai.provider;
 public enum SearchScope
 {
     /**
-     * Search the container below the specified context, but not any children of the
+     * Search the container below the specified context, but not any children below the specified context.
      */
     ONE( javax.naming.directory.SearchControls.ONELEVEL_SCOPE ),
     /**
-     * Search the specified object, but not any descendants
+     * Search the specified object, but not any descendants.
      */
     BASE( javax.naming.directory.SearchControls.OBJECT_SCOPE ),
 
     /**
-     * Search the descendants below the specified context, and all lower descendants
+     * Search the descendants below the specified context, and all lower descendants.
      */
-    SUBTREE( javax.naming.directory.SearchControls.SUBTREE_SCOPE );
+    SUBTREE( javax.naming.directory.SearchControls.SUBTREE_SCOPE ),;
 
     private final int jndiScopeInt;
 

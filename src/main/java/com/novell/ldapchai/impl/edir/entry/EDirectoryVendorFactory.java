@@ -24,6 +24,7 @@ import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderFactory;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -37,7 +38,7 @@ import java.util.Set;
  * returns {@link DirectoryVendor#EDIRECTORY}.
  * }
  * In most cases, this factory should not
- * be used directly.  Instead, use {@link ChaiFactory}.
+ * be used directly.  Instead, use {@link ChaiProviderFactory}.
  */
 public class EDirectoryVendorFactory implements VendorFactory
 {

@@ -89,9 +89,8 @@ public interface ChallengeSet extends Serializable
     List<Challenge> getUserDefinedChallenges();
 
     /**
-     * Computes the minimum number of responses that would satisfy this policy.
-     * <p>
-     * Generally, this would be {@link #getMinRandomRequired()} + {@link #getRequiredChallenges()}{@code .size()};
+     * Computes the minimum number of responses that would satisfy this policy. Generally,
+     * this would be {@link #getMinRandomRequired()} + {@link #getRequiredChallenges()}{@code .size()};
      *
      * @return minimum number of responses that would satisfy this policy.
      */
