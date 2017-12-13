@@ -16,30 +16,3 @@
  * License along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
-
-package com.novell.ldapchai.tests;
-
-import com.novell.ldapchai.util.SearchHelper;
-import junit.framework.Assert;
-import junit.framework.TestCase;
-
-import java.util.LinkedHashMap;
-
-public class SearchHelperTester extends TestCase {
-
-    public void testAndFilter()
-            throws Exception
-    {
-        final LinkedHashMap<String, String> props = new LinkedHashMap<String, String>();
-        props.put("objectClass", "inetOrgPerson");
-        props.put("cn", "joe");
-
-        final SearchHelper sh = new SearchHelper();
-        sh.setFilterAnd(props);
-
-        final String expectedFilter = "(&(objectClass=inetOrgPerson)(cn=joe))";
-        final String filterFromHelper = sh.getFilter();
-
-        Assert.assertEquals(expectedFilter, filterFromHelper);
-    }
-}

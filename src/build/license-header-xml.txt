@@ -17,13 +17,3 @@
   ~ License along with this library; if not, write to the Free Software
   ~ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
   -->
-
-
-<!DOCTYPE suppressions PUBLIC
-        "-//Puppy Crawl//DTD Suppressions 1.1//EN"
-        "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
-
-<suppressions>
-    <suppress files="/external/" checks="."/>
-    <suppress files="/directoryServer389/" checks="PackageName"/>
-</suppressions>
