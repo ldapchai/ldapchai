@@ -61,7 +61,7 @@ import java.util.Set;
  * threads.  For a guaranteed thread safe ChaiProvider, use {@link com.novell.ldapchai.provider.ChaiProviderFactory#synchronizedProvider(ChaiProvider)}.</p>
  *
  * <p>To prevent leaks the {@link #close()} method should be called when a {@code ChaiProvider} instance is no longer
- * used.  Once closed, any operation annotated with {@link com.novell.ldapchai.provider.ChaiProviderImplementor.LdapOperation}  will throw an {@link IllegalStateException}.</p>
+ * used.  Once closed, any operation annotated with {@link LdapOperation}  will throw an {@link IllegalStateException}.</p>
  *
  * @author Jason D. Rivard                                                          b
  * @see com.novell.ldapchai.ChaiEntry
@@ -71,7 +71,7 @@ public interface ChaiProvider
 
     /**
      * Close the connection to ldap.  All other operational methods (those that are marked with
-     * {@code com.novell.ldapchai.provider.ChaiProviderImplementor.LdapOperation})
+     * {@code com.novell.ldapchai.provider.ChaiProvider.LdapOperation})
      * should throw an exception if called after this method.
      */
     void close();

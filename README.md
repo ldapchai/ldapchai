@@ -52,6 +52,7 @@ LDAP Chai is available from maven central repository.  You can import by adding 
 
 The 0.7 update changes the API in several ways that are not backward compatible:
 
+* Minimum Java level increased to Java 8
 * The factories are no longer static and must be instantiated and have their own lifecycle.
 * ChaiFactory has been replaced with ChaiEntryFactory (which can be obtained via ChaiProvider.getEntryFactory())
 * Deprecated APIs have been removed

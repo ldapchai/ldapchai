@@ -91,7 +91,7 @@ class WireTraceWrapper extends AbstractWrapper
         {
             if ( isLdap )
             {
-                return traceInvokation( method, args );
+                return traceInvocation( method, args );
             }
             else
             {
@@ -100,7 +100,7 @@ class WireTraceWrapper extends AbstractWrapper
         }
         catch ( InvocationTargetException e )
         {
-            throw e.getTargetException();
+            throw e.getCause();
         }
         catch ( Exception e )
         {
@@ -108,7 +108,7 @@ class WireTraceWrapper extends AbstractWrapper
         }
     }
 
-    private Object traceInvokation(
+    private Object traceInvocation(
             final Method method,
             final Object[] args )
             throws Throwable

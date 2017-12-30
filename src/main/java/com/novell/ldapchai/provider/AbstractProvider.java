@@ -691,4 +691,21 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     {
         return INPUT_VALIDATOR;
     }
+
+    static ChaiException convertInvocationExceptionToChaiException( final Exception e )
+    {
+        if ( e instanceof ChaiOperationException )
+        {
+            return ( ChaiOperationException ) e;
+        }
+        else if ( e instanceof ChaiUnavailableException )
+        {
+            return ( ChaiUnavailableException ) e;
+        }
+        else
+        {
+            LOGGER.warn( "unexpected chai api error", e );
+            throw new IllegalStateException( e.getMessage(), e );
+        }
+    }
 }

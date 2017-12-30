@@ -25,15 +25,18 @@ import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 class WatchdogService
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiLogger.class );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogService.class );
 
     private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
 
@@ -43,10 +46,7 @@ class WatchdogService
 
     private final Lock serviceThreadLock = new ReentrantLock();
 
-    /**
-     * timer instance used to watch all the outstanding providers.
-     */
-    private volatile Timer watchDogTimer = null;
+    private volatile ScheduledExecutorService watchdogTimer = null;
 
     WatchdogService( final ChaiProviderFactory chaiProviderFactory )
     {
@@ -86,7 +86,7 @@ class WatchdogService
         {
             serviceThreadLock.lock();
 
-            if ( watchDogTimer == null )
+            if ( watchdogTimer == null )
             {
                 // if there is NOT an active timer
                 if ( !activeWrappers.isEmpty() )
@@ -95,8 +95,7 @@ class WatchdogService
                     LOGGER.debug( "starting up " + THREAD_NAME + ", " + watchdogFrequency + "ms check frequency" );
 
                     // create a new timer
-                    watchDogTimer = new Timer( THREAD_NAME, true );
-                    watchDogTimer.schedule( new WatchdogTask(), watchdogFrequency, watchdogFrequency );
+                    startWatchdogThread();
                 }
             }
         }
@@ -104,6 +103,32 @@ class WatchdogService
         {
             serviceThreadLock.unlock();
         }
+    }
+
+    private void startWatchdogThread()
+    {
+        final ThreadFactory threadFactory = new ThreadFactory()
+        {
+            private final ThreadFactory realThreadFactory = Executors.defaultThreadFactory();
+
+            @Override
+            public Thread newThread( final Runnable runnable )
+            {
+                final Thread t = realThreadFactory.newThread( runnable );
+                t.setDaemon( true );
+                t.setName( THREAD_NAME );
+                return t;
+            }
+        };
+
+        watchdogTimer = Executors.newSingleThreadScheduledExecutor( threadFactory );
+        watchdogTimer.scheduleWithFixedDelay( new WatchdogTask(),  watchdogFrequency, watchdogFrequency, TimeUnit.MILLISECONDS );
+    }
+
+    private void stopWatchdogThread()
+    {
+        watchdogTimer.shutdown();
+        watchdogTimer = null;
     }
 
     private void checkProvider( final WatchdogWrapper wdWrapper )
@@ -168,15 +193,13 @@ class WatchdogService
                     serviceThreadLock.lock();
 
                     // kill the timer.
-                    watchDogTimer.cancel();
-                    watchDogTimer = null;
+                    stopWatchdogThread();
                 }
                 finally
                 {
                     serviceThreadLock.unlock();
                 }
             }
-
         }
     }
 }

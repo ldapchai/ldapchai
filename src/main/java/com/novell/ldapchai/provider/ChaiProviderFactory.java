@@ -110,9 +110,16 @@ public final class ChaiProviderFactory
      *
      * @return a ProviderStatistics instance containing global statistics for the Chai API
      */
-    public ProviderStatistics getGlobalStatistics()
+    public Map<String, String> getGlobalStatistics()
     {
-        return getCentralService().getStatsBean();
+        final Map<String, String> debugProperties = new LinkedHashMap<>();
+        final ProviderStatistics providerStatistics = getCentralService().getStatsBean();
+        if ( providerStatistics != null )
+        {
+            debugProperties.putAll( providerStatistics.allStatistics() );
+        }
+
+        return Collections.unmodifiableMap( debugProperties );
     }
 
     /**
@@ -143,10 +150,13 @@ public final class ChaiProviderFactory
     public ChaiProvider newProvider( final ChaiConfiguration chaiConfiguration )
             throws ChaiUnavailableException
     {
-        return newProviderImpl( chaiConfiguration );
+        return newProviderImpl( chaiConfiguration, false );
     }
 
-    ChaiProviderImplementor newProviderImpl( final ChaiConfiguration chaiConfiguration )
+    ChaiProviderImplementor newProviderImpl(
+            final ChaiConfiguration chaiConfiguration,
+            final boolean failOverWrapperChild
+    )
             throws ChaiUnavailableException
     {
         checkStatus();
@@ -156,7 +166,7 @@ public final class ChaiProviderFactory
         {
             final boolean enableFailover = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.FAILOVER_ENABLE ) );
 
-            if ( enableFailover )
+            if ( enableFailover && !failOverWrapperChild )
             {
                 providerImpl = FailOverWrapper.forConfiguration( this, chaiConfiguration );
             }
@@ -164,12 +174,11 @@ public final class ChaiProviderFactory
             {
                 if ( LOGGER.isTraceEnabled() )
                 {
-                    final StringBuilder sb = new StringBuilder();
-                    sb.append( "creating new jndi ldap connection to " );
-                    sb.append( chaiConfiguration.getSetting( ChaiSetting.BIND_URLS ) );
-                    sb.append( " as " );
-                    sb.append( chaiConfiguration.getSetting( ChaiSetting.BIND_DN ) );
-                    LOGGER.trace( sb.toString() );
+                    final String debugMsg = "creating new jndi ldap connection to "
+                            + chaiConfiguration.getSetting( ChaiSetting.BIND_URLS )
+                            + " as "
+                            + chaiConfiguration.getSetting( ChaiSetting.BIND_DN );
+                    LOGGER.trace( debugMsg );
                 }
 
                 providerImpl = createConcreteProvider( this, chaiConfiguration, true );
@@ -189,9 +198,11 @@ public final class ChaiProviderFactory
             throw new ChaiUnavailableException( "unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
         }
 
-        providerImpl = addProviderWrappers( providerImpl );
-
-        getCentralService().registerProvider( providerImpl );
+        if ( !failOverWrapperChild )
+        {
+            providerImpl = addProviderWrappers( providerImpl );
+            getCentralService().registerProvider( providerImpl );
+        }
 
         return providerImpl;
     }

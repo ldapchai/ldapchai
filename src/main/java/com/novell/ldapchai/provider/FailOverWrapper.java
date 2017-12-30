@@ -20,7 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.exception.ChaiError;
-import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
@@ -154,7 +154,7 @@ class FailOverWrapper implements InvocationHandler
     }
 
     private Object failOverInvoke( final Method m, final Object[] args )
-            throws ChaiUnavailableException, ChaiOperationException
+            throws ChaiException
     {
         int attempts = 0;
         final int maxAttempts = settings.getMaxRetries();
@@ -192,19 +192,7 @@ class FailOverWrapper implements InvocationHandler
                 }
                 else
                 {
-                    if ( e instanceof ChaiOperationException )
-                    {
-                        throw ( ChaiOperationException ) e;
-                    }
-                    else if ( e instanceof ChaiUnavailableException )
-                    {
-                        throw ( ChaiUnavailableException ) e;
-                    }
-                    else
-                    {
-                        LOGGER.warn( "unexpected chai api error", e );
-                        throw new IllegalStateException( e.getMessage(), e );
-                    }
+                    throw AbstractProvider.convertInvocationExceptionToChaiException( e );
                 }
             }
             attempts++;
