@@ -308,6 +308,13 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
+    public void renameEntry( String entryDN, String newRDN, String newParentDN )
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+        throw ChaiOperationException.forErrorMessage( "Not implemented" );
+    }
+
     public void deleteEntry( final String entryDN )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {

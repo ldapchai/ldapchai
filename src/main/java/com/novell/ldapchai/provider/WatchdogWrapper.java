@@ -164,6 +164,12 @@ class WatchdogWrapper implements ChaiProviderImplementor
     }
 
     @Override
+    public void renameEntry(String entryDN, String newRDN, String newParentDN)
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+        providerHolder.getProvider().renameEntry( entryDN, newRDN, newParentDN );
+    }
+
+    @Override
     public void deleteEntry( final String entryDN )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
