@@ -124,6 +124,11 @@ public interface ChaiProvider
     void createEntry( String entryDN, Set<String> baseObjectClasses, Map<String, String> stringAttributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
+    @ChaiProvider.LdapOperation
+    @ChaiProvider.ModifyOperation
+    void renameEntry(String entryDN, String newRDN, String newParentDN)
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
+
     /**
      * Delete the specified entry.
      *
