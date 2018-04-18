@@ -460,6 +460,7 @@ class WatchdogWrapper implements ChaiProviderImplementor
                     realProvider.close();
                 }
                 realProvider = null;
+                chaiProviderFactory.getCentralService().getWatchdogService().deRegisterInstance( WatchdogWrapper.this );
                 lastActivity = Instant.now();
             }
             finally

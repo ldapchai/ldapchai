@@ -32,11 +32,21 @@ public enum ChaiProviderFactorySetting
      * be able to remain idle between 30 and 60 seconds.</p>
      *
      * <table border="0"><caption>Setting Information</caption>
-     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.connection.watchdog.frequency</td></tr>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.connection.watchdog.frequencyMs</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
+     * </table>
+     */
+    WATCHDOG_CHECK_FREQUENCY( "chai.providerFactory.connection.watchdog.frequencyMs", "1000", ChaiSetting.Validator.INTEGER_VALIDATOR ),
+
+    /**
+     * <p>Maximum time duration to cache a vendor identification for a given LDAP URL.</p>
+     *
+     * <table border="0"><caption>Setting Information</caption>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.vendor.cache.maxAgeMs</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
      */
-    WATCHDOG_CHECK_FREQUENCY( "chai.connection.watchdog.frequency", "1000", ChaiSetting.Validator.INTEGER_VALIDATOR ),;
+    VENDOR_CACHE_MAX_AGE_MS( "chai.providerFactory.vendorCache.maxAgeMs", "60000", ChaiSetting.Validator.INTEGER_VALIDATOR ),;
 
     private final String key;
     private final String defaultValue;

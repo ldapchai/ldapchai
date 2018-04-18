@@ -21,12 +21,9 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.util.ChaiLogger;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -40,9 +37,9 @@ class WatchdogService
 
     private static final String THREAD_NAME = "LDAP Chai WatchdogWrapper timer thread";
 
-    private final Set<WeakReference<WatchdogWrapper>> activeWrappers = ConcurrentHashMap.newKeySet();
-
     private final long watchdogFrequency;
+
+    private final ChaiProviderFactory chaiProviderFactory;
 
     private final Lock serviceThreadLock = new ReentrantLock();
 
@@ -56,24 +53,18 @@ class WatchdogService
                         ChaiProviderFactorySetting.WATCHDOG_CHECK_FREQUENCY.getDefaultValue()
                 )
         );
+        this.chaiProviderFactory = chaiProviderFactory;
     }
 
     void registerInstance( final WatchdogWrapper wdWrapper )
     {
-        activeWrappers.add( new WeakReference<>( wdWrapper ) );
+        chaiProviderFactory.getCentralService().registerProvider( wdWrapper );
         checkTimer();
     }
 
     void deRegisterInstance( final WatchdogWrapper wdWrapper )
     {
-        for ( final WeakReference<WatchdogWrapper> reference : activeWrappers )
-        {
-            final WatchdogWrapper watchdogWrapper = reference.get();
-            if ( watchdogWrapper != null && watchdogWrapper.equals( wdWrapper ) )
-            {
-                activeWrappers.remove( reference );
-            }
-        }
+        chaiProviderFactory.getCentralService().deRegisterProvider( wdWrapper );
     }
 
     /**
@@ -89,7 +80,7 @@ class WatchdogService
             if ( watchdogTimer == null )
             {
                 // if there is NOT an active timer
-                if ( !activeWrappers.isEmpty() )
+                if ( !getWrappers().isEmpty() )
                 {
                     // if there are active providers.
                     LOGGER.debug( "starting up " + THREAD_NAME + ", " + watchdogFrequency + "ms check frequency" );
@@ -155,12 +146,11 @@ class WatchdogService
     private Set<WatchdogWrapper> getWrappers()
     {
         final Set<WatchdogWrapper> copyCollection = new HashSet<>();
-        for ( final Reference<WatchdogWrapper> reference : activeWrappers )
+        for ( final ChaiProvider provider : chaiProviderFactory.getCentralService().activeProviders() )
         {
-            final WatchdogWrapper wrapper = reference.get();
-            if ( wrapper != null )
+            if ( provider instanceof WatchdogWrapper )
             {
-                copyCollection.add( wrapper );
+                copyCollection.add( (WatchdogWrapper ) provider );
             }
         }
         return copyCollection;

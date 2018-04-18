@@ -31,8 +31,10 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -406,23 +408,59 @@ public final class ChaiProviderFactory
 
         private final StatisticsWrapper.StatsBean globalStats = new StatisticsWrapper.StatsBean();
 
-        private final Map<ChaiConfiguration, DirectoryVendor> vendorCacheMap = new LinkedHashMap<>();
+        // cache thread access isn't strictly locked but should be good enough for cache usage
+        private final Map<String, VendorCacheInfo> vendorCacheMap = new ConcurrentHashMap<>();
+
+        private final int maxVendorCacheAgeMs;
 
         private final Set<WeakReference<ChaiProviderImplementor>> activeProviders = ConcurrentHashMap.newKeySet();
 
         private CentralService( final ChaiProviderFactory chaiProviderFactory )
         {
+            maxVendorCacheAgeMs = Integer.parseInt(
+                    chaiProviderFactory.getChaiProviderFactorySettings().getOrDefault(
+                            ChaiProviderFactorySetting.VENDOR_CACHE_MAX_AGE_MS,
+                            ChaiProviderFactorySetting.VENDOR_CACHE_MAX_AGE_MS.getDefaultValue()
+                    )
+            );
             watchdogService = new WatchdogService( chaiProviderFactory );
         }
 
         void addVendorCache( final ChaiConfiguration chaiConfiguration, final DirectoryVendor vendor )
         {
-            vendorCacheMap.put( chaiConfiguration, vendor );
+            if ( maxVendorCacheAgeMs > 0 )
+            {
+                final String cacheKey = chaiConfiguration.getSetting( ChaiSetting.BIND_URLS );
+
+                if ( !vendorCacheMap.containsKey( cacheKey ) )
+                {
+                    vendorCacheMap.put( cacheKey, new VendorCacheInfo( Instant.now(), vendor ) );
+                }
+
+                // safety check
+                while ( vendorCacheMap.size() > 100 )
+                {
+                    vendorCacheMap.entrySet().iterator().remove();
+                }
+            }
         }
 
         DirectoryVendor getVendorCache( final ChaiConfiguration chaiConfiguration )
         {
-            return vendorCacheMap.get( chaiConfiguration );
+            final String cacheKey = chaiConfiguration.getSetting( ChaiSetting.BIND_URLS );
+            final VendorCacheInfo vendorCacheInfo = vendorCacheMap.get( cacheKey );
+            if ( vendorCacheInfo != null )
+            {
+                if ( vendorCacheInfo.getTimestamp().plusMillis( maxVendorCacheAgeMs ).isBefore( Instant.now() ) )
+                {
+                    vendorCacheMap.remove( cacheKey );
+                }
+                else
+                {
+                    return vendorCacheInfo.getVendor();
+                }
+            }
+            return null;
         }
 
         StatisticsWrapper.StatsBean getStatsBean()
@@ -435,7 +473,7 @@ public final class ChaiProviderFactory
             return watchdogService;
         }
 
-        private Set<ChaiProvider> activeProviders()
+        Set<ChaiProvider> activeProviders()
         {
             final Set<ChaiProvider> returnSet = new HashSet<>( );
             for ( final WeakReference<ChaiProviderImplementor> reference : activeProviders )
@@ -449,24 +487,54 @@ public final class ChaiProviderFactory
             return Collections.unmodifiableSet( returnSet );
         }
 
-        private void registerProvider( final ChaiProviderImplementor chaiProviderImplementor )
+        void registerProvider( final ChaiProviderImplementor chaiProviderImplementor )
         {
             final WeakReference<ChaiProviderImplementor> reference = new WeakReference<>( chaiProviderImplementor );
             activeProviders.add( reference );
+
+            // call the de-register to clear dead references.
+            deRegisterProvider( null );
         }
 
         void deRegisterProvider( final ChaiProviderImplementor chaiProviderImplementor )
         {
-            for ( final WeakReference<ChaiProviderImplementor> reference : activeProviders )
+            for ( Iterator<WeakReference<ChaiProviderImplementor>> iterator = activeProviders.iterator(); iterator.hasNext(); )
             {
+                final WeakReference<ChaiProviderImplementor> reference = iterator.next();
                 final ChaiProviderImplementor implementor = reference.get();
-                if ( implementor == chaiProviderImplementor )
+
+                if ( implementor == null )
                 {
-                    activeProviders.remove( reference );
+                    iterator.remove();
+                }
+                else if ( implementor.equals( chaiProviderImplementor ) )
+                {
+                    iterator.remove();
                 }
             }
         }
+    }
 
+    private static class VendorCacheInfo
+    {
+        private final Instant timestamp;
+        private final DirectoryVendor vendor;
+
+        VendorCacheInfo( final Instant timestamp, final DirectoryVendor vendor )
+        {
+            this.timestamp = timestamp;
+            this.vendor = vendor;
+        }
+
+        public Instant getTimestamp()
+        {
+            return timestamp;
+        }
+
+        public DirectoryVendor getVendor()
+        {
+            return vendor;
+        }
     }
 }
 
