@@ -231,11 +231,12 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
 
     @ChaiProvider.LdapOperation
     @ChaiProvider.ModifyOperation
-    public void renameEntry( String entryDN, String newRDN, String newParentDN)
-            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
+    public void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
+    {
         try
         {
-            ldapConnection.rename(entryDN, newRDN, newParentDN, true);
+            ldapConnection.rename( entryDN, newRDN, newParentDN, true );
         }
         catch ( LDAPException e )
         {

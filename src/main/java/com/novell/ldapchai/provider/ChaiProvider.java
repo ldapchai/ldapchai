@@ -126,7 +126,10 @@ public interface ChaiProvider
 
     @ChaiProvider.LdapOperation
     @ChaiProvider.ModifyOperation
-    void renameEntry(String entryDN, String newRDN, String newParentDN)
+    /**
+     * Rename the specified entry.  The old entry name will not be retained.
+     */
+    void renameEntry( String entryDN, String newRDN, String newParentDN )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException;
 
     /**

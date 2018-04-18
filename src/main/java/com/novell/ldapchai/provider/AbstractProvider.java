@@ -297,7 +297,8 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
-        public final void renameEntry(final String entryDN, final String newRDN, final String newParentDN) {
+        public final void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
+        {
             if ( newParentDN == null )
             {
                 throw new NullPointerException( "newParentDN must not be null" );

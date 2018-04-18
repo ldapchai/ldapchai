@@ -48,6 +48,9 @@ import org.apache.directory.api.ldap.model.message.DeleteRequest;
 import org.apache.directory.api.ldap.model.message.DeleteRequestImpl;
 import org.apache.directory.api.ldap.model.message.DeleteResponse;
 import org.apache.directory.api.ldap.model.message.MessageTypeEnum;
+import org.apache.directory.api.ldap.model.message.ModifyDnRequest;
+import org.apache.directory.api.ldap.model.message.ModifyDnRequestImpl;
+import org.apache.directory.api.ldap.model.message.ModifyDnResponse;
 import org.apache.directory.api.ldap.model.message.ModifyRequest;
 import org.apache.directory.api.ldap.model.message.ModifyRequestImpl;
 import org.apache.directory.api.ldap.model.message.ModifyResponse;
@@ -56,6 +59,7 @@ import org.apache.directory.api.ldap.model.message.ResultResponse;
 import org.apache.directory.api.ldap.model.message.SearchRequest;
 import org.apache.directory.api.ldap.model.message.SearchRequestImpl;
 import org.apache.directory.api.ldap.model.name.Dn;
+import org.apache.directory.api.ldap.model.name.Rdn;
 import org.apache.directory.ldap.client.api.LdapConnection;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
@@ -310,9 +314,23 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
     @ChaiProvider.LdapOperation
     @ChaiProvider.ModifyOperation
-    public void renameEntry( String entryDN, String newRDN, String newParentDN )
-            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
-        throw ChaiOperationException.forErrorMessage( "Not implemented" );
+    public void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
+    {
+        try
+        {
+            final ModifyDnRequest modifyDnRequest = new ModifyDnRequestImpl();
+            modifyDnRequest.setName( new Dn(  entryDN ) );
+            modifyDnRequest.setDeleteOldRdn( true );
+            modifyDnRequest.setNewRdn( new Rdn( newRDN ) );
+            modifyDnRequest.setNewSuperior( new Dn( newParentDN ) );
+            final ModifyDnResponse response = connection.modifyDn( modifyDnRequest );
+            processResponse( response );
+        }
+        catch ( LdapException e )
+        {
+            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+        }
     }
 
     public void deleteEntry( final String entryDN )

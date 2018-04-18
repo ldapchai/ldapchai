@@ -334,21 +334,17 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @ChaiProvider.LdapOperation
     @ChaiProvider.ModifyOperation
-    public void renameEntry(String entryDN, String newRDN, String newParentDN)
-            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException {
-
+    public void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
+            throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
+    {
         activityPreCheck();
-        getInputValidator().renameEntry(entryDN, newRDN, newParentDN);
+        getInputValidator().renameEntry( entryDN, newRDN, newParentDN );
 
         final LdapContext ldapConnection = getLdapConnection();
         try
         {
-            StringBuilder newDN = new StringBuilder( newRDN.length() + newParentDN.length() + 1 );
-            newDN.append( newRDN );
-            newDN.append( "," );
-            newDN.append( newParentDN );
-
-            ldapConnection.rename( entryDN, newDN.toString() );
+            final String newDN = newRDN + "," + newParentDN;
+            ldapConnection.rename( entryDN, newDN );
         }
         catch ( NamingException e )
         {
