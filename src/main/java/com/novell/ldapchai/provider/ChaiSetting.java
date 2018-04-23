@@ -227,6 +227,17 @@ public enum ChaiSetting
     WATCHDOG_IDLE_TIMEOUT( "chai.watchdog.idleTimeout", "30000", true, Validator.INTEGER_VALIDATOR ),
 
     /**
+     * <p>Maximum time a ChaiProvider can remain in use(in ms).  If this time is exceeded, the connection will
+     * be closed and re-opened.</p>
+     *
+     * <table border="1"><caption><b>Setting Information</b></caption>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.watchdog.maxConnectionLifetime</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>30000</td></tr>
+     * </table>
+     */
+    WATCHDOG_MAX_CONNECTION_LIFETIME( "chai.watchdog.maxConnectionLifetime", "3300000", true, Validator.INTEGER_VALIDATOR ),
+
+    /**
      * <p>Disable watchdog timeout on providers where the bind URL's principal has its password expired.</p>
      *
      * <table border="1"><caption><b>Setting Information</b></caption>

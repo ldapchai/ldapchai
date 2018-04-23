@@ -183,6 +183,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         this.providerFactory = providerFactory;
         this.chaiConfig = chaiConfiguration;
         state = ConnectionState.OPEN;
+        incrementBindStatistic();
     }
 
     protected void activityPreCheck()
@@ -724,6 +725,14 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         {
             LOGGER.warn( "unexpected chai api error", e );
             throw new IllegalStateException( e.getMessage(), e );
+        }
+    }
+
+    private void incrementBindStatistic()
+    {
+        if ( getChaiConfiguration().getBooleanSetting( ChaiSetting.STATISTICS_ENABLE ) )
+        {
+            getProviderFactory().getCentralService().getStatsBean().incrementStatistic( ProviderStatistics.IncrementerStatistic.BIND_COUNT );
         }
     }
 }

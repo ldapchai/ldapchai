@@ -41,13 +41,13 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 class StatisticsWrapper implements InvocationHandler
 {
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( StatisticsWrapper.class.getName() );
 
     /**
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
      */
     private ChaiProviderImplementor realProvider;
+
     private final StatsBean statisticsProvider = new StatsBean();
 
     static ChaiProviderImplementor forProvider( final ChaiProviderImplementor chaiProvider )
@@ -84,8 +84,6 @@ class StatisticsWrapper implements InvocationHandler
             throws Throwable
     {
         final boolean isLdap = method.getAnnotation( ChaiProviderImplementor.LdapOperation.class ) != null;
-        final boolean isModify = method.getAnnotation( ChaiProviderImplementor.ModifyOperation.class ) != null;
-        final boolean isSearch = method.getAnnotation( ChaiProviderImplementor.SearchOperation.class ) != null;
 
         if ( method.getName().equals( "getProviderStatistics" ) )
         {
@@ -94,39 +92,30 @@ class StatisticsWrapper implements InvocationHandler
 
         if ( isLdap )
         {
-            statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.OPERATION_COUNT );
-            getGlobalStatsBean().incrementStatistic( ProviderStatistics.IncrementerStatistic.OPERATION_COUNT );
+            incrementStat( ProviderStatistics.IncrementerStatistic.OPERATION_COUNT );
+
+            final boolean isModify = method.getAnnotation( ChaiProviderImplementor.ModifyOperation.class ) != null;
+            final boolean isSearch = method.getAnnotation( ChaiProviderImplementor.SearchOperation.class ) != null;
 
             if ( isModify )
             {
-                statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.MODIFY_COUNT );
-                getGlobalStatsBean().incrementStatistic( ProviderStatistics.IncrementerStatistic.MODIFY_COUNT );
+                incrementStat( ProviderStatistics.IncrementerStatistic.MODIFY_COUNT );
             }
             else if ( isSearch )
             {
-                statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.SEARCH_COUNT );
-                getGlobalStatsBean().incrementStatistic( ProviderStatistics.IncrementerStatistic.SEARCH_COUNT );
+                incrementStat( ProviderStatistics.IncrementerStatistic.SEARCH_COUNT );
             }
             else
             {
-                statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.READ_COUNT );
-                getGlobalStatsBean().incrementStatistic( ProviderStatistics.IncrementerStatistic.READ_COUNT );
+                incrementStat( ProviderStatistics.IncrementerStatistic.READ_COUNT );
             }
 
-            statisticsProvider.markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_OPERATION_BEGIN );
-            getGlobalStatsBean().markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_OPERATION_BEGIN );
+            markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_OPERATION_BEGIN );
         }
 
         try
         {
-            final Object returnObj = method.invoke( realProvider, args );
-
-            if ( method.getName().equals( "init" ) )
-            {
-                statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.BIND_COUNT );
-            }
-
-            return returnObj;
+            return method.invoke( realProvider, args );
         }
         catch ( InvocationTargetException e )
         {
@@ -134,20 +123,29 @@ class StatisticsWrapper implements InvocationHandler
 
             if ( exceptionCause instanceof ChaiUnavailableException )
             {
-                statisticsProvider.markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_UNAVAILABLE_EXCEPTION );
-                getGlobalStatsBean().markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_UNAVAILABLE_EXCEPTION );
+                markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_UNAVAILABLE_EXCEPTION );
 
-                statisticsProvider.incrementStatistic( ProviderStatistics.IncrementerStatistic.UNAVAILABLE_COUNT );
-                getGlobalStatsBean().incrementStatistic( ProviderStatistics.IncrementerStatistic.UNAVAILABLE_COUNT );
+                incrementStat( ProviderStatistics.IncrementerStatistic.UNAVAILABLE_COUNT );
             }
 
             throw exceptionCause;
         }
         finally
         {
-            statisticsProvider.markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_OPERATION_FINISH );
-            getGlobalStatsBean().markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_OPERATION_FINISH );
+            markTimestampStatistic( ProviderStatistics.TimestampStatistic.LAST_OPERATION_FINISH );
         }
+    }
+
+    private void incrementStat( final ProviderStatistics.IncrementerStatistic incrementerStatistic )
+    {
+        statisticsProvider.incrementStatistic( incrementerStatistic );
+        getGlobalStatsBean().incrementStatistic( incrementerStatistic );
+    }
+
+    private void markTimestampStatistic( final ProviderStatistics.TimestampStatistic timestampStatistic )
+    {
+        statisticsProvider.markTimestampStatistic( timestampStatistic );
+        getGlobalStatsBean().markTimestampStatistic( timestampStatistic );
     }
 
     static class StatsBean implements ProviderStatistics

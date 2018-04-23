@@ -26,18 +26,18 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -152,12 +152,11 @@ public final class ChaiProviderFactory
     public ChaiProvider newProvider( final ChaiConfiguration chaiConfiguration )
             throws ChaiUnavailableException
     {
-        return newProviderImpl( chaiConfiguration, false );
+        return newProviderImpl( chaiConfiguration );
     }
 
-    ChaiProviderImplementor newProviderImpl(
-            final ChaiConfiguration chaiConfiguration,
-            final boolean failOverWrapperChild
+    private ChaiProviderImplementor newProviderImpl(
+            final ChaiConfiguration chaiConfiguration
     )
             throws ChaiUnavailableException
     {
@@ -166,25 +165,7 @@ public final class ChaiProviderFactory
         ChaiProviderImplementor providerImpl;
         try
         {
-            final boolean enableFailover = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.FAILOVER_ENABLE ) );
-
-            if ( enableFailover && !failOverWrapperChild )
-            {
-                providerImpl = FailOverWrapper.forConfiguration( this, chaiConfiguration );
-            }
-            else
-            {
-                if ( LOGGER.isTraceEnabled() )
-                {
-                    final String debugMsg = "creating new jndi ldap connection to "
-                            + chaiConfiguration.getSetting( ChaiSetting.BIND_URLS )
-                            + " as "
-                            + chaiConfiguration.getSetting( ChaiSetting.BIND_DN );
-                    LOGGER.trace( debugMsg );
-                }
-
-                providerImpl = createConcreteProvider( this, chaiConfiguration, true );
-            }
+            providerImpl = createFailOverOrConcreteProvider( chaiConfiguration );
         }
         catch ( Exception e )
         {
@@ -200,13 +181,36 @@ public final class ChaiProviderFactory
             throw new ChaiUnavailableException( "unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
         }
 
-        if ( !failOverWrapperChild )
-        {
-            providerImpl = addProviderWrappers( providerImpl );
-            getCentralService().registerProvider( providerImpl );
-        }
+        providerImpl = addProviderWrappers( providerImpl );
+        getCentralService().registerProvider( providerImpl );
 
         return providerImpl;
+    }
+
+    ChaiProviderImplementor createFailOverOrConcreteProvider(
+            final ChaiConfiguration chaiConfiguration
+    )
+            throws ChaiUnavailableException
+    {
+        final boolean enableFailover = chaiConfiguration.getBooleanSetting( ChaiSetting.FAILOVER_ENABLE );
+
+        if ( enableFailover )
+        {
+            return FailOverWrapper.forConfiguration( this, chaiConfiguration );
+        }
+        else
+        {
+            if ( LOGGER.isTraceEnabled() )
+            {
+                final String debugMsg = "creating new ldap connection to "
+                        + chaiConfiguration.getSetting( ChaiSetting.BIND_URLS )
+                        + " as "
+                        + chaiConfiguration.getSetting( ChaiSetting.BIND_DN );
+                LOGGER.trace( debugMsg );
+            }
+
+            return createConcreteProvider( this, chaiConfiguration, true );
+        }
     }
 
     static ChaiProviderImplementor createConcreteProvider(
@@ -214,59 +218,69 @@ public final class ChaiProviderFactory
             final ChaiConfiguration chaiConfiguration,
             final boolean initialize
     )
-            throws Exception
+            throws ChaiUnavailableException, IllegalStateException
     {
-        final String className = chaiConfiguration.getSetting( ChaiSetting.PROVIDER_IMPLEMENTATION );
-
-        final ChaiProviderImplementor providerImpl;
-
-        final Class providerClass = Class.forName( className );
-        final Object impl = providerClass.newInstance();
-        if ( !( impl instanceof ChaiProvider ) )
+        try
         {
-            final String msg = "unable to create new ChaiProvider, "
-                    + className + " is not instance of "
-                    + ChaiProvider.class.getName();
-            throw new ChaiUnavailableException( msg, ChaiError.UNKNOWN );
-        }
-        if ( !( impl instanceof ChaiProviderImplementor ) )
-        {
-            final String msg = "unable to create new ChaiProvider, "
-                    + className + " is not instance of "
-                    + ChaiProviderImplementor.class.getName();
-            throw new ChaiUnavailableException( msg, ChaiError.UNKNOWN );
-        }
-        providerImpl = ( ChaiProviderImplementor ) impl;
+            final String className = chaiConfiguration.getSetting( ChaiSetting.PROVIDER_IMPLEMENTATION );
 
-        if ( initialize )
-        {
-            providerImpl.init( chaiConfiguration, providerFactory );
-        }
+            final ChaiProviderImplementor providerImpl;
 
-        return providerImpl;
+            final Class providerClass = Class.forName( className );
+            final Object impl = providerClass.newInstance();
+            if ( !( impl instanceof ChaiProvider ) )
+            {
+                final String msg = "unable to create new ChaiProvider, "
+                        + className + " is not instance of "
+                        + ChaiProvider.class.getName();
+                throw new ChaiUnavailableException( msg, ChaiError.UNKNOWN );
+            }
+            if ( !( impl instanceof ChaiProviderImplementor ) )
+            {
+                final String msg = "unable to create new ChaiProvider, "
+                        + className + " is not instance of "
+                        + ChaiProviderImplementor.class.getName();
+                throw new ChaiUnavailableException( msg, ChaiError.UNKNOWN );
+            }
+            providerImpl = ( ChaiProviderImplementor ) impl;
+
+            if ( initialize )
+            {
+                providerImpl.init( chaiConfiguration, providerFactory );
+            }
+
+            return providerImpl;
+        }
+        catch ( ClassNotFoundException | IllegalAccessException | InstantiationException e )
+        {
+            final String msg = "unexpected error creating new concrete ChaiProvider instance: " + e.getMessage();
+            LOGGER.error( msg, e );
+            throw new IllegalStateException( msg );
+        }
     }
 
-    ChaiProviderImplementor addProviderWrappers( final ChaiProviderImplementor providerImpl )
+    private ChaiProviderImplementor addProviderWrappers( final ChaiProviderImplementor providerImpl )
     {
         final ChaiConfiguration chaiConfiguration = providerImpl.getChaiConfiguration();
 
-        final boolean enableReadOnly = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.READONLY ) );
-        final boolean enableWatchdog = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.WATCHDOG_ENABLE ) );
-        final boolean enableWireTrace = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.WIRETRACE_ENABLE ) );
-        final boolean enableStatistics = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.STATISTICS_ENABLE ) );
-        final boolean enableCaching = "true".equalsIgnoreCase( chaiConfiguration.getSetting( ChaiSetting.CACHE_ENABLE ) );
+        final boolean enableWatchdog = chaiConfiguration.getBooleanSetting( ChaiSetting.WATCHDOG_ENABLE );
+        final boolean enableReadOnly = chaiConfiguration.getBooleanSetting( ChaiSetting.READONLY );
+        final boolean enableWireTrace = chaiConfiguration.getBooleanSetting( ChaiSetting.WIRETRACE_ENABLE );
+        final boolean enableStatistics = chaiConfiguration.getBooleanSetting( ChaiSetting.STATISTICS_ENABLE );
+        final boolean enableCaching = chaiConfiguration.getBooleanSetting( ChaiSetting.CACHE_ENABLE );
 
         ChaiProviderImplementor outputProvider = providerImpl;
-        if ( enableReadOnly && !( outputProvider instanceof ReadOnlyWrapper ) )
-        {
-            LOGGER.trace( "adding ReadOnlyWrapper to provider instance" );
-            outputProvider = ReadOnlyWrapper.forProvider( outputProvider );
-        }
 
         if ( enableWatchdog && !( outputProvider instanceof WatchdogWrapper ) )
         {
             LOGGER.trace( "adding WatchdogWrapper to provider instance" );
             outputProvider = WatchdogWrapper.forProvider( this, outputProvider );
+        }
+
+        if ( enableReadOnly && !( outputProvider instanceof ReadOnlyWrapper ) )
+        {
+            LOGGER.trace( "adding ReadOnlyWrapper to provider instance" );
+            outputProvider = ReadOnlyWrapper.forProvider( outputProvider );
         }
 
         if ( enableWireTrace && !( outputProvider instanceof WireTraceWrapper ) )
@@ -413,7 +427,7 @@ public final class ChaiProviderFactory
 
         private final int maxVendorCacheAgeMs;
 
-        private final Set<WeakReference<ChaiProviderImplementor>> activeProviders = ConcurrentHashMap.newKeySet();
+        private final WeakReferenceHolder<ChaiProviderImplementor> activeProviders = new WeakReferenceHolder<>();
 
         private CentralService( final ChaiProviderFactory chaiProviderFactory )
         {
@@ -475,43 +489,18 @@ public final class ChaiProviderFactory
 
         Set<ChaiProvider> activeProviders()
         {
-            final Set<ChaiProvider> returnSet = new HashSet<>( );
-            for ( final WeakReference<ChaiProviderImplementor> reference : activeProviders )
-            {
-                final ChaiProviderImplementor implementor = reference.get();
-                if ( implementor != null )
-                {
-                    returnSet.add( implementor );
-                }
-            }
+            final Set<ChaiProvider> returnSet = new HashSet<>( activeProviders.allValues() );
             return Collections.unmodifiableSet( returnSet );
         }
 
         void registerProvider( final ChaiProviderImplementor chaiProviderImplementor )
         {
-            final WeakReference<ChaiProviderImplementor> reference = new WeakReference<>( chaiProviderImplementor );
-            activeProviders.add( reference );
-
-            // call the de-register to clear dead references.
-            deRegisterProvider( null );
+            activeProviders.add( chaiProviderImplementor );
         }
 
         void deRegisterProvider( final ChaiProviderImplementor chaiProviderImplementor )
         {
-            for ( Iterator<WeakReference<ChaiProviderImplementor>> iterator = activeProviders.iterator(); iterator.hasNext(); )
-            {
-                final WeakReference<ChaiProviderImplementor> reference = iterator.next();
-                final ChaiProviderImplementor implementor = reference.get();
-
-                if ( implementor == null )
-                {
-                    iterator.remove();
-                }
-                else if ( implementor.equals( chaiProviderImplementor ) )
-                {
-                    iterator.remove();
-                }
-            }
+            activeProviders.remove( chaiProviderImplementor );
         }
     }
 
@@ -534,6 +523,40 @@ public final class ChaiProviderFactory
         public DirectoryVendor getVendor()
         {
             return vendor;
+        }
+    }
+
+    static class WeakReferenceHolder<E>
+    {
+        private WeakHashMap<E, Object> internalWeakMap = new WeakHashMap<>();
+
+        private final Object lock = new Object();
+
+        void add( final E reference )
+        {
+            synchronized ( lock )
+            {
+                internalWeakMap.put( reference, null );
+            }
+        }
+
+        void remove( final E reference )
+        {
+            synchronized ( lock )
+            {
+                internalWeakMap.remove( reference, null );
+            }
+        }
+
+        Collection<E> allValues()
+        {
+            final Set<E> newSet;
+            synchronized ( lock )
+            {
+                newSet = new HashSet<>( internalWeakMap.keySet() );
+                newSet.remove( null );
+            }
+            return newSet;
         }
     }
 }

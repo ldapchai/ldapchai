@@ -41,6 +41,8 @@ class WatchdogService
 
     private final ChaiProviderFactory chaiProviderFactory;
 
+    private final ChaiProviderFactory.WeakReferenceHolder<WatchdogWrapper> issuedWatchdogWrappers = new ChaiProviderFactory.WeakReferenceHolder<>();
+
     private final Lock serviceThreadLock = new ReentrantLock();
 
     private volatile ScheduledExecutorService watchdogTimer = null;
@@ -58,13 +60,8 @@ class WatchdogService
 
     void registerInstance( final WatchdogWrapper wdWrapper )
     {
-        chaiProviderFactory.getCentralService().registerProvider( wdWrapper );
+        issuedWatchdogWrappers.add( wdWrapper );
         checkTimer();
-    }
-
-    void deRegisterInstance( final WatchdogWrapper wdWrapper )
-    {
-        chaiProviderFactory.getCentralService().deRegisterProvider( wdWrapper );
     }
 
     /**
@@ -80,7 +77,7 @@ class WatchdogService
             if ( watchdogTimer == null )
             {
                 // if there is NOT an active timer
-                if ( !getWrappers().isEmpty() )
+                if ( !issuedWatchdogWrappers.allValues().isEmpty() )
                 {
                     // if there are active providers.
                     LOGGER.debug( "starting up " + THREAD_NAME + ", " + watchdogFrequency + "ms check frequency" );
@@ -143,24 +140,11 @@ class WatchdogService
         }
     }
 
-    private Set<WatchdogWrapper> getWrappers()
-    {
-        final Set<WatchdogWrapper> copyCollection = new HashSet<>();
-        for ( final ChaiProvider provider : chaiProviderFactory.getCentralService().activeProviders() )
-        {
-            if ( provider instanceof WatchdogWrapper )
-            {
-                copyCollection.add( (WatchdogWrapper ) provider );
-            }
-        }
-        return copyCollection;
-    }
-
     private class WatchdogTask extends TimerTask implements Runnable
     {
         public void run()
         {
-            final Set<WatchdogWrapper> copyCollection = getWrappers();
+            final Set<WatchdogWrapper> copyCollection = new HashSet<>( issuedWatchdogWrappers.allValues() );
 
             for ( final WatchdogWrapper wdWrapper : copyCollection )
             {
