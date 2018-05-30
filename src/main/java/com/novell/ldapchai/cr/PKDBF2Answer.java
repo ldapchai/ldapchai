@@ -29,14 +29,16 @@ import java.security.SecureRandom;
 
 class PKDBF2Answer implements Answer
 {
-    protected final String answerHash;
-    protected final String salt;
-    protected final int hashCount;
-    protected final boolean caseInsensitive;
 
-    protected final FormatType formatType;
+    private String hashedAnswer;
+    private String plainAnswer;
+    private final String salt;
+    private final int hashCount;
+    private final boolean caseInsensitive;
 
-    PKDBF2Answer(
+    private final FormatType formatType;
+
+    private PKDBF2Answer(
             final FormatType formatType,
             final String answerHash,
             final String salt,
@@ -67,13 +69,13 @@ class PKDBF2Answer implements Answer
         }
 
         this.formatType = formatType;
-        this.answerHash = answerHash;
+        this.hashedAnswer = answerHash;
         this.salt = salt;
         this.hashCount = hashCount;
         this.caseInsensitive = caseInsensitive;
     }
 
-    PKDBF2Answer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+    private PKDBF2Answer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
     {
         this.hashCount = answerConfiguration.hashCount;
         this.caseInsensitive = answerConfiguration.caseInsensitive;
@@ -85,18 +87,31 @@ class PKDBF2Answer implements Answer
             throw new IllegalArgumentException( "missing answerHash text" );
         }
 
+        this.plainAnswer = answer;
+    }
+
+    private String getHashedAnswer()
+    {
+        if ( hashedAnswer != null )
         {
-            // make hash
-            final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
-            this.answerHash = hashValue( casedAnswer );
+            return hashedAnswer;
         }
 
+        if ( plainAnswer != null )
+        {
+            // make hash
+            final String casedAnswer = caseInsensitive ? plainAnswer.toLowerCase() : plainAnswer;
+            this.hashedAnswer = hashValue( casedAnswer );
+            return this.hashedAnswer;
+        }
+
+        return null;
     }
 
     public Element toXml()
     {
         final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
-        answerElement.setText( answerHash );
+        answerElement.setText( getHashedAnswer() );
         if ( salt != null && salt.length() > 0 )
         {
             answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT, salt );
@@ -119,10 +134,17 @@ class PKDBF2Answer implements Answer
 
         final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
         final String hashedTest = hashValue( casedResponse );
-        return answerHash.equalsIgnoreCase( hashedTest );
+        final String hashedAnswer = getHashedAnswer();
+
+        if ( hashedTest != null && hashedAnswer != null )
+        {
+            return hashedAnswer.equalsIgnoreCase( hashedTest );
+        }
+
+        return false;
     }
 
-    protected String hashValue( final String input )
+    private String hashValue( final String input )
     {
         try
         {
@@ -183,7 +205,7 @@ class PKDBF2Answer implements Answer
     {
         final AnswerBean answerBean = new AnswerBean();
         answerBean.setType( formatType );
-        answerBean.setAnswerHash( answerHash );
+        answerBean.setAnswerHash( getHashedAnswer() );
         answerBean.setCaseInsensitive( caseInsensitive );
         answerBean.setHashCount( hashCount );
         answerBean.setSalt( salt );
