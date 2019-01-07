@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>com.github.ldapchai</groupId>
-    <version>0.7.3</version>
+    <version>0.7.4</version>
     <artifactId>ldapchai</artifactId>
     <packaging>jar</packaging>
 
