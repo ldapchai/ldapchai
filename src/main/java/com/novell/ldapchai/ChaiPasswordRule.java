@@ -71,6 +71,9 @@ public enum ChaiPasswordRule
 
     MinimumNumeric( "chai.pwrule.numeric.min", RuleType.MIN, "0" ),
     MaximumNumeric( "chai.pwrule.numeric.max", RuleType.MAX, "0" ),
+    AllowNonAlpha( "chai.pwrule.nonalpha.allow", RuleType.BOOLEAN, "true" ),
+    MinimumNonAlpha( "chai.pwrule.nonalpha.min", RuleType.MIN, "0" ),
+    MaximumNonAlpha( "chai.pwrule.nonalpha.max", RuleType.MAX, "0" ),
     MinimumUnique( "chai.pwrule.unique.min", RuleType.MIN, "0" ),
     MaximumUnique( "chai.pwrule.unique.max", RuleType.MAX, "0" ),
     AllowFirstCharNumeric( "chai.pwrule.numeric.allowFirst", RuleType.BOOLEAN, "true" ),

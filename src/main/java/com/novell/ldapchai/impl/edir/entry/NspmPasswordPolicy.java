@@ -95,6 +95,15 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
         /**
          * Maximum number of times a numeric character may appear in the password.
          */
+        MAX_NONALPHA(
+                TYPE.MAX,
+                ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_NONALPHA_CHARACTERS,
+                "0",
+                ChaiPasswordRule.MaximumNonAlpha ),
+
+        /**
+         * Maximum number of times a numeric character may appear in the password.
+         */
         MAX_NUMERIC(
                 TYPE.MAX,
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MAX_NUMERIC_CHARACTERS,
@@ -132,7 +141,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
                 ChaiPasswordRule.MaximumLength ),
 
         /**
-         * Minimim total length of the password.
+         * Minimum total length of the password.
          */
         MIN_LOWER(
                 TYPE.MIN,
@@ -141,7 +150,17 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
                 ChaiPasswordRule.MinimumLowerCase ),
 
         /**
-         * Minimum number of times a numeric character mayappear in the password.
+         * Minimum number of times a non-alpha character may appear in the password.
+         */
+        MIN_NONALPHA(
+                TYPE.MIN,
+                ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_MIN_NONALPHA_CHARACTERS,
+                "0",
+                ChaiPasswordRule.MinimumNonAlpha ),
+
+
+        /**
+         * Minimum number of times a numeric character may appear in the password.
          */
         MIN_NUMERIC(
                 TYPE.MIN,
@@ -219,6 +238,15 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
                 ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_NUMERIC_LAST_ALLOWED,
                 "TRUE",
                 ChaiPasswordRule.AllowLastCharNumeric ),
+
+        /**
+         * If non-alpha characters are allowed (true/false).
+         */
+        NONALPHA_ALLOWED(
+                TYPE.BOOLEAN,
+                ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_NONALPHA_ALLOWED,
+                "TRUE",
+                ChaiPasswordRule.AllowNonAlpha ),
 
         /**
          * If special (non-alphanumeric) characters are allowed (true/false).

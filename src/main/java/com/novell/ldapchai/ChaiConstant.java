@@ -245,17 +245,20 @@ public interface ChaiConstant
 
     String ATTR_EDIR_PASSWORD_POLICY_MAX_CONSECUTIVE_CHARACTERS = "nspmMaxConsecutiveCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MAX_LOWER_CHARACTERS = "nspmMaxLowerCaseCharacters";
+    String ATTR_EDIR_PASSWORD_POLICY_MAX_NONALPHA_CHARACTERS = "nspmMaxNonAlphaCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MAX_NUMERIC_CHARACTERS = "nspmMaxNumericCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MAX_REPEATED_CHARACTERS = "nspmMaxRepeatedCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MAX_SPECIAL_CHARACTERS = "nspmMaxSpecialCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MAX_UPPER_CHARACTERS = "nspmMaxUpperCaseCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MAX_LENGTH = "nspmMaximumLength";
     String ATTR_EDIR_PASSWORD_POLICY_MIN_LOWER_CHARACTERS = "nspmMinLowerCaseCharacters";
+    String ATTR_EDIR_PASSWORD_POLICY_MIN_NONALPHA_CHARACTERS = "nspmMinNonAlphaCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MIN_NUMERIC_CHARACTERS = "nspmMinNumericCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS = "nspmMinSpecialCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MIN_UNIQUE_CHARACTERS = "nspmMinUniqueCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MIN_UPPER_CHARACTERS = "nspmMinUpperCaseCharacters";
     String ATTR_EDIR_PASSWORD_POLICY_MIN_LENGTH = ATTR_LDAP_PASSWORD_MINIMUM_LENGTH;
+    String ATTR_EDIR_PASSWORD_POLICY_NONALPHA_ALLOWED = "nspmNonAlphaCharactersAllowed";
     String ATTR_EDIR_PASSWORD_POLICY_NUMERIC_ALLOWED = "nspmNumericCharactersAllowed";
     String ATTR_EDIR_PASSWORD_POLICY_NUMERIC_FIRST_ALLOWED = "nspmNumericAsFirstCharacter";
     String ATTR_EDIR_PASSWORD_POLICY_NUMERIC_LAST_ALLOWED = "nspmNumericAsLastCharacter";
