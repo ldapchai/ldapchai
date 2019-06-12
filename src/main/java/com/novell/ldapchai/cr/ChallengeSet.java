@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.ChallengeSetBean;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Locale;
@@ -116,4 +118,6 @@ public interface ChallengeSet extends Serializable
      * @return the value of the implementor
      */
     String getIdentifier();
+
+    ChallengeSetBean asChallengeSetBean();
 }

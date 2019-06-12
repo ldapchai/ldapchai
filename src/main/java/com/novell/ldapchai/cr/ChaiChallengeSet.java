@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.cr.bean.ChallengeBean;
+import com.novell.ldapchai.cr.bean.ChallengeSetBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiValidationException;
 
@@ -29,12 +31,11 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 
 public class ChaiChallengeSet implements ChallengeSet, Serializable
 {
-
-
     private List<Challenge> challenges;
     private int minRandomRequired;
     private Locale locale;
@@ -203,5 +204,19 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
     public String getIdentifier()
     {
         return identifier;
+    }
+
+    public ChallengeSetBean asChallengeSetBean()
+    {
+        final ChallengeSetBean challengeSetBean = new ChallengeSetBean();
+        challengeSetBean.setIdentifier( this.getIdentifier() );
+        challengeSetBean.setLocale(  this.getLocale() );
+        challengeSetBean.setMinRandomRequired( this.getMinRandomRequired() );
+
+        final List<ChallengeBean> challengeBeans = this.getChallenges().stream()
+                .map( Challenge::asChallengeBean )
+                .collect( Collectors.toList() );
+        challengeSetBean.setChallenges( challengeBeans );
+        return challengeSetBean;
     }
 }
