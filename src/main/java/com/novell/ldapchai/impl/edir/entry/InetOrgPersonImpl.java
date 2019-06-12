@@ -179,12 +179,12 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             }
         }
 
-        LOGGER.debug( "unknown error retreiving password (null response)" );
-        throw new ChaiOperationException( "unknown error retreiving password (null response)", ChaiError.UNKNOWN );
+        LOGGER.debug( "unknown error retrieving password (null response)" );
+        throw new ChaiOperationException( "unknown error retrieving password (null response)", ChaiError.UNKNOWN );
     }
 
     public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
-            throws ChaiUnavailableException, ChaiPasswordPolicyException
+            throws ChaiUnavailableException, ChaiOperationException, ChaiPasswordPolicyException
     {
         final boolean useNmasSetting = this.getChaiProvider().getChaiConfiguration().getBooleanSetting( ChaiSetting.EDIRECTORY_ENABLE_NMAS );
         if ( !useNmasSetting )
@@ -220,6 +220,10 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
                 {
                     LOGGER.debug( "error setting nmas password: " + responseCode );
                     final String errorString = "nmas error " + responseCode;
+                    if ( responseCode == -222 )
+                    {
+                        throw new ChaiOperationException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
+                    }
                     throw new ChaiPasswordPolicyException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
                 }
             }
