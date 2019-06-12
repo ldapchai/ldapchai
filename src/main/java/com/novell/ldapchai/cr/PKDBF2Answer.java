@@ -264,7 +264,9 @@ class PKDBF2Answer implements Answer
                 saltCount = Integer.parseInt( hashCount );
             }
             catch ( NumberFormatException e )
-            { /* noop */ }
+            {
+                /* noop */
+            }
             return new PKDBF2Answer( formatTypeEnum, answerValue, salt, saltCount, caseInsensitive );
         }
     }

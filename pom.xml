@@ -65,7 +65,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.60</version>
+            <version>1.62</version>
         </dependency>
 
         <!-- Directory Access -->
@@ -87,12 +87,6 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.12</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.23.4</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -173,7 +167,7 @@
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
                         <artifactId>checkstyle</artifactId>
-                        <version>8.15</version>
+                        <version>8.21</version>
                     </dependency>
                 </dependencies>
                 <executions>

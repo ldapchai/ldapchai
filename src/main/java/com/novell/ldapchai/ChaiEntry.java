@@ -228,7 +228,7 @@ public interface ChaiEntry
      *
      * @param attributeName A valid attribute on the object.
      * @return A byte array where the first dimension is each ldap value, and the second dimension
-     * is the actual byte values.
+     *     is the actual byte values.
      * @throws ChaiOperationException   If an error is encountered during the operation
      * @throws ChaiUnavailableException If no directory servers are reachable
      * @see com.novell.ldapchai.provider.ChaiProvider#readMultiByteAttribute(String, String)

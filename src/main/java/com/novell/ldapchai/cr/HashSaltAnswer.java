@@ -308,7 +308,9 @@ class HashSaltAnswer implements Answer
                 saltCount = Integer.parseInt( hashCount );
             }
             catch ( NumberFormatException e )
-            { /* noop */ }
+            {
+                /* noop */
+            }
             final String formatStr = element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT ) == null
                     ? ""
                     : element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );

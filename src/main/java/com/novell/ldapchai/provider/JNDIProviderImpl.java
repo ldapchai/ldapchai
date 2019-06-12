@@ -280,7 +280,9 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     answer.close();
                 }
                 catch ( Exception e )
-                { /* action not required */ }
+                {
+                    /* action not required */
+                }
             }
         }
 
