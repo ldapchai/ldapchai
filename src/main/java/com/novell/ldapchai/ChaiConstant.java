@@ -279,6 +279,7 @@ public interface ChaiConstant
     String ATTR_EDIR_PASSWORD_POLICY_FORGOTTEN_ACTION = "nsimForgottenAction";
     String ATTR_EDIR_PASSWORD_POLICY_FORGOTTEN_LOGIN_CONFIG = "nsimForgottenLoginConfig";
     String ATTR_EDIR_PASSWORD_POLICY_PASSWORD_LIFETIME = "nspmMinPasswordLifetime";
+    String ATTR_EDIR_PASSWORD_POLICY_DN = "nspmPasswordPolicyDN";
 
     String ATTR_AD_PASSWORD_POLICY_PRECEDENCE = "msDS-PasswordSettingsPrecedence";
     String ATTR_AD_PASSWORD_POLICY_REVERSIBLE_ENCRYPTION = "msDS-PasswordReversibleEncryptionEnabled";
