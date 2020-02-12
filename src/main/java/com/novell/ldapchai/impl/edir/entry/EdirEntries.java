@@ -387,7 +387,7 @@ public class EdirEntries
             {
                 // look at user object first
                 {
-                    final String policyDN = theUser.readStringAttribute( "nspmPasswordPolicyDN" );
+                    final String policyDN = theUser.readStringAttribute( ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_DN );
                     if ( policyDN != null && policyDN.length() > 0 )
                     {
                         return chaiEntryFactory.newChaiEntry( policyDN );
@@ -400,7 +400,7 @@ public class EdirEntries
                 {
                     if ( parentObject != null )
                     {
-                        final String policyDN = parentObject.readStringAttribute( "nspmPasswordPolicyDN" );
+                        final String policyDN = parentObject.readStringAttribute( ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_DN );
                         if ( policyDN != null && policyDN.length() > 0 )
                         {
                             return chaiEntryFactory.newChaiEntry( policyDN );
@@ -415,7 +415,7 @@ public class EdirEntries
                         final ChaiEntry partitonRoot = findPartitionRoot( parentObject );
                         if ( partitonRoot != null )
                         {
-                            final String policyDN = partitonRoot.readStringAttribute( "nspmPasswordPolicyDN" );
+                            final String policyDN = partitonRoot.readStringAttribute( ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_DN  );
                             if ( policyDN != null && policyDN.length() > 0 )
                             {
                                 return chaiEntryFactory.newChaiEntry( policyDN );
@@ -431,7 +431,7 @@ public class EdirEntries
                     if ( loginPolicyDN != null && loginPolicyDN.length() > 0 )
                     {
                         final ChaiEntry loginPolicy = chaiEntryFactory.newChaiEntry( loginPolicyDN );
-                        final String policyDN = loginPolicy.readStringAttribute( "nspmPasswordPolicyDN" );
+                        final String policyDN = loginPolicy.readStringAttribute( ChaiConstant.ATTR_EDIR_PASSWORD_POLICY_DN  );
                         if ( policyDN != null && policyDN.length() > 0 )
                         {
                             return chaiEntryFactory.newChaiEntry( policyDN );
