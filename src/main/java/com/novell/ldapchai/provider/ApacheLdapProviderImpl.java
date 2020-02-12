@@ -30,14 +30,12 @@ import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
 import org.apache.directory.api.ldap.model.cursor.SearchCursor;
 import org.apache.directory.api.ldap.model.entry.Attribute;
-import org.apache.directory.api.ldap.model.entry.BinaryValue;
 import org.apache.directory.api.ldap.model.entry.DefaultAttribute;
 import org.apache.directory.api.ldap.model.entry.DefaultEntry;
 import org.apache.directory.api.ldap.model.entry.DefaultModification;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.entry.Modification;
 import org.apache.directory.api.ldap.model.entry.ModificationOperation;
-import org.apache.directory.api.ldap.model.entry.StringValue;
 import org.apache.directory.api.ldap.model.entry.Value;
 import org.apache.directory.api.ldap.model.exception.LdapException;
 import org.apache.directory.api.ldap.model.message.AddRequest;
@@ -633,7 +631,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         activityPreCheck();
         getInputValidator().replaceStringAttribute( entryDN, attributeName, oldValue, newValue );
 
-        replaceAttributeImpl( entryDN, attributeName, new StringValue( oldValue ), new StringValue( newValue ) );
+        replaceAttributeImpl( entryDN, attributeName, new Value( oldValue ), new Value( newValue ) );
     }
 
     private void replaceAttributeImpl( final String entryDN, final String attributeName, final Value oldValue, final Value newValue )
@@ -898,7 +896,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         activityPreCheck();
         getInputValidator().replaceBinaryAttribute( entryDN, attributeName, oldValue, newValue );
 
-        replaceAttributeImpl( entryDN, attributeName, new BinaryValue( oldValue ), new BinaryValue( newValue ) );
+        replaceAttributeImpl( entryDN, attributeName, new Value( oldValue ), new Value( newValue ) );
     }
 
     public boolean isConnected()
