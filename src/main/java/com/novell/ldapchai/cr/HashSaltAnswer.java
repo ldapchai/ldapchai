@@ -20,19 +20,17 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
+import com.novell.ldapchai.util.StringHelper;
 import net.iharder.Base64;
 import org.jdom2.Element;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Arrays;
 
 class HashSaltAnswer implements Answer
 {
-    private static final Map<FormatType, String> SUPPORTED_FORMATS;
     private static final String VERSION_SEPARATOR = ":";
     private static final VERSION DEFAULT_VERSION = VERSION.B;
 
@@ -52,16 +50,50 @@ class HashSaltAnswer implements Answer
         B,
     }
 
-    static
+
+    enum HashType
     {
-        final Map<FormatType, String> map = new HashMap<>();
-        map.put( FormatType.MD5, "MD5" );
-        map.put( FormatType.SHA1, "SHA1" );
-        map.put( FormatType.SHA1_SALT, "SHA1" );
-        map.put( FormatType.SHA256_SALT, "SHA-256" );
-        map.put( FormatType.SHA512_SALT, "SHA-512" );
-        SUPPORTED_FORMATS = Collections.unmodifiableMap( map );
+        MD5( FormatType.MD5, "MD5", false ),
+        SHA1( FormatType.SHA1, "SHA1", false ),
+        SHA1_SALT( FormatType.SHA1_SALT, "SHA1", true ),
+        SHA256_SALT( FormatType.SHA256_SALT, "SHA-256", true ),
+        SHA512_SALT( FormatType.SHA512_SALT, "SHA-512", true ),;
+
+        private final FormatType formatType;
+        private final String hashAlgName;
+        private final boolean saltEnabled;
+
+        HashType( final FormatType formatType, final String hashAlgName, final boolean saltEnabled )
+        {
+            this.hashAlgName = hashAlgName;
+            this.formatType = formatType;
+            this.saltEnabled = saltEnabled;
+        }
+
+        public FormatType getFormatType()
+        {
+            return formatType;
+        }
+
+        public String getHashAlgName()
+        {
+            return hashAlgName;
+        }
+
+        public boolean isSaltEnabled()
+        {
+            return saltEnabled;
+        }
+
+        public static HashType forFormatType( final FormatType formatType )
+        {
+            return Arrays.stream( values() )
+                    .filter( ( t ) -> t.getFormatType() == formatType )
+                    .findFirst()
+                    .orElseThrow( () ->  new IllegalArgumentException( "unsupported format type '" ) );
+        }
     }
+
 
     HashSaltAnswer(
             final String answerHash,
@@ -72,15 +104,13 @@ class HashSaltAnswer implements Answer
             final VERSION version
     )
     {
-        if ( answerHash == null || answerHash.length() < 1 )
+        if ( StringHelper.isEmpty( answerHash ) )
         {
-            throw new IllegalArgumentException( "missing answerHash" );
+            throw new IllegalArgumentException( "missing answerHash value" );
         }
 
-        if ( formatType == null || !SUPPORTED_FORMATS.containsKey( formatType ) )
-        {
-            throw new IllegalArgumentException( "unsupported format type '" + ( formatType == null ? "null" : formatType.toString() + "'" ) );
-        }
+        // throw exception for unknown format type;
+        HashType.forFormatType( formatType );
 
         this.answerHash = answerHash;
         this.version = version;
@@ -90,42 +120,38 @@ class HashSaltAnswer implements Answer
         this.caseInsensitive = caseInsensitive;
     }
 
-    HashSaltAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+    HashSaltAnswer( final AnswerConfiguration answerConfiguration, final String answer )
     {
-        this.hashCount = answerConfiguration.hashCount;
+        this.hashCount = answerConfiguration.iterations;
         this.caseInsensitive = answerConfiguration.caseInsensitive;
         this.formatType = answerConfiguration.formatType;
         this.version = DEFAULT_VERSION;
 
-        if ( answer == null || answer.length() < 1 )
+        if ( StringHelper.isEmpty( answer ) )
         {
-            throw new IllegalArgumentException( "missing answerHash text" );
+            throw new IllegalArgumentException( "missing answer value" );
         }
 
-        if ( formatType == null || !SUPPORTED_FORMATS.containsKey( formatType ) )
-        {
-            throw new IllegalArgumentException( "unsupported format type '" + ( formatType == null ? "null" : formatType.toString() + "'" ) );
-        }
+        final HashType hashType = HashType.forFormatType( formatType );
 
-        {
-            // make hash
-            final boolean includeSalt = formatType.toString().contains( "SALT" );
-            final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
-            this.salt = includeSalt ? generateSalt( 32 ) : "";
-            final String saltedAnswer = includeSalt ? salt + casedAnswer : casedAnswer;
-            this.answerHash = hashValue( saltedAnswer );
-        }
-
+        // make hash
+        final boolean includeSalt = hashType.isSaltEnabled();
+        final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
+        this.salt = includeSalt ? generateSalt( answerConfiguration.getSaltCharCount() ) : "";
+        final String saltedAnswer = includeSalt ? salt + casedAnswer : casedAnswer;
+        this.answerHash = hashValue( saltedAnswer );
     }
 
     public Element toXml()
     {
         final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( version.toString() + VERSION_SEPARATOR + answerHash );
-        if ( salt != null && salt.length() > 0 )
+
+        if ( !StringHelper.isEmpty( salt ) )
         {
             answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT, salt );
         }
+
         answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString() );
         if ( hashCount > 1 )
         {
@@ -161,19 +187,19 @@ class HashSaltAnswer implements Answer
     )
             throws IllegalStateException
     {
-        final String algorithm = SUPPORTED_FORMATS.get( formatType );
+        final HashType hashType = HashType.forFormatType( formatType );
         final MessageDigest md;
         try
         {
-            md = MessageDigest.getInstance( algorithm );
+            md = MessageDigest.getInstance( hashType.getHashAlgName() );
         }
         catch ( NoSuchAlgorithmException e )
         {
-            throw new IllegalStateException( "unable to load " + algorithm + " message digest algorithm: " + e.getMessage() );
+            throw new IllegalStateException( "unable to load " + hashType.getHashAlgName() + " message digest algorithm: " + e.getMessage() );
         }
 
 
-        byte[] hashedBytes = input.getBytes();
+        byte[] hashedBytes = input.getBytes( ChaiCrFactory.DEFAULT_CHARSET );
         switch ( version )
         {
             case A:
@@ -218,7 +244,7 @@ class HashSaltAnswer implements Answer
     static class HashSaltAnswerFactory implements ImplementationFactory
     {
         public HashSaltAnswer newAnswer(
-                final AnswerFactory.AnswerConfiguration answerConfiguration,
+                final AnswerConfiguration answerConfiguration,
                 final String answer
         )
         {

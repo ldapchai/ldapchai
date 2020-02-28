@@ -197,4 +197,9 @@ public class StringHelper
 
         return stringCollectionToString( tempList, seperator );
     }
+
+    public static boolean isEmpty( final String value )
+    {
+        return value == null || value.isEmpty();
+    }
 }

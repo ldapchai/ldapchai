@@ -71,8 +71,8 @@ public interface ResponseSet
      * <p>Tests the {@code ResponseSet} to see if it meets the requirements of the supplied {@link com.novell.ldapchai.cr.ChallengeSet}.
      * This method does not test any response values.</p>
      *
-     * <p>A typical use case for this method is to validate if an existing, stored {@code com.novell.ldapchai.cr.ResponseSet} of
-     * a user satisfies a current {@code com.novell.ldapchai.cr.ChallengeSet} policy.</p>
+     * <p>A typical use case for this method is to validate if an existing, stored {@code com.novell.ldapchai.com.novell.ldapchai.cr.ResponseSet} of
+     * a user satisfies a current {@code com.novell.ldapchai.com.novell.ldapchai.cr.ChallengeSet} policy.</p>
      *
      * @param challengeSet A valid {@code ChallengeSet}
      * @return true if this {@code ResponseSet} meets the requirements of the challenge set.

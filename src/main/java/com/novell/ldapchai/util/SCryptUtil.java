@@ -23,15 +23,17 @@ import net.iharder.Base64;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
 public class SCryptUtil
 {
     // dkLen
-    static final int SCRYPT_LENGTH = 32;
+    private static final int SCRYPT_LENGTH = 64;
+    private static final Charset CHARSET = Charset.forName( "UTF-8" );
 
-    public static boolean check( final String passwd, final String hashed )
+    public static boolean check( final String password, final String hashed )
     {
         try
         {
@@ -50,7 +52,7 @@ public class SCryptUtil
             final int valueR = ( int ) params >> 8 & 0xff;
             final int valueP = ( int ) params & 0xff;
 
-            final byte[] derived1 = org.bouncycastle.crypto.generators.SCrypt.generate( passwd.getBytes( "UTF-8" ), salt, valueN, valueR, valueP, SCRYPT_LENGTH );
+            final byte[] derived1 = org.bouncycastle.crypto.generators.SCrypt.generate( password.getBytes( CHARSET ), salt, valueN, valueR, valueP, SCRYPT_LENGTH );
 
             if ( derived0.length != derived1.length )
             {
@@ -74,15 +76,17 @@ public class SCryptUtil
         }
     }
 
+    public static String scrypt( final String password )
+    {
+        return scrypt( password, 16, 16 );
+    }
 
-    public static String scrypt( final String passwd )
+    public static String scrypt( final String password, final int saltLength, final int cost )
     {
         try
         {
-            final int saltLength = 16;
-
             // N
-            final int cost = 16;
+            final int effectiveCost = nextPowerOf2( cost );
 
             // r
             final int blockSize = 16;
@@ -91,22 +95,16 @@ public class SCryptUtil
             final int parallelization = 16;
 
             final byte[] salt = new byte[saltLength];
-            SecureRandom.getInstance( "SHA1PRNG" ).nextBytes( salt );
+            SecureRandom.getInstanceStrong().nextBytes( salt );
 
-            final byte[] pwdBytes = passwd.getBytes( "UTF-8" );
-            final byte[] derived = org.bouncycastle.crypto.generators.SCrypt.generate( pwdBytes, salt, cost, blockSize, parallelization, SCRYPT_LENGTH );
+            final byte[] pwdBytes = password.getBytes( CHARSET );
+            final byte[] derived = org.bouncycastle.crypto.generators.SCrypt.generate( pwdBytes, salt, effectiveCost, blockSize, parallelization, SCRYPT_LENGTH );
 
-            final String params = Long.toString( log2( cost ) << 16L | blockSize << 8 | parallelization, 16 );
+            final String params = Long.toString( log2( effectiveCost ) << 16L | blockSize << 8 | parallelization, 16 );
 
-            final StringBuilder sb = new StringBuilder( ( salt.length + derived.length ) * 2 );
-            sb.append( "$s0$" ).append( params ).append( '$' );
-            sb.append( Base64.encodeBytes( salt ) ).append( '$' );
-            sb.append( Base64.encodeBytes( derived ) );
-            return sb.toString();
-        }
-        catch ( UnsupportedEncodingException e )
-        {
-            throw new IllegalStateException( "JVM doesn't support UTF-8?" );
+            return "$s0$" + params + '$'
+                    + Base64.encodeBytes( salt ) + '$'
+                    + Base64.encodeBytes( derived );
         }
         catch ( GeneralSecurityException e )
         {
@@ -144,5 +142,18 @@ public class SCryptUtil
         }
 
         return log + ( valueN >>> 1 );
+    }
+
+    private static int nextPowerOf2( final int input )
+    {
+        int value = input;
+        value--;
+        value |= value >> 1;
+        value |= value >> 2;
+        value |= value >> 4;
+        value |= value >> 8;
+        value |= value >> 16;
+        value++;
+        return Math.max( 16, value );
     }
 }

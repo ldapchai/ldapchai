@@ -35,7 +35,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A {@link ChaiProvider} implementation wrapper that handles automatic idle disconnects.
@@ -48,9 +47,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 class WatchdogWrapper implements ChaiProviderImplementor
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogWrapper.class );
-
-    private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
-    private final int counter = ID_COUNTER.getAndIncrement();
 
     private final WatchdogProviderHolder providerHolder;
     private final ChaiConfiguration chaiConfiguration;
@@ -159,16 +155,9 @@ class WatchdogWrapper implements ChaiProviderImplementor
     @Override
     public String getIdentifier()
     {
-        final StringBuilder id = new StringBuilder(  );
-        id.append( "w" );
-        id.append( counter );
-
-        if ( providerHolder != null )
-        {
-            id.append( providerHolder.getIdentifier() );
-        }
-
-        return id.toString();
+        return providerHolder == null
+                ? "[null provider holder]"
+                : providerHolder.getIdentifier();
     }
 
     @Override
@@ -476,8 +465,6 @@ class WatchdogWrapper implements ChaiProviderImplementor
             return false;
         }
 
-        LOGGER.trace( "checking for user password expiration to adjust watchdog timeout id=" + getIdentifier() );
-
         boolean userPwExpired;
         try
         {
@@ -488,9 +475,7 @@ class WatchdogWrapper implements ChaiProviderImplementor
         catch ( ChaiException e )
         {
             LOGGER.error( "unexpected error attempting to read user password expiration value during"
-                    + " watchdog initialization, will assume expiration, id="
-                    + this.getIdentifier()
-                    + ", error: " + e.getMessage() );
+                    + " watchdog initialization, will assume expiration, error: " + e.getMessage() );
             userPwExpired = true;
         }
 
@@ -501,5 +486,11 @@ class WatchdogWrapper implements ChaiProviderImplementor
         }
 
         return false;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "WatchdogWrapper[" + getIdentifier() + "]";
     }
 }

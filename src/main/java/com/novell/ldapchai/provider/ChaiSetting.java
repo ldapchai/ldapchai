@@ -203,6 +203,16 @@ public enum ChaiSetting
     WATCHDOG_ENABLE( "chai.watchdog.enable", "true", true, Validator.BOOLEAN_VALIDATOR ),
 
     /**
+     * <p>Enable thread safe locking API.</p>
+     *
+     * <table border="1"><caption><b>Setting Information</b></caption>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.threadSafe.enable</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
+     * </table>
+     */
+    THREAD_SAFE_ENABLE( "chai.threadSafe.enable", "true", true, Validator.BOOLEAN_VALIDATOR ),
+
+    /**
      * <p>Maximum time an operation can be in progress (in ms).  If this time is exceeded, the connection will
      * be closed.  Future ldap api's called to the ChaiProvider will attempt to re-open a new
      * ldap connection.</p>
@@ -477,48 +487,66 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>SHA1_SALT</td></tr>
      * </table>
      */
-    CR_DEFAULT_FORMAT_TYPE( "chai.crsetting.defaultFormatType", Answer.FormatType.SHA1_SALT.toString(), true, Validator.BOOLEAN_VALIDATOR ),
+    CR_DEFAULT_FORMAT_TYPE( "chai.crsetting.defaultFormatType", Answer.FormatType.PBKDF2_SHA512.toString(), true, Validator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Setting key to control the ldap attribute name used when reading/writing Chai Challenge/Response formats.</p>
      *
      * <table border="1"><caption><b>Setting Information</b></caption>
-     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cr.chai.attributeName</td></tr>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.com.novell.ldapchai.cr.chai.attributeName</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>carLicense</td></tr>
      * </table>
      *
      * @see com.novell.ldapchai.cr.ChaiResponseSet
      * @see com.novell.ldapchai.util.ConfigObjectRecord
      */
-    CR_CHAI_STORAGE_ATTRIBUTE( "chai.cr.chai.attributeName", "carLicense", true, null ),
+    CR_CHAI_STORAGE_ATTRIBUTE( "chai.com.novell.ldapchai.cr.chai.attributeName", "carLicense", true, null ),
 
     /**
      * <p>Setting key to control the {@link com.novell.ldapchai.util.ConfigObjectRecord COR}
      * RecordType used when reading/writing Chai Challenge/Response formats.</p>
      *
      * <table border="1"><caption><b>Setting Information</b></caption>
-     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cr.chai.recordId</td></tr>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.com.novell.ldapchai.cr.chai.recordId</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>0002</td></tr>
      * </table>
      *
      * @see com.novell.ldapchai.cr.ChaiResponseSet
      * @see com.novell.ldapchai.util.ConfigObjectRecord
      */
-    CR_CHAI_STORAGE_RECORD_ID( "chai.cr.chai.recordId", "0002", true, null ),
+    CR_CHAI_STORAGE_RECORD_ID( "chai.com.novell.ldapchai.cr.chai.recordId", "0002", true, null ),
 
     /**
      * <p>Setting key to control the number of iterations to perform the CR Salt when the
      * format type is set to a hash type that allows for multiple iterations such as {@link com.novell.ldapchai.cr.Answer.FormatType#SHA1_SALT}.</p>
      *
+     * <p>Each {@link Answer.FormatType} of answer has a {@link Answer.FormatType#getDefaultIterations() value.   This setting can override
+     * the default iteration count.  If this setting value is a positive integer, it will override the default.}</p>
      * <table border="1"><caption><b>Setting Information</b></caption>
-     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.cr.chai.saltCount</td></tr>
-     * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.com.novell.ldapchai.cr.chai.iterations</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>0</td></tr>
      * </table>
      *
      * @see com.novell.ldapchai.cr.ChaiResponseSet
      * @see com.novell.ldapchai.util.ConfigObjectRecord
      */
-    CR_CHAI_SALT_COUNT( "chai.cr.chai.saltCount", "1000", true, Validator.INTEGER_VALIDATOR ),
+    CR_CHAI_ITERATIONS( "chai.com.novell.ldapchai.cr.chai.iterations", "0", true, Validator.INTEGER_VALIDATOR ),
+
+    /**
+     * <p>Setting key to control the number of salt alphanumeric characters to use for the response salt. to perform the CR Salt when the
+     * format type is set to a hash type that allows for multiple iterations such as {@link com.novell.ldapchai.cr.Answer.FormatType#SHA1_SALT}.</p>
+     *
+     * <p>Each {@link Answer.FormatType} of answer has a {@link Answer.FormatType#getDefaultIterations() value.   This setting can override
+     * the default iteration count.  If this setting value is a positive integer, it will override the default.}</p>
+     * <table border="1"><caption><b>Setting Information</b></caption>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.com.novell.ldapchai.cr.chai.iterations</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>0</td></tr>
+     * </table>
+     *
+     * @see com.novell.ldapchai.cr.ChaiResponseSet
+     * @see com.novell.ldapchai.util.ConfigObjectRecord
+     */
+    CR_CHAI_SALT_CHAR_COUNT( "chai.com.novell.ldapchai.cr.chai.saltCharCount", "0", true, Validator.INTEGER_VALIDATOR ),
 
     /**
      * <p>If true, then during the {@link com.novell.ldapchai.ChaiUser#setPassword(String)} operation, the control for
@@ -593,7 +621,17 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>UTF8</td></tr>
      * </table>
      */
-    LDAP_CHARACTER_ENCODING( "chai.ldap.characterEncoding", "UTF8", true, null ),;
+    LDAP_CHARACTER_ENCODING( "chai.ldap.characterEncoding", "UTF8", true, null ),
+
+    /**
+     * <p>This method is deprecated and should not be used because it was incorrectly implemented
+     * and ambiguous.  Setting this value has no effect.</p>
+     * <p>See instead {@link ChaiSetting#CR_CHAI_SALT_CHAR_COUNT} and {@link ChaiSetting#CR_CHAI_ITERATIONS}.</p>
+     *
+     * @deprecated Thie setting has no effect.
+     */
+    @Deprecated
+    CR_CHAI_SALT_COUNT( "chai.cr.chai.saltCount", "1000", true, Validator.INTEGER_VALIDATOR ),;
 
 
     private final String key;

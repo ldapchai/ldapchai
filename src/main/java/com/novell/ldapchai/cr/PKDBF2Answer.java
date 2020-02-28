@@ -75,9 +75,9 @@ class PKDBF2Answer implements Answer
         this.caseInsensitive = caseInsensitive;
     }
 
-    private PKDBF2Answer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+    private PKDBF2Answer( final AnswerConfiguration answerConfiguration, final String answer )
     {
-        this.hashCount = answerConfiguration.hashCount;
+        this.hashCount = answerConfiguration.iterations;
         this.caseInsensitive = answerConfiguration.caseInsensitive;
         this.salt = generateSalt( 32 );
         this.formatType = answerConfiguration.getFormatType();
@@ -176,7 +176,7 @@ class PKDBF2Answer implements Answer
                 }
 
                 final char[] chars = input.toCharArray();
-                final byte[] saltBytes = salt.getBytes( "UTF-8" );
+                final byte[] saltBytes = salt.getBytes( ChaiCrFactory.DEFAULT_CHARSET );
 
                 spec = new PBEKeySpec( chars, saltBytes, hashCount, keyLength );
                 skf = SecretKeyFactory.getInstance( methodName );
@@ -215,7 +215,7 @@ class PKDBF2Answer implements Answer
     static class PKDBF2AnswerFactory implements ImplementationFactory
     {
         public PKDBF2Answer newAnswer(
-                final AnswerFactory.AnswerConfiguration answerConfiguration,
+                final AnswerConfiguration answerConfiguration,
                 final String answer
         )
         {

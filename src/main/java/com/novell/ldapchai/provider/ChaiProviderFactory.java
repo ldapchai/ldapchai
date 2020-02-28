@@ -268,6 +268,7 @@ public final class ChaiProviderFactory
         final boolean enableWireTrace = chaiConfiguration.getBooleanSetting( ChaiSetting.WIRETRACE_ENABLE );
         final boolean enableStatistics = chaiConfiguration.getBooleanSetting( ChaiSetting.STATISTICS_ENABLE );
         final boolean enableCaching = chaiConfiguration.getBooleanSetting( ChaiSetting.CACHE_ENABLE );
+        final boolean threadSafeEnabled = chaiConfiguration.getBooleanSetting( ChaiSetting.THREAD_SAFE_ENABLE );
 
         ChaiProviderImplementor outputProvider = providerImpl;
 
@@ -299,6 +300,12 @@ public final class ChaiProviderFactory
         {
             LOGGER.trace( "adding CachingWrapper to provider instance" );
             outputProvider = CachingWrapper.forProvider( outputProvider );
+        }
+
+        if ( threadSafeEnabled && !( outputProvider instanceof ThreadSafeWrapper ) )
+        {
+            LOGGER.trace( "adding ThreadSafeWrapper to provider instance" );
+            outputProvider = ThreadSafeWrapper.forProvider( outputProvider );
         }
 
         return outputProvider;

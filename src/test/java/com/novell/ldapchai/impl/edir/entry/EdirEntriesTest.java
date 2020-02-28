@@ -39,7 +39,7 @@ public class EdirEntriesTest {
     @Test
     public void shouldReturnInstantWhenConvertZuluToInstantValueIsCorrect() throws Exception {
         Instant d = EdirEntries.convertZuluToInstant("20150402010745Z");
-        assertThat(d.toEpochMilli(), is(1427936865000L));
+        Assert.assertEquals( d.toEpochMilli(), 1427936865000L );
     }
 
     @Test

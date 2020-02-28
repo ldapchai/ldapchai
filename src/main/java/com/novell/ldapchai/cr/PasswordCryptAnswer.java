@@ -44,7 +44,7 @@ class PasswordCryptAnswer implements Answer
         this.formatType = formatType;
     }
 
-    private PasswordCryptAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+    private PasswordCryptAnswer( final AnswerConfiguration answerConfiguration, final String answer )
     {
         if ( answer == null || answer.length() < 1 )
         {
@@ -54,17 +54,20 @@ class PasswordCryptAnswer implements Answer
         this.caseInsensitive = answerConfiguration.isCaseInsensitive();
         this.formatType = answerConfiguration.formatType;
         final String casedAnswer = caseInsensitive ? answer.toLowerCase() : answer;
+
+        final int iterations = Math.max( 10, answerConfiguration.getIterations() );
+        final int saltChars = Math.max( 16, answerConfiguration.getSaltCharCount() );
+
         switch ( formatType )
         {
             case BCRYPT:
-                final int bcryptRounds = 10;
-                final byte[] salt = new byte[16];
+                final byte[] salt = new byte[saltChars];
                 ( new SecureRandom() ).nextBytes( salt );
-                answerHash = OpenBSDBCrypt.generate( casedAnswer.toCharArray(), salt, bcryptRounds );
+                answerHash = OpenBSDBCrypt.generate( casedAnswer.toCharArray(), salt, iterations );
                 break;
 
             case SCRYPT:
-                answerHash = SCryptUtil.scrypt( casedAnswer );
+                answerHash = SCryptUtil.scrypt( casedAnswer, saltChars, iterations );
                 break;
 
             default:
@@ -113,7 +116,7 @@ class PasswordCryptAnswer implements Answer
 
     static class PasswordCryptAnswerFactory implements ImplementationFactory
     {
-        public PasswordCryptAnswer newAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+        public PasswordCryptAnswer newAnswer( final AnswerConfiguration answerConfiguration, final String answer )
         {
             return new PasswordCryptAnswer( answerConfiguration, answer );
         }

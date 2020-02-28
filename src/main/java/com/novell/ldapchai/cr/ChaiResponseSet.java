@@ -41,8 +41,8 @@ import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.io.StringReader;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -56,7 +56,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-public class ChaiResponseSet extends AbstractResponseSet implements Serializable
+public class ChaiResponseSet extends AbstractResponseSet
 {
 
 
@@ -96,11 +96,11 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
     static ChaiResponseSet readUserResponseSet( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiValidationException, ChaiOperationException
     {
-        final String corRecordIdentifer = theUser.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.CR_CHAI_STORAGE_RECORD_ID );
+        final String corRecordIdentifier = theUser.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.CR_CHAI_STORAGE_RECORD_ID );
         final String corAttribute = theUser.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.CR_CHAI_STORAGE_ATTRIBUTE );
 
         final ChaiResponseSet returnVal;
-        final List<ConfigObjectRecord> corList = ConfigObjectRecord.readRecordFromLDAP( theUser, corAttribute, corRecordIdentifer, null, null );
+        final List<ConfigObjectRecord> corList = ConfigObjectRecord.readRecordFromLDAP( theUser, corAttribute, corRecordIdentifier, null, null );
         String payload = "";
         if ( !corList.isEmpty() )
         {
@@ -182,11 +182,13 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
 
         int correctRandoms = 0;
-        for ( final Challenge loopChallenge : this.crMap.keySet() )
+        for ( final Map.Entry<Challenge, Answer> entry : this.crMap.entrySet() )
         {
+            final Challenge loopChallenge = entry.getKey();
+            final Answer answer = entry.getValue();
             final String proposedResponse = testResponses.get( loopChallenge );
 
-            final boolean correct = crMap.get( loopChallenge ).testAnswer( proposedResponse );
+            final boolean correct = answer.testAnswer( proposedResponse );
 
             if ( correct && !loopChallenge.isRequired() )
             {
@@ -227,9 +229,9 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
                 theCor = ConfigObjectRecord.createNew( user, corAttribute, corRecordIdentifier, null, null );
             }
 
-            final String attributePaylod = rsToChaiXML( this );
+            final String attributePayload = rsToChaiXML( this );
 
-            theCor.updatePayload( attributePaylod );
+            theCor.updatePayload( attributePayload );
         }
         catch ( ChaiOperationException e )
         {
@@ -246,6 +248,26 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
         this.state = STATE.WRITTEN;
 
         return true;
+    }
+
+    void write( final Writer writer )
+            throws ChaiOperationException
+    {
+        if ( this.state != STATE.NEW )
+        {
+            throw new IllegalStateException( "ResponseSet not suitable for writing (not in NEW state)" );
+        }
+
+        try
+        {
+            final String attributePayload = rsToChaiXML( this );
+            writer.write( attributePayload );
+        }
+        catch ( ChaiValidationException | IOException e )
+        {
+            LOGGER.warn( "validation error", e );
+            throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN );
+        }
     }
 
     static String rsToChaiXML( final ChaiResponseSet rs )
@@ -274,9 +296,10 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
         if ( rs.crMap != null )
         {
-            for ( final Challenge loopChallenge : rs.crMap.keySet() )
+            for ( final Map.Entry<Challenge, Answer> entry : rs.crMap.entrySet() )
             {
-                final Answer answer = rs.crMap.get( loopChallenge );
+                final Challenge loopChallenge = entry.getKey();
+                final Answer answer = entry.getValue();
                 final Element responseElement = challengeToXml( loopChallenge, answer, XML_NODE_RESPONSE );
                 rootElement.addContent( responseElement );
             }
@@ -284,9 +307,10 @@ public class ChaiResponseSet extends AbstractResponseSet implements Serializable
 
         if ( rs.helpdeskCrMap != null )
         {
-            for ( final Challenge loopChallenge : rs.helpdeskCrMap.keySet() )
+            for ( final Map.Entry<Challenge, HelpdeskAnswer> entry : rs.helpdeskCrMap.entrySet() )
             {
-                final Answer answer = rs.helpdeskCrMap.get( loopChallenge );
+                final Challenge loopChallenge = entry.getKey();
+                final Answer answer = entry.getValue();
                 final Element responseElement = challengeToXml( loopChallenge, answer, XML_NODE_HELPDESK_RESPONSE );
                 rootElement.addContent( responseElement );
             }

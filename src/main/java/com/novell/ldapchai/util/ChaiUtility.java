@@ -136,7 +136,7 @@ public final class ChaiUtility
         String stringCounter = null;
 
         // Start with a random 3 digit number
-        int counter = randomNumber.nextInt() % 1000;
+        int counter = randomNumber.nextInt( 1000 );
         while ( true )
         {
             // Initialize the String Buffer and Unique DN.

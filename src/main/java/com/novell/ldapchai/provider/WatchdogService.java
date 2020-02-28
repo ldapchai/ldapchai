@@ -156,6 +156,12 @@ class WatchdogService
                 {
                     LOGGER.error( "error during watchdog timer check: " + e.getMessage() );
                 }
+
+                final int currentCollectionSize = issuedWatchdogWrappers.allValues().size();
+                if ( copyCollection.size() != currentCollectionSize )
+                {
+                    LOGGER.trace( "outstanding providers: " + currentCollectionSize );
+                }
             }
 
             if ( copyCollection.isEmpty() )

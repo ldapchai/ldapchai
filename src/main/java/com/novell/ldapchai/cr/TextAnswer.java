@@ -68,7 +68,7 @@ class TextAnswer implements Answer
 
     static class TextAnswerFactory implements ImplementationFactory
     {
-        public TextAnswer newAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answer )
+        public TextAnswer newAnswer( final AnswerConfiguration answerConfiguration, final String answer )
         {
             final boolean caseInsensitive = answerConfiguration.caseInsensitive;
             return new TextAnswer( answer, caseInsensitive );

@@ -19,11 +19,10 @@
 
 package com.novell.ldapchai.util;
 
+import com.novell.ldapchai.ChaiConstant;
+
 import javax.swing.JOptionPane;
-import java.util.Enumeration;
-import java.util.ResourceBundle;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Map;
 
 /**
  * Main class to display the chai version info and about when the ldapChai.jar
@@ -31,11 +30,8 @@ import java.util.TreeSet;
  */
 class MainHandler
 {
-
-
-    private static final ResourceBundle BUILD_INFO_BUNDLE = ResourceBundle.getBundle( "com.novell.ldapchai.BuildInformation" );
-    private static final String CHAI_VERSION = BUILD_INFO_BUNDLE.getString( "chai.version" );
-    private static final String CHAI_WEBSITE = BUILD_INFO_BUNDLE.getString( "chai.website" );
+    private static final String CHAI_VERSION = ChaiConstant.CHAI_API_VERSION;
+    private static final String CHAI_WEBSITE = ChaiConstant.CHAI_API_WEBSITE;
 
     public static void main( final String[] args )
     {
@@ -56,21 +52,14 @@ class MainHandler
         sb.append( "\n" );
         sb.append( "Build Information: \n" );
 
-        final Set<String> keySet = new TreeSet<String>();
-        for ( Enumeration<String> keyEnum = BUILD_INFO_BUNDLE.getKeys(); keyEnum.hasMoreElements(); )
+        for ( final Map.Entry<String, String> entry : ChaiConstant.BUILD_MANIFEST.entrySet() )
         {
-            keySet.add( keyEnum.nextElement() );
-        }
-
-        for ( final String key : keySet )
-        {
-            final String property = BUILD_INFO_BUNDLE.getString( key );
-            sb.append( "    " ).append( key ).append( "=" ).append( property );
+            sb.append( "    " ).append( entry.getKey() ).append( "=" ).append( entry.getValue() );
             sb.append( "\n" );
         }
 
         sb.append( "\n" );
-        sb.append( "LDAP Chai project page: " + CHAI_WEBSITE + "\n" );
+        sb.append( "LDAP Chai project page: " ).append( CHAI_WEBSITE ).append( "\n" );
         sb.append( "\n" );
         sb.append( "source files are included inside jar archive" );
 

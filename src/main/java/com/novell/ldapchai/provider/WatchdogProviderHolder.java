@@ -40,6 +40,10 @@ class WatchdogProviderHolder
     private volatile HolderStatus wdStatus = HolderStatus.ACTIVE;
     private volatile Instant lastActivity = Instant.now();
     private volatile Instant connectionEstablishedTime = Instant.now();
+
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
+    private final int counter = ID_COUNTER.getAndIncrement();
+
     private final AtomicInteger activeOpCounter = new AtomicInteger();
 
     private final boolean allowDisconnect;
@@ -61,12 +65,14 @@ class WatchdogProviderHolder
     {
         this.watchdogWrapper = watchdogWrapper;
         this.chaiConfiguration = chaiProviderImplementor.getChaiConfiguration();
-        settings = watchdogWrapper.getSettings();
+        this.settings = watchdogWrapper.getSettings();
         this.realProvider = chaiProviderImplementor;
         this.chaiProviderFactory = chaiProviderImplementor.getProviderFactory();
         allowDisconnect = !watchdogWrapper.checkForPwExpiration( realProvider );
 
         chaiProviderFactory.getCentralService().getWatchdogService().registerInstance( watchdogWrapper );
+
+        LOGGER.trace( "created WatchdogProviderHolder " + getIdentifier() );
     }
 
     HolderStatus getStatus()
@@ -82,11 +88,11 @@ class WatchdogProviderHolder
         {
             if ( wdStatus != HolderStatus.CLOSED && realProvider != null )
             {
-                return "-" + realProvider.getIdentifier();
+                return "w" + counter + "-" + realProvider.getIdentifier();
             }
             else
             {
-                return "";
+                return "w" + counter;
             }
         }
         finally
@@ -133,6 +139,11 @@ class WatchdogProviderHolder
             lastActivity = Instant.now();
             return ldapFunction.execute( getProvider() );
         }
+        catch ( ChaiUnavailableException | ChaiOperationException e )
+        {
+            e.fillInStackTrace();
+            throw e;
+        }
         finally
         {
             statusChangeLock.writeLock().lock();
@@ -146,6 +157,7 @@ class WatchdogProviderHolder
                 statusChangeLock.writeLock().unlock();
             }
         }
+
     }
 
 
@@ -272,20 +284,13 @@ class WatchdogProviderHolder
     private ChaiProviderImplementor restoreRealProvider()
             throws ChaiUnavailableException
     {
-        {
-            final Duration duration = Duration.between( Instant.now(), lastActivity );
-            final String msg = "reopening ldap connection for method="
-                    + ", id="
-                    + getIdentifier() + ", after "
-                    + duration.toString();
-            LOGGER.debug( msg );
-        }
-
         try
         {
             realProvider = chaiProviderFactory.createFailOverOrConcreteProvider( chaiConfiguration );
             wdStatus = HolderStatus.ACTIVE;
             connectionEstablishedTime = Instant.now();
+
+            LOGGER.debug( "re-opened ldap connection id=" + getIdentifier() );
 
             return realProvider;
         }

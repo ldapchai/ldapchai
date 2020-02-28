@@ -164,7 +164,7 @@ public abstract class AbstractResponseSet implements ResponseSet
 
     public Date getTimestamp()
     {
-        return timestamp;
+        return new Date( timestamp.getTime() );
     }
 
     public ChallengeSet getPresentableChallengeSet()

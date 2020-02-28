@@ -85,7 +85,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
             final SecretKey secretKey = makeKey( key );
             final Cipher cipher = Cipher.getInstance( "AES" );
             cipher.init( Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters() );
-            final byte[] encrypted = cipher.doFinal( value.getBytes() );
+            final byte[] encrypted = cipher.doFinal( value.getBytes( ChaiCrFactory.DEFAULT_CHARSET ) );
             return Base64.encodeBytes( encrypted, Base64.URL_SAFE | Base64.GZIP );
         }
         catch ( Exception e )
@@ -109,7 +109,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
             final Cipher cipher = Cipher.getInstance( "AES" );
             cipher.init( Cipher.DECRYPT_MODE, secretKey );
             final byte[] decrypted = cipher.doFinal( decoded );
-            return new String( decrypted );
+            return new String( decrypted, ChaiCrFactory.DEFAULT_CHARSET );
         }
         catch ( Exception e )
         {
@@ -138,7 +138,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
 
     static class ChaiHelpdeskAnswerFactory implements ImplementationFactory
     {
-        public Answer newAnswer( final AnswerFactory.AnswerConfiguration answerConfiguration, final String answerText )
+        public Answer newAnswer( final AnswerConfiguration answerConfiguration, final String answerText )
         {
             return new ChaiHelpdeskAnswer( answerText, answerConfiguration.getChallengeText() );
         }

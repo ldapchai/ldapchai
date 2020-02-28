@@ -30,6 +30,9 @@ import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 
+import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -53,6 +56,7 @@ public final class ChaiCrFactory
      */
     public static final String USER_SUPPLIED_QUESTION = "%user%";
 
+    static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiCrFactory.class );
 
@@ -128,6 +132,15 @@ public final class ChaiCrFactory
         return new ChaiResponseSet( tempCrMap, tempHelpdeskCrMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date() );
     }
 
+    public static void writeChaiResponseSet(
+            final ChaiResponseSet chaiResponseSet,
+            final Writer writer
+    )
+            throws ChaiOperationException
+    {
+        chaiResponseSet.write( writer );
+    }
+
     public static boolean writeChaiResponseSet(
             final ChaiResponseSet chaiResponseSet,
             final ChaiUser chaiUser
@@ -144,9 +157,9 @@ public final class ChaiCrFactory
     {
         final Map<Challenge, Answer> tempMap = makeAnswerMap( crMap, Answer.FormatType.HELPDESK, chaiConfiguration );
         final Map<Challenge, HelpdeskAnswer> returnMap = new LinkedHashMap<>();
-        for ( final Challenge challenge : tempMap.keySet() )
+        for ( final Map.Entry<Challenge, Answer> entry : tempMap.entrySet() )
         {
-            returnMap.put( challenge, ( HelpdeskAnswer ) tempMap.get( challenge ) );
+            returnMap.put( entry.getKey(), ( HelpdeskAnswer ) entry.getValue() );
         }
         return returnMap;
     }
@@ -167,18 +180,38 @@ public final class ChaiCrFactory
             final ChaiConfiguration chaiConfiguration
     )
     {
-
         final Map<Challenge, Answer> answerMap = new LinkedHashMap<>();
-        for ( final Challenge challenge : crMap.keySet() )
+        for ( final Map.Entry<Challenge, String> entry : crMap.entrySet() )
         {
-            final AnswerFactory.AnswerConfiguration answerConfiguration = new AnswerFactory.AnswerConfiguration();
-            answerConfiguration.caseInsensitive = chaiConfiguration.getBooleanSetting( ChaiSetting.CR_CASE_INSENSITIVE );
-            answerConfiguration.formatType = formatType;
-            answerConfiguration.hashCount = Integer.parseInt( chaiConfiguration.getSetting( ChaiSetting.CR_CHAI_SALT_COUNT ) );
+            final Challenge challenge = entry.getKey();
+            final String answerText = entry.getValue();
 
-            //needed for helpdesk challenges
-            answerConfiguration.challengeText = challenge.getChallengeText();
-            final String answerText = crMap.get( challenge );
+            final int iterations;
+            {
+                final int configuredIterations = Integer.parseInt( chaiConfiguration.getSetting( ChaiSetting.CR_CHAI_ITERATIONS ) );
+                iterations = configuredIterations > 0
+                        ? configuredIterations
+                        : formatType.getDefaultIterations();
+            }
+
+            final int saltCharCount;
+            {
+                final int configuredIterations = Integer.parseInt( chaiConfiguration.getSetting( ChaiSetting.CR_CHAI_SALT_CHAR_COUNT ) );
+                saltCharCount = configuredIterations > 0
+                        ? configuredIterations
+                        : formatType.getSaltLength();
+            }
+
+
+            final AnswerConfiguration answerConfiguration = AnswerConfiguration.builder()
+                    .caseInsensitive( chaiConfiguration.getBooleanSetting( ChaiSetting.CR_CASE_INSENSITIVE ) )
+                    .iterations( iterations )
+                    .saltCharCount( saltCharCount )
+                    .formatType( formatType )
+                    .challengeText( challenge.getChallengeText() )
+                    .build();
+
+
             final Answer answer = AnswerFactory.newAnswer( answerConfiguration, answerText );
             answerMap.put( challenge, answer );
         }
@@ -189,9 +222,10 @@ public final class ChaiCrFactory
             throws ChaiValidationException
     {
         final boolean allowDuplicates = chaiConfiguration.getBooleanSetting( ChaiSetting.CR_ALLOW_DUPLICATE_RESPONSES );
-        for ( final Challenge loopChallenge : crMap.keySet() )
+        for ( final Map.Entry<Challenge, String> entry : crMap.entrySet() )
         {
-            final String answerText = crMap.get( loopChallenge );
+            final Challenge loopChallenge = entry.getKey();
+            final String answerText = entry.getValue();
 
             if ( loopChallenge.getChallengeText() == null || loopChallenge.getChallengeText().length() < 1 )
             {
@@ -245,10 +279,12 @@ public final class ChaiCrFactory
 
         if ( !allowDuplicates )
         {
-            final Set<String> seenResponses = new HashSet<String>();
-            for ( final Challenge loopChallenge : crMap.keySet() )
+            final Set<String> seenResponses = new HashSet<>();
+            for ( final Map.Entry<Challenge, String> entry : crMap.entrySet() )
+
             {
-                final String responseText = crMap.get( loopChallenge );
+                final Challenge loopChallenge  = entry.getKey();
+                final String responseText = entry.getValue();
                 if ( responseText != null && responseText.length() > 1 )
                 {
                     final String lowercaseResponseText = responseText.toLowerCase();

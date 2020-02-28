@@ -23,6 +23,11 @@ import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import org.jdom2.Element;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public interface Answer
 {
     boolean testAnswer( String answer );
@@ -34,37 +39,57 @@ public interface Answer
 
     enum FormatType
     {
-        TEXT( new TextAnswer.TextAnswerFactory() ),
-        MD5( new HashSaltAnswer.HashSaltAnswerFactory() ),
-        SHA1( new HashSaltAnswer.HashSaltAnswerFactory() ),
-        SHA1_SALT( new HashSaltAnswer.HashSaltAnswerFactory() ),
-        SHA256_SALT( new HashSaltAnswer.HashSaltAnswerFactory() ),
-        SHA512_SALT( new HashSaltAnswer.HashSaltAnswerFactory() ),
-        BCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory() ),
-        SCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory() ),
-        PBKDF2( new PKDBF2Answer.PKDBF2AnswerFactory() ),
-        PBKDF2_SHA256( new PKDBF2Answer.PKDBF2AnswerFactory() ),
-        PBKDF2_SHA512( new PKDBF2Answer.PKDBF2AnswerFactory() ),
-        HELPDESK( new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory() ),
-        NMAS( null ),;
+        TEXT( new TextAnswer.TextAnswerFactory(), 0, 0 ),
+        MD5( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 1_00_000 ),
+        SHA1( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 1_000_000 ),
+        SHA1_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 1_000_000 ),
+        SHA256_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 500_000 ),
+        SHA512_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 500_000 ),
+        BCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 16, 10 ),
+        SCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(),  16, 2048 ),
+        PBKDF2( new PKDBF2Answer.PKDBF2AnswerFactory(), 32, 10_000 ),
+        PBKDF2_SHA256( new PKDBF2Answer.PKDBF2AnswerFactory(), 32, 10_000 ),
+        PBKDF2_SHA512( new PKDBF2Answer.PKDBF2AnswerFactory(), 32, 10_000 ),
+        HELPDESK( new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory(), 0, 0 ),
+        NMAS( null, -1, -1 ),;
 
-        private ImplementationFactory factory;
+        private final transient ImplementationFactory factory;
+        private final int saltLength;
+        private final int defaultIterations;
 
-
-        FormatType( final ImplementationFactory implementationClass )
+        FormatType( final ImplementationFactory implementationClass, final int saltLength, final int defaultIterations )
         {
             this.factory = implementationClass;
+            this.saltLength = saltLength;
+            this.defaultIterations = defaultIterations;
         }
 
         public ImplementationFactory getFactory()
         {
             return factory;
         }
+
+        public int getDefaultIterations()
+        {
+            return defaultIterations;
+        }
+
+        public int getSaltLength()
+        {
+            return saltLength;
+        }
+
+        public static List<FormatType> implementedValues()
+        {
+            return Arrays.stream( values() )
+                    .filter( formatType -> formatType.getFactory() != null )
+                    .collect( Collectors.collectingAndThen( Collectors.toList(), Collections::unmodifiableList ) );
+        }
     }
 
     interface ImplementationFactory
     {
-        Answer newAnswer( AnswerFactory.AnswerConfiguration answerConfiguration, String answerText );
+        Answer newAnswer( AnswerConfiguration answerConfiguration, String answerText );
 
         Answer fromAnswerBean( AnswerBean input, String challengeText );
 

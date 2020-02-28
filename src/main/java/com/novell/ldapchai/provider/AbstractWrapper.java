@@ -66,7 +66,7 @@ abstract class AbstractWrapper implements InvocationHandler
 
         try
         {
-            final Constructor constructor = wrapperClass.getConstructor( ChaiProviderImplementor.class.getClass() );
+            final Constructor constructor = wrapperClass.getConstructor( ChaiProviderImplementor.class );
             final InvocationHandler wrapper = ( InvocationHandler ) constructor.newInstance( chaiProvider );
             final Object wrappedProvider = Proxy.newProxyInstance( chaiProvider.getClass().getClassLoader(), chaiProvider.getClass().getInterfaces(), wrapper );
             return ( ChaiProviderImplementor ) wrappedProvider;

@@ -21,8 +21,6 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
 
-import java.io.Serializable;
-
 public class AnswerFactory
 {
     private AnswerFactory()
@@ -56,51 +54,4 @@ public class AnswerFactory
         return respFormat.getFactory().fromXml( element, caseInsensitive, challengeText );
     }
 
-    public static class AnswerConfiguration implements Serializable
-    {
-        public boolean caseInsensitive;
-        public int hashCount;
-        public Answer.FormatType formatType;
-        public String challengeText;
-
-        public boolean isCaseInsensitive()
-        {
-            return caseInsensitive;
-        }
-
-        public void setCaseInsensitive( final boolean caseInsensitive )
-        {
-            this.caseInsensitive = caseInsensitive;
-        }
-
-        public int getHashCount()
-        {
-            return hashCount;
-        }
-
-        public void setHashCount( final int hashCount )
-        {
-            this.hashCount = hashCount;
-        }
-
-        public Answer.FormatType getFormatType()
-        {
-            return formatType;
-        }
-
-        public void setFormatType( final Answer.FormatType formatType )
-        {
-            this.formatType = formatType;
-        }
-
-        public String getChallengeText()
-        {
-            return challengeText;
-        }
-
-        public void setChallengeText( final String challengeText )
-        {
-            this.challengeText = challengeText;
-        }
-    }
 }

@@ -29,8 +29,6 @@ import java.io.Serializable;
  */
 public class ChaiChallenge implements Challenge, Serializable
 {
-
-
     private boolean adminDefined;
     private boolean required;
     private String challengeText;
