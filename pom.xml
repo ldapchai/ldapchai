@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -15,13 +14,19 @@
 
     <name>LDAP Chai Library</name>
 
+    <scm>
+        <connection>scm:git:git@www.github.com:ldapchai/ldapchai.git</connection>
+        <developerConnection>scm:git:git@www.github.com:ldapchai/ldapchai.git</developerConnection>
+        <url>git@github.com:ldapchai/ldapchai.git</url>
+    </scm>
+
     <organization>
         <name>LDAP Chai Project</name>
         <url>https://github.com/ldapchai/ldapchai</url>
     </organization>
 
     <description>
-        The LDAP Chai API, easy to use LDAP for Java developers.  LDAP Chai is a wrapper library that makes using ldap services as simple and easy as it can be.  LDAP Chai has methods for commonly used functions, and relieves developers of the need to write code that has been written many times before.
+        The LDAP Chai API, easy to use LDAP for Java developers.
     </description>
 
     <licenses>
@@ -37,8 +42,10 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <skipTests>false</skipTests>
         <outputDirectory.private>${project.build.directory}/private</outputDirectory.private>
-        <timestamp.iso>${maven.build.timestamp}</timestamp.iso>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
+
+        <!-- git.commit.time is populated via git-commit-id-plugin and results in a (hopefully) reproducible maven build -->
+        <project.build.outputTimestamp>${git.commit.time}</project.build.outputTimestamp>
     </properties>
 
     <dependencies>
@@ -78,7 +85,7 @@
         <dependency>
             <groupId>org.apache.directory.api</groupId>
             <artifactId>api-all</artifactId>
-            <version>2.0.0.AM4</version>
+            <version>2.0.0</version>
             <scope>provided</scope>
         </dependency>
 
@@ -88,6 +95,16 @@
             <artifactId>junit</artifactId>
             <version>4.13</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-core</artifactId>
+            <version>1.23</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jmh</groupId>
+            <artifactId>jmh-generator-annprocess</artifactId>
+            <version>1.23</version>
         </dependency>
     </dependencies>
 
@@ -102,7 +119,35 @@
                 <targetPath>src</targetPath>
             </resource>
         </resources>
+
+        <!--reads the git commit info -->
         <plugins>
+            <plugin>
+                <groupId>pl.project13.maven</groupId>
+                <artifactId>git-commit-id-plugin</artifactId>
+                <version>4.0.0</version>
+                <executions>
+                    <execution>
+                        <id>get-the-git-infos</id>
+                        <goals>
+                            <goal>revision</goal>
+                        </goals>
+                        <phase>initialize</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <dateFormat>yyyy-MM-dd'T'HH:mm:ss'Z'</dateFormat>
+                    <dateFormatTimeZone>Zulu</dateFormatTimeZone>
+                    <generateGitPropertiesFile>true</generateGitPropertiesFile>
+                    <generateGitPropertiesFilename>${project.build.outputDirectory}/classes/git.json</generateGitPropertiesFilename>
+                    <format>json</format>
+                    <excludeProperties>
+                        <!-- git.build.time is current timestamp so prevents reproducible build -->
+                        <excludeProperty>git.build.time</excludeProperty>
+                    </excludeProperties>
+                </configuration>
+            </plugin>
+
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
@@ -111,7 +156,7 @@
                     <dependency>
                         <groupId>com.github.spotbugs</groupId>
                         <artifactId>spotbugs</artifactId>
-                        <version>4.0.0-RC3</version>
+                        <version>4.0.0</version>
                     </dependency>
                 </dependencies>
                 <configuration>
@@ -129,7 +174,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.0.0-M3</version>
                 <executions>
                     <execution>
                         <id>enforce-maven</id>
@@ -162,7 +207,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.1.1</version>
                 <dependencies>
                     <dependency>
                         <groupId>com.puppycrawl.tools</groupId>
@@ -195,60 +240,10 @@
                     <skipTests>${skipTests}</skipTests>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <!-- include the examples in the test build -->
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>examples</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <!-- Capture secondary private javadoc -->
-                    <!--
-                    <execution>
-                        <id>add-private-javadoc</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>attach-artifact</goal>
-                        </goals>
-                        <configuration>
-                            <artifacts>
-                                <artifact>
-                                    <file>${outputDirectory.private}/${finalName}-</file>
-                                    <type>extension of your file </type>
-                                    <classifier>optional</classifier>
-                                </artifact>
-                            </artifacts>
-                        </configuration>
-                    </execution>
-                    -->
-                    <execution>
-                        <id>add-source</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>src/external/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.2</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -257,19 +252,27 @@
                             <excludes>
                                 <exclude>com/novell/security/</exclude>
                             </excludes>
-
                             <archive>
                                 <manifest>
-                                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                                    <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
                                     <mainClass>com.novell.ldapchai.util.MainHandler</mainClass>
                                 </manifest>
                                 <manifestEntries>
+                                    <Archive-Type>jar</Archive-Type>
+                                    <Archive-UID>854FF0D1B8B9E20E9476A6658AEF997E0ACB09ED6F9B593E086D2C8FBD83DBA8</Archive-UID>
+                                    <Automatic-Module-Name>com.novell.ldapchai</Automatic-Module-Name>
                                     <Implementation-Title>${project.name}</Implementation-Title>
                                     <Implementation-Version>${project.version}</Implementation-Version>
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
-                                    <Implementation-Description>${project.description}</Implementation-Description>
-                                    <Automatic-Module-Name>com.novell.ldapchai</Automatic-Module-Name>
+                                    <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
+                                    <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
+                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                    <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
+                                    <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
+                                    <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
+                                    <SCM-Git-Commit-Timestamp>${git.commit.time}</SCM-Git-Commit-Timestamp>
+                                    <SCM-Git-Commit-Dirty>${git.dirty}</SCM-Git-Commit-Dirty>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -279,7 +282,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
-                <version>1.6.6</version>
+                <version>1.6.8</version>
                 <extensions>true</extensions>
                 <configuration>
                     <serverId>ossrh</serverId>
@@ -290,7 +293,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -302,6 +305,26 @@
                             <excludes>
                                 <exclude>com/novell/security/</exclude>
                             </excludes>
+                            <archive>
+                                <manifest>
+                                    <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+                                </manifest>
+                                <manifestEntries>
+                                    <Archive-Type>source</Archive-Type>
+                                    <Implementation-Title>${project.name}</Implementation-Title>
+                                    <Implementation-Version>${project.version}</Implementation-Version>
+                                    <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                                    <Implementation-URL>${project.organization.url}</Implementation-URL>
+                                    <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
+                                    <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
+                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                    <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
+                                    <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
+                                    <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
+                                    <SCM-Git-Commit-Timestamp>${git.commit.time}</SCM-Git-Commit-Timestamp>
+                                    <SCM-Git-Commit-Dirty>${git.commit.dirty}</SCM-Git-Commit-Dirty>
+                                </manifestEntries>
+                            </archive>
                         </configuration>
                     </execution>
                 </executions>
@@ -340,42 +363,17 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.0-M1</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
                 <configuration>
-                    <doctitle>LDAP Chai API</doctitle>
-                    <windowtitle>LDAP Chai API</windowtitle>
+                    <generatedSourcesDirectory>src/external/java</generatedSourcesDirectory>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <show>private</show>
-                            <outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
-                            <jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
-                            <attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>attach-javadocs-public</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <failOnError>true</failOnError>
-                            <show>public</show>
-                            <excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
-                            <!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
-                                default -->
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
+
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -383,8 +381,20 @@
                 <configuration>
                     <source>${maven.compiler.source}</source>
                     <target>${maven.compiler.target}</target>
+                    <compilerArgs>
+                        <arg>-XDcompilePolicy=simple</arg>
+                        <arg>-Xplugin:ErrorProne</arg>
+                    </compilerArgs>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.google.errorprone</groupId>
+                            <artifactId>error_prone_core</artifactId>
+                            <version>2.3.3</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
+            -->
         </plugins>
     </build>
 
@@ -415,7 +425,125 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>execute-jmh-tests</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>run-benchmarks</id>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <classpathScope>test</classpathScope>
+                                    <executable>java</executable>
+                                    <arguments>
+                                        <argument>-classpath</argument>
+                                        <classpath />
+                                        <argument>com.novell.ldapchai.cr.CRBenchMark</argument>
+                                        <argument>.*</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>include-javadoc</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <configuration>
+                            <doctitle>LDAP Chai API</doctitle>
+                            <windowtitle>LDAP Chai API</windowtitle>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>attach-javadocs</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <show>private</show>
+                                    <outputDirectory>${outputDirectory.private}/apidocs</outputDirectory>
+                                    <jarOutputDirectory>${outputDirectory.private}</jarOutputDirectory>
+                                    <attach>false</attach> <!-- requires using helper to attach with alternate classifier -->
+                                    <archive>
+                                        <manifest>
+                                            <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+                                        </manifest>
+                                        <manifestEntries>
+                                            <Archive-Type>javadoc</Archive-Type>
+                                            <Implementation-Title>${project.name}</Implementation-Title>
+                                            <Implementation-Version>${project.version}</Implementation-Version>
+                                            <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                                            <Implementation-URL>${project.organization.url}</Implementation-URL>
+                                            <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
+                                            <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
+                                            <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                            <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
+                                            <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
+                                            <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
+                                            <SCM-Git-Commit-Timestamp>${git.commit.time}</SCM-Git-Commit-Timestamp>
+                                            <SCM-Git-Commit-Dirty>${git.commit.dirty}</SCM-Git-Commit-Dirty>
+                                        </manifestEntries>
+                                    </archive>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>attach-javadocs-public</id>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                                <configuration>
+                                    <failOnError>true</failOnError>
+                                    <show>public</show>
+                                    <excludePackageNames>com.novell.security:com.novell.ldapchai.schema:com.novell.ldapchai.com.novell.ldapchai.cr.nmasAuth:com.novell.ldapchai.util.internal:com.novell.ldapchai.impl.*</excludePackageNames>
+                                    <!-- <outputDirectory>${project.build.directory}/apidocs</outputDirectory>
+                                        default -->
+                                    <archive>
+                                        <manifest>
+                                            <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
+                                        </manifest>
+                                        <manifestEntries>
+                                            <Archive-Type>javadoc</Archive-Type>
+                                            <Implementation-Title>${project.name}</Implementation-Title>
+                                            <Implementation-Version>${project.version}</Implementation-Version>
+                                            <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
+                                            <Implementation-URL>${project.organization.url}</Implementation-URL>
+                                            <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
+                                            <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
+                                            <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                            <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
+                                            <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
+                                            <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
+                                            <SCM-Git-Commit-Timestamp>${git.commit.time}</SCM-Git-Commit-Timestamp>
+                                            <SCM-Git-Commit-Dirty>${git.commit.dirty}</SCM-Git-Commit-Dirty>
+                                        </manifestEntries>
+                                    </archive>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
+
 
     <distributionManagement>
         <snapshotRepository>
@@ -439,10 +567,5 @@
         </developer>
     </developers>
 
-    <scm>
-        <connection>scm:git:git@github.com:ldapchai/ldapchai.git</connection>
-        <developerConnection>scm:git:git@github.com:ldapchai/ldapchai.git</developerConnection>
-        <url>git@github.com:ldapchai/ldapchai.git</url>
-    </scm>
 
 </project>

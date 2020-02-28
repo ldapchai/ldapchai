@@ -24,7 +24,7 @@
         <Package name="~com\.novell\.security\.nmas\..*"/>
     </Match>
     <Match>
-        <Package name="~com\.novell\.ldapchai\.cr.*"/>
+        <Package name="~com\.novell\.ldapchai\.com.novell.ldapchai.cr.*"/>
     </Match>
 </FindBugsFilter>
 

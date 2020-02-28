@@ -64,6 +64,11 @@
     </module>
     <module name="NewlineAtEndOfFile"/>
 
+    <module name="LineLength">
+        <property name="max" value="180" />
+        <property name="ignorePattern" value="@version|@see|@todo|TODO"/>
+    </module>
+
     <module name="TreeWalker">
 
         <!-- required for SuppressWarningsFilter (and other Suppress* rules not used here) -->
