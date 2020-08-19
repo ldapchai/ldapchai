@@ -41,9 +41,10 @@ abstract class AbstractWrapper implements InvocationHandler
      * @param enableSetting setting to mark if watchdog is enabled
      * @param wrapperClass chai provider wrapper
      * @return a wrapped {@code ChaiProvider} instance.
+     * @throws Exception if there is any error instantiating the implementor instance.
      */
     protected static ChaiProviderImplementor factoryImpl(
-            final Class wrapperClass,
+            final Class<ChaiProviderImplementor> wrapperClass,
             final ChaiSetting enableSetting,
             final ChaiProviderImplementor chaiProvider
     )
@@ -66,7 +67,7 @@ abstract class AbstractWrapper implements InvocationHandler
 
         try
         {
-            final Constructor constructor = wrapperClass.getConstructor( ChaiProviderImplementor.class );
+            final Constructor<ChaiProviderImplementor> constructor = wrapperClass.getConstructor( ChaiProviderImplementor.class );
             final InvocationHandler wrapper = ( InvocationHandler ) constructor.newInstance( chaiProvider );
             final Object wrappedProvider = Proxy.newProxyInstance( chaiProvider.getClass().getClassLoader(), chaiProvider.getClass().getInterfaces(), wrapper );
             return ( ChaiProviderImplementor ) wrappedProvider;

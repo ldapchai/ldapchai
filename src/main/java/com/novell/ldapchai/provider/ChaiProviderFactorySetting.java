@@ -31,7 +31,7 @@ public enum ChaiProviderFactorySetting
      * example, if the idle timeout is 30 seconds, and the frequency is 30 seconds, then connections may actually
      * be able to remain idle between 30 and 60 seconds.</p>
      *
-     * <table border="0"><caption>Setting Information</caption>
+     * <table><caption>Setting Information</caption>
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.connection.watchdog.frequencyMs</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
      * </table>
@@ -41,7 +41,7 @@ public enum ChaiProviderFactorySetting
     /**
      * <p>Maximum time duration to cache a vendor identification for a given LDAP URL.</p>
      *
-     * <table border="0"><caption>Setting Information</caption>
+     * <table><caption>Setting Information</caption>
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.provider.vendor.cache.maxAgeMs</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
