@@ -64,6 +64,7 @@ class ReadOnlyWrapper implements InvocationHandler
         this.realProvider = realProvider;
     }
 
+    @Override
     public Object invoke( final Object proxy, final Method method, final Object[] args )
             throws Throwable
     {

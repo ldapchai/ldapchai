@@ -50,6 +50,7 @@ public abstract class AbstractChaiGroup extends AbstractChaiEntry implements Cha
         super( groupDN, chaiProvider );
     }
 
+    @Override
     public Set<ChaiUser> getMembers()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -67,12 +68,14 @@ public abstract class AbstractChaiGroup extends AbstractChaiEntry implements Cha
         return Collections.unmodifiableSet( returnSet );
     }
 
+    @Override
     public String readGroupName()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readStringAttribute( ChaiConstant.ATTR_LDAP_DESCRIPTION );
     }
 
+    @Override
     public void addMember( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -80,6 +83,7 @@ public abstract class AbstractChaiGroup extends AbstractChaiEntry implements Cha
         theUser.addAttribute( ChaiConstant.ATTR_LDAP_GROUP_MEMBERSHIP, this.getEntryDN() );
     }
 
+    @Override
     public void removeMember( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {

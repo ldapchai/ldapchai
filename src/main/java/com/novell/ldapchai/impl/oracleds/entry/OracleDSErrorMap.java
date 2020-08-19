@@ -23,23 +23,31 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class OracleDSErrorMap implements ErrorMap
 {
+    @Override
     public DirectoryVendor forDirectoryVendor()
     {
         return DirectoryVendor.ORACLE_DS;
     }
 
+    @Override
     public ChaiError errorForMessage( final String message )
     {
         return forMessage( message ).getChaiErrorCode();
     }
 
+    @Override
     public boolean isPermanent( final String message )
     {
-        return forMessage( message ).isPermenant();
+        return forMessage( message ).isPermanent();
     }
 
+    @Override
     public boolean isAuthenticationRelated( final String message )
     {
         return forMessage( message ).isAuthentication();
@@ -77,27 +85,27 @@ public class OracleDSErrorMap implements ErrorMap
 
         UNKNOWN( ChaiError.UNKNOWN, true, false ),;
 
-        private ChaiError chaiErrorCode;
-        private boolean permenant;
-        private boolean authentication;
-        private String[] errorStrings;
+        private final ChaiError chaiErrorCode;
+        private final boolean permanent;
+        private final boolean authentication;
+        private List<String> errorStrings;
 
         OracleDSError(
                 final ChaiError chaiErrorCode,
-                final boolean permenant,
+                final boolean permanent,
                 final boolean authentication,
                 final String... errorStrings
         )
         {
             this.chaiErrorCode = chaiErrorCode;
-            this.permenant = permenant;
+            this.permanent = permanent;
             this.authentication = authentication;
-            this.errorStrings = errorStrings;
+            this.errorStrings = Collections.unmodifiableList( Arrays.asList( errorStrings ) );
         }
 
-        public boolean isPermenant()
+        public boolean isPermanent()
         {
-            return permenant;
+            return permanent;
         }
 
         public boolean isAuthentication()
@@ -110,7 +118,7 @@ public class OracleDSErrorMap implements ErrorMap
             return chaiErrorCode;
         }
 
-        public String[] getErrorStrings()
+        public List<String> getErrorStrings()
         {
             return errorStrings;
         }

@@ -69,7 +69,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
 
     static
     {
-        final ArrayList<String> ldapPasswordAttributes = new ArrayList<String>();
+        final ArrayList<String> ldapPasswordAttributes = new ArrayList<>();
         for ( final Attribute attribute : Attribute.values() )
         {
             ldapPasswordAttributes.add( attribute.getLdapAttribute() );
@@ -78,8 +78,8 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
     }
 
 
-    private final Map<String, String> ruleMap = new HashMap<String, String>();
-    private final Map<String, List<String>> allEntryValues = new HashMap<String, List<String>>();
+    private final Map<String, String> ruleMap = new HashMap<>();
+    private final Map<String, List<String>> allEntryValues = new HashMap<>();
 
     NspmPasswordPolicyImpl( final String entryDN, final ChaiProvider chaiProvider )
             throws ChaiUnavailableException, ChaiOperationException
@@ -99,17 +99,20 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         ruleMap.putAll( createRuleMapUsingAttributeValues( results ) );
     }
 
+    @Override
     public String getLdapObjectClassName()
     {
         return "nspmPasswordPolicy";
     }
 
+    @Override
     public String getChallengeSetDN()
     {
         final List<String> dnValues = allEntryValues.get( Attribute.CHALLENGE_SET_DN.getLdapAttribute() );
         return ( dnValues != null && !dnValues.isEmpty() ) ? dnValues.get( 0 ) : "";
     }
 
+    @Override
     public String getSourceDN()
     {
         return this.getEntryDN();
@@ -121,6 +124,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         throw new UnsupportedOperationException( "not implemented" );
     }
 
+    @Override
     public PasswordRuleHelper getRuleHelper()
     {
         return new GenericRuleHelper( this );
@@ -179,7 +183,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
             final List<String> results = entryValues.get( Attribute.DISALLOWED_ATTRIBUTES.getLdapAttribute() );
             if ( results != null )
             {
-                final List<String> cleanedResults = new ArrayList<String>();
+                final List<String> cleanedResults = new ArrayList<>();
                 for ( ListIterator<String> iterator = results.listIterator(); iterator.hasNext(); )
                 {
                     cleanedResults.add( iterator.next().replaceAll( "[ :]", "" ) );
@@ -206,16 +210,19 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         return returnMap;
     }
 
+    @Override
     public String getValue( final String key )
     {
         return ruleMap.get( key );
     }
 
+    @Override
     public String getValue( final ChaiPasswordRule rule )
     {
         return ruleMap.get( rule.getKey() );
     }
 
+    @Override
     public Set<String> getKeys()
     {
         return Collections.unmodifiableSet( ruleMap.keySet() );
@@ -379,6 +386,7 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         }
     }
 
+    @Override
     public ChaiEntry getPolicyEntry()
     {
         return this;

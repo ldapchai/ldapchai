@@ -52,6 +52,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
 
     private static final String PW_EXPIRATION_ZULU_TIMESTAMP = "19800101010101Z";
 
+    @Override
     public String getLdapObjectClassName()
     {
         return InetOrgPerson.OBJECT_CLASS_VALUE;
@@ -62,6 +63,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         super( userDN, chaiProvider );
     }
 
+    @Override
     public ChaiPasswordPolicy getPasswordPolicy()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -69,6 +71,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     }
 
 
+    @Override
     public boolean testPasswordPolicy( final String password )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
@@ -105,6 +108,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return true;
     }
 
+    @Override
     public final void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -134,18 +138,21 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         }
     }
 
+    @Override
     public final void addGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
         EdirEntries.writeGroupMembership( this, theGroup );
     }
 
+    @Override
     public void removeGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
         EdirEntries.removeGroupMembership( this, theGroup );
     }
 
+    @Override
     public final String readPassword()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -183,6 +190,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         throw new ChaiOperationException( "unknown error retrieving password (null response)", ChaiError.UNKNOWN );
     }
 
+    @Override
     public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiOperationException, ChaiPasswordPolicyException
     {
@@ -230,6 +238,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         }
     }
 
+    @Override
     public boolean isPasswordExpired()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -266,12 +275,14 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return false;
     }
 
+    @Override
     public final Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute( ATTR_LAST_LOGIN );
     }
 
+    @Override
     public final void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
@@ -316,18 +327,21 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         }
     }
 
+    @Override
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
         this.writeStringAttribute( ATTR_PASSWORD_EXPIRE_TIME, PW_EXPIRATION_ZULU_TIMESTAMP );
     }
 
+    @Override
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return readBooleanAttribute( "lockedByIntruder" );
     }
 
+    @Override
     public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -349,12 +363,14 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         return EdirEntries.readGuid( this );
     }
 
+    @Override
     public boolean isAccountEnabled()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return !readBooleanAttribute( ATTR_LOGIN_DISABLED );
     }
 
+    @Override
     public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {

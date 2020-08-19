@@ -110,6 +110,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
         return unlockDate.isAfter( Instant.now() );
     }
 
+    @Override
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {

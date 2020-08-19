@@ -86,12 +86,14 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
     private LdapConnection connection;
 
+    @Override
     public Object getConnectionObject()
             throws Exception
     {
         return null;
     }
 
+    @Override
     public String getCurrentConnectionURL()
     {
         return null;
@@ -253,6 +255,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return super.getIdentifier();
     }
 
+    @Override
     public boolean compareStringAttribute( final String entryDN, final String attributeName, final String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -269,6 +272,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void createEntry( final String entryDN, final String baseObjectClass, final Map<String, String> stringAttributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -278,6 +282,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         createEntry( entryDN, Collections.singleton( baseObjectClass ), stringAttributes );
     }
 
+    @Override
     public void createEntry( final String entryDN, final Set<String> baseObjectClasses, final Map<String, String> stringAttributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -310,6 +315,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     @ChaiProvider.LdapOperation
     @ChaiProvider.ModifyOperation
     public void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
@@ -331,6 +337,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void deleteEntry( final String entryDN )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -350,6 +357,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void deleteStringAttributeValue( final String entryDN, final String attributeName, final String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -380,86 +388,103 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public ExtendedResponse extendedOperation( final ExtendedRequest request )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
         final org.apache.directory.api.ldap.model.message.ExtendedRequest apacheRequest = new org.apache.directory.api.ldap.model.message.ExtendedRequest()
         {
+            @Override
             public String getRequestName()
             {
                 return request.getID();
             }
 
+            @Override
             public org.apache.directory.api.ldap.model.message.ExtendedRequest setRequestName( final String oid )
             {
                 return this;
             }
 
+            @Override
             public org.apache.directory.api.ldap.model.message.ExtendedRequest setMessageId( final int messageId )
             {
                 return this;
             }
 
+            @Override
             public org.apache.directory.api.ldap.model.message.ExtendedRequest addControl( final Control control )
             {
                 return null;
             }
 
+            @Override
             public org.apache.directory.api.ldap.model.message.ExtendedRequest addAllControls( final Control[] controls )
             {
                 return null;
             }
 
+            @Override
             public org.apache.directory.api.ldap.model.message.ExtendedRequest removeControl( final Control control )
             {
                 return null;
             }
 
+            @Override
             public MessageTypeEnum getResponseType()
             {
                 return null;
             }
 
+            @Override
             public ResultResponse getResultResponse()
             {
                 return null;
             }
 
+            @Override
             public boolean hasResponse()
             {
                 return false;
             }
 
+            @Override
             public MessageTypeEnum getType()
             {
                 return null;
             }
 
+            @Override
             public Map<String, Control> getControls()
             {
                 return null;
             }
 
+            @Override
             public Control getControl( final String oid )
             {
                 return null;
             }
 
+            @Override
             public boolean hasControl( final String oid )
             {
                 return false;
             }
 
+            @Override
             public int getMessageId()
             {
                 return 0;
             }
 
+            @Override
             public Object get( final Object key )
             {
                 return null;
             }
 
+            @Override
             public Object put( final Object key, final Object value )
             {
                 return null;
@@ -470,11 +495,13 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
             final org.apache.directory.api.ldap.model.message.ExtendedResponse apacheResponse = connection.extended( apacheRequest );
             final ExtendedResponse extendedResponse = new ExtendedResponse()
             {
+                @Override
                 public String getID()
                 {
                     return apacheResponse.getResponseName();
                 }
 
+                @Override
                 public byte[] getEncodedValue()
                 {
                     return null;
@@ -488,11 +515,13 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public ProviderStatistics getProviderStatistics()
     {
         return null;
     }
 
+    @Override
     public byte[][] readMultiByteAttribute( final String entryDN, final String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -513,6 +542,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
 
 
+    @Override
     public Set<String> readMultiStringAttribute( final String entryDN, final String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -524,7 +554,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         {
             return Collections.emptySet();
         }
-        final Set<String> returnSet = new LinkedHashSet<String>();
+        final Set<String> returnSet = new LinkedHashSet<>();
         for ( final Value value : values )
         {
             returnSet.add( value.getString() );
@@ -567,6 +597,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
     }
 
+    @Override
     public String readStringAttribute( final String entryDN, final String attribute )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -592,6 +623,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public Map<String, String> readStringAttributes( final String entryDN, final Set<String> attributes )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -604,7 +636,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
                     entryDN,
                     ChaiConstant.FILTER_OBJECTCLASS_ANY,
                     org.apache.directory.api.ldap.model.message.SearchScope.OBJECT,
-                    attributes.toArray( new String[attributes.size()] )
+                    attributes.toArray( new String[0] )
             );
             final Entry entry = entries.iterator().next();
             final Collection<Attribute> attrs = entry.getAttributes();
@@ -625,6 +657,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void replaceStringAttribute( final String entryDN, final String attributeName, final String oldValue, final String newValue )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -662,6 +695,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public Map<String, Map<String, String>> search( final String baseDN, final SearchHelper searchHelper )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -686,6 +720,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return Collections.unmodifiableMap( returnObj );
     }
 
+    @Override
     public Map<String, Map<String, String>> search(
             final String baseDN,
             final String filter,
@@ -705,6 +740,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return search( baseDN, searchHelper );
     }
 
+    @Override
     public Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final SearchHelper searchHelper )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -714,6 +750,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         return searchImpl( baseDN, searchHelper, true );
     }
 
+    @Override
     public Map<String, Map<String, List<String>>> searchMultiValues(
             final String baseDN,
             final String filter,
@@ -747,17 +784,17 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
             final SearchCursor searchCursor = connection.search( searchRequest );
 
-            final Map<String, Map<String, List<String>>> returnObj = new LinkedHashMap<String, Map<String, List<String>>>();
+            final Map<String, Map<String, List<String>>> returnObj = new LinkedHashMap<>();
 
             while ( searchCursor.next() )
             {
                 final Entry entry = searchCursor.getEntry();
                 final String dnValue = entry.getDn().getName();
-                final Map<String, List<String>> entryMap = new HashMap<String, List<String>>();
+                final Map<String, List<String>> entryMap = new HashMap<>();
                 for ( Attribute returnAttr : entry )
                 {
                     final String attrName = returnAttr.getId();
-                    final List<String> valueList = new ArrayList<String>();
+                    final List<String> valueList = new ArrayList<>();
                     if ( multivalued )
                     {
                         for ( Value value : returnAttr )
@@ -788,6 +825,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void writeBinaryAttribute( final String entryDN, final String attributeName, final byte[][] values, final boolean overwrite )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -813,6 +851,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void writeBinaryAttribute( final String entryDN, final String attributeName, final byte[][] values, final boolean overwrite, final ChaiRequestControl[] controls )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -837,6 +876,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
     }
 
+    @Override
     public void writeStringAttribute( final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -850,7 +890,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
             {
                 final Modification modification = new DefaultModification();
                 modification.setOperation( overwrite ? ModificationOperation.REPLACE_ATTRIBUTE : ModificationOperation.ADD_ATTRIBUTE );
-                modification.setAttribute( new DefaultAttribute( attributeName, values.toArray( new String[values.size()] ) ) );
+                modification.setAttribute( new DefaultAttribute( attributeName, values.toArray( new String[0] ) ) );
                 modifyRequest.addModification( modification );
             }
             final ModifyResponse response = connection.modify( modifyRequest );
@@ -862,6 +902,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void writeStringAttributes( final String entryDN, final Map<String, String> attributeValueProps, final boolean overwrite )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -890,6 +931,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
     }
 
+    @Override
     public void replaceBinaryAttribute( final String entryDN, final String attributeName, final byte[] oldValue, final byte[] newValue )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -899,6 +941,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         replaceAttributeImpl( entryDN, attributeName, new Value( oldValue ), new Value( newValue ) );
     }
 
+    @Override
     public boolean isConnected()
     {
         return connection != null && connection.isConnected();
@@ -935,21 +978,24 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
 
     private static Control[] figureControls( final ChaiRequestControl[] chaiControls )
     {
-        final List<Control> returnObj = new ArrayList<Control>();
+        final List<Control> returnObj = new ArrayList<>();
         for ( final ChaiRequestControl chaiControl : chaiControls )
         {
             final Control control = new Control()
             {
+                @Override
                 public String getOid()
                 {
                     return chaiControl.getId();
                 }
 
+                @Override
                 public boolean isCritical()
                 {
                     return chaiControl.isCritical();
                 }
 
+                @Override
                 public void setCritical( final boolean isCritical )
                 {
 
@@ -957,6 +1003,6 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
             };
             returnObj.add( control );
         }
-        return returnObj.toArray( new Control[returnObj.size()] );
+        return returnObj.toArray( new Control[0] );
     }
 }

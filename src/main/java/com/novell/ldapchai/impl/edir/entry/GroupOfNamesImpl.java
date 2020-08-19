@@ -33,6 +33,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
 class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames
 {
 
+    @Override
     public String getLdapObjectClassName()
     {
         return GroupOfNames.OBJECT_CLASS_VALUE;
@@ -43,18 +44,21 @@ class GroupOfNamesImpl extends AbstractChaiGroup implements GroupOfNames
         super( entryDN, chaiHelper );
     }
 
+    @Override
     public final boolean isDynamic()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return this.compareStringAttribute( ChaiConstant.ATTR_LDAP_OBJECTCLASS, ChaiConstant.OBJECTCLASS_AUX_LDAP_DYNAMIC_GROUP );
     }
 
+    @Override
     public void addMember( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {
         EdirEntries.writeGroupMembership( theUser, this );
     }
 
+    @Override
     public void removeMember( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {

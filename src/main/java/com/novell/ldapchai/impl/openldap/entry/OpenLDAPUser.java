@@ -43,6 +43,7 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         super( userDN, chaiProvider );
     }
 
+    @Override
     public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -55,12 +56,14 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         return Collections.unmodifiableSet( returnGroups );
     }
 
+    @Override
     public void addGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
         theGroup.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
+    @Override
     public void removeGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {

@@ -23,24 +23,32 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class EdirErrorMap implements ErrorMap
 {
 
+    @Override
     public DirectoryVendor forDirectoryVendor()
     {
         return DirectoryVendor.EDIRECTORY;
     }
 
+    @Override
     public ChaiError errorForMessage( final String message )
     {
         return forMessage( message ).chaiErrorCode;
     }
 
+    @Override
     public boolean isPermanent( final String message )
     {
-        return forMessage( message ).isPermenant();
+        return forMessage( message ).isPermanent();
     }
 
+    @Override
     public boolean isAuthenticationRelated( final String message )
     {
         return forMessage( message ).isAuthentication();
@@ -525,25 +533,25 @@ public class EdirErrorMap implements ErrorMap
         UNSUPPORTED_OPERATION( Integer.MAX_VALUE, ChaiError.UNSUPPORTED_OPERATION, true, false, "Unrecognized extended operation" ),
         UNKNOWN( -1, ChaiError.UNKNOWN, true, false ),;
 
-        private int edirErrorCode;
-        private ChaiError chaiErrorCode;
-        private boolean permenant;
-        private boolean authentication;
-        private String[] errorStrings;
+        private final int edirErrorCode;
+        private final ChaiError chaiErrorCode;
+        private final boolean permanent;
+        private final boolean authentication;
+        private final List<String> errorStrings;
 
         EdirError(
                 final int errorCodeNumber,
                 final ChaiError chaiErrorCode,
-                final boolean permenant,
+                final boolean permanent,
                 final boolean authentication,
                 final String... errorStrings
         )
         {
             this.edirErrorCode = errorCodeNumber;
             this.chaiErrorCode = chaiErrorCode;
-            this.permenant = permenant;
+            this.permanent = permanent;
             this.authentication = authentication;
-            this.errorStrings = errorStrings;
+            this.errorStrings = Collections.unmodifiableList( Arrays.asList( errorStrings ) );
         }
 
         public int getEdirErrorCode()
@@ -551,9 +559,9 @@ public class EdirErrorMap implements ErrorMap
             return edirErrorCode;
         }
 
-        public boolean isPermenant()
+        public boolean isPermanent()
         {
-            return permenant;
+            return permanent;
         }
 
         public boolean isAuthentication()
@@ -566,7 +574,7 @@ public class EdirErrorMap implements ErrorMap
             return chaiErrorCode;
         }
 
-        public String[] getErrorStrings()
+        public List<String> getErrorStrings()
         {
             return errorStrings;
         }

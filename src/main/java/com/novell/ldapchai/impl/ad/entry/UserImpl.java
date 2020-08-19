@@ -65,10 +65,11 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         super( userDN, chaiProvider );
     }
 
+    @Override
     public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Set<ChaiGroup> returnGroups = new HashSet<ChaiGroup>();
+        final Set<ChaiGroup> returnGroups = new HashSet<>();
         final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
         for ( final String group : groups )
         {
@@ -77,12 +78,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         return Collections.unmodifiableSet( returnGroups );
     }
 
+    @Override
     public void addGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
         theGroup.addAttribute( "member", this.getEntryDN() );
     }
 
+    @Override
     public ChaiPasswordPolicy getPasswordPolicy()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -120,36 +123,42 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         return DefaultChaiPasswordPolicy.createDefaultChaiPasswordPolicy( policyMap );
     }
 
+    @Override
     public String readPassword()
             throws ChaiUnavailableException, ChaiOperationException
     {
         throw new UnsupportedOperationException( "ChaiUser#readPassword not implemented in ad-impl ldapChai API" );
     }
 
+    @Override
     public void removeGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
         theGroup.deleteAttribute( "member", this.getEntryDN() );
     }
 
+    @Override
     public boolean testPassword( final String passwordValue )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
         throw new UnsupportedOperationException( "ChaiUser#testPassword not implemented in ad-impl ldapChai API" );
     }
 
+    @Override
     public boolean testPasswordPolicy( final String testPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
         return false;
     }
 
+    @Override
     public void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
         this.writeStringAttribute( "lockoutTime", "0" );
     }
 
+    @Override
     public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
@@ -192,6 +201,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         }
     }
 
+    @Override
     public boolean isPasswordExpired()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -208,12 +218,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
     }
 
 
+    @Override
     public final String readGivenName()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readStringAttribute( ATTR_GIVEN_NAME );
     }
 
+    @Override
     public final Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -236,6 +248,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
                 : lastLoginDateTimestamp;
     }
 
+    @Override
     public final void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
@@ -271,12 +284,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
 
     }
 
+    @Override
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
         this.writeStringAttribute( "pwdLastSet", "0" );
     }
 
+    @Override
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -326,12 +341,14 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         return false;
     }
 
+    @Override
     public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readDateAttribute( "pwdLastSet" );
     }
 
+    @Override
     public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -340,7 +357,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
                 "userAccountControl",
                 "msDS-UserPasswordExpiryTimeComputed",
         };
-        final Map<String, String> readAttrs = readStringAttributes( new HashSet<String>( Arrays.asList( attrsToRead ) ) );
+        final Map<String, String> readAttrs = readStringAttributes( new HashSet<>( Arrays.asList( attrsToRead ) ) );
 
         final String computedValue = readAttrs.get( "msDS-UserPasswordExpiryTimeComputed" );
         if ( computedValue != null && computedValue.length() > 0 )
@@ -428,6 +445,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         return ADEntries.readGUID( this );
     }
 
+    @Override
     public boolean isAccountEnabled()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -447,6 +465,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
     }
 
 
+    @Override
     public Instant readAccountExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {

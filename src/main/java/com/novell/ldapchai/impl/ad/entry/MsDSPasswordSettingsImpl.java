@@ -44,7 +44,7 @@ public class MsDSPasswordSettingsImpl extends TopImpl implements MsDSPasswordSet
 
     static
     {
-        final ArrayList<String> ldapPasswordAttributes = new ArrayList<String>();
+        final ArrayList<String> ldapPasswordAttributes = new ArrayList<>();
         for ( final MsDSPasswordSettings.Attribute attribute : MsDSPasswordSettings.Attribute.values() )
         {
             ldapPasswordAttributes.add( attribute.getLdapAttribute() );
@@ -52,8 +52,8 @@ public class MsDSPasswordSettingsImpl extends TopImpl implements MsDSPasswordSet
         LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableCollection( ldapPasswordAttributes );
     }
 
-    private final Map<String, String> ruleMap = new HashMap<String, String>();
-    private final Map<String, List<String>> allEntryValues = new HashMap<String, List<String>>();
+    private final Map<String, String> ruleMap = new HashMap<>();
+    private final Map<String, List<String>> allEntryValues = new HashMap<>();
 
     MsDSPasswordSettingsImpl( final String entryDN, final ChaiProvider chaiProvider )
             throws ChaiUnavailableException, ChaiOperationException
@@ -106,26 +106,31 @@ public class MsDSPasswordSettingsImpl extends TopImpl implements MsDSPasswordSet
     }
 
 
+    @Override
     public String getValue( final String key )
     {
         return ruleMap.get( key );
     }
 
+    @Override
     public String getValue( final ChaiPasswordRule rule )
     {
         return ruleMap.get( rule.getKey() );
     }
 
+    @Override
     public Set<String> getKeys()
     {
         return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
+    @Override
     public ChaiEntry getPolicyEntry()
     {
         return this;
     }
 
+    @Override
     public PasswordRuleHelper getRuleHelper()
     {
         return null;

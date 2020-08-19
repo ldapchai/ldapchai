@@ -76,7 +76,7 @@ public class DirXMLAssociation implements Serializable
          */
         MIGRATE( 4 ),;
 
-        private int numValue;
+        private final int numValue;
 
         State( final int numValue )
         {
@@ -109,9 +109,9 @@ public class DirXMLAssociation implements Serializable
 
     private static final String SEPERATOR = "#";
 
-    private String driverDN;
-    private State state;
-    private String value;
+    private final String driverDN;
+    private final State state;
+    private final String value;
 
     public static DirXMLAssociation forStoredValue( final String storedValue )
     {
@@ -120,12 +120,12 @@ public class DirXMLAssociation implements Serializable
 
     public static Set<DirXMLAssociation> forStoredValues( final Collection<String> values )
     {
-        return forStoredValues( values.toArray( new String[values.size()] ) );
+        return forStoredValues( values.toArray( new String[0] ) );
     }
 
     public static Set<DirXMLAssociation> forStoredValues( final String... values )
     {
-        final Set<DirXMLAssociation> returnSet = new HashSet<DirXMLAssociation>();
+        final Set<DirXMLAssociation> returnSet = new HashSet<>();
         for ( final String value : values )
         {
             final DirXMLAssociation assocValue = new DirXMLAssociation( value );

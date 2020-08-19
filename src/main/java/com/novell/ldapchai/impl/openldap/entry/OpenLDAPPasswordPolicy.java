@@ -249,7 +249,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
     static
     {
-        final Set<String> ldapPasswordAttributes = new HashSet<String>();
+        final Set<String> ldapPasswordAttributes = new HashSet<>();
         ldapPasswordAttributes.add( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY );
         for ( final Attribute attribute : Attribute.values() )
         {
@@ -258,8 +258,8 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
         LDAP_PASSWORD_ATTRIBUTES = Collections.unmodifiableSet( ldapPasswordAttributes );
     }
 
-    private final Map<String, String> ruleMap = new HashMap<String, String>();
-    private final Map<String, String> allEntryValues = new HashMap<String, String>();
+    private final Map<String, String> ruleMap = new HashMap<>();
+    private final Map<String, String> allEntryValues = new HashMap<>();
     private final ChaiProvider provider;
 
     public OpenLDAPPasswordPolicy( final String entryDN, final ChaiProvider chaiProvider )
@@ -331,7 +331,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
     private static Map<String, String> createRuleMapUsingAttributeValues( final Map<String, String> entryValues )
     {
-        final Map<String, String> returnMap = new HashMap<String, String>();
+        final Map<String, String> returnMap = new HashMap<>();
 
         // defaults for OpenLDAP policy
         returnMap.put( ChaiPasswordRule.AllowNumeric.getKey(), String.valueOf( true ) );
@@ -379,26 +379,31 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
         return returnMap;
     }
 
+    @Override
     public String getValue( final String key )
     {
         return ruleMap.get( key );
     }
 
+    @Override
     public String getValue( final ChaiPasswordRule rule )
     {
         return ruleMap.get( rule.getKey() );
     }
 
+    @Override
     public Set<String> getKeys()
     {
         return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
+    @Override
     public ChaiEntry getPolicyEntry()
     {
         return this;
     }
 
+    @Override
     public PasswordRuleHelper getRuleHelper()
     {
         return new GenericRuleHelper( this );

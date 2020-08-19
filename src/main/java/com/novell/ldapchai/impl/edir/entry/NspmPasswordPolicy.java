@@ -43,7 +43,7 @@ public interface NspmPasswordPolicy extends Top, ChaiPasswordPolicy
         EMAIL_HINT( "EmailHint" ),
         SHOW_HINT( "ShowHint" );
 
-        protected String xmlName;
+        private final String xmlName;
 
         ForgottenMode( final String xmlName )
         {

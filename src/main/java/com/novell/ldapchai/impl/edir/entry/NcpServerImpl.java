@@ -31,6 +31,7 @@ import java.util.Set;
 class NcpServerImpl extends TopImpl implements NcpServer
 {
 
+    @Override
     public String getLdapObjectClassName()
     {
         return NcpServer.OBJECT_CLASS_VALUE;

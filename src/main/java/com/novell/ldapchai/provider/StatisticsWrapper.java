@@ -46,7 +46,7 @@ class StatisticsWrapper implements InvocationHandler
     /**
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
      */
-    private ChaiProviderImplementor realProvider;
+    private final ChaiProviderImplementor realProvider;
 
     private final StatsBean statisticsProvider = new StatsBean();
 
@@ -80,6 +80,7 @@ class StatisticsWrapper implements InvocationHandler
     }
 
 
+    @Override
     public Object invoke( final Object proxy, final Method method, final Object[] args )
             throws Throwable
     {
@@ -166,11 +167,13 @@ class StatisticsWrapper implements InvocationHandler
             }
         }
 
+        @Override
         public long getIncrementorStatistic( final IncrementerStatistic statistic )
         {
             return incrementerMap.get( statistic ).get();
         }
 
+        @Override
         public Instant getTimestampStatistic( final TimestampStatistic timestampStatistic )
         {
             return timestampMap.get( timestampStatistic );

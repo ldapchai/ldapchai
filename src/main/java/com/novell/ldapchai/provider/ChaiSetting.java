@@ -20,9 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.cr.Answer;
-import com.novell.ldapchai.exception.ChaiRuntimeException;
 
-import java.io.Serializable;
 import java.net.URI;
 
 /**
@@ -69,7 +67,7 @@ public enum ChaiSetting
      *
      * @see #FAILOVER_ENABLE
      */
-    BIND_URLS( "chai.bind.URLs", "ldap://localhost", true, ( Validator ) value ->
+    BIND_URLS( "chai.bind.URLs", "ldap://localhost", true, ( SettingValidator.Validator ) value ->
     {
         if ( value == null || value.length() < 0 )
         {
@@ -91,7 +89,7 @@ public enum ChaiSetting
             }
             catch ( IllegalArgumentException e )
             {
-                final StringBuffer sb = new StringBuffer();
+                final StringBuilder sb = new StringBuilder();
                 sb.append( "ldap server url \"" ).append( s );
                 sb.append( "\" does not have proper url syntax such as \"ldap://127.0.0.1\" or \"ldaps://ldap.example.com\" " );
                 sb.append( "[" ).append( e.getMessage() ).append( "]" );
@@ -161,7 +159,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>128</td></tr>
      * </table>
      */
-    CACHE_MAXIMUM_SIZE( "chai.cache.maximumSize", "128", true, Validator.INTEGER_VALIDATOR ),
+    CACHE_MAXIMUM_SIZE( "chai.cache.maximumSize", "128", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Maximum amount of time to cache results.</p>
@@ -171,7 +169,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
      * </table>
      */
-    CACHE_MAXIMUM_AGE( "chai.cache.maximumAge", "1000", true, Validator.INTEGER_VALIDATOR ),
+    CACHE_MAXIMUM_AGE( "chai.cache.maximumAge", "1000", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Enable chai statistics.  If enabled, each ChaiProvider will maintain statistics and make them
@@ -184,7 +182,7 @@ public enum ChaiSetting
      *
      * @see ProviderStatistics
      */
-    STATISTICS_ENABLE( "chai.statistics.enable", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    STATISTICS_ENABLE( "chai.statistics.enable", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Enable watchdog idle protection.  If this value is set to "true", then the {@code ChaiProvider} will automatically
@@ -200,7 +198,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    WATCHDOG_ENABLE( "chai.watchdog.enable", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    WATCHDOG_ENABLE( "chai.watchdog.enable", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Enable thread safe locking API.</p>
@@ -210,7 +208,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    THREAD_SAFE_ENABLE( "chai.threadSafe.enable", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    THREAD_SAFE_ENABLE( "chai.threadSafe.enable", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Maximum time an operation can be in progress (in ms).  If this time is exceeded, the connection will
@@ -222,7 +220,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>60000</td></tr>
      * </table>
      */
-    WATCHDOG_OPERATION_TIMEOUT( "chai.watchdog.operationTimeout", "60000", true, Validator.INTEGER_VALIDATOR ),
+    WATCHDOG_OPERATION_TIMEOUT( "chai.watchdog.operationTimeout", "60000", true, SettingValidator.INTEGER_VALIDATOR ),
     
     /**
      * <p>Maximum time a ChaiProvider can remain inactive (in ms).  If this time is exceeded, the connection will
@@ -234,7 +232,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>30000</td></tr>
      * </table>
      */
-    WATCHDOG_IDLE_TIMEOUT( "chai.watchdog.idleTimeout", "30000", true, Validator.INTEGER_VALIDATOR ),
+    WATCHDOG_IDLE_TIMEOUT( "chai.watchdog.idleTimeout", "30000", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Maximum time a ChaiProvider can remain in use(in ms).  If this time is exceeded, the connection will
@@ -245,7 +243,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>30000</td></tr>
      * </table>
      */
-    WATCHDOG_MAX_CONNECTION_LIFETIME( "chai.watchdog.maxConnectionLifetime", "3300000", true, Validator.INTEGER_VALIDATOR ),
+    WATCHDOG_MAX_CONNECTION_LIFETIME( "chai.watchdog.maxConnectionLifetime", "3300000", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Disable watchdog timeout on providers where the bind URL's principal has its password expired.</p>
@@ -255,7 +253,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
      */
-    WATCHDOG_DISABLE_IF_PW_EXPIRED( "chai.watchdog.disableIfPwExpired", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    WATCHDOG_DISABLE_IF_PW_EXPIRED( "chai.watchdog.disableIfPwExpired", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
 
     /**
@@ -271,7 +269,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    PROMISCUOUS_SSL( "chai.connection.promiscuousSSL", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    PROMISCUOUS_SSL( "chai.connection.promiscuousSSL", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Enable wire trace debugging.  This will cause all data in/out of chai to be output to the
@@ -285,7 +283,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    WIRETRACE_ENABLE( "chai.wireDebug.enable", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    WIRETRACE_ENABLE( "chai.wireDebug.enable", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Enable fail over when multiple servers are present.  Also allows retries to a single server
@@ -296,7 +294,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    FAILOVER_ENABLE( "chai.failover.enable", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    FAILOVER_ENABLE( "chai.failover.enable", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Indicates if the failover engine will use it's "last known good" mechanism.  When a new connection is made, if
@@ -308,7 +306,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    FAILOVER_USE_LAST_KNOWN_GOOD_HINT( "chai.failover.useLastKnownGoodHint", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    FAILOVER_USE_LAST_KNOWN_GOOD_HINT( "chai.failover.useLastKnownGoodHint", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Minimum time Chai will wait before retrying a server marked as down.  Time is in milliseconds.</p>
@@ -318,7 +316,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>90000</td></tr>
      * </table>
      */
-    FAILOVER_MINIMUM_FAILBACK_TIME( "chai.failover.failBackTime", "90000", true, Validator.INTEGER_VALIDATOR ),
+    FAILOVER_MINIMUM_FAILBACK_TIME( "chai.failover.failBackTime", "90000", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Minimum number of attempts Chai will make to contact a server if there is a communication problem.</p>
@@ -328,7 +326,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>4</td></tr>
      * </table>
      */
-    FAILOVER_CONNECT_RETRIES( "chai.failover.connectRetries", "4", true, Validator.INTEGER_VALIDATOR ),
+    FAILOVER_CONNECT_RETRIES( "chai.failover.connectRetries", "4", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Configure alias handling.  By default, alias de-referencing is set to "never", so aliases
@@ -354,7 +352,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
      */
-    LDAP_CONNECT_TIMEOUT( "chai.ldap.ldapTimeout", "5000", true, Validator.INTEGER_VALIDATOR ),
+    LDAP_CONNECT_TIMEOUT( "chai.ldap.ldapTimeout", "5000", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Ldap read timeout, if supported by the ChaiProvider implementation.  Time is in milliseconds.
@@ -365,7 +363,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
      */
-    LDAP_READ_TIMEOUT( "chai.ldap.ldapReadTimeout", "0", true, Validator.INTEGER_VALIDATOR ),
+    LDAP_READ_TIMEOUT( "chai.ldap.ldapReadTimeout", "0", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Enable LDAP referral following.  Valid settings are "true" or "false".</p>
@@ -375,7 +373,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    LDAP_FOLLOW_REFERRALS( "chai.ldap.followReferrals", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    LDAP_FOLLOW_REFERRALS( "chai.ldap.followReferrals", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Set the fully qualified class name of the {@code ChaiProvider} class name to be used.  By default this is
@@ -401,7 +399,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    EDIRECTORY_ENABLE_NMAS( "chai.edirectory.enableNMAS", "false", true, Validator.ENABLE_NMAS_VALIDATOR ),
+    EDIRECTORY_ENABLE_NMAS( "chai.edirectory.enableNMAS", "false", true, SettingValidator.ENABLE_NMAS_VALIDATOR ),
 
     /**
      * <p>Cache failed operations due to unknown extended operations.  Once an unknown extended operation for a
@@ -412,7 +410,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    EXTENDED_OPERATION_FAILURE_CACHE( "chai.provider.extendedOperation.failureCache", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    EXTENDED_OPERATION_FAILURE_CACHE( "chai.provider.extendedOperation.failureCache", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Set to read-only mode.   When enabled, no "write" opertions will be permitted, and will fail with an {@link com.novell.ldapchai.exception.ChaiOperationException} of
@@ -424,7 +422,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    READONLY( "chai.provider.readonly", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    READONLY( "chai.provider.readonly", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Specify a default directory vendor.  If not empty, {@link ChaiProvider} implementations <b>should</b> always
@@ -438,7 +436,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>(none)</td></tr>
      * </table>
      */
-    DEFAULT_VENDOR( "chai.vendor.default", "", true, ( Validator ) value ->
+    DEFAULT_VENDOR( "chai.vendor.default", "", true, ( SettingValidator.Validator ) value ->
     {
         if ( value == null || value.length() < 1 )
         {
@@ -457,7 +455,7 @@ public enum ChaiSetting
     }
     ),
 
-    JNDI_ENABLE_POOL( "chai.provider.jndi.enablePool", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    JNDI_ENABLE_POOL( "chai.provider.jndi.enablePool", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Case insensitive challenge/responses.  If true, the case of the responses will be ignored when tested.</p>
@@ -467,7 +465,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    CR_CASE_INSENSITIVE( "chai.crsetting.caseInsensitive", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    CR_CASE_INSENSITIVE( "chai.crsetting.caseInsensitive", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * Allow duplicate response values to be used.
@@ -477,7 +475,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    CR_ALLOW_DUPLICATE_RESPONSES( "chai.crsetting.allowDuplicateResponses", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    CR_ALLOW_DUPLICATE_RESPONSES( "chai.crsetting.allowDuplicateResponses", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * Default Chai CR Format Type.  Must be a valid string value of {@link com.novell.ldapchai.cr.Answer.FormatType}
@@ -487,7 +485,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>SHA1_SALT</td></tr>
      * </table>
      */
-    CR_DEFAULT_FORMAT_TYPE( "chai.crsetting.defaultFormatType", Answer.FormatType.PBKDF2_SHA512.toString(), true, Validator.BOOLEAN_VALIDATOR ),
+    CR_DEFAULT_FORMAT_TYPE( "chai.crsetting.defaultFormatType", Answer.FormatType.PBKDF2_SHA512.toString(), true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Setting key to control the ldap attribute name used when reading/writing Chai Challenge/Response formats.</p>
@@ -530,7 +528,7 @@ public enum ChaiSetting
      * @see com.novell.ldapchai.cr.ChaiResponseSet
      * @see com.novell.ldapchai.util.ConfigObjectRecord
      */
-    CR_CHAI_ITERATIONS( "chai.com.novell.ldapchai.cr.chai.iterations", "0", true, Validator.INTEGER_VALIDATOR ),
+    CR_CHAI_ITERATIONS( "chai.com.novell.ldapchai.cr.chai.iterations", "0", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Setting key to control the number of salt alphanumeric characters to use for the response salt. to perform the CR Salt when the
@@ -546,7 +544,7 @@ public enum ChaiSetting
      * @see com.novell.ldapchai.cr.ChaiResponseSet
      * @see com.novell.ldapchai.util.ConfigObjectRecord
      */
-    CR_CHAI_SALT_CHAR_COUNT( "chai.com.novell.ldapchai.cr.chai.saltCharCount", "0", true, Validator.INTEGER_VALIDATOR ),
+    CR_CHAI_SALT_CHAR_COUNT( "chai.com.novell.ldapchai.cr.chai.saltCharCount", "0", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>If true, then during the {@link com.novell.ldapchai.ChaiUser#setPassword(String)} operation, the control for
@@ -558,7 +556,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    AD_SET_POLICY_HINTS_ON_PW_SET( "chai.ad.setPolicyHintsOnPwSet", "false", true, Validator.BOOLEAN_VALIDATOR ),
+    AD_SET_POLICY_HINTS_ON_PW_SET( "chai.ad.setPolicyHintsOnPwSet", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Enable support for search result paging.  If set to "auto" then the RootDSE will be checked to see if it
@@ -570,7 +568,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>auto</td></tr>
      * </table>
      */
-    LDAP_SEARCH_PAGING_ENABLE( "chai.ldap.paging.enable", "auto", true, Validator.AUTO_OR_BOOLEAN_VALIDATOR ),
+    LDAP_SEARCH_PAGING_ENABLE( "chai.ldap.paging.enable", "auto", true, SettingValidator.AUTO_OR_BOOLEAN_VALIDATOR ),
 
     /**
      * <p>If {@link #LDAP_SEARCH_PAGING_ENABLE} is enabled, then this setting will control the page size.</p>
@@ -580,7 +578,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>500</td></tr>
      * </table>
      */
-    LDAP_SEARCH_PAGING_SIZE( "chai.ldap.paging.size", "500", true, Validator.INTEGER_VALIDATOR ),
+    LDAP_SEARCH_PAGING_SIZE( "chai.ldap.paging.size", "500", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Distinguished name of the default password policy in OpenLDAP.</p>
@@ -611,7 +609,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>true</td></tr>
      * </table>
      */
-    JNDI_RESOLVE_IN_NAMESPACE( "chai.jndi.resolveInNamespace", "true", true, Validator.BOOLEAN_VALIDATOR ),
+    JNDI_RESOLVE_IN_NAMESPACE( "chai.jndi.resolveInNamespace", "true", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Set the LDAP character encoding type to use during text/binary conversions.</p>
@@ -631,13 +629,13 @@ public enum ChaiSetting
      * @deprecated Thie setting has no effect.
      */
     @Deprecated
-    CR_CHAI_SALT_COUNT( "chai.cr.chai.saltCount", "1000", true, Validator.INTEGER_VALIDATOR ),;
+    CR_CHAI_SALT_COUNT( "chai.cr.chai.saltCount", "1000", true, SettingValidator.INTEGER_VALIDATOR ),;
 
 
     private final String key;
     private final String defaultValue;
     private final boolean visible;
-    private final Validator validator;
+    private final SettingValidator.Validator validator;
 
     /**
      * For a given key, find the associated setting.  If no setting matches
@@ -659,7 +657,7 @@ public enum ChaiSetting
         return null;
     }
 
-    ChaiSetting( final String key, final String defaultValue, final boolean visible, final Validator validator )
+    ChaiSetting( final String key, final String defaultValue, final boolean visible, final SettingValidator.Validator validator )
     {
         this.key = key;
         this.defaultValue = defaultValue;
@@ -709,75 +707,4 @@ public enum ChaiSetting
         this.validator.validate( value );
     }
 
-    interface Validator extends Serializable
-    {
-        void validate( String value );
-
-        Validator INTEGER_VALIDATOR = ( Validator ) value ->
-        {
-            try
-            {
-                Integer.parseInt( value );
-            }
-            catch ( Exception e )
-            {
-                throw new IllegalArgumentException( e.getMessage() );
-            }
-        };
-
-        Validator BOOLEAN_VALIDATOR = ( Validator ) value ->
-        {
-            try
-            {
-                Boolean.parseBoolean( value );
-            }
-            catch ( Exception e )
-            {
-                throw new IllegalArgumentException( e.getMessage() );
-            }
-        };
-
-        Validator AUTO_OR_BOOLEAN_VALIDATOR = ( Validator ) value ->
-        {
-            if ( !"auto".equalsIgnoreCase( value ) )
-            {
-                try
-                {
-                    Boolean.parseBoolean( value );
-                }
-                catch ( Exception e )
-                {
-                    throw new IllegalArgumentException( e.getMessage() );
-                }
-            }
-        };
-
-
-        Validator ENABLE_NMAS_VALIDATOR = ( Validator ) value ->
-        {
-            try
-            {
-                final boolean enableNmas = Boolean.parseBoolean( value );
-
-                if ( enableNmas )
-                {
-                    try
-                    {
-                        Class.forName( "com.novell.security.nmas.mgmt.NMASChallengeResponse" );
-                    }
-                    catch ( ClassNotFoundException ex )
-                    {
-                        final String errorMsg = "Error: Unable to enable NMAS support. One or more classes"
-                                + " could not be loaded from the NMAS Toolkit.  Check to make sure NMASToolkit.jar"
-                                + " is available on the classpath.";
-                        throw new ChaiRuntimeException( errorMsg );
-                    }
-                }
-            }
-            catch ( Exception e )
-            {
-                throw new IllegalArgumentException( e.getMessage() );
-            }
-        };
-    }
 }

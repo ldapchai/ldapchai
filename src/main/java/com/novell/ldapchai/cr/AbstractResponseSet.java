@@ -34,9 +34,7 @@ import java.util.Map;
 
 public abstract class AbstractResponseSet implements ResponseSet
 {
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractResponseSet.class.getName() );
-
 
     public enum STATE
     {
@@ -44,7 +42,7 @@ public abstract class AbstractResponseSet implements ResponseSet
         WRITTEN( true ),
         READ( false );
 
-        private boolean readableResponses;
+        private final boolean readableResponses;
 
         STATE( final boolean readableResponses )
         {
@@ -118,12 +116,14 @@ public abstract class AbstractResponseSet implements ResponseSet
     }
 
 
+    @Override
     public final ChallengeSet getChallengeSet()
             throws ChaiValidationException
     {
         return allChallengeSet;
     }
 
+    @Override
     public boolean meetsChallengeSetRequirements( final ChallengeSet challengeSet )
             throws ChaiValidationException
     {
@@ -157,22 +157,26 @@ public abstract class AbstractResponseSet implements ResponseSet
         return true;
     }
 
+    @Override
     public Locale getLocale()
     {
         return locale;
     }
 
+    @Override
     public Date getTimestamp()
     {
         return new Date( timestamp.getTime() );
     }
 
+    @Override
     public ChallengeSet getPresentableChallengeSet()
             throws ChaiValidationException
     {
         return presentableChallengeSet;
     }
 
+    @Override
     public Map<Challenge, String> getHelpdeskResponses()
     {
         final Map<Challenge, String> returnMap = new LinkedHashMap<>();

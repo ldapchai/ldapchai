@@ -34,12 +34,14 @@ class OpenLDAPGroup extends AbstractChaiGroup implements ChaiGroup
         super( groupDN, chaiProvider );
     }
 
+    @Override
     public void addMember( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {
         this.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
     }
 
+    @Override
     public void removeMember( final ChaiUser theUser )
             throws ChaiUnavailableException, ChaiOperationException
     {

@@ -121,7 +121,7 @@ public final class ChaiCrFactory
                 throw new IllegalArgumentException( "all answers must have the same caseInsensitive value" );
             }
         }
-        final Map<Challenge, HelpdeskAnswer> tempHelpdeskCrMap = new LinkedHashMap<Challenge, HelpdeskAnswer>();
+        final Map<Challenge, HelpdeskAnswer> tempHelpdeskCrMap = new LinkedHashMap<>();
         for ( final ChallengeBean challengeBean : helpdeskChallengeResponses )
         {
             final AnswerBean answerBean = challengeBean.getAnswer();

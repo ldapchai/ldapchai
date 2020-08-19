@@ -54,6 +54,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         super( userDN, chaiProvider );
     }
 
+    @Override
     public final ChaiUser getAssistant()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -65,6 +66,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return getChaiProvider().getEntryFactory().newChaiUser( mgrDN );
     }
 
+    @Override
     public final Set<ChaiUser> getDirectReports()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -77,6 +79,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return Collections.unmodifiableSet( reports );
     }
 
+    @Override
     public Set<ChaiGroup> getGroups()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -89,6 +92,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         return Collections.unmodifiableSet( returnGroups );
     }
 
+    @Override
     public final ChaiUser getManager()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -101,6 +105,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
     }
 
 
+    @Override
     public boolean testPassword( final String password )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
@@ -114,18 +119,21 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         }
     }
 
+    @Override
     public final String readSurname()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readStringAttribute( ATTR_SURNAME );
     }
 
+    @Override
     public String readUsername()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readStringAttribute( ATTR_COMMON_NAME );
     }
 
+    @Override
     public void addGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -133,6 +141,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         theGroup.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
+    @Override
     public void removeGroupMembership( final ChaiGroup theGroup )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -140,18 +149,21 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         theGroup.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 
+    @Override
     public String readGivenName()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readStringAttribute( ATTR_GIVEN_NAME );
     }
 
+    @Override
     public void setPassword( final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
         this.setPassword( newPassword, false );
     }
 
+    @Override
     public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
@@ -165,6 +177,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         }
     }
 
+    @Override
     public void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
@@ -178,82 +191,96 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         }
     }
 
+    @Override
     public void expirePassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
     }
 
+    @Override
     public ChaiPasswordPolicy getPasswordPolicy()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return null;
     }
 
+    @Override
     public boolean isPasswordExpired()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return false;
     }
 
+    @Override
     public Instant readLastLoginTime()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return null;
     }
 
+    @Override
     public String readPassword()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return null;
     }
 
+    @Override
     public Instant readPasswordExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return null;
     }
 
+    @Override
     public boolean testPasswordPolicy( final String testPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException
     {
         return true;
     }
 
+    @Override
     public void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
     }
 
+    @Override
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return false;
     }
 
+    @Override
     public Instant readPasswordModificationDate()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return null;
     }
 
+    @Override
     public boolean isAccountEnabled()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return !readBooleanAttribute( ATTR_LOGIN_DISABLED );
     }
 
+    @Override
     public boolean isLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.isPasswordLocked();
     }
 
+    @Override
     public Instant readAccountExpirationDate()
             throws ChaiUnavailableException, ChaiOperationException
     {
         return null;
     }
 
+    @Override
     public boolean isAccountExpired()
             throws ChaiOperationException, ChaiUnavailableException
     {

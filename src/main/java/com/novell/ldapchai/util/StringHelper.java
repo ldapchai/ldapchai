@@ -121,8 +121,7 @@ public class StringHelper
             return Collections.emptyList();
         }
 
-        final List<String> values = new ArrayList<String>();
-        values.addAll( Arrays.asList( inputString.split( seperator ) ) );
+        final List<String> values = new ArrayList<>( Arrays.asList( inputString.split( seperator ) ) );
         return Collections.unmodifiableList( values );
     }
 

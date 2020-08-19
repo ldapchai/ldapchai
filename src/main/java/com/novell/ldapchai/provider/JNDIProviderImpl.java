@@ -206,6 +206,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         super();
     }
 
+    @Override
     public void close()
     {
         super.close();
@@ -233,6 +234,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     public final boolean compareStringAttribute( final String entryDN, final String attributeName, final String value )
             throws ChaiUnavailableException, ChaiOperationException
@@ -289,6 +291,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return result;
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void createEntry( final String entryDN, final String baseObjectClass, final Map<String, String> stringAttributes )
@@ -298,6 +301,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         this.createEntry( entryDN, Collections.singleton( baseObjectClass ), stringAttributes );
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void createEntry( final String entryDN, final Set<String> baseObjectClasses, final Map<String, String> stringAttributes )
@@ -334,6 +338,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @ChaiProvider.LdapOperation
     @ChaiProvider.ModifyOperation
     public void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
@@ -354,6 +359,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void deleteEntry( final String entryDN )
@@ -373,6 +379,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void deleteStringAttributeValue( final String entryDN, final String attributeName, final String attributeValue )
@@ -402,6 +409,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final ExtendedResponse extendedOperation( final ExtendedRequest request )
@@ -431,16 +439,19 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     }
 
 
+    @Override
     public ChaiConfiguration getChaiConfiguration()
     {
         return chaiConfig;
     }
 
+    @Override
     public ProviderStatistics getProviderStatistics()
     {
         return null;
     }
 
+    @Override
     @LdapOperation
     public final byte[][] readMultiByteAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
@@ -510,6 +521,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     public final Set<String> readMultiStringAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
@@ -563,6 +575,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     public final String readStringAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
@@ -573,6 +586,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return readStringAttributes( entryDN, Collections.singleton( attributeName ) ).get( attributeName );
     }
 
+    @Override
     @LdapOperation
     public final Map<String, String> readStringAttributes( final String entryDN, final Set<String> attributes )
             throws ChaiUnavailableException, ChaiOperationException
@@ -611,7 +625,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             else
             {
                 // Loop through each requested attribute
-                returnedAttribs = ldapConnection.getAttributes( addJndiEscape( entryDN ), attributes.toArray( new String[attributes.size()] ) );
+                returnedAttribs = ldapConnection.getAttributes( addJndiEscape( entryDN ), attributes.toArray( new String[0] ) );
                 for ( final String loopAttr : attributes )
                 {
                     // Ask JNDI for the attribute (which actually includes all the values)
@@ -647,6 +661,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return returnObj;
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void replaceStringAttribute( final String entryDN, final String attributeName, final String oldValue, final String newValue )
@@ -678,6 +693,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     public final Map<String, Map<String, String>> search( final String baseDN, final SearchHelper searchHelper )
             throws ChaiUnavailableException, ChaiOperationException
@@ -714,6 +730,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
             throws ChaiUnavailableException, ChaiOperationException
@@ -729,6 +746,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return this.search( baseDN, searchHelper );
     }
 
+    @Override
     public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final SearchHelper searchHelper )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -738,6 +756,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return searchEngine.getResults();
     }
 
+    @Override
     public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -753,6 +772,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return searchEngine.getResults();
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void writeBinaryAttribute(
@@ -766,6 +786,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         writeBinaryAttribute( entryDN, attributeName, values, overwrite, null );
     }
 
+    @Override
     public final void writeBinaryAttribute(
             final String entryDN,
             final String attributeName,
@@ -827,6 +848,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void replaceBinaryAttribute(
@@ -886,6 +908,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void writeStringAttribute( final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite )
@@ -927,6 +950,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
     }
 
+    @Override
     @LdapOperation
     @ModifyOperation
     public final void writeStringAttributes( final String entryDN, final Map<String, String> attributeValueProps, final boolean overwrite )
@@ -961,7 +985,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
 
         // convert to array
-        final ModificationItem[] modificationItemArray = modificationItems.toArray( new ModificationItem[modificationItems.size()] );
+        final ModificationItem[] modificationItemArray = modificationItems.toArray( new ModificationItem[0] );
 
         // get ldap connection
         final LdapContext ldapConnection = getLdapConnection();
@@ -989,17 +1013,20 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
      * @return the underlying {@code LdapContext} used by this {@code JNDIProviderImpl}.
      * @throws com.novell.ldapchai.exception.ChaiUnavailableException if no valid {@code LdapContext} is currently allocated.
      */
+    @Override
     public Object getConnectionObject()
             throws Exception
     {
         return getLdapConnection();
     }
 
+    @Override
     public String getCurrentConnectionURL()
     {
         return this.getChaiConfiguration().bindURLsAsList().get( 0 );
     }
 
+    @Override
     public void init( final ChaiConfiguration chaiConfig, final ChaiProviderFactory providerFactory )
             throws ChaiUnavailableException, IllegalStateException
     {
@@ -1127,7 +1154,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         private final ChaiConfiguration chaiConfiguration;
 
         private boolean used = false;
-        private final Map<String, Map<String, List<String>>> results = new HashMap<String, Map<String, List<String>>>();
+        private final Map<String, Map<String, List<String>>> results = new HashMap<>();
 
         SearchEngine(
                 final ChaiConfiguration chaiConfiguration,
@@ -1242,7 +1269,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             searchControls.setSearchScope( searchHelper.getSearchScope().getJndiScopeInt() );
             final String[] returnAttributes = searchHelper.getAttributes() == null
                     ? null
-                    : searchHelper.getAttributes().toArray( new String[searchHelper.getAttributes().size()] );
+                    : searchHelper.getAttributes().toArray( new String[0] );
 
             searchControls.setReturningAttributes( returnAttributes );
             searchControls.setTimeLimit( searchHelper.getTimeLimit() );
@@ -1309,7 +1336,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     entryDN = entryDNbuilder.toString();
                 }
 
-                final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
+                final Map<String, List<String>> attrValues = new HashMap<>();
                 {
                     final NamingEnumeration attributeEnum = searchResult.getAttributes().getAll();
                     attrValues.putAll( parseAttributeValues( attributeEnum, returnAllValues ) );
@@ -1333,14 +1360,14 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     )
             throws NamingException
     {
-        final Map<String, List<String>> attrValues = new HashMap<String, List<String>>();
+        final Map<String, List<String>> attrValues = new HashMap<>();
         if ( attributeEnum != null && attributeEnum.hasMore() )
         {
             while ( attributeEnum.hasMore() )
             {
                 final Attribute loopAttribute = ( Attribute ) attributeEnum.next();
                 final String attrName = loopAttribute.getID();
-                final List<String> valueList = new ArrayList<String>();
+                final List<String> valueList = new ArrayList<>();
                 for ( NamingEnumeration attrValueEnum = loopAttribute.getAll(); attrValueEnum.hasMore(); )
                 {
                     final Object value = attrValueEnum.next();
@@ -1426,6 +1453,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     }
 
 
+    @Override
     public boolean errorIsRetryable( final Exception e )
     {
         if ( e instanceof CommunicationException || e instanceof ServiceUnavailableException )
@@ -1440,6 +1468,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         return super.errorIsRetryable( e );
     }
 
+    @Override
     public boolean isConnected()
     {
         return jndiConnection != null;
@@ -1493,7 +1522,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             extends SocketFactory
     {
 
-        static ThreadLocal<SocketFactory> local = new ThreadLocal<SocketFactory>();
+        static ThreadLocal<SocketFactory> local = new ThreadLocal<>();
 
         public static SocketFactory getDefault()
         {

@@ -39,26 +39,31 @@ public class ADVendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new ADErrorMap();
 
+    @Override
     public User newChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
         return new UserImpl( userDN, chaiProvider );
     }
 
+    @Override
     public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
         return new GroupImpl( entryDN, provider );
     }
 
+    @Override
     public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
         return new TopImpl( entryDN, provider );
     }
 
+    @Override
     public DirectoryVendor getDirectoryVendor()
     {
         return DirectoryVendor.ACTIVE_DIRECTORY;
     }
 
+    @Override
     public ErrorMap getErrorMap()
     {
         return ERROR_MAP;

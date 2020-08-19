@@ -77,6 +77,7 @@ class WireTraceWrapper extends AbstractWrapper
         this.realProvider = realProvider;
     }
 
+    @Override
     public Object invoke(
             final Object proxy,
             final Method method,

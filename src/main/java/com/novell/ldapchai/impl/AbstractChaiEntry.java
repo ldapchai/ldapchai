@@ -57,7 +57,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
     {
         IPv4( 9 );
 
-        private int typeIdentifier;
+        private final int typeIdentifier;
 
         NetworkAddressType( final int typeIdentifier )
         {
@@ -106,11 +106,13 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         this.entryDN = entryDN == null ? "" : entryDN;
     }
 
+    @Override
     public final ChaiProvider getChaiProvider()
     {
         return this.chaiProvider;
     }
 
+    @Override
     public final String getEntryDN()
     {
         return this.entryDN;
@@ -161,36 +163,42 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return sb.toString();
     }
 
+    @Override
     public final void addAttribute( final String attributeName, final String attributeValue )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute( entryDN, attributeName, Collections.singleton( attributeValue ), false );
     }
 
+    @Override
     public final void addAttribute( final String attributeName, final Set<String> attributeValues )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute( entryDN, attributeName, attributeValues, false );
     }
 
+    @Override
     public final void addAttribute( final String attributeName, final String... attributeValues )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttribute( entryDN, attributeName, new LinkedHashSet<>( Arrays.asList( attributeValues ) ), false );
     }
 
+    @Override
     public final boolean compareStringAttribute( final String attributeName, final String attributeValue )
             throws ChaiUnavailableException, ChaiOperationException
     {
         return chaiProvider.compareStringAttribute( this.getEntryDN(), attributeName, attributeValue );
     }
 
+    @Override
     public final void deleteAttribute( final String attributeName, final String attributeValue )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.deleteStringAttributeValue( this.entryDN, attributeName, attributeValue );
     }
 
+    @Override
     public final Set<ChaiEntry> getChildObjects()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -210,6 +218,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return returnSet;
     }
 
+    @Override
     public final ChaiEntry getParentEntry()
             throws ChaiUnavailableException
     {
@@ -245,6 +254,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return parentDN.toString();
     }
 
+    @Override
     public final boolean exists()
     {
         try
@@ -263,6 +273,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return false;
     }
 
+    @Override
     public final boolean readBooleanAttribute( final String attributeName )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -270,6 +281,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return value != null && "TRUE".equalsIgnoreCase( value );
     }
 
+    @Override
     public String readCanonicalDN()
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -292,6 +304,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         throw new ChaiOperationException( "search for canonical DN resulted in multiple results", ChaiError.UNKNOWN );
     }
 
+    @Override
     public final int readIntAttribute( final String attributeName )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -306,18 +319,21 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         }
     }
 
+    @Override
     public final byte[][] readMultiByteAttribute( final String attributeName )
             throws ChaiOperationException, ChaiUnavailableException
     {
         return chaiProvider.readMultiByteAttribute( this.getEntryDN(), attributeName );
     }
 
+    @Override
     public final Set<String> readMultiStringAttribute( final String attributeName )
             throws ChaiOperationException, ChaiUnavailableException
     {
         return chaiProvider.readMultiStringAttribute( entryDN, attributeName );
     }
 
+    @Override
     public List<InetAddress> readNetAddressAttribute( final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -356,12 +372,14 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return returnValues;
     }
 
+    @Override
     public final Set<String> readObjectClass()
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_OBJECTCLASS );
     }
 
+    @Override
     public final String readStringAttribute( final String attributeName )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -369,24 +387,28 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return chaiProvider.readStringAttribute( entryDN, attributeName );
     }
 
+    @Override
     public final Map<String, String> readStringAttributes( final Set<String> attributes )
             throws ChaiOperationException, ChaiUnavailableException
     {
         return chaiProvider.readStringAttributes( this.entryDN, attributes );
     }
 
+    @Override
     public final void replaceAttribute( final String attributeName, final String oldValue, final String newValue )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.replaceStringAttribute( this.entryDN, attributeName, oldValue, newValue );
     }
 
+    @Override
     public final Set<ChaiEntry> search( final String filter )
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.search( new SearchHelper( filter ) );
     }
 
+    @Override
     public Set<ChaiEntry> search( final SearchHelper searchHelper )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -405,12 +427,14 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return resultSet;
     }
 
+    @Override
     public final Set<ChaiEntry> search( final String filter, final SearchScope searchScope )
             throws ChaiOperationException, ChaiUnavailableException
     {
         return this.search( new SearchHelper( filter, searchScope ) );
     }
 
+    @Override
     public final void writeStringAttribute( final String attributeName, final String attributeValue )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -419,12 +443,14 @@ public abstract class AbstractChaiEntry implements ChaiEntry
                 : Collections.singleton( attributeValue ), true );
     }
 
+    @Override
     public final void writeStringAttributes( final Map<String, String> attributeValueProps )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.writeStringAttributes( this.entryDN, attributeValueProps, true );
     }
 
+    @Override
     public final void writeStringAttribute( final String attributeName, final Set<String> attributeValues )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -432,6 +458,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         chaiProvider.writeStringAttribute( this.entryDN, attributeName, attributeValues, true );
     }
 
+    @Override
     public void writeStringAttribute( final String attributeName, final String... attributeValues )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -441,6 +468,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
                 : new LinkedHashSet<>( Arrays.asList( attributeValues ) ), true );
     }
 
+    @Override
     public void writeBinaryAttribute( final String attributeName, final byte[]... attributeValues )
             throws ChaiOperationException, ChaiUnavailableException
     {
@@ -448,12 +476,14 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         chaiProvider.writeBinaryAttribute( this.entryDN, attributeName, attributeValues, true );
     }
 
+    @Override
     public void replaceBinaryAttribute( final String attributeName, final byte[] oldValue, final byte[] newValue )
             throws ChaiOperationException, ChaiUnavailableException
     {
         chaiProvider.replaceBinaryAttribute( this.entryDN, attributeName, oldValue, newValue );
     }
 
+    @Override
     public Instant readDateAttribute( final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -467,6 +497,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         return getChaiProvider().getDirectoryVendor().getVendorFactory().stringToInstant( value );
     }
 
+    @Override
     public void writeDateAttribute( final String attributeName, final Instant instant )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -478,6 +509,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         writeStringAttribute( attributeName, strValue );
     }
 
+    @Override
     public String readGUID()
             throws ChaiOperationException, ChaiUnavailableException
     {

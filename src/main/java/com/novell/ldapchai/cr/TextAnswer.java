@@ -24,8 +24,8 @@ import org.jdom2.Element;
 
 class TextAnswer implements Answer
 {
-    private String answer;
-    private boolean caseInsensitive;
+    private final String answer;
+    private final boolean caseInsensitive;
 
     TextAnswer( final String answer, final boolean caseInsensitive )
     {
@@ -38,6 +38,7 @@ class TextAnswer implements Answer
         this.caseInsensitive = caseInsensitive;
     }
 
+    @Override
     public Element toXml()
     {
         final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
@@ -46,6 +47,7 @@ class TextAnswer implements Answer
         return answerElement;
     }
 
+    @Override
     public boolean testAnswer( final String testResponse )
     {
         if ( testResponse == null )
@@ -57,6 +59,7 @@ class TextAnswer implements Answer
         return answer.equalsIgnoreCase( casedResponse );
     }
 
+    @Override
     public AnswerBean asAnswerBean()
     {
         final AnswerBean answerBean = new AnswerBean();
@@ -68,17 +71,20 @@ class TextAnswer implements Answer
 
     static class TextAnswerFactory implements ImplementationFactory
     {
+        @Override
         public TextAnswer newAnswer( final AnswerConfiguration answerConfiguration, final String answer )
         {
             final boolean caseInsensitive = answerConfiguration.caseInsensitive;
             return new TextAnswer( answer, caseInsensitive );
         }
 
+        @Override
         public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
         {
             return new TextAnswer( input.getAnswerText(), input.isCaseInsensitive() );
         }
 
+        @Override
         public TextAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
         {
             final String answerValue = element.getText();

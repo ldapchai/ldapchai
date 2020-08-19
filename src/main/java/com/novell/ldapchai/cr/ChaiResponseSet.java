@@ -143,6 +143,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         return sb.toString();
     }
 
+    @Override
     public String stringValue()
             throws UnsupportedOperationException, ChaiOperationException
     {
@@ -160,6 +161,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
     }
 
+    @Override
     public boolean test( final Map<Challenge, String> testResponses )
     {
         if ( testResponses == null )
@@ -479,11 +481,13 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
     }
 
+    @Override
     public List<ChallengeBean> asChallengeBeans( final boolean includeAnswers )
     {
         return asBeans( crMap, includeAnswers );
     }
 
+    @Override
     public List<ChallengeBean> asHelpdeskChallengeBeans( final boolean includeAnswers )
     {
         return asBeans( helpdeskCrMap, includeAnswers );

@@ -457,7 +457,7 @@ public final class ChaiUtility
         }
 
         final SearchHelper searchHelper = new SearchHelper();
-        searchHelper.setAttributes( interestedAttributes.toArray( new String[interestedAttributes.size()] ) );
+        searchHelper.setAttributes( interestedAttributes.toArray( new String[0] ) );
         searchHelper.setFilter( "(objectClass=*)" );
         searchHelper.setMaxResults( 1 );
         searchHelper.setSearchScope( SearchScope.BASE );

@@ -49,7 +49,7 @@ public class DirXMLEntitlementRef implements Serializable
         REVOKED( 0 ),
         GRANTED( 1 );
 
-        private int numValue;
+        private final int numValue;
 
         State( final int intValue )
         {
@@ -74,9 +74,9 @@ public class DirXMLEntitlementRef implements Serializable
         }
     }
 
-    private String entitlementDN;
-    private int state;
-    private String payload;
+    private final String entitlementDN;
+    private final int state;
+    private final String payload;
 
     public DirXMLEntitlementRef( final String value, final ChaiProvider provider )
     {

@@ -29,15 +29,15 @@ import java.io.Serializable;
  */
 public class ChaiChallenge implements Challenge, Serializable
 {
-    private boolean adminDefined;
-    private boolean required;
+    private final boolean adminDefined;
+    private final boolean required;
     private String challengeText;
 
-    private int minLength;
-    private int maxLength;
+    private final int minLength;
+    private final int maxLength;
 
-    private int maxQuestionCharsInAnswer;
-    private boolean enforceWordlist;
+    private final int maxQuestionCharsInAnswer;
+    private final boolean enforceWordlist;
 
     private boolean locked;
 
@@ -60,11 +60,13 @@ public class ChaiChallenge implements Challenge, Serializable
         this.enforceWordlist = enforceWordlist;
     }
 
+    @Override
     public final String getChallengeText()
     {
         return challengeText;
     }
 
+    @Override
     public void setChallengeText( final String challengeText )
     {
         if ( isLocked() )
@@ -80,36 +82,43 @@ public class ChaiChallenge implements Challenge, Serializable
         this.challengeText = challengeText;
     }
 
+    @Override
     public final int getMaxLength()
     {
         return maxLength;
     }
 
+    @Override
     public final int getMinLength()
     {
         return minLength;
     }
 
+    @Override
     public final boolean isAdminDefined()
     {
         return adminDefined;
     }
 
+    @Override
     public boolean isLocked()
     {
         return locked;
     }
 
+    @Override
     public final boolean isRequired()
     {
         return required;
     }
 
+    @Override
     public int getMaxQuestionCharsInAnswer()
     {
         return maxQuestionCharsInAnswer;
     }
 
+    @Override
     public boolean isEnforceWordlist()
     {
         return enforceWordlist;
@@ -174,7 +183,6 @@ public class ChaiChallenge implements Challenge, Serializable
         return true;
     }
 
-
     public int hashCode()
     {
         int result;
@@ -191,11 +199,13 @@ public class ChaiChallenge implements Challenge, Serializable
         return "Challenge: " + new Gson().toJson( asChallengeBean() );
     }
 
+    @Override
     public void lock()
     {
         locked = true;
     }
 
+    @Override
     public ChallengeBean asChallengeBean()
     {
         final ChallengeBean challengeBean = new ChallengeBean();

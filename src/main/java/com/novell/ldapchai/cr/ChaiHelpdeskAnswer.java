@@ -48,11 +48,13 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         this.challengeText = challengeText;
     }
 
+    @Override
     public String answerText()
     {
         return answer;
     }
 
+    @Override
     public Element toXml()
             throws ChaiOperationException
     {
@@ -62,6 +64,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         return answerElement;
     }
 
+    @Override
     public boolean testAnswer( final String testResponse )
     {
         if ( testResponse == null )
@@ -128,6 +131,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         return new SecretKeySpec( key, "AES" );
     }
 
+    @Override
     public AnswerBean asAnswerBean()
     {
         final AnswerBean answerBean = new AnswerBean();
@@ -138,16 +142,19 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
 
     static class ChaiHelpdeskAnswerFactory implements ImplementationFactory
     {
+        @Override
         public Answer newAnswer( final AnswerConfiguration answerConfiguration, final String answerText )
         {
             return new ChaiHelpdeskAnswer( answerText, answerConfiguration.getChallengeText() );
         }
 
+        @Override
         public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
         {
             return new ChaiHelpdeskAnswer( input.answerText, challengeText );
         }
 
+        @Override
         public ChaiHelpdeskAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
         {
             final String hashedAnswer = element.getText();

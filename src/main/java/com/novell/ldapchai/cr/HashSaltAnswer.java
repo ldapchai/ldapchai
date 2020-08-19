@@ -142,6 +142,7 @@ class HashSaltAnswer implements Answer
         this.answerHash = hashValue( saltedAnswer );
     }
 
+    @Override
     public Element toXml()
     {
         final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
@@ -161,6 +162,7 @@ class HashSaltAnswer implements Answer
     }
 
 
+    @Override
     public boolean testAnswer( final String testResponse )
     {
         if ( testResponse == null )
@@ -230,6 +232,7 @@ class HashSaltAnswer implements Answer
         return sb.toString();
     }
 
+    @Override
     public AnswerBean asAnswerBean()
     {
         final AnswerBean answerBean = new AnswerBean();
@@ -243,6 +246,7 @@ class HashSaltAnswer implements Answer
 
     static class HashSaltAnswerFactory implements ImplementationFactory
     {
+        @Override
         public HashSaltAnswer newAnswer(
                 final AnswerConfiguration answerConfiguration,
                 final String answer
@@ -251,6 +255,7 @@ class HashSaltAnswer implements Answer
             return new HashSaltAnswer( answerConfiguration, answer );
         }
 
+        @Override
         public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
         {
 
@@ -292,6 +297,7 @@ class HashSaltAnswer implements Answer
             );
         }
 
+        @Override
         public HashSaltAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
         {
             final String answerValue = element.getText();

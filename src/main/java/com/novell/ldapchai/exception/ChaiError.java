@@ -84,11 +84,12 @@ public enum ChaiError
     CR_TOO_MANY_QUESTION_CHARS( "TooManyQuestionChars", 608 ),;
 
     private final int errorCode;
-    private String errorKey;
+    private final String errorKey;
 
     ChaiError( final String errorKey, final int errorCode )
     {
         this.errorCode = errorCode;
+        this.errorKey = errorKey;
     }
 
     /**

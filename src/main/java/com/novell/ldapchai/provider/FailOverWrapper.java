@@ -115,6 +115,7 @@ class FailOverWrapper implements InvocationHandler
         originalProvider = rotationMachine.getCurrentProvider();
     }
 
+    @Override
     public Object invoke( final Object proxy, final Method m, final Object[] args )
             throws Throwable
     {

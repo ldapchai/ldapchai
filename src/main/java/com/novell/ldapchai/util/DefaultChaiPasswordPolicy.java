@@ -40,7 +40,7 @@ public class DefaultChaiPasswordPolicy implements ChaiPasswordPolicy
 
     private static Map<String, String> makeDefaultRuleMap()
     {
-        final Map<String, String> rules = new HashMap<String, String>();
+        final Map<String, String> rules = new HashMap<>();
 
         for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
         {
@@ -54,21 +54,25 @@ public class DefaultChaiPasswordPolicy implements ChaiPasswordPolicy
     {
     }
 
+    @Override
     public String getValue( final String key )
     {
         return rules.get( key );
     }
 
+    @Override
     public String getValue( final ChaiPasswordRule rule )
     {
         return rules.get( rule.getKey() );
     }
 
+    @Override
     public Set<String> getKeys()
     {
         return Collections.unmodifiableSet( rules.keySet() );
     }
 
+    @Override
     public PasswordRuleHelper getRuleHelper()
     {
         return new GenericRuleHelper( this );
@@ -107,6 +111,7 @@ public class DefaultChaiPasswordPolicy implements ChaiPasswordPolicy
         return ChaiUtility.passwordPolicyToString( this );
     }
 
+    @Override
     public ChaiEntry getPolicyEntry()
     {
         return null;

@@ -100,7 +100,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         {
             final StringBuilder sb = new StringBuilder();
             sb.append( "[" );
-            for ( final Object loopValue : Arrays.asList( ( Object[] ) nextValue ) )
+            for ( final Object loopValue : ( Object[] ) nextValue )
             {
                 sb.append( parameterToString( loopValue ) );
                 sb.append( "," );
@@ -114,6 +114,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
     }
 
+    @Override
     public Map<String, Object> getProviderProperties()
     {
         return providerProperties;
@@ -153,22 +154,26 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return sb.toString();
     }
 
+    @Override
     public void close()
     {
         this.state = ConnectionState.CLOSED;
         this.providerFactory.getCentralService().deRegisterProvider( this );
     }
 
+    @Override
     public ChaiConfiguration getChaiConfiguration()
     {
         return chaiConfig;
     }
 
+    @Override
     public ConnectionState getConnectionState()
     {
         return state;
     }
 
+    @Override
     public void init( final ChaiConfiguration chaiConfiguration, final ChaiProviderFactory providerFactory )
             throws ChaiUnavailableException
     {
@@ -199,6 +204,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
     }
 
+    @Override
     public boolean errorIsRetryable( final Exception e )
     {
         if ( e instanceof IOException )
@@ -215,16 +221,19 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     static class PromiscuousTrustManager implements X509TrustManager
     {
+        @Override
         public java.security.cert.X509Certificate[] getAcceptedIssuers()
         {
             return null;
         }
 
+        @Override
         public void checkClientTrusted(
                 final java.security.cert.X509Certificate[] certs, final String authType )
         {
         }
 
+        @Override
         public void checkServerTrusted(
                 final java.security.cert.X509Certificate[] certs, final String authType )
         {
@@ -233,20 +242,24 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     public static class ChaiProviderInputValidator implements ChaiProvider
     {
+        @Override
         public final void close()
         {
         }
 
+        @Override
         public boolean isConnected()
         {
             return false;
         }
 
+        @Override
         public ProviderStatistics getProviderStatistics()
         {
             return null;
         }
 
+        @Override
         public final boolean compareStringAttribute( final String entryDN, final String attributeName, final String value )
         {
             if ( attributeName == null )
@@ -267,6 +280,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return false;
         }
 
+        @Override
         public final void createEntry( final String entryDN, final String baseObjectClass, final Map<String, String> stringAttributes )
         {
             if ( baseObjectClass == null )
@@ -280,6 +294,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void createEntry( final String entryDN, final Set<String> baseObjectClasses, final Map<String, String> stringAttributes )
         {
             if ( baseObjectClasses == null )
@@ -298,6 +313,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void renameEntry( final String entryDN, final String newRDN, final String newParentDN )
         {
             if ( newParentDN == null )
@@ -316,6 +332,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void deleteEntry( final String entryDN )
         {
             if ( entryDN == null )
@@ -324,6 +341,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void deleteStringAttributeValue( final String entryDN, final String attributeName, final String attributeValue )
         {
             if ( entryDN == null )
@@ -336,6 +354,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final ExtendedResponse extendedOperation( final ExtendedRequest request )
         {
             if ( request == null )
@@ -346,6 +365,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public ChaiConfiguration getChaiConfiguration()
         {
             return null;
@@ -356,6 +376,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         {
         }
 
+        @Override
         public final byte[][] readMultiByteAttribute( final String entryDN, final String attributeName )
         {
             if ( entryDN == null )
@@ -369,6 +390,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final Set<String> readMultiStringAttribute( final String entryDN, final String attributeName )
         {
             if ( entryDN == null )
@@ -383,6 +405,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final String readStringAttribute( final String entryDN, final String attributeName )
         {
             if ( entryDN == null )
@@ -398,6 +421,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final Map<String, String> readStringAttributes( final String entryDN, final Set<String> attributes )
         {
             if ( entryDN == null )
@@ -408,6 +432,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final void replaceStringAttribute( final String entryDN, final String attributeName, final String oldValue, final String newValue )
         {
             if ( entryDN == null )
@@ -428,6 +453,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final Map<String, Map<String, String>> search( final String baseDN, final SearchHelper searchHelper )
         {
             if ( baseDN == null )
@@ -441,6 +467,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final Map<String, Map<String, String>> search( final String baseDN, final String filter, final Set<String> attributes, final SearchScope searchScope )
         {
             if ( baseDN == null )
@@ -458,6 +485,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final Map<String, Map<String, List<String>>> searchMultiValues( final String baseDN, final SearchHelper searchHelper )
         {
             if ( baseDN == null )
@@ -471,6 +499,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final Map<String, Map<String, List<String>>> searchMultiValues(
                 final String baseDN, final String filter,
                 final Set<String> attributes,
@@ -492,6 +521,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             return null;
         }
 
+        @Override
         public final void writeBinaryAttribute(
                 final String entryDN,
                 final String attributeName,
@@ -513,6 +543,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void writeBinaryAttribute(
                 final String entryDN,
                 final String attributeName,
@@ -535,6 +566,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void writeStringAttribute( final String entryDN, final String attributeName, final Set<String> values, final boolean overwrite )
         {
             if ( entryDN == null )
@@ -551,6 +583,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public final void writeStringAttributes( final String entryDN, final Map<String, String> attributeValues, final boolean overwrite )
         {
             if ( entryDN == null )
@@ -567,12 +600,14 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public DirectoryVendor getDirectoryVendor()
                 throws ChaiUnavailableException
         {
             return null;
         }
 
+        @Override
         public void replaceBinaryAttribute(
                 final String entryDN,
                 final String attributeName,
@@ -599,11 +634,13 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
         }
 
+        @Override
         public ChaiEntryFactory getEntryFactory()
         {
             return null;
         }
 
+        @Override
         public ChaiProviderFactory getProviderFactory()
         {
             return null;
@@ -648,6 +685,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
     }
 
+    @Override
     public DirectoryVendor getDirectoryVendor()
             throws ChaiUnavailableException
     {
@@ -691,16 +729,19 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         return cachedDirectoryVendor;
     }
 
+    @Override
     public String getIdentifier()
     {
         return String.valueOf( counter );
     }
 
+    @Override
     public ChaiProviderFactory getProviderFactory()
     {
         return this.providerFactory;
     }
 
+    @Override
     public ChaiEntryFactory getEntryFactory()
     {
         return ChaiEntryFactory.newChaiFactory( this );

@@ -46,26 +46,31 @@ public class EDirectoryVendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
+    @Override
     public InetOrgPerson newChaiUser( final String userDN, final ChaiProvider chaiProvider )
     {
         return new InetOrgPersonImpl( userDN, chaiProvider );
     }
 
+    @Override
     public GroupOfNames newChaiGroup( final String userDN, final ChaiProvider chaiProvider )
     {
         return new GroupOfNamesImpl( userDN, chaiProvider );
     }
 
+    @Override
     public ChaiEntry newChaiEntry( final String userDN, final ChaiProvider chaiProvider )
     {
         return new ChaiEntryImpl( userDN, chaiProvider );
     }
 
+    @Override
     public DirectoryVendor getDirectoryVendor()
     {
         return DirectoryVendor.EDIRECTORY;
     }
 
+    @Override
     public ErrorMap getErrorMap()
     {
         return ERROR_MAP;

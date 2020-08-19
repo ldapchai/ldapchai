@@ -75,6 +75,7 @@ class PasswordCryptAnswer implements Answer
         }
     }
 
+    @Override
     public Element toXml()
     {
         final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
@@ -83,6 +84,7 @@ class PasswordCryptAnswer implements Answer
         return answerElement;
     }
 
+    @Override
     public boolean testAnswer( final String testResponse )
     {
         if ( testResponse == null )
@@ -104,6 +106,7 @@ class PasswordCryptAnswer implements Answer
         }
     }
 
+    @Override
     public AnswerBean asAnswerBean()
     {
         final AnswerBean answerBean = new AnswerBean();
@@ -116,16 +119,19 @@ class PasswordCryptAnswer implements Answer
 
     static class PasswordCryptAnswerFactory implements ImplementationFactory
     {
+        @Override
         public PasswordCryptAnswer newAnswer( final AnswerConfiguration answerConfiguration, final String answer )
         {
             return new PasswordCryptAnswer( answerConfiguration, answer );
         }
 
+        @Override
         public PasswordCryptAnswer fromAnswerBean( final AnswerBean answerBean, final String challengeText )
         {
             return new PasswordCryptAnswer( answerBean.getAnswerHash(), answerBean.isCaseInsensitive(), answerBean.getType() );
         }
 
+        @Override
         public PasswordCryptAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
         {
             final String answerValue = element.getText();

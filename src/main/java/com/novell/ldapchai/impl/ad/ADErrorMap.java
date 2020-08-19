@@ -23,24 +23,32 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 public class ADErrorMap implements ErrorMap
 {
 
+    @Override
     public DirectoryVendor forDirectoryVendor()
     {
         return DirectoryVendor.ACTIVE_DIRECTORY;
     }
 
+    @Override
     public ChaiError errorForMessage( final String message )
     {
         return forMessage( message ).chaiErrorCode;
     }
 
+    @Override
     public boolean isPermanent( final String message )
     {
         return forMessage( message ).isPermanent();
     }
 
+    @Override
     public boolean isAuthenticationRelated( final String message )
     {
         return forMessage( message ).isAuthentication();
@@ -58,8 +66,8 @@ public class ADErrorMap implements ErrorMap
             if ( message.contains( error.getErrorCodeString() ) )
             {
 
-                final String[] additionalStrings = error.getErrorStrings();
-                if ( additionalStrings == null || additionalStrings.length == 0 )
+                final List<String> additionalStrings = error.getErrorStrings();
+                if ( additionalStrings == null || additionalStrings.isEmpty() )
                 {
                     return error;
                 }
@@ -106,11 +114,11 @@ public class ADErrorMap implements ErrorMap
         UNKNOWN( "-999", ChaiError.UNKNOWN, true, false ),;
 
 
-        private String errorCodeString;
-        private ChaiError chaiErrorCode;
-        private boolean permanent;
-        private boolean authentication;
-        private String[] errorStrings;
+        private final String errorCodeString;
+        private final ChaiError chaiErrorCode;
+        private final boolean permanent;
+        private final boolean authentication;
+        private final List<String> errorStrings;
 
         ADError(
                 final String errorCodeString,
@@ -124,7 +132,7 @@ public class ADErrorMap implements ErrorMap
             this.chaiErrorCode = chaiErrorCode;
             this.permanent = permanent;
             this.authentication = authentication;
-            this.errorStrings = errorStrings;
+            this.errorStrings = Collections.unmodifiableList( Arrays.asList( errorStrings ) );
         }
 
         public String getErrorCodeString()
@@ -147,7 +155,7 @@ public class ADErrorMap implements ErrorMap
             return chaiErrorCode;
         }
 
-        public String[] getErrorStrings()
+        public List<String> getErrorStrings()
         {
             return errorStrings;
         }

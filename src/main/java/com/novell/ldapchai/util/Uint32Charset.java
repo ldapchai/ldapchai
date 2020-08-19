@@ -34,16 +34,19 @@ class Uint32Charset extends Charset
         super( "unit32", null );
     }
 
+    @Override
     public boolean contains( final Charset cs )
     {
         return cs.getClass() == this.getClass();
     }
 
+    @Override
     public CharsetDecoder newDecoder()
     {
         return new Uint32CharsetDecoder( this );
     }
 
+    @Override
     public CharsetEncoder newEncoder()
     {
         throw new UnsupportedOperationException();
@@ -56,6 +59,7 @@ class Uint32Charset extends Charset
             super( cs, 0.5f, 1 );
         }
 
+        @Override
         protected CoderResult decodeLoop( final ByteBuffer in, final CharBuffer out )
         {
             for ( int i = 0; in.hasRemaining(); i++ )

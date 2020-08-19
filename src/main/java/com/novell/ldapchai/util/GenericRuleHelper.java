@@ -38,76 +38,91 @@ public class GenericRuleHelper implements PasswordRuleHelper
         this.wrappedPolicy = policy;
     }
 
+    @Override
     public boolean isAllowNumeric()
     {
         return StringHelper.convertStrToBoolean( readSetting( ChaiPasswordRule.AllowNumeric ) );
     }
 
+    @Override
     public boolean isAllowFirstCharNumeric()
     {
         return readBooleanSetting( ChaiPasswordRule.AllowFirstCharNumeric );
     }
 
+    @Override
     public boolean isAllowLastCharNumeric()
     {
         return readBooleanSetting( ChaiPasswordRule.AllowLastCharNumeric );
     }
 
+    @Override
     public boolean isAllowSpecial()
     {
         return readBooleanSetting( ChaiPasswordRule.AllowSpecial );
     }
 
+    @Override
     public boolean isAllowFirstCharSpecial()
     {
         return readBooleanSetting( ChaiPasswordRule.AllowFirstCharSpecial );
     }
 
+    @Override
     public boolean isAllowLastCharSpecial()
     {
         return readBooleanSetting( ChaiPasswordRule.AllowLastCharSpecial );
     }
 
+    @Override
     public int getMaximumSequentialRepeat()
     {
         return readNumericSetting( ChaiPasswordRule.MaximumSequentialRepeat );
     }
 
+    @Override
     public int getMaximumRepeat()
     {
         return readNumericSetting( ChaiPasswordRule.MaximumRepeat );
     }
 
+    @Override
     public int getMinimumLifetime()
     {
         return readNumericSetting( ChaiPasswordRule.MinimumLifetime );
     }
 
+    @Override
     public final String getChangeMessage()
     {
         return readSetting( ChaiPasswordRule.ChangeMessage );
     }
 
+    @Override
     public int getExpirationInterval()
     {
         return readNumericSetting( ChaiPasswordRule.ExpirationInterval );
     }
 
+    @Override
     public boolean isCaseSensitive()
     {
         return readBooleanSetting( ChaiPasswordRule.CaseSensitive );
     }
 
+    @Override
     public boolean isEnforceAtLogin()
     {
         return readBooleanSetting( ChaiPasswordRule.EnforceAtLogin );
     }
 
+    @Override
     public boolean isUniqueRequired()
     {
         return readBooleanSetting( ChaiPasswordRule.UniqueRequired );
     }
 
+    @Override
     public boolean isPolicyEnabled()
     {
         return readBooleanSetting( ChaiPasswordRule.PolicyEnabled );
@@ -128,11 +143,13 @@ public class GenericRuleHelper implements PasswordRuleHelper
         return StringHelper.convertStrToInt( readSetting( attr ), 0 );
     }
 
+    @Override
     public List<String> getDisallowedValues()
     {
         return StringHelper.tokenizeString( readSetting( ChaiPasswordRule.DisallowedValues ), "\n" );
     }
 
+    @Override
     public List<String> getDisallowedAttributes()
     {
         return StringHelper.tokenizeString( readSetting( ChaiPasswordRule.DisallowedAttributes ), "\n" );

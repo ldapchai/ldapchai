@@ -70,10 +70,9 @@ class WatchdogService
      */
     private void checkTimer()
     {
+        serviceThreadLock.lock();
         try
         {
-            serviceThreadLock.lock();
-
             if ( watchdogTimer == null )
             {
                 // if there is NOT an active timer
@@ -142,6 +141,7 @@ class WatchdogService
 
     private class WatchdogTask extends TimerTask implements Runnable
     {
+        @Override
         public void run()
         {
             final Set<WatchdogWrapper> copyCollection = new HashSet<>( issuedWatchdogWrappers.allValues() );
@@ -168,10 +168,10 @@ class WatchdogService
             {
                 // if there are no active providers
                 LOGGER.debug( "exiting " + THREAD_NAME + ", no connections requiring monitoring are in use" );
+
+                serviceThreadLock.lock();
                 try
                 {
-                    serviceThreadLock.lock();
-
                     // kill the timer.
                     stopWatchdogThread();
                 }

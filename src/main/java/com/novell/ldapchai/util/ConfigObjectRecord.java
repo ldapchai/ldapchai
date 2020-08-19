@@ -170,7 +170,7 @@ public class ConfigObjectRecord
         //Read the attribute
         final Set<String> values = ldapEntry.readMultiStringAttribute( attr );
 
-        final List<ConfigObjectRecord> cors = new ArrayList<ConfigObjectRecord>();
+        final List<ConfigObjectRecord> cors = new ArrayList<>();
 
         for ( final String value : values )
         {
@@ -229,7 +229,7 @@ public class ConfigObjectRecord
             payload = st.nextToken( "" );
             if ( payload.startsWith( RECORD_SEPERATOR ) )
             {
-                payload = payload.substring( RECORD_SEPERATOR.length(), payload.length() );
+                payload = payload.substring( RECORD_SEPERATOR.length() );
             }
         }
         catch ( NoSuchElementException e )

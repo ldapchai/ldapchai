@@ -36,7 +36,7 @@ public enum ChaiProviderFactorySetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>1000</td></tr>
      * </table>
      */
-    WATCHDOG_CHECK_FREQUENCY( "chai.providerFactory.connection.watchdog.frequencyMs", "1000", ChaiSetting.Validator.INTEGER_VALIDATOR ),
+    WATCHDOG_CHECK_FREQUENCY( "chai.providerFactory.connection.watchdog.frequencyMs", "1000", SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>Maximum time duration to cache a vendor identification for a given LDAP URL.</p>
@@ -46,11 +46,11 @@ public enum ChaiProviderFactorySetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>5000</td></tr>
      * </table>
      */
-    VENDOR_CACHE_MAX_AGE_MS( "chai.providerFactory.vendorCache.maxAgeMs", "60000", ChaiSetting.Validator.INTEGER_VALIDATOR ),;
+    VENDOR_CACHE_MAX_AGE_MS( "chai.providerFactory.vendorCache.maxAgeMs", "60000", SettingValidator.INTEGER_VALIDATOR ),;
 
     private final String key;
     private final String defaultValue;
-    private final ChaiSetting.Validator validator;
+    private final SettingValidator.Validator validator;
 
     private static final Map<ChaiProviderFactorySetting, String> DEFAULT_SETTINGS;
 
@@ -64,7 +64,7 @@ public enum ChaiProviderFactorySetting
         DEFAULT_SETTINGS = Collections.unmodifiableMap( settings );
     }
 
-    ChaiProviderFactorySetting( final String key, final String defaultValue, final ChaiSetting.Validator validator )
+    ChaiProviderFactorySetting( final String key, final String defaultValue, final SettingValidator.Validator validator )
     {
         this.key = key;
         this.defaultValue = defaultValue;

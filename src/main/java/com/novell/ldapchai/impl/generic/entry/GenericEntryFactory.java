@@ -40,26 +40,31 @@ public class GenericEntryFactory implements VendorFactory
 
     private static ErrorMap errorMap;
 
+    @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
         return new GenericChaiUser( entryDN, provider );
     }
 
+    @Override
     public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
         return new GenericChaiGroup( entryDN, provider );
     }
 
+    @Override
     public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
         return new GenericChaiEntry( entryDN, provider );
     }
 
+    @Override
     public DirectoryVendor getDirectoryVendor()
     {
         return DirectoryVendor.GENERIC;
     }
 
+    @Override
     public ErrorMap getErrorMap()
     {
         if ( errorMap == null )

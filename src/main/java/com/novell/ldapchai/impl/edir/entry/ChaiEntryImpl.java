@@ -24,6 +24,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 class ChaiEntryImpl extends TopImpl implements ChaiEntry
 {
+    @Override
     public String getLdapObjectClassName()
     {
         return "";

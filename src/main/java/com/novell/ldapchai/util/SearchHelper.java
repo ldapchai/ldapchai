@@ -130,7 +130,7 @@ public class SearchHelper implements Serializable
      */
     public void setAttributes( final Collection<String> attributes )
     {
-        this.attributes = attributes == null ? null : Collections.unmodifiableSet( new HashSet<String>( attributes ) );
+        this.attributes = attributes == null ? null : Collections.unmodifiableSet( new HashSet<>( attributes ) );
     }
 
     /**
@@ -285,7 +285,7 @@ public class SearchHelper implements Serializable
      */
     public void setAttributes( final String... attributes )
     {
-        this.attributes = attributes == null ? null : new HashSet<String>( Arrays.asList( attributes ) );
+        this.attributes = attributes == null ? null : new HashSet<>( Arrays.asList( attributes ) );
     }
 
     /**
@@ -402,7 +402,7 @@ public class SearchHelper implements Serializable
         sb.append( "scope: " ).append( this.getSearchScope() ).append( ", " );
         if ( attributes != null )
         {
-            sb.append( "attributes: " ).append( Arrays.toString( attributes.toArray( new String[attributes.size()] ) ) );
+            sb.append( "attributes: " ).append( Arrays.toString( attributes.toArray( new String[0] ) ) );
         }
 
         return sb.toString();
@@ -660,7 +660,7 @@ public class SearchHelper implements Serializable
             GREATER( ">=" ),
             LESS( "<=" );
 
-            private String matchCode;
+            private final String matchCode;
 
             MatchingRuleEnum( final String matchCode )
             {
@@ -673,9 +673,9 @@ public class SearchHelper implements Serializable
             }
         }
 
-        private String attr;
-        private String value;
-        private MatchingRuleEnum matchingRule;
+        private final String attr;
+        private final String value;
+        private final MatchingRuleEnum matchingRule;
 
 
         FilterSequence( final String attr, final String value, final MatchingRuleEnum matchingRule )

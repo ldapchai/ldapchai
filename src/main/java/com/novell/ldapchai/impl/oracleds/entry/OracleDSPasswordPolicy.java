@@ -200,7 +200,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
 
     static
     {
-        final Set<String> ldapPasswordAttributes = new HashSet<String>();
+        final Set<String> ldapPasswordAttributes = new HashSet<>();
         for ( final Attribute attribute : Attribute.values() )
         {
             ldapPasswordAttributes.add( attribute.getLdapAttribute() );
@@ -209,8 +209,8 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
     }
 
 
-    private final Map<String, String> ruleMap = new HashMap<String, String>();
-    private final Map<String, String> allEntryValues = new HashMap<String, String>();
+    private final Map<String, String> ruleMap = new HashMap<>();
+    private final Map<String, String> allEntryValues = new HashMap<>();
 
     OracleDSPasswordPolicy(
             final String entryDN,
@@ -235,6 +235,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         return this.getEntryDN();
     }
 
+    @Override
     public PasswordRuleHelper getRuleHelper()
     {
         return new GenericRuleHelper( this );
@@ -288,21 +289,25 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
         return returnMap;
     }
 
+    @Override
     public String getValue( final String key )
     {
         return ruleMap.get( key );
     }
 
+    @Override
     public String getValue( final ChaiPasswordRule rule )
     {
         return ruleMap.get( rule.getKey() );
     }
 
+    @Override
     public Set<String> getKeys()
     {
         return Collections.unmodifiableSet( ruleMap.keySet() );
     }
 
+    @Override
     public ChaiEntry getPolicyEntry()
     {
         return this;

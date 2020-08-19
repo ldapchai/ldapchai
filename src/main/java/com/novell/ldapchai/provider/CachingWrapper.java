@@ -26,12 +26,14 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Implements a naive caching wrapper around a provider.
@@ -42,8 +44,8 @@ class CachingWrapper extends AbstractWrapper
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( CachingWrapper.class.getName() );
 
-    private ChaiProvider realProvider;
-    private ChaiProvider memorizedProvider;
+    private final ChaiProvider realProvider;
+    private final ChaiProvider memorizedProvider;
 
     static ChaiProviderImplementor forProvider( final ChaiProviderImplementor chaiProvider )
     {
@@ -74,6 +76,7 @@ class CachingWrapper extends AbstractWrapper
         this.memorizedProvider = ( ChaiProviderImplementor ) Memorizer.forObject( realProvider, maxSize, maxTime );
     }
 
+    @Override
     public Object invoke(
             final Object proxy,
             final Method m,
@@ -112,13 +115,13 @@ class CachingWrapper extends AbstractWrapper
     {
         private static final ChaiLogger LOGGER = ChaiLogger.getLogger( Memorizer.class );
 
-        private Object memorizedObject;
+        private final Object memorizedObject;
 
-        private Map<Method, Map<List<Object>, ValueWrapper>> hardCache = new HashMap<>();
-        private Map<Method, Map<List<Object>, WeakReference<ValueWrapper>>> weakCache = new HashMap<>();
-        private LinkedList<ValueWrapper> valueStack = new LinkedList<ValueWrapper>();
+        private final Map<Method, Map<List<Object>, ValueWrapper>> hardCache = new HashMap<>();
+        private final Map<Method, Map<List<Object>, WeakReference<ValueWrapper>>> weakCache = new HashMap<>();
+        private final Deque<ValueWrapper> valueStack = new ArrayDeque<>();
 
-        private final Object lock = new Object();
+        private final ReentrantLock lock = new ReentrantLock();
 
         // timeout values stored as primitives for performance.
         private int maxSize = Integer.parseInt( ChaiSetting.CACHE_MAXIMUM_SIZE.getDefaultValue() );
@@ -154,6 +157,7 @@ class CachingWrapper extends AbstractWrapper
             hardCache.clear();
         }
 
+        @Override
         public Object invoke( final Object object, final Method method, final Object[] args )
                 throws Throwable
         {
@@ -168,7 +172,7 @@ class CachingWrapper extends AbstractWrapper
 
                 Object value = this.getCachedValue( method, key );
 
-                // value is not in cache, so invoke method normaly
+                // value is not in cache, so invoke method normally
                 if ( value == null )
                 {
                     try
@@ -188,29 +192,17 @@ class CachingWrapper extends AbstractWrapper
 
         private Map<List<Object>, ValueWrapper> getHardCachedInvocations( final Method method )
         {
-            Map<List<Object>, ValueWrapper> cache = this.hardCache.get( method );
-            if ( cache == null )
-            {
-                cache = new HashMap<List<Object>, ValueWrapper>();
-                this.hardCache.put( method, cache );
-            }
-            return cache;
+            return this.hardCache.computeIfAbsent( method, k -> new HashMap<>() );
         }
 
         private Map<List<Object>, WeakReference<ValueWrapper>> getWeakCachedInvocations( final Method method )
         {
-            Map<List<Object>, WeakReference<ValueWrapper>> cache = this.weakCache.get( method );
-            if ( cache == null )
-            {
-                cache = new WeakHashMap<List<Object>, WeakReference<ValueWrapper>>();
-                this.weakCache.put( method, cache );
-            }
-            return cache;
+            return this.weakCache.computeIfAbsent( method, k -> new WeakHashMap<>() );
         }
 
         private Object getCachedValue( final Method method, final List<Object> key )
         {
-            // retreive the value from cache
+            // retrieve the value from cache
             ValueWrapper vw = getHardCachedInvocations( method ).get( key );
 
             // if got nothing, check the weak map
@@ -242,7 +234,8 @@ class CachingWrapper extends AbstractWrapper
 
         private void removeCachedValue( final ValueWrapper vw, final boolean addToWeakCache )
         {
-            synchronized ( lock )
+            lock.lock();
+            try
             {
                 final Map<List<Object>, ValueWrapper> cachedInvocations = this.getHardCachedInvocations( vw.getMethod() );
                 cachedInvocations.remove( vw.getKey() );
@@ -250,19 +243,28 @@ class CachingWrapper extends AbstractWrapper
 
                 if ( addToWeakCache )
                 {
-                    getWeakCachedInvocations( vw.getMethod() ).put( vw.getKey(), new WeakReference<ValueWrapper>( vw ) );
+                    getWeakCachedInvocations( vw.getMethod() ).put( vw.getKey(), new WeakReference<>( vw ) );
                 }
+            }
+            finally
+            {
+                lock.unlock();
             }
         }
 
         private void addCachedValue( final ValueWrapper vw )
         {
-            synchronized ( lock )
+            lock.lock();
+            try
             {
                 final Map<List<Object>, ValueWrapper> cachedInvocations = this.getHardCachedInvocations( vw.getMethod() );
                 cachedInvocations.put( vw.getKey(), vw );
                 valueStack.remove( vw );
                 valueStack.addFirst( vw );
+            }
+            finally
+            {
+                lock.unlock();
             }
 
             while ( valueStack.size() > maxSize )
@@ -274,11 +276,11 @@ class CachingWrapper extends AbstractWrapper
 
         static class ValueWrapper
         {
-            private long timestamp;
+            private final long timestamp;
 
-            private Method method;
-            private List<Object> key;
-            private Object value;
+            private final Method method;
+            private final List<Object> key;
+            private final Object value;
 
             ValueWrapper( final Method method, final List<Object> key, final Object value )
             {

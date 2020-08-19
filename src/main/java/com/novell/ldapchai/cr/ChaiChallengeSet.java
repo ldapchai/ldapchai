@@ -36,10 +36,10 @@ import java.util.stream.Collectors;
 
 public class ChaiChallengeSet implements ChallengeSet, Serializable
 {
-    private List<Challenge> challenges;
-    private int minRandomRequired;
-    private Locale locale;
-    private String identifier;
+    private final List<Challenge> challenges;
+    private final int minRandomRequired;
+    private final Locale locale;
+    private final String identifier;
 
     public ChaiChallengeSet(
             final Collection<Challenge> challenges,
@@ -49,7 +49,7 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
     )
             throws ChaiValidationException
     {
-        this.challenges = Collections.unmodifiableList( new LinkedList<Challenge>( challenges ) );
+        this.challenges = Collections.unmodifiableList( new LinkedList<>( challenges ) );
         this.minRandomRequired = minRandomRequired > getRandomChallenges().size() ? getRandomChallenges().size() : minRandomRequired;
         this.locale = locale == null ? Locale.getDefault() : locale;
         this.identifier = identifer;
@@ -70,16 +70,19 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         }
     }
 
+    @Override
     public final List<Challenge> getChallenges()
     {
         return challenges;
     }
 
+    @Override
     public final Locale getLocale()
     {
         return locale;
     }
 
+    @Override
     public final int getMinRandomRequired()
     {
         return minRandomRequired;
@@ -105,9 +108,10 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return sb.toString();
     }
 
+    @Override
     public final List<Challenge> getAdminDefinedChallenges()
     {
-        final List<Challenge> tempList = new ArrayList<Challenge>();
+        final List<Challenge> tempList = new ArrayList<>();
         for ( final Challenge loopChallenge : challenges )
         {
             if ( loopChallenge.isAdminDefined() )
@@ -118,9 +122,10 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return Collections.unmodifiableList( tempList );
     }
 
+    @Override
     public List<String> getChallengeTexts()
     {
-        final List<String> tempList = new ArrayList<String>();
+        final List<String> tempList = new ArrayList<>();
         for ( final Challenge loopChallenge : challenges )
         {
             if ( loopChallenge.getChallengeText() != null && loopChallenge.getChallengeText().length() > 0 )
@@ -131,9 +136,10 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return Collections.unmodifiableList( tempList );
     }
 
+    @Override
     public final List<Challenge> getRandomChallenges()
     {
-        final List<Challenge> tempList = new ArrayList<Challenge>();
+        final List<Challenge> tempList = new ArrayList<>();
         for ( final Challenge loopChallenge : challenges )
         {
             if ( !loopChallenge.isRequired() )
@@ -144,9 +150,10 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return Collections.unmodifiableList( tempList );
     }
 
+    @Override
     public final List<Challenge> getRequiredChallenges()
     {
-        final List<Challenge> tempList = new ArrayList<Challenge>();
+        final List<Challenge> tempList = new ArrayList<>();
         for ( final Challenge loopChallenge : challenges )
         {
             if ( loopChallenge.isRequired() )
@@ -157,9 +164,10 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return Collections.unmodifiableList( tempList );
     }
 
+    @Override
     public final List<Challenge> getUserDefinedChallenges()
     {
-        final List<Challenge> tempList = new ArrayList<Challenge>();
+        final List<Challenge> tempList = new ArrayList<>();
         for ( final Challenge loopChallenge : challenges )
         {
             if ( !loopChallenge.isAdminDefined() )
@@ -170,6 +178,7 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return Collections.unmodifiableList( tempList );
     }
 
+    @Override
     public int minimumResponses()
     {
         int mininimumResponses = 0;
@@ -180,6 +189,7 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return mininimumResponses;
     }
 
+    @Override
     public boolean isLocked()
     {
         for ( final Challenge loopChallenge : challenges )
@@ -193,6 +203,7 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         return true;
     }
 
+    @Override
     public void lock()
     {
         for ( final Challenge loopChallenge : challenges )
@@ -201,11 +212,13 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         }
     }
 
+    @Override
     public String getIdentifier()
     {
         return identifier;
     }
 
+    @Override
     public ChallengeSetBean asChallengeSetBean()
     {
         final ChallengeSetBean challengeSetBean = new ChallengeSetBean();

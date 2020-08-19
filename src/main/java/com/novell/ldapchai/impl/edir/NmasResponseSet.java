@@ -71,12 +71,12 @@ public class NmasResponseSet extends AbstractResponseSet
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( NmasResponseSet.class.getName() );
 
-    private ChaiUser user;
+    private final ChaiUser user;
 
     static List<Challenge> parseNmasPolicyXML( final String str, final Locale locale )
             throws IOException, JDOMException
     {
-        final List<Challenge> returnList = new ArrayList<Challenge>();
+        final List<Challenge> returnList = new ArrayList<>();
 
         final Reader xmlreader = new StringReader( str );
         final SAXBuilder builder = new SAXBuilder();
@@ -124,7 +124,7 @@ public class NmasResponseSet extends AbstractResponseSet
         }
 
         // convert the xml 'display' elements to a map of locales/strings
-        final Map<Locale, String> localizedStringMap = new HashMap<Locale, String>();
+        final Map<Locale, String> localizedStringMap = new HashMap<>();
         for ( final Object loopDisplayChild : displayChildren )
         {
             final Element loopDisplay = ( Element ) loopDisplayChild;
@@ -183,7 +183,7 @@ public class NmasResponseSet extends AbstractResponseSet
                     try
                     {
                         parseAttempts++;
-                        final String xmlSubstring = xmlString.substring( beginIndex, xmlString.length() );
+                        final String xmlSubstring = xmlString.substring( beginIndex );
                         LOGGER.trace( "attempting parse of index stripped value: " + xmlSubstring );
                         cs = parseNmasUserResponseXML( xmlSubstring );
                         LOGGER.trace( "successfully parsed nmas ChallengeResponseQuestions response after index " + beginIndex );
@@ -258,7 +258,7 @@ public class NmasResponseSet extends AbstractResponseSet
                 return null;
             }
 
-            final Map<Challenge, String> crMap = new HashMap<Challenge, String>();
+            final Map<Challenge, String> crMap = new HashMap<>();
             for ( final Challenge loopChallenge : cs.getChallenges() )
             {
                 crMap.put( loopChallenge, null );
@@ -280,7 +280,7 @@ public class NmasResponseSet extends AbstractResponseSet
     static ChallengeSet parseNmasUserResponseXML( final String str )
             throws IOException, JDOMException, ChaiValidationException
     {
-        final List<Challenge> returnList = new ArrayList<Challenge>();
+        final List<Challenge> returnList = new ArrayList<>();
 
         final Reader xmlreader = new StringReader( str );
         final SAXBuilder builder = new SAXBuilder();
@@ -327,12 +327,14 @@ public class NmasResponseSet extends AbstractResponseSet
         this.user = user;
     }
 
+    @Override
     public String stringValue()
             throws UnsupportedOperationException
     {
         throw new UnsupportedOperationException( "stringValue() is not supported by NMAS response sets" );
     }
 
+    @Override
     public boolean test( final Map<Challenge, String> responseTest )
     {
         //@todo TODO
@@ -575,7 +577,7 @@ public class NmasResponseSet extends AbstractResponseSet
 
     private static class NmasAnswer implements Answer
     {
-        private String answerText;
+        private final String answerText;
 
         private NmasAnswer( final String answerText )
         {
@@ -587,23 +589,27 @@ public class NmasResponseSet extends AbstractResponseSet
             return answerText;
         }
 
+        @Override
         public boolean testAnswer( final String answer )
         {
             //@todo TODO
             throw new UnsupportedOperationException( "NMAS Response testing not yet implemented" );
         }
 
+        @Override
         public Element toXml()
         {
             return null;
         }
 
+        @Override
         public AnswerBean asAnswerBean()
         {
             throw new UnsupportedOperationException( "NMAS stored responses do not support retrieval of answers" );
         }
     }
 
+    @Override
     public List<ChallengeBean> asChallengeBeans( final boolean includeAnswers )
     {
         if ( includeAnswers )
@@ -616,7 +622,7 @@ public class NmasResponseSet extends AbstractResponseSet
             return Collections.emptyList();
         }
 
-        final List<ChallengeBean> returnList = new ArrayList<ChallengeBean>();
+        final List<ChallengeBean> returnList = new ArrayList<>();
         for ( final Challenge challenge : this.crMap.keySet() )
         {
             returnList.add( challenge.asChallengeBean() );
@@ -624,6 +630,7 @@ public class NmasResponseSet extends AbstractResponseSet
         return returnList;
     }
 
+    @Override
     public List<ChallengeBean> asHelpdeskChallengeBeans( final boolean includeAnswers )
     {
         //@todo TODO

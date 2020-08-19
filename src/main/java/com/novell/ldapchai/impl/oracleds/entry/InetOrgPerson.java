@@ -63,6 +63,7 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser
                 || readBooleanAttribute( "pwdReset" );
     }
 
+    @Override
     public void setPassword( final String newPassword, final boolean enforcePasswordPolicy )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {
@@ -76,6 +77,7 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser
         }
     }
 
+    @Override
     public void changePassword( final String oldPassword, final String newPassword )
             throws ChaiUnavailableException, ChaiPasswordPolicyException, ChaiOperationException
     {

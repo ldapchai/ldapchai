@@ -129,6 +129,7 @@ public class OpenLDAPModifyPasswordRequest
      *
      * @return a String with the OID of this operation
      */
+    @Override
     public String getID()
     {
         return LDAP_EXOP_X_MODIFY_PASSWD;
@@ -139,6 +140,7 @@ public class OpenLDAPModifyPasswordRequest
      *
      * @return a bytearray containing the BER sequence.
      */
+    @Override
     public byte[] getEncodedValue()
     {
         final String characterEncoding = this.chaiConfiguration.getSetting( ChaiSetting.LDAP_CHARACTER_ENCODING );
@@ -188,6 +190,7 @@ public class OpenLDAPModifyPasswordRequest
      * @return returns null as the modify password operation doesn't
      *     generate a response.
      */
+    @Override
     public ExtendedResponse createExtendedResponse(
             final String id,
             final byte[] berValue,
