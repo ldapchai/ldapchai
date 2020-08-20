@@ -1,14 +1,10 @@
 package com.novell.ldapchai.impl.edir.entry;
 
 
-import org.hamcrest.core.IsNull;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.time.Instant;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertThat;
 
 
 public class EdirEntriesTest {

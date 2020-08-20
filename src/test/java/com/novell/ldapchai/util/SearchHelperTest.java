@@ -17,20 +17,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.tests;
+package com.novell.ldapchai.util;
 
-import com.novell.ldapchai.util.SearchHelper;
-import junit.framework.Assert;
 import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.LinkedHashMap;
 
-public class SearchHelperTester extends TestCase {
+public class SearchHelperTest extends TestCase {
 
+    @Test
     public void testAndFilter()
             throws Exception
     {
-        final LinkedHashMap<String, String> props = new LinkedHashMap<String, String>();
+        final LinkedHashMap<String, String> props = new LinkedHashMap<>();
         props.put("objectClass", "inetOrgPerson");
         props.put("cn", "joe");
 

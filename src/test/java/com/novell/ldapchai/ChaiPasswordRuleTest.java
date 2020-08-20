@@ -17,35 +17,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.tests;
+package com.novell.ldapchai;
 
-import com.novell.ldapchai.provider.ChaiSetting;
-import junit.framework.TestCase;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ChaiConfigTester extends TestCase {
+public class ChaiPasswordRuleTest
+{
 
-    public void testUniqueSettingKeys()
+
+    @Test
+    public void testUniquePasswordRules()
             throws Exception
     {
-        final int settingCount = ChaiSetting.values().length;
-        final Set<String> settingPropNames = new HashSet<String>();
-        for (final ChaiSetting setting : ChaiSetting.values()) {
-            settingPropNames.add(setting.getKey());
+        final int ruleCount = ChaiPasswordRule.values().length;
+        final Set<String> rulePropNames = new HashSet<>();
+        for (final ChaiPasswordRule rule : ChaiPasswordRule.values()) {
+            rulePropNames.add(rule.getKey());
         }
 
-        Assert.assertEquals(settingCount, settingPropNames.size());
+        Assert.assertEquals(ruleCount, rulePropNames.size());
     }
 
-
-    public void testValidatedDefalts()
-            throws Exception
-    {
-        for (final ChaiSetting setting : ChaiSetting.values()) {
-            setting.validateValue(setting.getDefaultValue());
-        }
-    }
 }
