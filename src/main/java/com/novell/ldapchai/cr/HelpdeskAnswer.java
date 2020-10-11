@@ -19,6 +19,11 @@
 
 package com.novell.ldapchai.cr;
 
+/**
+ * Similar to {@link Answer}, helpdesk answers are typically stored so that
+ * the values can be retrieved to be viewed by a helpdesk operator to verify
+ * the user's identity over an out-of-band voice channel.
+ */
 public interface HelpdeskAnswer extends Answer
 {
     String answerText();

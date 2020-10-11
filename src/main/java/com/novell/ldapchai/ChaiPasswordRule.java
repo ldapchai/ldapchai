@@ -145,6 +145,10 @@ public enum ChaiPasswordRule
         return key;
     }
 
+    /**
+     * Password rules come in several syntax types, most commonly minimum, maximum or booleans, but other
+     * types are also possible.
+     */
     public enum RuleType
     {
         MIN,

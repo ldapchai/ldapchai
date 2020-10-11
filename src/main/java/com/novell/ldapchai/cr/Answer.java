@@ -28,6 +28,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * An {@code Answer} is an instance of a response to a challenge/response question.
+ */
 public interface Answer
 {
     boolean testAnswer( String answer );
@@ -37,6 +40,10 @@ public interface Answer
 
     AnswerBean asAnswerBean();
 
+    /**
+     * Defined format types for answers.  Format types typically denote the hash mechanism (if any)
+     * and any other character encoding and possibly the storage system.
+     */
     enum FormatType
     {
         TEXT( new TextAnswer.TextAnswerFactory(), 0, 0 ),
@@ -87,6 +94,9 @@ public interface Answer
         }
     }
 
+    /**
+     * Interface for any factory class that can instantiate an {@link Answer}.
+     */
     interface ImplementationFactory
     {
         Answer newAnswer( AnswerConfiguration answerConfiguration, String answerText );

@@ -22,6 +22,9 @@ package com.novell.ldapchai;
 import java.io.Serializable;
 import java.util.Arrays;
 
+/**
+ * An immutable representation of an LDAP extended request control.
+ */
 public class ChaiRequestControl implements Serializable
 {
     private final String id;

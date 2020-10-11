@@ -21,6 +21,9 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
 
+/**
+ * Factory for generating {@link Answer} instances.
+ */
 public class AnswerFactory
 {
     private AnswerFactory()
