@@ -20,27 +20,45 @@
 package com.novell.ldapchai.cr.bean;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class ChallengeBean implements Serializable
 {
-    public String challengeText;
-    public int minLength;
-    public int maxLength;
-    public boolean adminDefined;
-    public boolean required;
-    public int maxQuestionCharsInAnswer;
-    public boolean enforceWordlist;
+    public final String challengeText;
+    public final int minLength;
+    public final int maxLength;
+    public final boolean adminDefined;
+    public final boolean required;
+    public final int maxQuestionCharsInAnswer;
+    public final boolean enforceWordlist;
+    public final AnswerBean answer;
 
-    public AnswerBean answer;
+
+    @SuppressWarnings( "checkstyle:ParameterNumber" )
+    public ChallengeBean(
+            final String challengeText,
+            final int minLength,
+            final int maxLength,
+            final boolean adminDefined,
+            final boolean required,
+            final int maxQuestionCharsInAnswer,
+            final boolean enforceWordlist,
+            final AnswerBean answer
+    )
+    {
+        this.challengeText = challengeText;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+        this.adminDefined = adminDefined;
+        this.required = required;
+        this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer;
+        this.enforceWordlist = enforceWordlist;
+        this.answer = answer;
+    }
 
     public String getChallengeText()
     {
         return challengeText;
-    }
-
-    public void setChallengeText( final String challengeText )
-    {
-        this.challengeText = challengeText;
     }
 
     public int getMinLength()
@@ -48,19 +66,9 @@ public class ChallengeBean implements Serializable
         return minLength;
     }
 
-    public void setMinLength( final int minLength )
-    {
-        this.minLength = minLength;
-    }
-
     public int getMaxLength()
     {
         return maxLength;
-    }
-
-    public void setMaxLength( final int maxLength )
-    {
-        this.maxLength = maxLength;
     }
 
     public boolean isAdminDefined()
@@ -68,19 +76,9 @@ public class ChallengeBean implements Serializable
         return adminDefined;
     }
 
-    public void setAdminDefined( final boolean adminDefined )
-    {
-        this.adminDefined = adminDefined;
-    }
-
     public boolean isRequired()
     {
         return required;
-    }
-
-    public void setRequired( final boolean required )
-    {
-        this.required = required;
     }
 
     public int getMaxQuestionCharsInAnswer()
@@ -88,19 +86,9 @@ public class ChallengeBean implements Serializable
         return maxQuestionCharsInAnswer;
     }
 
-    public void setMaxQuestionCharsInAnswer( final int maxQuestionCharsInAnswer )
-    {
-        this.maxQuestionCharsInAnswer = maxQuestionCharsInAnswer;
-    }
-
     public boolean isEnforceWordlist()
     {
         return enforceWordlist;
-    }
-
-    public void setEnforceWordlist( final boolean enforceWordlist )
-    {
-        this.enforceWordlist = enforceWordlist;
     }
 
     public AnswerBean getAnswer()
@@ -108,8 +96,40 @@ public class ChallengeBean implements Serializable
         return answer;
     }
 
-    public void setAnswer( final AnswerBean answer )
+    public boolean equals( final Object o )
     {
-        this.answer = answer;
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final ChallengeBean other = ( ChallengeBean ) o;
+        return Objects.equals( adminDefined, other.adminDefined )
+                && Objects.equals( required, other.required )
+                && Objects.equals( challengeText, other.challengeText )
+                && Objects.equals( minLength, other.minLength )
+                && Objects.equals( maxLength, other.maxLength )
+                && Objects.equals( maxQuestionCharsInAnswer, other.maxQuestionCharsInAnswer )
+                && Objects.equals( enforceWordlist, other.enforceWordlist )
+                && Objects.equals( answer, other.answer );
     }
+
+    public int hashCode()
+    {
+        return Objects.hash(
+                adminDefined,
+                required,
+                challengeText,
+                minLength,
+                maxLength,
+                maxQuestionCharsInAnswer,
+                enforceWordlist,
+                answer );
+    }
+
 }

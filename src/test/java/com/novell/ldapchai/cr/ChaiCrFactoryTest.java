@@ -1,6 +1,5 @@
 package com.novell.ldapchai.cr;
 
-import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiSetting;
 import org.junit.Assert;

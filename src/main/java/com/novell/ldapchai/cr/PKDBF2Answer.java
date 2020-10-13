@@ -206,13 +206,13 @@ class PKDBF2Answer implements Answer
     @Override
     public AnswerBean asAnswerBean()
     {
-        final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType( formatType );
-        answerBean.setAnswerHash( getHashedAnswer() );
-        answerBean.setCaseInsensitive( caseInsensitive );
-        answerBean.setHashCount( hashCount );
-        answerBean.setSalt( salt );
-        return answerBean;
+        return new AnswerBean(
+                formatType,
+                null,
+                getHashedAnswer(),
+                salt,
+                hashCount,
+                caseInsensitive );
     }
 
     static class PKDBF2AnswerFactory implements ImplementationFactory

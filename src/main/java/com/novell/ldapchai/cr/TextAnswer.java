@@ -62,11 +62,13 @@ class TextAnswer implements Answer
     @Override
     public AnswerBean asAnswerBean()
     {
-        final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType( FormatType.TEXT );
-        answerBean.setAnswerText( answer );
-        answerBean.setCaseInsensitive( caseInsensitive );
-        return answerBean;
+        return new AnswerBean(
+                FormatType.TEXT,
+                answer,
+                null,
+                null,
+                0,
+                caseInsensitive );
     }
 
     static class TextAnswerFactory implements ImplementationFactory

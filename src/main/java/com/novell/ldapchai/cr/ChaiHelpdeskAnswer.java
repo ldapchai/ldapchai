@@ -22,6 +22,7 @@ package com.novell.ldapchai.cr;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.util.StringHelper;
 import net.iharder.Base64;
 import org.jdom2.Element;
 
@@ -39,7 +40,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
 
     ChaiHelpdeskAnswer( final String answer, final String challengeText )
     {
-        if ( answer == null || answer.length() < 1 )
+        if ( StringHelper.isEmpty( answer ) )
         {
             throw new IllegalArgumentException( "missing answer text" );
         }
@@ -134,10 +135,13 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
     @Override
     public AnswerBean asAnswerBean()
     {
-        final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType( FormatType.HELPDESK );
-        answerBean.setAnswerText( answer );
-        return answerBean;
+        return new AnswerBean(
+                FormatType.HELPDESK,
+                answer,
+                null,
+                null,
+                0,
+                false );
     }
 
     static class ChaiHelpdeskAnswerFactory implements ImplementationFactory
@@ -151,7 +155,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         @Override
         public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
         {
-            return new ChaiHelpdeskAnswer( input.answerText, challengeText );
+            return new ChaiHelpdeskAnswer( input.getAnswerText(), challengeText );
         }
 
         @Override

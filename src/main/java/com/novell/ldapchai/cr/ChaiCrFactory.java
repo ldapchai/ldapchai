@@ -33,9 +33,9 @@ import com.novell.ldapchai.util.ChaiLogger;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
@@ -49,8 +49,6 @@ import java.util.Set;
  */
 public final class ChaiCrFactory
 {
-
-
     /**
      * Constant used to indicate user supplied question.
      */
@@ -97,7 +95,7 @@ public final class ChaiCrFactory
         validateAnswers( challengeResponseMap, chaiConfiguration );
         final Map<Challenge, Answer> answerMap = makeAnswerMap( challengeResponseMap, chaiConfiguration );
         final Map<Challenge, HelpdeskAnswer> helpdeskAnswerMap = makeHelpdeskAnswerMap( helpdeskChallengeResponseMap, chaiConfiguration );
-        return new ChaiResponseSet( answerMap, helpdeskAnswerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date() );
+        return new ChaiResponseSet( answerMap, helpdeskAnswerMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, Instant.now() );
     }
 
     public static ChaiResponseSet newChaiResponseSet(
@@ -129,7 +127,7 @@ public final class ChaiCrFactory
             tempHelpdeskCrMap.put( challenge, ( HelpdeskAnswer ) AnswerFactory.fromAnswerBean( answerBean, challenge.getChallengeText() ) );
         }
 
-        return new ChaiResponseSet( tempCrMap, tempHelpdeskCrMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, new Date() );
+        return new ChaiResponseSet( tempCrMap, tempHelpdeskCrMap, locale, minimumRandomRequired, AbstractResponseSet.STATE.NEW, caseInsensitive, csIdentifier, Instant.now() );
     }
 
     public static void writeChaiResponseSet(

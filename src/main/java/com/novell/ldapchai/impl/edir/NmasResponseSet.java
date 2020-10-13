@@ -323,7 +323,7 @@ public class NmasResponseSet extends AbstractResponseSet
     )
             throws ChaiValidationException
     {
-        super( convertAnswerTextMap( crMap ), Collections.emptyMap(), locale, minimumRandomRequired, state, csIdentifier );
+        super( convertAnswerTextMap( crMap ), Collections.emptyMap(), locale, minimumRandomRequired, state, csIdentifier, null );
         this.user = user;
     }
 

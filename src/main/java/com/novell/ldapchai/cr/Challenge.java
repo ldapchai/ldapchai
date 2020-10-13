@@ -34,7 +34,6 @@ import java.io.Serializable;
  */
 public interface Challenge extends Serializable
 {
-
     /**
      * Get the text of the {@code Challenge} question.  Depending on the origin and type of the
      * challenge, the value may be null.
@@ -67,34 +66,12 @@ public interface Challenge extends Serializable
     boolean isAdminDefined();
 
     /**
-     * Check if the {@code Challege} is locked.  Once locked, a {@code Challenge} is immutable.
-     *
-     * @return true if locked.
-     */
-    boolean isLocked();
-
-    /**
      * Indicates if this {@code Challenge} is one which is required, or if it is one of the
      * random questions.
      *
      * @return true if the question is required, false if random.
      */
     boolean isRequired();
-
-    /**
-     * Lock this {@code Challenge}.  Once locked, it is immutable.
-     */
-    void lock();
-
-    /**
-     * Set the challenge text.  Challenge text is only modifiable if the challenge is <i>not</i> locked, and if is not
-     * admin defiled ({@link #isAdminDefined()}).
-     *
-     * @param challengeText A valid challenge text string.
-     * @throws IllegalArgumentException if the challenge is admin defined
-     * @throws IllegalStateException    if the challenge is locked
-     */
-    void setChallengeText( String challengeText );
 
     ChallengeBean asChallengeBean();
 

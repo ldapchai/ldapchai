@@ -24,9 +24,10 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.util.ChaiLogger;
 
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,14 +56,14 @@ public abstract class AbstractResponseSet implements ResponseSet
         }
     }
 
-    protected Map<Challenge, Answer> crMap = Collections.emptyMap();
-    protected ChallengeSet allChallengeSet;
-    protected ChallengeSet presentableChallengeSet;
-    protected Locale locale;
-    protected int minimumRandomRequired;
-    protected Date timestamp;
-    protected String csIdentifier;
-    protected Map<Challenge, HelpdeskAnswer> helpdeskCrMap = Collections.emptyMap();
+    protected final Map<Challenge, Answer> crMap;
+    protected final ChallengeSet allChallengeSet;
+    protected final ChallengeSet presentableChallengeSet;
+    protected final Locale locale;
+    protected final int minimumRandomRequired;
+    protected final Instant timestamp;
+    protected final String csIdentifier;
+    protected final Map<Challenge, HelpdeskAnswer> helpdeskCrMap;
 
     protected STATE state;
 
@@ -72,28 +73,22 @@ public abstract class AbstractResponseSet implements ResponseSet
             final Locale locale,
             final int minimumRandomRequired,
             final STATE state,
-            final String csIdentifier
+            final String csIdentifier,
+            final Instant timestamp
     )
             throws ChaiValidationException
     {
         this.state = state;
         this.locale = locale;
         this.minimumRandomRequired = minimumRandomRequired;
-        this.crMap = crMap;
-        this.helpdeskCrMap = helpdeskCrMap;
+        this.crMap = crMap == null ? Collections.emptyMap() : Collections.unmodifiableMap( new HashMap<>( crMap ) );
+        this.helpdeskCrMap = helpdeskCrMap == null ? Collections.emptyMap() : Collections.unmodifiableMap( new HashMap<>( helpdeskCrMap ) );
         this.csIdentifier = csIdentifier;
 
-        this.timestamp = new Date();
+        this.timestamp = timestamp;
 
-        allChallengeSet = new ChaiChallengeSet( crMap.keySet(), minimumRandomRequired, locale, csIdentifier );
+        allChallengeSet = new ChaiChallengeSet( this.crMap.keySet(), minimumRandomRequired, locale, csIdentifier );
         presentableChallengeSet = reduceCsToMinRandoms( allChallengeSet );
-
-        if ( state == STATE.READ )
-        {
-            this.allChallengeSet.lock();
-            this.presentableChallengeSet.lock();
-        }
-
     }
 
 
@@ -149,7 +144,7 @@ public abstract class AbstractResponseSet implements ResponseSet
         if ( this.getChallengeSet().getRandomChallenges().size() < challengeSet.getMinRandomRequired() )
         {
             final StringBuilder errorMsg = new StringBuilder();
-            errorMsg.append( "minimum number of ramdom responses in response set (" ).append( this.getChallengeSet().getRandomChallenges().size() ).append( ")" );
+            errorMsg.append( "minimum number of random responses in response set (" ).append( this.getChallengeSet().getRandomChallenges().size() ).append( ")" );
             errorMsg.append( " is less than minimum number of random responses required in challenge set (" ).append( challengeSet.getMinRandomRequired() ).append( ")" );
             throw new ChaiValidationException( errorMsg.toString(), ChaiError.CR_TOO_FEW_RANDOM_RESPONSES );
         }
@@ -164,9 +159,9 @@ public abstract class AbstractResponseSet implements ResponseSet
     }
 
     @Override
-    public Date getTimestamp()
+    public Instant getTimestamp()
     {
-        return new Date( timestamp.getTime() );
+        return timestamp;
     }
 
     @Override

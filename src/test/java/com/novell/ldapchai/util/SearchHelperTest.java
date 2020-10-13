@@ -19,13 +19,13 @@
 
 package com.novell.ldapchai.util;
 
-import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.LinkedHashMap;
 
-public class SearchHelperTest extends TestCase {
+public class SearchHelperTest
+{
 
     @Test
     public void testAndFilter()

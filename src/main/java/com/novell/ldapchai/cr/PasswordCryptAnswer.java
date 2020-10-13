@@ -109,12 +109,13 @@ class PasswordCryptAnswer implements Answer
     @Override
     public AnswerBean asAnswerBean()
     {
-        final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType( formatType );
-        answerBean.setAnswerHash( answerHash );
-        answerBean.setCaseInsensitive( caseInsensitive );
-        answerBean.setHashCount( -1 );
-        return answerBean;
+        return new AnswerBean(
+                formatType,
+                null,
+                answerHash,
+                null,
+                -1,
+                caseInsensitive );
     }
 
     static class PasswordCryptAnswerFactory implements ImplementationFactory

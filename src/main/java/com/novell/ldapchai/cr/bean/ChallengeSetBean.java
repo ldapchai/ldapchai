@@ -20,24 +20,36 @@
 package com.novell.ldapchai.cr.bean;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 public class ChallengeSetBean implements Serializable
 {
-    private List<ChallengeBean> challenges;
-    private int minRandomRequired;
-    private Locale locale;
-    private String identifier;
+    private final List<ChallengeBean> challenges;
+    private final int minRandomRequired;
+    private final Locale locale;
+    private final String identifier;
+
+    public ChallengeSetBean(
+            final List<ChallengeBean> challenges,
+            final int minRandomRequired,
+            final Locale locale,
+            final String identifier )
+    {
+        this.challenges = challenges == null
+                ? Collections.emptyList()
+                : Collections.unmodifiableList( new ArrayList<>( challenges ) );
+        this.minRandomRequired = minRandomRequired;
+        this.locale = locale;
+        this.identifier = identifier;
+    }
 
     public List<ChallengeBean> getChallenges()
     {
         return challenges;
-    }
-
-    public void setChallenges( final List<ChallengeBean> challenges )
-    {
-        this.challenges = challenges;
     }
 
     public int getMinRandomRequired()
@@ -45,19 +57,9 @@ public class ChallengeSetBean implements Serializable
         return minRandomRequired;
     }
 
-    public void setMinRandomRequired( final int minRandomRequired )
-    {
-        this.minRandomRequired = minRandomRequired;
-    }
-
     public Locale getLocale()
     {
         return locale;
-    }
-
-    public void setLocale( final Locale locale )
-    {
-        this.locale = locale;
     }
 
     public String getIdentifier()
@@ -65,8 +67,31 @@ public class ChallengeSetBean implements Serializable
         return identifier;
     }
 
-    public void setIdentifier( final String identifier )
+    public boolean equals( final Object o )
     {
-        this.identifier = identifier;
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final ChallengeSetBean other = ( ChallengeSetBean ) o;
+        return Objects.equals( challenges, other.challenges )
+                && Objects.equals( minRandomRequired, other.minRandomRequired )
+                && Objects.equals( locale, other.locale )
+                && Objects.equals( identifier, other.identifier );
+    }
+
+    public int hashCode()
+    {
+        return Objects.hash(
+                challenges,
+                minRandomRequired,
+                locale,
+                identifier );
     }
 }

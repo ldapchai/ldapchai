@@ -99,21 +99,8 @@ public interface ChallengeSet extends Serializable
     int minimumResponses();
 
     /**
-     * Check to see if any of the underlying challenges are not locked.  If any challenge is not locked, then the
-     * entire {@code ChallengeSet} is considered to be not locked.
-     *
-     * @return true if all contained {@code Challenge}s are locked.
-     */
-    boolean isLocked();
-
-    /**
-     * Lock this {@code ChallengeSet}, and any {@code Challenge} objects contained within.
-     */
-    void lock();
-
-    /**
-     * Get the identifier for this challenge set.  The value or existance of the identifier is defined by the
-     * immplenetation
+     * Get the identifier for this challenge set.  The value or existence of the identifier is defined by the
+     * implementation.
      *
      * @return the value of the implementor
      */

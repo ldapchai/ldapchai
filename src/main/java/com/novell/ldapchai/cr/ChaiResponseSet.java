@@ -43,9 +43,9 @@ import org.jdom2.output.XMLOutputter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.Writer;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -58,8 +58,6 @@ import java.util.TimeZone;
 
 public class ChaiResponseSet extends AbstractResponseSet
 {
-
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiResponseSet.class.getName() );
 
     static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -126,13 +124,12 @@ public class ChaiResponseSet extends AbstractResponseSet
             final STATE state,
             final boolean caseInsensitive,
             final String csIdentifer,
-            final Date timestamp
+            final Instant timestamp
     )
             throws ChaiValidationException
     {
-        super( crMap, helpdeskCrMap, locale, minimumRandomRequired, state, csIdentifer );
+        super( crMap, helpdeskCrMap, locale, minimumRandomRequired, state, csIdentifer, timestamp );
         this.caseInsensitive = caseInsensitive;
-        this.timestamp = timestamp;
     }
 
     public String toString()
@@ -293,7 +290,7 @@ public class ChaiResponseSet extends AbstractResponseSet
 
         if ( rs.timestamp != null )
         {
-            rootElement.setAttribute( XML_ATTRIBUTE_TIMESTAMP, getDateFormat().format( rs.timestamp ) );
+            rootElement.setAttribute( XML_ATTRIBUTE_TIMESTAMP, formatInstant( rs.timestamp ) );
         }
 
         if ( rs.crMap != null )
@@ -358,7 +355,7 @@ public class ChaiResponseSet extends AbstractResponseSet
             Attribute localeAttr = null;
             boolean caseInsensitive = false;
             String csIdentifier = null;
-            Date timestamp = null;
+            Instant timestamp = null;
 
             try
             {
@@ -391,7 +388,7 @@ public class ChaiResponseSet extends AbstractResponseSet
                         final String timeStr = timeAttr.getValue();
                         try
                         {
-                            timestamp = getDateFormat().parse( timeStr );
+                            timestamp = parseInstant( timeStr );
                         }
                         catch ( ParseException e )
                         {
@@ -423,15 +420,7 @@ public class ChaiResponseSet extends AbstractResponseSet
                     helpdeskCrMap.put( newChallenge, answer );
                 }
             }
-            catch ( JDOMException e )
-            {
-                LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
-            }
-            catch ( IOException e )
-            {
-                LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
-            }
-            catch ( NullPointerException e )
+            catch ( JDOMException | NullPointerException | IOException e )
             {
                 LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
             }
@@ -493,7 +482,9 @@ public class ChaiResponseSet extends AbstractResponseSet
         return asBeans( helpdeskCrMap, includeAnswers );
     }
 
-    public static List<ChallengeBean> asBeans( final Map inputMap, final boolean includeAnswers )
+    public static <A extends Answer> List<ChallengeBean> asBeans(
+            final Map<Challenge, A> inputMap,
+            final boolean includeAnswers )
     {
         if ( inputMap == null )
         {
@@ -501,16 +492,25 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
 
         final List<ChallengeBean> returnList = new ArrayList<>();
-        for ( final Object loopChallengeObj : inputMap.keySet() )
+        for ( final Map.Entry<Challenge, A> entry : inputMap.entrySet() )
         {
-            final Challenge loopChallenge = ( Challenge ) loopChallengeObj;
-            final ChallengeBean challengeBean = loopChallenge.asChallengeBean();
+            final Challenge loopChallenge = entry.getKey();
+            ChallengeBean challengeBean = loopChallenge.asChallengeBean();
             if ( includeAnswers )
             {
-                final Answer loopAnswer = ( Answer ) inputMap.get( loopChallenge );
+                final Answer loopAnswer = entry.getValue();
                 final AnswerBean answerBean = loopAnswer.asAnswerBean();
-                challengeBean.setAnswer( answerBean );
+                challengeBean = new ChallengeBean(
+                        challengeBean.getChallengeText(),
+                        challengeBean.getMinLength(),
+                        challengeBean.getMaxLength(),
+                        challengeBean.isAdminDefined(),
+                        challengeBean.isRequired(),
+                        challengeBean.getMaxQuestionCharsInAnswer(),
+                        challengeBean.isEnforceWordlist(),
+                        answerBean );
             }
+
             returnList.add( challengeBean );
         }
         return returnList;
@@ -546,11 +546,19 @@ public class ChaiResponseSet extends AbstractResponseSet
         return new Locale( language, country, variant );
     }
 
-    static DateFormat getDateFormat()
+    static String formatInstant( final Instant instant )
     {
         final SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
         dateFormat.setTimeZone( TimeZone.getTimeZone( "Zulu" ) );
-        return dateFormat;
+        return dateFormat.format( Date.from( instant ) );
+    }
+
+    static Instant parseInstant( final String input )
+            throws ParseException
+    {
+        final SimpleDateFormat dateFormat = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss Z" );
+        dateFormat.setTimeZone( TimeZone.getTimeZone( "Zulu" ) );
+        return dateFormat.parse( input ).toInstant();
     }
 
 }

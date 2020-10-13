@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -45,14 +46,14 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
             final Collection<Challenge> challenges,
             final int minRandomRequired,
             final Locale locale,
-            final String identifer
+            final String identifier
     )
             throws ChaiValidationException
     {
         this.challenges = Collections.unmodifiableList( new LinkedList<>( challenges ) );
-        this.minRandomRequired = minRandomRequired > getRandomChallenges().size() ? getRandomChallenges().size() : minRandomRequired;
+        this.minRandomRequired = Math.min( minRandomRequired, getRandomChallenges().size() );
         this.locale = locale == null ? Locale.getDefault() : locale;
-        this.identifier = identifer;
+        this.identifier = identifier;
         this.isValid();
     }
 
@@ -181,35 +182,12 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
     @Override
     public int minimumResponses()
     {
-        int mininimumResponses = 0;
+        int minimumResponses = 0;
 
-        mininimumResponses += getRequiredChallenges().size();
-        mininimumResponses += getMinRandomRequired();
+        minimumResponses += getRequiredChallenges().size();
+        minimumResponses += getMinRandomRequired();
 
-        return mininimumResponses;
-    }
-
-    @Override
-    public boolean isLocked()
-    {
-        for ( final Challenge loopChallenge : challenges )
-        {
-            if ( !loopChallenge.isLocked() )
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public void lock()
-    {
-        for ( final Challenge loopChallenge : challenges )
-        {
-            loopChallenge.lock();
-        }
+        return minimumResponses;
     }
 
     @Override
@@ -221,15 +199,43 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
     @Override
     public ChallengeSetBean asChallengeSetBean()
     {
-        final ChallengeSetBean challengeSetBean = new ChallengeSetBean();
-        challengeSetBean.setIdentifier( this.getIdentifier() );
-        challengeSetBean.setLocale(  this.getLocale() );
-        challengeSetBean.setMinRandomRequired( this.getMinRandomRequired() );
-
         final List<ChallengeBean> challengeBeans = this.getChallenges().stream()
                 .map( Challenge::asChallengeBean )
                 .collect( Collectors.toList() );
-        challengeSetBean.setChallenges( challengeBeans );
-        return challengeSetBean;
+
+        return new ChallengeSetBean(
+                challengeBeans,
+                minRandomRequired,
+                locale,
+                identifier );
     }
+
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final ChaiChallengeSet other = ( ChaiChallengeSet ) o;
+        return Objects.equals( challenges, other.challenges )
+                && Objects.equals( minRandomRequired, other.minRandomRequired )
+                && Objects.equals( locale, other.locale )
+                && Objects.equals( identifier, other.identifier );
+    }
+
+    public int hashCode()
+    {
+        return Objects.hash(
+                challenges,
+                minRandomRequired,
+                locale,
+                identifier );
+    }
+
 }

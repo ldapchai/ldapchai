@@ -235,13 +235,14 @@ class HashSaltAnswer implements Answer
     @Override
     public AnswerBean asAnswerBean()
     {
-        final AnswerBean answerBean = new AnswerBean();
-        answerBean.setType( formatType );
-        answerBean.setAnswerHash( version.toString() + VERSION_SEPARATOR + answerHash );
-        answerBean.setCaseInsensitive( caseInsensitive );
-        answerBean.setHashCount( hashCount );
-        answerBean.setSalt( salt );
-        return answerBean;
+        return new AnswerBean(
+                formatType,
+                null,
+                version.toString() + VERSION_SEPARATOR + answerHash,
+                salt,
+                hashCount,
+                caseInsensitive );
+
     }
 
     static class HashSaltAnswerFactory implements ImplementationFactory

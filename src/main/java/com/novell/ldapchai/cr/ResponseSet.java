@@ -24,7 +24,7 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -127,7 +127,7 @@ public interface ResponseSet
      * @throws ChaiOperationException   If there is an error during the write operation
      * @throws IllegalStateException    if this response set is not suitable for writing, for example, if it has already been written, or was obtained by reading from ldap
      */
-    Date getTimestamp()
+    Instant getTimestamp()
             throws ChaiUnavailableException, IllegalStateException, ChaiOperationException;
 
     /**
