@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>com.github.ldapchai</groupId>
-    <version>0.8.0</version>
+    <version>0.8.1-SNAPSHOT</version>
     <artifactId>ldapchai</artifactId>
     <packaging>jar</packaging>
 
