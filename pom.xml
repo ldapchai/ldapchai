@@ -147,6 +147,9 @@
                     <generateGitPropertiesFile>true</generateGitPropertiesFile>
                     <generateGitPropertiesFilename>${project.build.outputDirectory}/classes/git.json</generateGitPropertiesFilename>
                     <format>json</format>
+                    <gitDescribe>
+                        <tags>true</tags>
+                    </gitDescribe>
                     <excludeProperties>
                         <!-- git.build.time is current timestamp so prevents reproducible build -->
                         <excludeProperty>git.build.time</excludeProperty>
@@ -263,9 +266,7 @@
                                     <Implementation-Version>${project.version}</Implementation-Version>
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
-                                    <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
-                                    <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
-                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                    <Implementation-Build-Java-Spec-Version>${java.specification.version}</Implementation-Build-Java-Spec-Version>
                                     <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
                                     <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
                                     <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
@@ -317,9 +318,7 @@
                                     <Implementation-Version>${project.version}</Implementation-Version>
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
-                                    <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
-                                    <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
-                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                    <Implementation-Build-Java-Spec-Version>${java.specification.version}</Implementation-Build-Java-Spec-Version>
                                     <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
                                     <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
                                     <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
@@ -353,9 +352,7 @@
                                     <Implementation-Version>${project.version}</Implementation-Version>
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
-                                    <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
-                                    <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
-                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                    <Implementation-Build-Java-Spec-Version>${java.specification.version}</Implementation-Build-Java-Spec-Version>
                                     <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
                                     <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
                                     <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
@@ -404,9 +401,7 @@
                                     <Implementation-Version>${project.version}</Implementation-Version>
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
-                                    <Implementation-Build-Java-Vendor>${java.vendor}</Implementation-Build-Java-Vendor>
-                                    <Implementation-Build-Java-Version>${java.version}</Implementation-Build-Java-Version>
-                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
+                                    <Implementation-Build-Java-Spec-Version>${java.specification.version}</Implementation-Build-Java-Spec-Version>
                                     <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
                                     <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
                                     <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
