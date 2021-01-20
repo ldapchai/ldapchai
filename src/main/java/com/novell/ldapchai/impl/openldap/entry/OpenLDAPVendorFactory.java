@@ -24,8 +24,8 @@ import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.impl.VendorFactory;
+import com.novell.ldapchai.impl.openldap.OpenLDAPErrorMap;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
@@ -38,7 +38,7 @@ import java.util.Set;
 public class OpenLDAPVendorFactory implements VendorFactory
 {
 
-    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
+    private static final ErrorMap ERROR_MAP = new OpenLDAPErrorMap();
 
     @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
