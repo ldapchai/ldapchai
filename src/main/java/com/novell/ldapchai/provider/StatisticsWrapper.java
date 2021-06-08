@@ -28,10 +28,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.time.Instant;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Default implementation of {@link com.novell.ldapchai.provider.ProviderStatistics}.
@@ -152,14 +153,14 @@ class StatisticsWrapper implements InvocationHandler
     static class StatsBean implements ProviderStatistics
     {
 
-        private final Map<IncrementerStatistic, AtomicInteger> incrementerMap = new ConcurrentHashMap<>();
+        private final Map<IncrementerStatistic, LongAdder> incrementerMap = new HashMap<>();
         private final Map<TimestampStatistic, Instant> timestampMap = new ConcurrentHashMap<>();
 
         StatsBean()
         {
             for ( final IncrementerStatistic statistic : IncrementerStatistic.values() )
             {
-                incrementerMap.put( statistic, new AtomicInteger( 0 ) );
+                incrementerMap.put( statistic, new LongAdder() );
             }
             for ( final TimestampStatistic statistic : TimestampStatistic.values() )
             {
@@ -170,7 +171,7 @@ class StatisticsWrapper implements InvocationHandler
         @Override
         public long getIncrementorStatistic( final IncrementerStatistic statistic )
         {
-            return incrementerMap.get( statistic ).get();
+            return incrementerMap.get( statistic ).sum();
         }
 
         @Override
@@ -181,7 +182,7 @@ class StatisticsWrapper implements InvocationHandler
 
         void incrementStatistic( final IncrementerStatistic incrementerStatistic )
         {
-            incrementerMap.get( incrementerStatistic ).incrementAndGet();
+            incrementerMap.get( incrementerStatistic ).increment();
         }
 
         void markTimestampStatistic( final TimestampStatistic timestampStatistic )
