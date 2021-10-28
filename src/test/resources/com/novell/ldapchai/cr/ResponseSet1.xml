@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ResponseSet minRandomRequired="1" locale="en" version="2" chaiVersion="0.8.1" caseInsensitive="true" challengeSetID="1455672376409" time="2021-06-12 01:57:50 +0000">
+    <response adminDefined="true" required="false" minLength="5" maxLength="6">
+        <challenge>What is your PIN?</challenge>
+        <answer salt="kkcJtJ3yfipVr37wYkeGKEcGUcUF1l94" format="PBKDF2_SHA512" hashcount="10000">SRQBfNxA93NyY0lh86sIf4V+ItwQlGsxWUjpt74UGLpjs7j3s+w7YZURiiAJVnu14AXx9DwaIgCGQSTaS30nlpqOpQR1tYJa3rckOVQ+CqcIbkVKvI9TO/9j0j0kHKlmieQFW+c1EjfdkwuZO4NXzuMevsdd3d9V4pCCv70Jno9eB44GgCh4Lvb+hXOe9NOJTgbuWLuN8stu+JzyQdqdQCT/OzNuDeU+FGXCt2FSFsSJPRRbfea+1/iE76nIGJE1</answer>
+    </response>
+    <response adminDefined="true" required="true" minLength="4" maxLength="128">
+        <challenge>How do you like your burger?</challenge>
+        <answer salt="LTY8tnTx6SwQkbpFPL8T2ZdBcS4RgM5V" format="PBKDF2_SHA512" hashcount="10000">IOv2Y/MbHhaDeSkgS0UlBZxttYScE7gtreyyCXGN6P/I/7JvMY3BcFcVZVVnmeLWkFybmr4XV+LYwD3Qy1/gSvJlE9kX7tJ+pxQl3AQeUvCfFOQ+Fa3SOTW6FcbyuIvUETu+WX0P5/DHuXRp9Pd5d/AEPLx6fD27tBGOS1R33DVhDBCD4pQSj7LoagRw5SK6qlLdXxp7AOlT5zI9GEO9w/g9xiYNkebAc1CU+nlj0YjrC32yPd2XDKo9Fwv7lQ8F</answer>
+    </response>
+    <response adminDefined="true" required="false" minLength="2" maxLength="128">
+        <challenge>What is your childhood pet's name?</challenge>
+        <answer salt="l2DKTYSf2OFtMxreVJukHgnMedr7Mp7o" format="PBKDF2_SHA512" hashcount="10000">qLc0iT61qk60Zz/t3zymHDlGs+NBH8AfdXf8NhiSkYZbveugBeJC5EXu9p7Xq7Rl8EiP4n2/4x0cKOSLJ3mpYw2tWjMIOJWxJZmKjlaRbnvej8kaSZ5E7dxdlfMb0bc5Zru+YnOnlM0/CIkV1FKRn32UKTj5/k+ZohLDeFXht5BfoE/gDs4WAcVv+LAWmTK7MQcKRghLm2tktVRIwhhtURF2cUjfQkBgDNk5aEmAalIoXIT+8KuX+spIFIDvIfpk</answer>
+    </response>
+    <response adminDefined="true" required="true" minLength="2" maxLength="255">
+        <challenge>What is your mother's maiden name?</challenge>
+        <answer salt="9WriPW2QT2E7riUKHIdvEuTwGfi3NNDu" format="PBKDF2_SHA512" hashcount="10000">3mfO1NGEXKlqPoKJhdOMlUmMQ+U+iaN2T/Xpdl241agTpjdbGSg4MFi9fLuAMANZfk1tPy338wQO0IXwq4AYJgm+kmF6eg3BNJ2A+Iook5316PHIfX1kOlmFxdyWLoA3+m0TjCZEWP3eYqzHGFQGzxfoi3X5YtyXUuhP6GWc173UC4eypVe06o8Ui6Q9WGedBSV4PkLhPnBa9pS9Q4ECvHDgWVczAdIaaySatayuRprp/TkCOB+DHcwKTkdxvuuZ</answer>
+    </response>
+    <response adminDefined="true" required="false" minLength="2" maxLength="255">
+        <challenge>What is your User ID?</challenge>
+        <answer salt="sEJ5VT5QOtWL5MBXtgVrC76Q0NVv4ABV" format="PBKDF2_SHA512" hashcount="10000">p2kYs3KuTCGcTat4viJFXO7jF/Uo0lYTZkx2uAEpajU2O9xWPeTrEtSBluTZo+1Z18WPMuzMxgzvTnQlw9qZ2tq9cohExMU8H8W43yUZl7F29lBw7PFUjJPX1oKsh4EFZTrK9Bp7Y6KQ5MeoVXcIXck5Sx/90BvDwtBUgzbv8Z/nNlwxkQwFrBpJFvjakmKkb8lh2ketMbINW6WNiFDEuPZsgthIyuhzYn0oNkoOHbvji1ZFI70NQc8FN6eQDy9Z</answer>
+    </response>
+</ResponseSet>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ResponseSet minRandomRequired="2" locale="en" version="2" chaiVersion="0.8.1" caseInsensitive="true" challengeSetID="PWM-defined v2.1.0-SNAPSHOT bac0a53e" time="2021-08-28 02:12:49 +0000">
+    <response adminDefined="true" required="false" minLength="1" maxLength="199">
+        <challenge>What is the name of your favoraaite teacher?</challenge>
+        <answer salt="0ZVLvOlCyRqkvvbQc28nlF1egxlmgMrx" format="PBKDF2_SHA512" hashcount="10000">xwx3vf7ZtYjBdYCEVO7SKMW6u8YPPOkQpoM/31m8IMOI4uOz48hk1i+59OwbQfmHKp18ZwqFPRdayn3TKpScAtqBT0Oy+lhTIAJBuFTP1kAXJ/A45L+GoxIKlurcveHg+UjtASVmPbN0He/asY4tcAIoKwAlcDWkTquV8LUwrlxzPAqgWIG6dZVoQ+q9nLfx6ZiauTylQwgBFUaElgPxDkEQUYMnltNPkjsemklGBCXJEsR1vMuGVn9yQV7WTGNV</answer>
+    </response>
+    <response adminDefined="true" required="false" minLength="1" maxLength="199">
+        <challenge>What was the name of your childhood best friend?</challenge>
+        <answer salt="KHEEIwgGz3yUPBDZOH0NKCaflcA4czKt" format="PBKDF2_SHA512" hashcount="10000">bla0oKC5/CsACRpq7zEbxx729GrZ50F6BCfMZaGB19GRauZ/OGykD4+gvoTZZ0MTpmjNM0AVC1JLCK3zRxnKhFBrkyHpWE2LPgJfposPO6FEELrtQIPG0yadwUhIRINOIDaTpWgeyHEIGMnRgQ3mHsvXrG51aDVva1EGIam9YUckfUjMatYjZfUyGT4zyanqh6CWHbiOf7Y4mUv/4HaD6OkflJ9O0W1stfl0jMcsQ77r3dpp0K+hlTSd+wj6mezG</answer>
+    </response>
+    <response adminDefined="true" required="false" minLength="1" maxLength="199">
+        <challenge>What is your partner's nickname?</challenge>
+        <answer salt="HZgLvTL82FSSSBGgrJsd7dMSTHEZQM4Q" format="PBKDF2_SHA512" hashcount="10000">HbCfifux0Evhb+0oxqozcdItGjmpnDWAPkBya/oI33D4ZmWCxXo2Rh6rTIycQtT170/uLLT1JbShsyq7mmAK8PnS6uTj8Fm2nPvWeM3rWBSnr+eDZE6EIqcqyidw2/lHcGqJFBBlQzUpGL6i0RCIL0M4DbP7J2Nab7d/zgKLwfjrW+HBYsaVK07uUH1hwhBrYvd1caK3FRWo32f5sguAtyRc59RbZRZ0HCoiBqpsNavmDmwxAHXS/TlV5BewFUFV</answer>
+    </response>
+    <response adminDefined="true" required="false" minLength="1" maxLength="199">
+        <challenge>Who is your favorite author?</challenge>
+        <answer salt="ozVm8U5f27ADFABgzhy7OsvNJKXz9bng" format="PBKDF2_SHA512" hashcount="10000">fTcDZF5WyemmuTEVtnycpoz3cCZ5njsjWP409/eXdAMrfkPoP82htVDfZndJMFgjtxfhm+GdWhokKYJ/p91I1I1uHRe95mrznP6z+5jJA0rQKR5bxPcDrDwr4m1JJj9STZA/iOEJxqZ3nyPgd0vcvNQhzkYtLDgv+AE/d6cy7N6bS3pe4ybmlssr0co3n8pMK8EObV8R8enRcDML1R0v9cuONENcPzDTtiQUNhsuvk1XOsZSVqJAzX7ZIEbg9Sus</answer>
+    </response>
+</ResponseSet>
