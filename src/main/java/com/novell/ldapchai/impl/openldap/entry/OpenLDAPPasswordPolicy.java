@@ -29,6 +29,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -262,6 +264,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
     private final Map<String, String> allEntryValues = new HashMap<>();
     private final ChaiProvider provider;
 
+    @SuppressFBWarnings( "EI_EXPOSE_REP2" )
     public OpenLDAPPasswordPolicy( final String entryDN, final ChaiProvider chaiProvider )
             throws ChaiUnavailableException,
             ChaiOperationException
@@ -273,7 +276,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
         LOGGER.trace( "allEntryValues = " + allEntryValues );
         final String pwdCheckQuality = allEntryValues.get( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY );
         LOGGER.debug( "pwdCheckQuality = " + pwdCheckQuality );
-        if ( pwdCheckQuality != null && ( "1".equals( pwdCheckQuality ) || "2".equals( pwdCheckQuality ) ) )
+        if ( Objects.equals( "1", pwdCheckQuality ) || Objects.equals( "2", pwdCheckQuality ) )
         {
             allEntryValues.putAll( readCheckPasswordAttributes() );
         }

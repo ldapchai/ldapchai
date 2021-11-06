@@ -19,6 +19,9 @@
 
 package com.novell.ldapchai.provider;
 
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -81,6 +84,7 @@ public enum ChaiProviderFactorySetting
         return defaultValue;
     }
 
+    @SuppressFBWarnings( value = "MS_EXPOSE_REP", justification = "static map is unmodifiable, no need to copy/wrap it" )
     public static Map<ChaiProviderFactorySetting, String> getDefaultSettings()
     {
         return DEFAULT_SETTINGS;

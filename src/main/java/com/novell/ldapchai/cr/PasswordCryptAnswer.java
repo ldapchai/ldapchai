@@ -25,9 +25,12 @@ import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 import org.jdom2.Element;
 
 import java.security.SecureRandom;
+import java.util.function.Supplier;
 
 class PasswordCryptAnswer implements Answer
 {
+    private static final Supplier<SecureRandom> SECURE_RANDOM_SUPPLIER = SecureRandom::new;
+
     private final String answerHash;
     private final boolean caseInsensitive;
     private final FormatType formatType;
@@ -62,7 +65,7 @@ class PasswordCryptAnswer implements Answer
         {
             case BCRYPT:
                 final byte[] salt = new byte[saltChars];
-                ( new SecureRandom() ).nextBytes( salt );
+                SECURE_RANDOM_SUPPLIER.get().nextBytes( salt );
                 answerHash = OpenBSDBCrypt.generate( casedAnswer.toCharArray(), salt, iterations );
                 break;
 

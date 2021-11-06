@@ -64,11 +64,6 @@ public class ChaiChallengeSet implements ChallengeSet, Serializable
         {
             throw new ChaiValidationException( "number of required responses greater then count of supplied random challenges", ChaiError.CR_NOT_ENOUGH_RANDOM_RESPONSES );
         }
-
-        if ( this.minRandomRequired + this.getRequiredChallenges().size() < 1 )
-        {
-            throw new ChaiValidationException( "too few challenges are required", ChaiError.CR_TOO_FEW_CHALLENGES );
-        }
     }
 
     @Override

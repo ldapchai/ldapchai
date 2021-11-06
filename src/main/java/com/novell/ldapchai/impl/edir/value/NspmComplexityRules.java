@@ -42,7 +42,7 @@ public class NspmComplexityRules
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiEntryFactory.class );
 
-    private List<Policy> policies = Collections.emptyList();
+    private final List<Policy> policies;
 
     static
     {
@@ -75,7 +75,7 @@ public class NspmComplexityRules
         {
             throw new NullPointerException( "policies may not be null" );
         }
-        this.policies = Collections.unmodifiableList( policies );
+        this.policies = Collections.unmodifiableList( new ArrayList<>( policies ) );
     }
 
     public NspmComplexityRules( final String input )
@@ -213,7 +213,7 @@ public class NspmComplexityRules
 
     public static class Policy
     {
-        List<RuleSet> ruleSets;
+        private final List<RuleSet> ruleSets;
 
         public Policy( final List<RuleSet> ruleSets )
         {
@@ -221,7 +221,7 @@ public class NspmComplexityRules
             {
                 throw new NullPointerException( "ruleSets may not be null" );
             }
-            this.ruleSets = Collections.unmodifiableList( ruleSets );
+            this.ruleSets = Collections.unmodifiableList( new ArrayList<>( ruleSets ) );
         }
 
         public List<RuleSet> getComplexityRuleSets()
@@ -260,8 +260,8 @@ public class NspmComplexityRules
 
     public static class RuleSet
     {
-        int violationsAllowed;
-        Map<Rule, String> complexityRules;
+        private final int violationsAllowed;
+        private final Map<Rule, String> complexityRules;
 
         public RuleSet( final int violationsAllowed, final Map<Rule, String> complexityRules )
         {
@@ -270,7 +270,7 @@ public class NspmComplexityRules
                 throw new NullPointerException( "complexityRules may not be null" );
             }
             this.violationsAllowed = violationsAllowed;
-            this.complexityRules = Collections.unmodifiableMap( complexityRules );
+            this.complexityRules = Collections.unmodifiableMap( new HashMap<>( complexityRules ) );
         }
 
         public int getViolationsAllowed()

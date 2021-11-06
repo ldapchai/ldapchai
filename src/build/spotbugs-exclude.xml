@@ -26,6 +26,14 @@
     <Match>
         <Package name="~com\.novell\.ldapchai\.com.novell.ldapchai.cr.*"/>
     </Match>
+    <Match>
+        <!-- overly aggressive checks in spotbugs 4.4.x -->
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <!-- overly aggressive checks in spotbugs 4.4.x -->
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
 </FindBugsFilter>
 
 

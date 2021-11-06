@@ -35,6 +35,7 @@ import com.novell.ldapchai.provider.DirectoryVendor;
 import com.novell.ldapchai.provider.SearchScope;
 
 import java.net.URI;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -42,8 +43,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * A collection of static helper methods used by the LDAP Chai API.
@@ -53,6 +54,8 @@ import java.util.Set;
 public final class ChaiUtility
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiUtility.class );
+
+    private static final Supplier<SecureRandom> SECURE_RANDOM_SUPPLIER = SecureRandom::new;
 
     /**
      * Creates a new group entry in the ldap directory.  A new "groupOfNames" object is created.
@@ -131,12 +134,10 @@ public final class ChaiUtility
         String uniqueCN;
         StringBuilder filter;
 
-        final Random randomNumber = new Random();
-
         String stringCounter = null;
 
         // Start with a random 3 digit number
-        int counter = randomNumber.nextInt( 1000 );
+        int counter = SECURE_RANDOM_SUPPLIER.get().nextInt( 1000 );
         while ( true )
         {
             // Initialize the String Buffer and Unique DN.

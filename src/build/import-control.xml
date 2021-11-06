@@ -64,4 +64,7 @@
     <allow pkg="com.novell.ldap"/>
     <allow pkg="com.novell.security.nmas"/>
 
+    <!-- suppress warnings -->
+    <allow class="edu.umd.cs.findbugs.annotations.SuppressFBWarnings"/>
+
 </import-control>
