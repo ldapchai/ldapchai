@@ -90,7 +90,7 @@ abstract class AbstractWrapper implements InvocationHandler
         }
         catch ( IllegalAccessException e )
         {
-            final String errorMsg = "unexpected api error";
+            final String errorMsg = "unexpected api error: " + e.getMessage();
             LOGGER.warn( errorMsg, e );
             throw new IllegalStateException( errorMsg );
         }
@@ -103,7 +103,7 @@ abstract class AbstractWrapper implements InvocationHandler
             }
             else
             {
-                final String errorMsg = "unexpected api error";
+                final String errorMsg = "unexpected api error: " + e.getMessage();
                 LOGGER.warn( errorMsg, e );
                 throw new IllegalStateException( errorMsg );
             }

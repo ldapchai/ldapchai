@@ -31,12 +31,13 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.impl.edir.entry.NspmPasswordPolicy;
+import com.novell.ldapchai.impl.edir.entry.ext.DeleteLoginConfigRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.DeleteLoginConfigResponse;
+import com.novell.ldapchai.impl.edir.entry.ext.NMASChallengeResponse;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.StringHelper;
-import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigRequest;
-import com.novell.security.nmas.jndi.ldap.ext.DeleteLoginConfigResponse;
-import com.novell.security.nmas.mgmt.NMASChallengeResponse;
+
 import org.jdom2.JDOMException;
 
 import java.io.IOException;
@@ -204,9 +205,9 @@ public class NmasCrFactory
 
         final DeleteLoginConfigRequest request = new DeleteLoginConfigRequest();
         request.setObjectDN( theUser.getEntryDN() );
-        request.setTag( "ChallengeResponseQuestions" );
-        request.setMethodID( NMASChallengeResponse.METHOD_ID );
-        request.setMethodIDLen( NMASChallengeResponse.METHOD_ID.length * 4 );
+        request.setTag( NMASChallengeResponse.CHALLENGE_RESPONSE_QUESTIONS_TAG );
+        request.setMethodID( NMASChallengeResponse.getMethodId() );
+        request.setMethodIDLen( NMASChallengeResponse.getMethodId().length * 4 );
 
         final DeleteLoginConfigResponse response = ( DeleteLoginConfigResponse ) provider.extendedOperation( request );
         if ( response != null && response.getNmasRetCode() != 0 )

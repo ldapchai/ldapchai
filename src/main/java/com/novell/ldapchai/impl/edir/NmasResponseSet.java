@@ -31,14 +31,15 @@ import com.novell.ldapchai.cr.bean.ChallengeBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.impl.edir.entry.ext.GetLoginConfigRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.NMASChallengeResponse;
+import com.novell.ldapchai.impl.edir.entry.ext.PutLoginConfigRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.PutLoginConfigResponse;
+import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretResponse;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.StringHelper;
-import com.novell.security.nmas.jndi.ldap.ext.GetLoginConfigRequest;
-import com.novell.security.nmas.jndi.ldap.ext.PutLoginConfigRequest;
-import com.novell.security.nmas.jndi.ldap.ext.PutLoginConfigResponse;
-import com.novell.security.nmas.jndi.ldap.ext.PutLoginSecretRequest;
-import com.novell.security.nmas.jndi.ldap.ext.PutLoginSecretResponse;
-import com.novell.security.nmas.mgmt.NMASChallengeResponse;
+
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -68,7 +69,6 @@ import java.util.StringTokenizer;
 
 public class NmasResponseSet extends AbstractResponseSet
 {
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( NmasResponseSet.class.getName() );
 
     private final ChaiUser user;
@@ -156,9 +156,10 @@ public class NmasResponseSet extends AbstractResponseSet
     {
         final GetLoginConfigRequest request = new GetLoginConfigRequest();
         request.setObjectDN( theUser.getEntryDN() );
-        request.setTag( "ChallengeResponseQuestions" );
-        request.setMethodID( NMASChallengeResponse.METHOD_ID );
-        request.setMethodIDLen( NMASChallengeResponse.METHOD_ID.length * 4 );
+        request.setTag( NMASChallengeResponse.CHALLENGE_RESPONSE_QUESTIONS_TAG );
+        request.setMethodID( NMASChallengeResponse.getMethodId() );
+        request.setMethodIDLen( NMASChallengeResponse.getMethodId().length * 4 );
+
         try
         {
             final ExtendedResponse response = theUser.getChaiProvider().extendedOperation( request );
@@ -357,9 +358,9 @@ public class NmasResponseSet extends AbstractResponseSet
             final byte[] data = csToNmasXML( getChallengeSet(), this.csIdentifier ).getBytes( "UTF8" );
             request.setData( data );
             request.setDataLen( data.length );
-            request.setTag( "ChallengeResponseQuestions" );
-            request.setMethodID( NMASChallengeResponse.METHOD_ID );
-            request.setMethodIDLen( NMASChallengeResponse.METHOD_ID.length * 4 );
+            request.setTag( NMASChallengeResponse.CHALLENGE_RESPONSE_QUESTIONS_TAG );
+            request.setMethodID( NMASChallengeResponse.getMethodId() );
+            request.setMethodIDLen( NMASChallengeResponse.getMethodId().length * 4 );
 
             final ExtendedResponse response = user.getChaiProvider().extendedOperation( request );
             if ( response != null && ( ( PutLoginConfigResponse ) response ).getNmasRetCode() != 0 )
@@ -398,8 +399,8 @@ public class NmasResponseSet extends AbstractResponseSet
                 request.setData( data );
                 request.setDataLen( data.length );
                 request.setTag( loopChallenge.getChallengeText() );
-                request.setMethodID( NMASChallengeResponse.METHOD_ID );
-                request.setMethodIDLen( NMASChallengeResponse.METHOD_ID.length * 4 );
+                request.setMethodID( NMASChallengeResponse.getMethodId() );
+                request.setMethodIDLen( NMASChallengeResponse.getMethodId().length * 4 );
 
                 final ExtendedResponse response = user.getChaiProvider().extendedOperation( request );
                 if ( response != null && ( ( PutLoginSecretResponse ) response ).getNmasRetCode() != 0 )

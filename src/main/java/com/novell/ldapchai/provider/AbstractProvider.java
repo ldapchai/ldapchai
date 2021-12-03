@@ -764,7 +764,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
         else
         {
-            LOGGER.warn( "unexpected chai api error", e );
+            LOGGER.warn( "unexpected chai api error: " + e.getMessage(), e );
             throw new IllegalStateException( e.getMessage(), e );
         }
     }

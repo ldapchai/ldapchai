@@ -47,6 +47,7 @@
         <skipTests>false</skipTests>
         <skipJavadoc>false</skipJavadoc>
         <skipSpotbugs>false</skipSpotbugs>
+        <checkstyle.skip>false</checkstyle.skip>
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
         <!-- git.commit.time is populated via git-commit-id-plugin and results in a (hopefully) reproducible maven build -->
@@ -459,22 +460,13 @@
                 <version>3.8.1</version>
                 <configuration>
                     <generatedSourcesDirectory>src/external/java</generatedSourcesDirectory>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
+                    <source>9</source>
+                    <target>9</target>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
                         <arg>-Xmaxwarns</arg>
                         <arg>9999</arg>
-                        <arg>-XDcompilePolicy=simple</arg>
-                        <arg>-Xplugin:ErrorProne</arg>
                     </compilerArgs>
-                    <annotationProcessorPaths>
-                        <path>
-                            <groupId>com.google.errorprone</groupId>
-                            <artifactId>error_prone_core</artifactId>
-                            <version>2.4.0</version>
-                        </path>
-                    </annotationProcessorPaths>
                 </configuration>
             </plugin>
             <plugin> <!-- checks owsp vulnerability database -->
@@ -498,6 +490,12 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>skip-checkstyle</id>
+            <properties>
+                <checkstyle.skip>true</checkstyle.skip>
+            </properties>
+        </profile>
         <profile>
             <id>skip-javadoc</id>
             <properties>
@@ -592,6 +590,4 @@
             <organizationUrl>https://github.com/ldapchai/</organizationUrl>
         </developer>
     </developers>
-
-
 </project>

@@ -21,10 +21,10 @@
 
 <FindBugsFilter>
     <Match>
-        <Package name="~com\.novell\.security\.nmas\..*"/>
+        <Package name="~com\.novell\.ldapchai\.impl\.edir\.entry\.ext"/>
     </Match>
-    <Match>
-        <Package name="~com\.novell\.ldapchai\.com.novell.ldapchai.cr.*"/>
+    <Match>com/novell/ldapchai/impl/edir/entry/ext/ber
+        <Package name="~com\.novell\.ldapchai\.impl\.edir\.entry\.ext\.ber"/>
     </Match>
     <Match>
         <!-- overly aggressive checks in spotbugs 4.4.x -->

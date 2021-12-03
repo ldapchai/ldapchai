@@ -29,6 +29,8 @@ import com.novell.ldapchai.ChaiPasswordRule;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
+import com.novell.ldapchai.impl.edir.entry.ext.GetPwdPolicyInfoRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.GetPwdPolicyInfoResponse;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.provider.SearchScope;
@@ -36,8 +38,6 @@ import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.DefaultChaiPasswordPolicy;
 import com.novell.ldapchai.util.SearchHelper;
 import com.novell.ldapchai.util.StringHelper;
-import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoRequest;
-import com.novell.security.nmas.jndi.ldap.ext.GetPwdPolicyInfoResponse;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.math.BigInteger;

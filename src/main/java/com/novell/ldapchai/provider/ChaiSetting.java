@@ -399,7 +399,7 @@ public enum ChaiSetting
      * <tr><td style="text-align: right"><i>Default: </i></td><td>false</td></tr>
      * </table>
      */
-    EDIRECTORY_ENABLE_NMAS( "chai.edirectory.enableNMAS", "false", true, SettingValidator.ENABLE_NMAS_VALIDATOR ),
+    EDIRECTORY_ENABLE_NMAS( "chai.edirectory.enableNMAS", "false", true, SettingValidator.BOOLEAN_VALIDATOR ),
 
     /**
      * <p>Cache failed operations due to unknown extended operations.  Once an unknown extended operation for a

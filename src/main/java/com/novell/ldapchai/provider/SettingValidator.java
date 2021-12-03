@@ -19,8 +19,6 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.exception.ChaiRuntimeException;
-
 import java.io.Serializable;
 
 class SettingValidator
@@ -63,34 +61,6 @@ class SettingValidator
             }
         }
     };
-
-    static final Validator ENABLE_NMAS_VALIDATOR = value ->
-    {
-        try
-        {
-            final boolean enableNmas = Boolean.parseBoolean( value );
-
-            if ( enableNmas )
-            {
-                try
-                {
-                    Class.forName( "com.novell.security.nmas.mgmt.NMASChallengeResponse" );
-                }
-                catch ( ClassNotFoundException ex )
-                {
-                    final String errorMsg = "Error: Unable to enable NMAS support. One or more classes"
-                            + " could not be loaded from the NMAS Toolkit.  Check to make sure NMASToolkit.jar"
-                            + " is available on the classpath.";
-                    throw new ChaiRuntimeException( errorMsg );
-                }
-            }
-        }
-        catch ( Exception e )
-        {
-            throw new IllegalArgumentException( e.getMessage() );
-        }
-    };
-
 
     interface Validator extends Serializable
     {

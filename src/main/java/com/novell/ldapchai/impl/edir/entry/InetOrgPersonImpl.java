@@ -29,17 +29,18 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
+import com.novell.ldapchai.impl.edir.entry.ext.ChangePwdRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.ChangePwdResponse;
+import com.novell.ldapchai.impl.edir.entry.ext.GetPwdRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.GetPwdResponse;
+import com.novell.ldapchai.impl.edir.entry.ext.PwdPolicyCheckRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.PwdPolicyCheckResponse;
+import com.novell.ldapchai.impl.edir.entry.ext.SetPwdRequest;
+import com.novell.ldapchai.impl.edir.entry.ext.SetPwdResponse;
+
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.StringHelper;
-import com.novell.security.nmas.jndi.ldap.ext.ChangePwdRequest;
-import com.novell.security.nmas.jndi.ldap.ext.ChangePwdResponse;
-import com.novell.security.nmas.jndi.ldap.ext.GetPwdRequest;
-import com.novell.security.nmas.jndi.ldap.ext.GetPwdResponse;
-import com.novell.security.nmas.jndi.ldap.ext.PwdPolicyCheckRequest;
-import com.novell.security.nmas.jndi.ldap.ext.PwdPolicyCheckResponse;
-import com.novell.security.nmas.jndi.ldap.ext.SetPwdRequest;
-import com.novell.security.nmas.jndi.ldap.ext.SetPwdResponse;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.time.Instant;
@@ -49,7 +50,6 @@ import java.util.Map;
 
 class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser
 {
-
     private static final String PW_EXPIRATION_ZULU_TIMESTAMP = "19800101010101Z";
 
     @Override

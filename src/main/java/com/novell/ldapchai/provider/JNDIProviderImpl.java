@@ -431,11 +431,15 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         {
             cacheExtendedOperationException( request, e );
 
-            // guaranteedb to throw ChaiException
+            // guaranteed to throw ChaiException
             convertNamingException( e );
-        }
 
-        return null;
+            throw new IllegalStateException( "unexpected chai api error: " + e.getMessage() );
+        }
+        catch ( Throwable t )
+        {
+            throw new IllegalStateException( "unexpected chai api error: " + t.getMessage(), t );
+        }
     }
 
 
