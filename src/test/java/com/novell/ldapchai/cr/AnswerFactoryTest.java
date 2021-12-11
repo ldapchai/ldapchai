@@ -10,6 +10,7 @@ public class AnswerFactoryTest
     {
         for ( final Answer.FormatType formatType : Answer.FormatType.implementedValues() )
         {
+            System.out.println( formatType );
             final AnswerConfiguration answerConfiguration = makeAnswerConfiguration( formatType );
             final Answer answer = AnswerFactory.newAnswer( answerConfiguration, "response-value" );
             Assert.assertTrue( formatType + " format answer test error", answer.testAnswer( "response-value" ) );

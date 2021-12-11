@@ -23,7 +23,7 @@ import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.util.StringHelper;
-import net.iharder.Base64;
+
 import org.jdom2.Element;
 
 import javax.crypto.Cipher;
@@ -90,7 +90,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
             final Cipher cipher = Cipher.getInstance( "AES" );
             cipher.init( Cipher.ENCRYPT_MODE, secretKey, cipher.getParameters() );
             final byte[] encrypted = cipher.doFinal( value.getBytes( ChaiCrFactory.DEFAULT_CHARSET ) );
-            return Base64.encodeBytes( encrypted, Base64.URL_SAFE | Base64.GZIP );
+            return StringHelper.base64Encode( encrypted, StringHelper.Base64Options.URL_SAFE, StringHelper.Base64Options.GZIP );
         }
         catch ( Exception e )
         {
@@ -109,7 +109,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
             }
 
             final SecretKey secretKey = makeKey( key );
-            final byte[] decoded = Base64.decode( value, Base64.URL_SAFE | Base64.GZIP );
+            final byte[] decoded = StringHelper.base64Decode( value, StringHelper.Base64Options.URL_SAFE, StringHelper.Base64Options.GZIP );
             final Cipher cipher = Cipher.getInstance( "AES" );
             cipher.init( Cipher.DECRYPT_MODE, secretKey );
             final byte[] decrypted = cipher.doFinal( decoded );

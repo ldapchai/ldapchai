@@ -33,4 +33,9 @@ public class ChaiRuntimeException extends RuntimeException
     {
         super( message );
     }
+
+    public ChaiRuntimeException( final String message, final Throwable cause )
+    {
+        super( message, cause );
+    }
 }

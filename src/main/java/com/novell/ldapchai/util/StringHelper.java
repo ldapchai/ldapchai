@@ -19,6 +19,11 @@
 
 package com.novell.ldapchai.util;
 
+import com.novell.ldapchai.exception.ChaiRuntimeException;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,6 +32,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 public class StringHelper
 {
@@ -181,7 +188,7 @@ public class StringHelper
         return sb.toString();
     }
 
-    public static String stringMapToString( final Map<String, String> map, final String seperator )
+    public static String stringMapToString( final Map<String, String> map, final String separator )
     {
         if ( map == null )
         {
@@ -194,11 +201,123 @@ public class StringHelper
             tempList.add( entry.getKey() + "=" + entry.getValue() );
         }
 
-        return stringCollectionToString( tempList, seperator );
+        return stringCollectionToString( tempList, separator );
     }
 
-    public static boolean isEmpty( final String value )
+    public static boolean isEmpty( final CharSequence value )
     {
-        return value == null || value.isEmpty();
+        return value == null || value.length() == 0;
+    }
+
+    public static <E extends Enum<E>> boolean enumArrayContainsValue( final E[] enumArray, final E enumValue )
+    {
+        if ( enumArray == null || enumArray.length == 0 )
+        {
+            return false;
+        }
+
+        for ( final E loopValue : enumArray )
+        {
+            if ( loopValue == enumValue )
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public enum Base64Options
+    {
+        GZIP,
+        URL_SAFE,;
+    }
+
+    public static byte[] base64Decode( final CharSequence input, final Base64Options... options )
+            throws IOException
+    {
+        if ( isEmpty( input ) )
+        {
+            return new byte[0];
+        }
+
+        final byte[] decodedBytes;
+        if ( enumArrayContainsValue( options, Base64Options.URL_SAFE ) )
+        {
+            decodedBytes = java.util.Base64.getUrlDecoder().decode( input.toString() );
+        }
+        else
+        {
+            decodedBytes = java.util.Base64.getMimeDecoder().decode( input.toString() );
+        }
+
+        if ( enumArrayContainsValue( options, Base64Options.GZIP ) )
+        {
+            return gunzip( decodedBytes );
+        }
+        else
+        {
+            return decodedBytes;
+        }
+    }
+
+    public static String base64Encode( final byte[] input, final Base64Options... options )
+    {
+        final byte[] compressedBytes;
+        if ( enumArrayContainsValue( options, Base64Options.GZIP ) )
+        {
+            try
+            {
+                compressedBytes = gzip( input );
+            }
+            catch ( final IOException e )
+            {
+                throw new ChaiRuntimeException( "unexpected error during base64 decoding: " + e, e );
+            }
+        }
+        else
+        {
+            compressedBytes = input;
+        }
+
+        if ( enumArrayContainsValue( options, Base64Options.URL_SAFE ) )
+        {
+            return java.util.Base64.getUrlEncoder().encodeToString( compressedBytes );
+        }
+        else
+        {
+            return java.util.Base64.getMimeEncoder( 0, new byte[ 0 ] ).encodeToString( compressedBytes );
+        }
+    }
+
+    public static byte[] gunzip( final byte[] bytes )
+            throws IOException
+    {
+        try ( ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                GZIPInputStream inputGzipStream = new GZIPInputStream( new ByteArrayInputStream( bytes ) )
+        )
+        {
+            final byte[] buffer = new byte[128];
+
+            int len;
+            while ( ( len = inputGzipStream.read( buffer ) ) > 0 )
+            {
+                byteArrayOutputStream.write( buffer, 0, len );
+            }
+
+            return byteArrayOutputStream.toByteArray();
+        }
+    }
+
+    public static byte[] gzip( final byte[] bytes )
+            throws IOException
+    {
+        try ( ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+              GZIPOutputStream gzipOutputStream = new GZIPOutputStream( byteArrayOutputStream ) )
+        {
+            gzipOutputStream.write( bytes );
+            gzipOutputStream.close();
+            return byteArrayOutputStream.toByteArray();
+        }
     }
 }

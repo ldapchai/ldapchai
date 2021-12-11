@@ -20,7 +20,8 @@
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import net.iharder.Base64;
+
+import com.novell.ldapchai.util.StringHelper;
 import org.jdom2.Element;
 
 import javax.crypto.SecretKeyFactory;
@@ -184,7 +185,7 @@ class PKDBF2Answer implements Answer
                 skf = SecretKeyFactory.getInstance( methodName );
             }
             final byte[] hash = skf.generateSecret( spec ).getEncoded();
-            return Base64.encodeBytes( hash );
+            return StringHelper.base64Encode( hash );
         }
         catch ( Exception e )
         {

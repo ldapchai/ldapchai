@@ -19,8 +19,6 @@
 
 package com.novell.ldapchai.util;
 
-import net.iharder.Base64;
-
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -45,8 +43,8 @@ public class SCryptUtil
             }
 
             final long params = Long.parseLong( parts[2], 16 );
-            final byte[] salt = Base64.decode( parts[3] );
-            final byte[] derived0 = Base64.decode( parts[4] );
+            final byte[] salt = StringHelper.base64Decode( parts[3] );
+            final byte[] derived0 = StringHelper.base64Decode( parts[4] );
 
             final int valueN = ( int ) Math.pow( 2, params >> 16 & 0xffff );
             final int valueR = ( int ) params >> 8 & 0xff;
@@ -103,8 +101,8 @@ public class SCryptUtil
             final String params = Long.toString( log2( effectiveCost ) << 16L | blockSize << 8 | parallelization, 16 );
 
             return "$s0$" + params + '$'
-                    + Base64.encodeBytes( salt ) + '$'
-                    + Base64.encodeBytes( derived );
+                    + StringHelper.base64Encode(  salt ) + '$'
+                    + StringHelper.base64Encode( derived );
         }
         catch ( GeneralSecurityException e )
         {

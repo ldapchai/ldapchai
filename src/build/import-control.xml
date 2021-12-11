@@ -53,8 +53,6 @@
     <!-- apache directory -->
     <allow pkg="org.apache.directory"/>
 
-    <allow class="net.iharder.Base64"/>
-
     <!-- security -->
     <allow pkg="org.bouncycastle"/>
     <allow pkg="javax.net"/>

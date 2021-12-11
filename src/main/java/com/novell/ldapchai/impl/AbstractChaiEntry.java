@@ -29,7 +29,7 @@ import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
-import net.iharder.Base64;
+import com.novell.ldapchai.util.StringHelper;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -519,6 +519,6 @@ public abstract class AbstractChaiEntry implements ChaiEntry
             return null;
         }
         final byte[] guidValue = guidValues[0];
-        return Base64.encodeBytes( guidValue );
+        return StringHelper.base64Encode( guidValue );
     }
 }
