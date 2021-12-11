@@ -28,6 +28,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.naming.CommunicationException;
 import javax.naming.Context;
@@ -457,6 +458,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @Override
     @LdapOperation
+    // legacy code, suppress should be removed in future
+    @SuppressFBWarnings( "DCN_NULLPOINTER_EXCEPTION" )
     public final byte[][] readMultiByteAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -527,6 +530,8 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
     @Override
     @LdapOperation
+    // legacy code, new spotbugs detection, suppress should be removed in future
+    @SuppressFBWarnings( "DCN_NULLPOINTER_EXCEPTION" )
     public final Set<String> readMultiStringAttribute( final String entryDN, final String attributeName )
             throws ChaiUnavailableException, ChaiOperationException
     {

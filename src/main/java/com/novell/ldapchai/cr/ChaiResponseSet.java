@@ -30,6 +30,7 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jdom2.Attribute;
 import org.jdom2.DataConversionException;
 import org.jdom2.Document;
@@ -339,6 +340,8 @@ public class ChaiResponseSet extends AbstractResponseSet
         return responseElement;
     }
 
+    // legacy code, new spotbugs detection, suppress should be removed in future
+    @SuppressFBWarnings( "DCN_NULLPOINTER_EXCEPTION" )
     static class ChaiResponseXmlParser
     {
         static ChaiResponseSet parseChaiResponseSetXML( final String input )

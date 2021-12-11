@@ -21,6 +21,7 @@ package com.novell.ldapchai.impl.edir.value;
 
 import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.util.ChaiLogger;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
@@ -83,6 +84,8 @@ public class NspmComplexityRules
         this.policies = readComplexityPoliciesFromXML( input );
     }
 
+    // legacy code, new spotbugs detection, suppress should be removed in future
+    @SuppressFBWarnings( "DCN_NULLPOINTER_EXCEPTION" )
     private static List<Policy> readComplexityPoliciesFromXML( final String input )
     {
         final List<Policy> returnList = new ArrayList<>();
@@ -128,19 +131,7 @@ public class NspmComplexityRules
                 returnList.add( new Policy( returnRuleSets ) );
             }
         }
-        catch ( JDOMException e )
-        {
-            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
-        }
-        catch ( IOException e )
-        {
-            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
-        }
-        catch ( NullPointerException e )
-        {
-            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
-        }
-        catch ( IllegalArgumentException e )
+        catch ( JDOMException | IOException | NullPointerException | IllegalArgumentException e )
         {
             LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
         }
