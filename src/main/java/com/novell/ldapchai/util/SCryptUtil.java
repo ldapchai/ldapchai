@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.util;
 
+import com.novell.ldapchai.util.internal.StringHelper;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;

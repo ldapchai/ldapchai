@@ -19,16 +19,14 @@
 
 package com.novell.ldapchai.impl.edir.value;
 
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.util.ChaiLogger;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,8 +35,6 @@ import java.util.Map;
 
 public class NspmComplexityRules
 {
-
-
     public static final NspmComplexityRules MS_COMPLEXITY_POLICY;
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiEntryFactory.class );
@@ -84,45 +80,31 @@ public class NspmComplexityRules
         this.policies = readComplexityPoliciesFromXML( input );
     }
 
-    // legacy code, new spotbugs detection, suppress should be removed in future
-    @SuppressFBWarnings( "DCN_NULLPOINTER_EXCEPTION" )
     private static List<Policy> readComplexityPoliciesFromXML( final String input )
     {
         final List<Policy> returnList = new ArrayList<>();
         try
         {
-            final SAXBuilder builder = new SAXBuilder();
-            final Document doc = builder.build( new StringReader( input ) );
-            final Element rootElement = doc.getRootElement();
+            final XmlDocument doc = XmlChai.getFactory().parseString( input, AccessMode.IMMUTABLE );
+            final XmlElement rootElement = doc.getRootElement();
 
-            final List policyElements = rootElement.getChildren( "Policy" );
-            for ( final Object policyNode : policyElements )
+            final List<XmlElement> policyElements = rootElement.getChildren( "Policy" );
+            for ( final XmlElement policyElement : policyElements )
             {
-                final Element policyElement = ( Element ) policyNode;
                 final List<RuleSet> returnRuleSets = new ArrayList<>();
-                for ( final Object ruleSetObjects : policyElement.getChildren( "RuleSet" ) )
+                for ( final XmlElement loopRuleSet : policyElement.getChildren( "RuleSet" ) )
                 {
-                    final Element loopRuleSet = ( Element ) ruleSetObjects;
                     final Map<Rule, String> returnRules = new HashMap<>();
-                    int violationsAllowed = 0;
 
-                    final org.jdom2.Attribute violationsAttribute = loopRuleSet.getAttribute( "ViolationsAllowed" );
-                    if ( violationsAttribute != null && violationsAttribute.getValue().length() > 0 )
+                    final int violationsAllowed = Integer.parseInt( loopRuleSet.getAttribute( "ViolationsAllowed" ).orElse( "0" ) );
+
+                    for ( final XmlElement loopRuleElement : loopRuleSet.getChildren( "Rule" ) )
                     {
-                        violationsAllowed = Integer.parseInt( violationsAttribute.getValue() );
-                    }
-
-                    for ( final Object ruleObject : loopRuleSet.getChildren( "Rule" ) )
-                    {
-                        final Element loopRuleElement = ( Element ) ruleObject;
-
-                        final List ruleAttributes = loopRuleElement.getAttributes();
-                        for ( final Object attributeObject : ruleAttributes )
+                        final List<String> ruleAttributes = loopRuleElement.getAttributeNames();
+                        for ( final String loopAttribute : ruleAttributes )
                         {
-                            final org.jdom2.Attribute loopAttribute = ( org.jdom2.Attribute ) attributeObject;
-
-                            final Rule rule = Rule.valueOf( loopAttribute.getName() );
-                            final String value = loopAttribute.getValue();
+                            final Rule rule = Rule.valueOf( loopAttribute );
+                            final String value = loopRuleElement.getAttribute( loopAttribute ).orElseThrow( IllegalArgumentException::new );
                             returnRules.put( rule, value );
                         }
                     }
@@ -131,7 +113,7 @@ public class NspmComplexityRules
                 returnList.add( new Policy( returnRuleSets ) );
             }
         }
-        catch ( JDOMException | IOException | NullPointerException | IllegalArgumentException e )
+        catch ( IOException | IllegalArgumentException e )
         {
             LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
         }

@@ -40,7 +40,7 @@ import com.novell.ldapchai.impl.edir.entry.ext.SetPwdResponse;
 
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
-import com.novell.ldapchai.util.StringHelper;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.time.Instant;

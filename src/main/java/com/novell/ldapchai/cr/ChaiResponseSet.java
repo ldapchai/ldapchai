@@ -19,6 +19,12 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
+
+import org.jrivard.xmlchai.XmlFactory;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.bean.AnswerBean;
@@ -30,20 +36,10 @@ import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.util.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.jdom2.Attribute;
-import org.jdom2.DataConversionException;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Text;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.io.Writer;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -54,6 +50,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
@@ -273,7 +270,9 @@ public class ChaiResponseSet extends AbstractResponseSet
     static String rsToChaiXML( final ChaiResponseSet rs )
             throws ChaiValidationException, ChaiOperationException
     {
-        final Element rootElement = new Element( XML_NODE_ROOT );
+        final XmlDocument doc = XmlChai.getFactory().newDocument( XML_NODE_ROOT );
+        final XmlElement rootElement = doc.getRootElement();
+
         rootElement.setAttribute( XML_ATTRIBUTE_MIN_RANDOM_REQUIRED, String.valueOf( rs.getChallengeSet().getMinRandomRequired() ) );
         rootElement.setAttribute( XML_ATTRIBUTE_LOCALE, rs.getChallengeSet().getLocale().toString() );
         rootElement.setAttribute( XML_ATTRIBUTE_VERSION, VALUE_VERSION );
@@ -300,8 +299,8 @@ public class ChaiResponseSet extends AbstractResponseSet
             {
                 final Challenge loopChallenge = entry.getKey();
                 final Answer answer = entry.getValue();
-                final Element responseElement = challengeToXml( loopChallenge, answer, XML_NODE_RESPONSE );
-                rootElement.addContent( responseElement );
+                final XmlElement responseElement = challengeToXml( loopChallenge, answer, XML_NODE_RESPONSE );
+                rootElement.attachElement( responseElement );
             }
         }
 
@@ -311,28 +310,34 @@ public class ChaiResponseSet extends AbstractResponseSet
             {
                 final Challenge loopChallenge = entry.getKey();
                 final Answer answer = entry.getValue();
-                final Element responseElement = challengeToXml( loopChallenge, answer, XML_NODE_HELPDESK_RESPONSE );
-                rootElement.addContent( responseElement );
+                final XmlElement responseElement = challengeToXml( loopChallenge, answer, XML_NODE_HELPDESK_RESPONSE );
+                rootElement.attachElement( responseElement );
             }
         }
 
-
-        final Document doc = new Document( rootElement );
-        final XMLOutputter outputter = new XMLOutputter();
-        final Format format = Format.getRawFormat();
-        format.setTextMode( Format.TextMode.PRESERVE );
-        format.setLineSeparator( "" );
-        outputter.setFormat( format );
-        return outputter.outputString( doc );
+        try
+        {
+            return XmlChai.getFactory().outputString( doc, XmlFactory.OutputFlag.Compact );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "unexpected error outputting challenge/response xml stream" );
+        }
     }
 
-    private static Element challengeToXml( final Challenge loopChallenge, final Answer answer, final String elementName )
+    private static XmlElement challengeToXml( final Challenge loopChallenge, final Answer answer, final String elementName )
             throws ChaiOperationException
     {
-        final Element responseElement = new Element( elementName );
-        responseElement.addContent( new Element( XML_NODE_CHALLENGE ).addContent( new Text( loopChallenge.getChallengeText() ) ) );
-        final Element answerElement = answer.toXml();
-        responseElement.addContent( answerElement );
+        final XmlElement responseElement = XmlChai.getFactory().newElement( elementName );
+        {
+            final XmlElement challengeElement = XmlChai.getFactory().newElement( XML_NODE_CHALLENGE );
+            challengeElement.setText( loopChallenge.getChallengeText() );
+            responseElement.attachElement( challengeElement );
+        }
+        {
+            final XmlElement answerElement = answer.toXml();
+            responseElement.attachElement( answerElement );
+        }
         responseElement.setAttribute( XML_ATTRIBUTE_ADMIN_DEFINED, String.valueOf( loopChallenge.isAdminDefined() ) );
         responseElement.setAttribute( XML_ATTRIBUTE_REQUIRED, String.valueOf( loopChallenge.isRequired() ) );
         responseElement.setAttribute( XNL_ATTRIBUTE_MIN_LENGTH, String.valueOf( loopChallenge.getMinLength() ) );
@@ -340,8 +345,6 @@ public class ChaiResponseSet extends AbstractResponseSet
         return responseElement;
     }
 
-    // legacy code, new spotbugs detection, suppress should be removed in future
-    @SuppressFBWarnings( "DCN_NULLPOINTER_EXCEPTION" )
     static class ChaiResponseXmlParser
     {
         static ChaiResponseSet parseChaiResponseSetXML( final String input )
@@ -355,43 +358,28 @@ public class ChaiResponseSet extends AbstractResponseSet
             final Map<Challenge, Answer> crMap = new LinkedHashMap<>();
             final Map<Challenge, HelpdeskAnswer> helpdeskCrMap = new LinkedHashMap<>();
             int minRandRequired = 0;
-            Attribute localeAttr = null;
+            String localeAttr = null;
             boolean caseInsensitive = false;
             String csIdentifier = null;
             Instant timestamp = null;
 
             try
             {
-                final SAXBuilder builder = new SAXBuilder();
-                final Document doc = builder.build( new StringReader( input ) );
-                final Element rootElement = doc.getRootElement();
-                minRandRequired = rootElement.getAttribute( XML_ATTRIBUTE_MIN_RANDOM_REQUIRED ).getIntValue();
-                localeAttr = rootElement.getAttribute( XML_ATTRIBUTE_LOCALE );
+                final XmlDocument doc = XmlChai.getFactory().parseString( input, AccessMode.IMMUTABLE );
+                final XmlElement rootElement = doc.getRootElement();
+                minRandRequired = Integer.parseInt( rootElement.getAttribute( XML_ATTRIBUTE_MIN_RANDOM_REQUIRED ).orElse( "0" ) );
+                localeAttr = rootElement.getAttribute( XML_ATTRIBUTE_LOCALE ).orElse( null );
+
+                caseInsensitive = Boolean.parseBoolean( rootElement.getAttribute( XML_ATTRIBUTE_CASE_INSENSITIVE  ).orElse( "false" ) );
+                csIdentifier = rootElement.getAttribute( XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER ).orElse( null );
 
                 {
-                    final Attribute caseAttr = rootElement.getAttribute( XML_ATTRIBUTE_CASE_INSENSITIVE );
-                    if ( caseAttr != null && caseAttr.getBooleanValue() )
+                    final Optional<String> timeAttr = rootElement.getAttribute( XML_ATTRIBUTE_TIMESTAMP );
+                    if ( timeAttr.isPresent() )
                     {
-                        caseInsensitive = true;
-                    }
-                }
-
-                {
-                    final Attribute csIdentiferAttr = rootElement.getAttribute( XML_ATTRIBUTE_CHALLENGE_SET_IDENTIFER );
-                    if ( csIdentiferAttr != null )
-                    {
-                        csIdentifier = csIdentiferAttr.getValue();
-                    }
-                }
-
-                {
-                    final Attribute timeAttr = rootElement.getAttribute( XML_ATTRIBUTE_TIMESTAMP );
-                    if ( timeAttr != null )
-                    {
-                        final String timeStr = timeAttr.getValue();
                         try
                         {
-                            timestamp = parseInstant( timeStr );
+                            timestamp = parseInstant( timeAttr.get() );
                         }
                         catch ( ParseException e )
                         {
@@ -400,30 +388,30 @@ public class ChaiResponseSet extends AbstractResponseSet
                     }
                 }
 
-                for ( final Object o : rootElement.getChildren( XML_NODE_RESPONSE ) )
+                for ( final XmlElement loopResponseElement : rootElement.getChildren( XML_NODE_RESPONSE ) )
                 {
-                    final Element loopResponseElement = ( Element ) o;
                     final Challenge newChallenge = parseResponseElement( loopResponseElement );
                     final Answer answer = AnswerFactory.fromXml(
-                            loopResponseElement.getChild( XML_NODE_ANSWER_VALUE ),
+                            loopResponseElement.getChild( XML_NODE_ANSWER_VALUE ).orElseThrow( () -> new IllegalArgumentException( "response xml node missing answer node" ) ),
                             caseInsensitive,
                             newChallenge.getChallengeText()
                     );
                     crMap.put( newChallenge, answer );
                 }
-                for ( final Object o : rootElement.getChildren( XML_NODE_HELPDESK_RESPONSE ) )
+
+                for ( final XmlElement loopResponseElement : rootElement.getChildren( XML_NODE_HELPDESK_RESPONSE ) )
                 {
-                    final Element loopResponseElement = ( Element ) o;
                     final Challenge newChallenge = parseResponseElement( loopResponseElement );
                     final HelpdeskAnswer answer = ( HelpdeskAnswer ) AnswerFactory.fromXml(
-                            loopResponseElement.getChild( XML_NODE_ANSWER_VALUE ),
+                            loopResponseElement.getChild( XML_NODE_ANSWER_VALUE )
+                                    .orElseThrow( () -> new IllegalArgumentException( "helpdesk response xml node missing answer node" ) ),
                             caseInsensitive,
                             newChallenge.getChallengeText()
                     );
                     helpdeskCrMap.put( newChallenge, answer );
                 }
             }
-            catch ( JDOMException | NullPointerException | IOException e )
+            catch ( IOException e )
             {
                 LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
             }
@@ -431,7 +419,7 @@ public class ChaiResponseSet extends AbstractResponseSet
             Locale challengeLocale = Locale.getDefault();
             if ( localeAttr != null )
             {
-                challengeLocale = parseLocaleString( localeAttr.getValue() );
+                challengeLocale = parseLocaleString( localeAttr );
             }
 
             return new ChaiResponseSet(
@@ -445,15 +433,17 @@ public class ChaiResponseSet extends AbstractResponseSet
                     timestamp );
         }
 
-        private static Challenge parseResponseElement( final Element loopResponseElement )
-                throws DataConversionException
+        private static Challenge parseResponseElement( final XmlElement loopResponseElement )
         {
-            final boolean required = loopResponseElement.getAttribute( XML_ATTRIBUTE_REQUIRED ).getBooleanValue();
-            final boolean adminDefined = loopResponseElement.getAttribute( XML_ATTRIBUTE_ADMIN_DEFINED ).getBooleanValue();
+            final boolean required = Boolean.parseBoolean( loopResponseElement.getAttribute( XML_ATTRIBUTE_REQUIRED ).orElse( "" ) );
+            final boolean adminDefined = Boolean.parseBoolean( loopResponseElement.getAttribute( XML_ATTRIBUTE_ADMIN_DEFINED ).orElse( "" ) );
 
-            final String challengeText = loopResponseElement.getChild( XML_NODE_CHALLENGE ).getText();
-            final int minLength = loopResponseElement.getAttribute( XNL_ATTRIBUTE_MIN_LENGTH ).getIntValue();
-            final int maxLength = loopResponseElement.getAttribute( XNL_ATTRIBUTE_MAX_LENGTH ).getIntValue();
+
+            final String challengeText = loopResponseElement.getChild( XML_NODE_CHALLENGE )
+                    .orElseThrow( () -> new IllegalStateException( "response element missing challenge element" ) ).getText()
+                    .orElseThrow( () -> new IllegalStateException( "challenge element missing text" )  );
+            final int minLength = Integer.parseInt( loopResponseElement.getAttribute( XNL_ATTRIBUTE_MIN_LENGTH ).orElse( "0" ) );
+            final int maxLength = Integer.parseInt( loopResponseElement.getAttribute( XNL_ATTRIBUTE_MAX_LENGTH ).orElse( "0" ) );
 
             return new ChaiChallenge( required, challengeText, minLength, maxLength, adminDefined, 0, false );
         }

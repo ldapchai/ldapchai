@@ -19,7 +19,10 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
+
+import java.util.Optional;
 
 /**
  * Factory for generating {@link Answer} instances.
@@ -42,13 +45,13 @@ public class AnswerFactory
         return implementationFactory.fromAnswerBean( input, challengeText );
     }
 
-    public static Answer fromXml( final org.jdom2.Element element, final boolean caseInsensitive, final String challengeText )
+    public static Answer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
     {
-        final String formatStr = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT ).getValue();
+        final Optional<String> formatStr = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
         final Answer.FormatType respFormat;
-        if ( formatStr != null && formatStr.length() > 0 )
+        if ( formatStr.isPresent() )
         {
-            respFormat = Answer.FormatType.valueOf( formatStr );
+            respFormat = Answer.FormatType.valueOf( formatStr.get() );
         }
         else
         {

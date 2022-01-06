@@ -746,7 +746,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
                         loopAttributes.put( loopAttr.getName(), Arrays.asList( loopAttr.getStringValueArray() ) );
                     }
                 }
-                returnMap.put( loopDN, loopAttributes );
+                returnMap.put( loopDN, Collections.unmodifiableMap( loopAttributes ) );
             }
         }
         catch ( LDAPException e )

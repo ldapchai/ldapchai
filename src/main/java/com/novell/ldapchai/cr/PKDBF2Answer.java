@@ -19,10 +19,11 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 
-import com.novell.ldapchai.util.StringHelper;
-import org.jdom2.Element;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -110,9 +111,9 @@ class PKDBF2Answer implements Answer
     }
 
     @Override
-    public Element toXml()
+    public XmlElement toXml()
     {
-        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( getHashedAnswer() );
         if ( salt != null && salt.length() > 0 )
         {
@@ -248,23 +249,15 @@ class PKDBF2Answer implements Answer
         }
 
         @Override
-        public PKDBF2Answer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        public PKDBF2Answer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
         {
-            final String answerValue = element.getText();
+            final String answerValue = element.getText().orElseThrow( () -> new IllegalArgumentException( "missing answer value" ) );
 
-            if ( answerValue == null || answerValue.length() < 1 )
-            {
-                throw new IllegalArgumentException( "missing answer value" );
-            }
-
-            final String salt = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ) == null
-                    ? ""
-                    : element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ).getValue();
-            final String hashCount = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ) == null
-                    ? "1"
-                    : element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ).getValue();
-            final String formatTypeStr = element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
-            final FormatType formatTypeEnum = FormatType.valueOf( formatTypeStr );
+            final String salt = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ).orElse( "" );
+            final String hashCount = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ).orElse( "1" );
+            final FormatType formatTypeEnum = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT )
+                    .map( FormatType::valueOf )
+                    .orElseThrow( () -> new IllegalArgumentException( "unknown format type" ) );
             int saltCount = 1;
             try
             {

@@ -19,10 +19,15 @@
 
 package com.novell.ldapchai.impl.edir;
 
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.AbstractResponseSet;
+import com.novell.ldapchai.cr.ChaiChallenge;
 import com.novell.ldapchai.cr.ChaiChallengeSet;
 import com.novell.ldapchai.cr.Challenge;
 import com.novell.ldapchai.cr.ChallengeSet;
@@ -36,16 +41,18 @@ import com.novell.ldapchai.impl.edir.entry.ext.DeleteLoginConfigResponse;
 import com.novell.ldapchai.impl.edir.entry.ext.NMASChallengeResponse;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.ChaiLogger;
-import com.novell.ldapchai.util.StringHelper;
-
-import org.jdom2.JDOMException;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
+import java.util.StringTokenizer;
 
 
 /**
@@ -84,16 +91,12 @@ public class NmasCrFactory
         {
             if ( requiredQuestions != null && requiredQuestions.length() > 0 )
             {
-                challenges.addAll( NmasResponseSet.parseNmasPolicyXML( requiredQuestions, locale ) );
+                challenges.addAll( parseNmasChallengePolicyXML( requiredQuestions, locale ) );
             }
             if ( randomQuestions != null && randomQuestions.length() > 0 )
             {
-                challenges.addAll( NmasResponseSet.parseNmasPolicyXML( randomQuestions, locale ) );
+                challenges.addAll( parseNmasChallengePolicyXML( randomQuestions, locale ) );
             }
-        }
-        catch ( JDOMException e )
-        {
-            LOGGER.debug( e );
         }
         catch ( IOException e )
         {
@@ -243,4 +246,156 @@ public class NmasCrFactory
                 csIdentifier
         );
     }
+
+    static List<Challenge> parseNmasChallengePolicyXML( final String str, final Locale locale )
+            throws IOException
+    {
+        final List<Challenge> returnList = new ArrayList<>();
+
+        final XmlDocument doc = XmlChai.getFactory().parseString( str, AccessMode.IMMUTABLE );
+        final boolean required = doc.getRootElement().getName().equals( "RequiredQuestions" );
+
+
+        for ( final XmlElement loopQ : doc.evaluateXpathToElements( "//Question" ) )
+        {
+            final int maxLength = StringHelper.convertStrToInt( loopQ.getAttribute( "MaxLength" ).orElse( "" ), 255 );
+            final int minLength = StringHelper.convertStrToInt( loopQ.getAttribute( "MinLength" ).orElse( "" ), 1 );
+
+            final String challengeText = readDisplayString( loopQ, locale );
+
+            final Challenge challenge = new ChaiChallenge( required, challengeText, minLength, maxLength, true, 0, false );
+            returnList.add( challenge );
+        }
+
+        for ( final XmlElement loopQ : doc.evaluateXpathToElements( "//UserDefined" ) )
+        {
+            final int maxLength = StringHelper.convertStrToInt( loopQ.getAttribute( "MaxLength" ).orElse( "" ), 255 );
+            final int minLength = StringHelper.convertStrToInt( loopQ.getAttribute( "MinLength" ).orElse( "" ), 1 );
+
+            final Challenge challenge = new ChaiChallenge( required, null, minLength, maxLength, false, 0, false );
+            returnList.add( challenge );
+        }
+
+        return returnList;
+    }
+
+    private static String readDisplayString( final XmlElement questionElement, final Locale locale )
+    {
+        // see if the node has any localized displays.
+        final List<XmlElement> displayChildren = questionElement.getChildren( "display" );
+
+        // if no locale specified, or if no localized text is available, just use the default.
+        if ( locale == null || displayChildren == null || displayChildren.size() < 1 )
+        {
+            return questionElement.getText().orElseThrow( () -> new IllegalArgumentException( "missing display text" ) );
+        }
+
+        // convert the xml 'display' elements to a map of locales/strings
+        final Map<Locale, String> localizedStringMap = new HashMap<>();
+        for ( final XmlElement loopDisplayChild : displayChildren )
+        {
+            final Optional<String> localeAttr = loopDisplayChild.getAttribute( "lang" );
+            if ( localeAttr.isPresent() )
+            {
+                /*
+                final String localeStr = localeAttr.getValue();
+                final String displayStr = loopDisplay.getText();
+                final Locale localeKey = parseLocaleString( localeStr );
+                localizedStringMap.put( localeKey, displayStr );
+
+                 */
+            }
+        }
+
+        final Locale matchedLocale = localeResolver( locale, localizedStringMap.keySet() );
+
+        if ( matchedLocale != null )
+        {
+            return localizedStringMap.get( matchedLocale );
+        }
+
+        // none found, so just return the default string.
+        return questionElement.getText().orElseThrow( () -> new IllegalArgumentException( "missing display text" ) );
+    }
+
+    private static Locale localeResolver( final Locale desiredLocale, final Collection<Locale> localePool )
+    {
+        if ( desiredLocale == null || localePool == null || localePool.isEmpty() )
+        {
+            return null;
+        }
+
+        for ( final Locale loopLocale : localePool )
+        {
+            if ( loopLocale.getLanguage().equalsIgnoreCase( desiredLocale.getLanguage() ) )
+            {
+                if ( loopLocale.getCountry().equalsIgnoreCase( desiredLocale.getCountry() ) )
+                {
+                    if ( loopLocale.getVariant().equalsIgnoreCase( desiredLocale.getVariant() ) )
+                    {
+                        return loopLocale;
+                    }
+                }
+            }
+        }
+
+        for ( final Locale loopLocale : localePool )
+        {
+            if ( loopLocale.getLanguage().equalsIgnoreCase( desiredLocale.getLanguage() ) )
+            {
+                if ( loopLocale.getCountry().equalsIgnoreCase( desiredLocale.getCountry() ) )
+                {
+                    return loopLocale;
+                }
+            }
+        }
+
+        for ( final Locale loopLocale : localePool )
+        {
+            if ( loopLocale.getLanguage().equalsIgnoreCase( desiredLocale.getLanguage() ) )
+            {
+                return loopLocale;
+            }
+        }
+
+        final Locale defaultLocale = parseLocaleString( "" );
+        if ( localePool.contains( defaultLocale ) )
+        {
+            return defaultLocale;
+        }
+
+        return null;
+    }
+
+
+    private static Locale parseLocaleString( final String localeString )
+    {
+        if ( localeString == null )
+        {
+            return new Locale( "" );
+        }
+
+        final StringTokenizer st = new StringTokenizer( localeString, "_" );
+
+        if ( !st.hasMoreTokens() )
+        {
+            return new Locale( "" );
+        }
+
+        final String language = st.nextToken();
+        if ( !st.hasMoreTokens() )
+        {
+            return new Locale( language );
+        }
+
+        final String country = st.nextToken();
+        if ( !st.hasMoreTokens() )
+        {
+            return new Locale( language, country );
+        }
+
+        final String variant = st.nextToken( "" );
+        return new Locale( language, country, variant );
+    }
+
 }

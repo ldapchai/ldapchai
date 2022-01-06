@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RequiredQuestions>
+    <AdminDefined>
+        <Question MaxLength="128" MinLength="4">
+            <![CDATA[How do you like your burger?]]>
+            <display xml:lang="en" default="true"><![CDATA[How do you like your burger?]]></display>
+        </Question>
+        <Question MaxLength="255" MinLength="2">
+            <![CDATA[What is your mother's maiden name?]]>
+            <display xml:lang="en" default="true"><![CDATA[What is your mother's maiden name?]]></display>
+        </Question>
+    </AdminDefined>
+</RequiredQuestions>

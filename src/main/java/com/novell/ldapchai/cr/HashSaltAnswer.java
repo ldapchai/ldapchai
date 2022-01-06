@@ -19,9 +19,11 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlElement;
+
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.StringHelper;
-import org.jdom2.Element;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -142,9 +144,9 @@ class HashSaltAnswer implements Answer
     }
 
     @Override
-    public Element toXml()
+    public XmlElement toXml()
     {
-        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( version.toString() + VERSION_SEPARATOR + answerHash );
 
         if ( !StringHelper.isEmpty( salt ) )
@@ -298,14 +300,9 @@ class HashSaltAnswer implements Answer
         }
 
         @Override
-        public HashSaltAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        public HashSaltAnswer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
         {
-            final String answerValue = element.getText();
-
-            if ( answerValue == null || answerValue.length() < 1 )
-            {
-                throw new IllegalArgumentException( "missing answer value" );
-            }
+            final String answerValue = element.getText().orElseThrow( () -> new IllegalArgumentException( "missing answer value" ) );
 
             final String hashString;
             final VERSION version;
@@ -328,12 +325,9 @@ class HashSaltAnswer implements Answer
                 hashString = answerValue;
             }
 
-            final String salt = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ) == null
-                    ? ""
-                    : element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ).getValue();
-            final String hashCount = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ) == null
-                    ? "1"
-                    : element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ).getValue();
+            final String salt = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT ).orElse( "" );
+            final String hashCount = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_HASH_COUNT ).orElse( "1" );
+
             int saltCount = 1;
             try
             {
@@ -343,9 +337,7 @@ class HashSaltAnswer implements Answer
             {
                 /* noop */
             }
-            final String formatStr = element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT ) == null
-                    ? ""
-                    : element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
+            final String formatStr = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT ).orElse( "" );
             final FormatType formatType;
             try
             {

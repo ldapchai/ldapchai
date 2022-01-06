@@ -19,12 +19,12 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
-import com.novell.ldapchai.util.StringHelper;
-
-import org.jdom2.Element;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -56,10 +56,10 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
     }
 
     @Override
-    public Element toXml()
+    public XmlElement toXml()
             throws ChaiOperationException
     {
-        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( encryptValue( answer, challengeText ) );
         answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.HELPDESK.toString() );
         return answerElement;
@@ -159,9 +159,9 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         }
 
         @Override
-        public ChaiHelpdeskAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        public ChaiHelpdeskAnswer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
         {
-            final String hashedAnswer = element.getText();
+            final String hashedAnswer = element.getText().orElseThrow( () -> new IllegalArgumentException( "missing answer hash" ) );
             final String answerValue = decryptValue( hashedAnswer, challengeText );
             return new ChaiHelpdeskAnswer( answerValue, challengeText );
         }

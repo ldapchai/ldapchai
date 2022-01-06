@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.util.StringHelper;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.net.ssl.X509TrustManager;
 import java.io.Serializable;

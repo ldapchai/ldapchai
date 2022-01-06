@@ -1,28 +1,25 @@
 package com.novell.ldapchai.cr;
 
+import com.novell.ldapchai.TestHelper;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
+import com.novell.ldapchai.impl.edir.NmasResponseSet;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class StoredResponsesTest
 {
     @Test
-    public void testStoredResponseSet1()
+    public void testChaiStoredResponseSet1()
             throws IOException, ChaiValidationException, ChaiOperationException, ChaiUnavailableException
     {
-        final String responseAsString = readResourceFile( "ResponseSet1.xml" );
+        final String responseAsString = TestHelper.readResourceFile( StoredResponsesTest.class, "ChaiResponseSet1.xml" );
         final ResponseSet responseSet = ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML( responseAsString );
 
         final Map<String, String> testAnswers = new HashMap<>();
@@ -56,10 +53,10 @@ public class StoredResponsesTest
     }
 
     @Test
-    public void testStoredResponseSet2()
+    public void testChaiStoredResponseSet2()
             throws IOException, ChaiValidationException, ChaiOperationException, ChaiUnavailableException
     {
-        final String responseAsString = readResourceFile( "ResponseSet2.xml" );
+        final String responseAsString = TestHelper.readResourceFile( StoredResponsesTest.class, "ChaiResponseSet2.xml" );
         final ResponseSet responseSet = ChaiResponseSet.ChaiResponseXmlParser.parseChaiResponseSetXML( responseAsString );
 
         final Map<String, String> testAnswers = new HashMap<>();
@@ -91,19 +88,15 @@ public class StoredResponsesTest
         Assert.assertTrue( responseSet.test( challengeTestMap ) );
     }
 
-    private static String readResourceFile( final String name )
-            throws IOException
+
+    @Test
+    public void testNmasStoredResponseSet1()
+            throws IOException, ChaiValidationException, ChaiOperationException, ChaiUnavailableException
     {
-        final InputStream inputStream = ChaiCrFactoryTest.class.getResourceAsStream( name );
-        final StringBuilder textBuilder = new StringBuilder();
-        try ( Reader reader = new BufferedReader( new InputStreamReader( inputStream, Charset.forName( StandardCharsets.UTF_8.name() ) ) ) )
-        {
-            int c;
-            while ( ( c = reader.read() ) != -1)
-            {
-                textBuilder.append( (char) c );
-            }
-        }
-        return textBuilder.toString();
+    /*
+        final String responseAsString = TestHelper.readResourceFile( StoredResponsesTest.class, "NmasResponseSet1.xml" );
+        final ChallengeSet challengeSet = NmasResponseSet.parseNmasUserResponseXML( responseAsString );
+        Assert.assertEquals( 0, challengeSet.getChallenges().size() );
+     */
     }
 }

@@ -19,10 +19,11 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.util.SCryptUtil;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
-import org.jdom2.Element;
 
 import java.security.SecureRandom;
 import java.util.function.Supplier;
@@ -79,9 +80,9 @@ class PasswordCryptAnswer implements Answer
     }
 
     @Override
-    public Element toXml()
+    public XmlElement toXml()
     {
-        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( answerHash );
         answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, formatType.toString() );
         return answerElement;
@@ -136,10 +137,13 @@ class PasswordCryptAnswer implements Answer
         }
 
         @Override
-        public PasswordCryptAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        public PasswordCryptAnswer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
         {
-            final String answerValue = element.getText();
-            final String formatStr = element.getAttributeValue( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
+            final String answerValue = element.getText()
+                    .orElseThrow( () -> new IllegalArgumentException( "missing answer text" ) );
+            final String formatStr = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT )
+                    .orElseThrow( () -> new IllegalArgumentException( "missing format type" ) );
+
             final FormatType formatType;
             try
             {

@@ -19,9 +19,9 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
-import org.jdom2.Element;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -35,7 +35,7 @@ public interface Answer
 {
     boolean testAnswer( String answer );
 
-    Element toXml()
+    XmlElement toXml()
             throws ChaiOperationException;
 
     AnswerBean asAnswerBean();
@@ -103,7 +103,7 @@ public interface Answer
 
         Answer fromAnswerBean( AnswerBean input, String challengeText );
 
-        Answer fromXml( org.jdom2.Element element, boolean caseInsensitive, String challengeText );
+        Answer fromXml( XmlElement element, boolean caseInsensitive, String challengeText );
     }
 
 

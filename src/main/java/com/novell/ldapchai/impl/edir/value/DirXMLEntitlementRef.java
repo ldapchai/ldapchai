@@ -20,14 +20,8 @@
 package com.novell.ldapchai.impl.edir.value;
 
 import com.novell.ldapchai.provider.ChaiProvider;
-import org.jdom2.Document;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
 
-import java.io.IOException;
-import java.io.Reader;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.StringTokenizer;
 
 
@@ -39,8 +33,6 @@ import java.util.StringTokenizer;
 
 public class DirXMLEntitlementRef implements Serializable
 {
-
-
     //@todo make this class public
     public static final String ASN_VALUE = "2.16.840.1.113719.1.14.4.1.2087";
 
@@ -99,23 +91,6 @@ public class DirXMLEntitlementRef implements Serializable
         }
     }
 
-    private static Document convertStrToDoc( final String str )
-    {
-        final Reader xmlreader = new StringReader( str );
-        final SAXBuilder builder = new SAXBuilder();
-        Document doc = null;
-        try
-        {
-            doc = builder.build( xmlreader );
-        }
-        catch ( JDOMException | IOException e )
-        {
-            //@todo
-            e.printStackTrace();
-        }
-        return doc;
-    }
-
     public String getEntitlementDN()
     {
         return entitlementDN;
@@ -134,10 +109,5 @@ public class DirXMLEntitlementRef implements Serializable
     public String getPayload()
     {
         return payload;
-    }
-
-    public Document getPayloadDocument()
-    {
-        return convertStrToDoc( getPayload() );
     }
 }

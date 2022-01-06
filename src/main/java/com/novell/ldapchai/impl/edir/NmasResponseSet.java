@@ -19,6 +19,11 @@
 
 package com.novell.ldapchai.impl.edir;
 
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.AbstractResponseSet;
 import com.novell.ldapchai.cr.Answer;
@@ -38,33 +43,18 @@ import com.novell.ldapchai.impl.edir.entry.ext.PutLoginConfigResponse;
 import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretResponse;
 import com.novell.ldapchai.util.ChaiLogger;
-import com.novell.ldapchai.util.StringHelper;
-
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.Namespace;
-import org.jdom2.filter.ElementFilter;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 
 public class NmasResponseSet extends AbstractResponseSet
@@ -73,86 +63,10 @@ public class NmasResponseSet extends AbstractResponseSet
 
     private final ChaiUser user;
 
-    static List<Challenge> parseNmasPolicyXML( final String str, final Locale locale )
-            throws IOException, JDOMException
-    {
-        final List<Challenge> returnList = new ArrayList<>();
-
-        final Reader xmlreader = new StringReader( str );
-        final SAXBuilder builder = new SAXBuilder();
-        final Document doc = builder.build( xmlreader );
-        final boolean required = doc.getRootElement().getName().equals( "RequiredQuestions" );
-
-        for ( final Iterator questionIterator = doc.getDescendants( new ElementFilter( "Question" ) ); questionIterator.hasNext(); )
-        {
-            final Element loopQ = ( Element ) questionIterator.next();
-            final int maxLength = StringHelper.convertStrToInt( loopQ.getAttributeValue( "MaxLength" ), 255 );
-            final int minLength = StringHelper.convertStrToInt( loopQ.getAttributeValue( "MinLength" ), 1 );
-
-            final String challengeText = readDisplayString( loopQ, locale );
-
-            final Challenge challenge = new ChaiChallenge( required, challengeText, minLength, maxLength, true, 0, false );
-            returnList.add( challenge );
-        }
-
-        for ( Iterator iter = doc.getDescendants( new ElementFilter( "UserDefined" ) ); iter.hasNext(); )
-        {
-            final Element loopQ = ( Element ) iter.next();
-            final int maxLength = StringHelper.convertStrToInt( loopQ.getAttributeValue( "MaxLength" ), 255 );
-            final int minLength = StringHelper.convertStrToInt( loopQ.getAttributeValue( "MinLength" ), 1 );
-            final Challenge challenge = new ChaiChallenge( required, null, minLength, maxLength, false, 0, false );
-            returnList.add( challenge );
-        }
-
-        return returnList;
-    }
-
-    private static String readDisplayString( final Element questionElement, final Locale locale )
-    {
-
-        final Namespace xmlNamespace = Namespace.getNamespace( "xml", "http://www.w3.org/XML/1998/namespace" );
-
-        // someday ResoureBundle won't suck and this will be a 5 line method.
-
-        // see if the node has any localized displays.
-        final List displayChildren = questionElement.getChildren( "display" );
-
-        // if no locale specified, or if no localized text is available, just use the default.
-        if ( locale == null || displayChildren == null || displayChildren.size() < 1 )
-        {
-            return questionElement.getText();
-        }
-
-        // convert the xml 'display' elements to a map of locales/strings
-        final Map<Locale, String> localizedStringMap = new HashMap<>();
-        for ( final Object loopDisplayChild : displayChildren )
-        {
-            final Element loopDisplay = ( Element ) loopDisplayChild;
-            final Attribute localeAttr = loopDisplay.getAttribute( "lang", xmlNamespace );
-            if ( localeAttr != null )
-            {
-                final String localeStr = localeAttr.getValue();
-                final String displayStr = loopDisplay.getText();
-                final Locale localeKey = parseLocaleString( localeStr );
-                localizedStringMap.put( localeKey, displayStr );
-            }
-        }
-
-        final Locale matchedLocale = localeResolver( locale, localizedStringMap.keySet() );
-
-        if ( matchedLocale != null )
-        {
-            return localizedStringMap.get( matchedLocale );
-        }
-
-        // none found, so just return the default string.
-        return questionElement.getText();
-    }
-
     static NmasResponseSet readNmasUserResponseSet(
             final ChaiUser theUser
     )
-            throws ChaiUnavailableException, ChaiValidationException
+            throws ChaiUnavailableException
     {
         final GetLoginConfigRequest request = new GetLoginConfigRequest();
         request.setObjectDN( theUser.getEntryDN() );
@@ -172,140 +86,137 @@ public class NmasResponseSet extends AbstractResponseSet
 
             final String xmlString = new String( responseValue, "UTF8" );
             LOGGER.trace( "[parse v3]: read ChallengeResponseQuestions from server: " + xmlString );
-
-            ChallengeSet cs = null;
-            int parseAttempts = 0;
-            final StringBuilder parsingErrorMsg = new StringBuilder();
-
-            {
-                final int beginIndex = xmlString.indexOf( "<" );
-                if ( beginIndex > 0 )
-                {
-                    try
-                    {
-                        parseAttempts++;
-                        final String xmlSubstring = xmlString.substring( beginIndex );
-                        LOGGER.trace( "attempting parse of index stripped value: " + xmlSubstring );
-                        cs = parseNmasUserResponseXML( xmlSubstring );
-                        LOGGER.trace( "successfully parsed nmas ChallengeResponseQuestions response after index " + beginIndex );
-                    }
-                    catch ( JDOMException e )
-                    {
-                        if ( parsingErrorMsg.length() > 0 )
-                        {
-                            parsingErrorMsg.append( ", " );
-                        }
-                        parsingErrorMsg.append( "error parsing index stripped value: " ).append( e.getMessage() );
-                        LOGGER.trace( "unable to parse index stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
-                    }
-                }
-            }
-
-            if ( cs == null )
-            {
-                if ( xmlString.startsWith( "<?xml" ) )
-                {
-                    try
-                    {
-                        parseAttempts++;
-                        cs = parseNmasUserResponseXML( xmlString );
-                    }
-                    catch ( JDOMException e )
-                    {
-                        parsingErrorMsg.append( "error parsing raw value: " ).append( e.getMessage() );
-                        LOGGER.trace( "unable to parse raw ChallengeResponseQuestions nmas response; will retry after stripping header; error: " + e.getMessage() );
-                    }
-                    LOGGER.trace( "successfully parsed full nmas ChallengeResponseQuestions response" );
-                }
-            }
-
-            if ( cs == null )
-            {
-                if ( xmlString.length() > 16 )
-                {
-                    // first 16 bytes are non-xml header.
-                    final String strippedXml = xmlString.substring( 16 );
-                    try
-                    {
-                        parseAttempts++;
-                        cs = parseNmasUserResponseXML( strippedXml );
-                        LOGGER.trace( "successfully parsed full nmas ChallengeResponseQuestions response" );
-                    }
-                    catch ( JDOMException e )
-                    {
-                        if ( parsingErrorMsg.length() > 0 )
-                        {
-                            parsingErrorMsg.append( ", " );
-                        }
-                        parsingErrorMsg.append( "error parsing header stripped value: " ).append( e.getMessage() );
-                        LOGGER.trace( "unable to parse stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
-                    }
-                }
-            }
-
-
-            if ( cs == null )
-            {
-                final String logMsg = "unable to parse nmas ChallengeResponseQuestions: " + parsingErrorMsg;
-                if ( parseAttempts > 0 && xmlString.length() > 16 )
-                {
-                    LOGGER.error( logMsg );
-                }
-                else
-                {
-                    LOGGER.trace( logMsg );
-
-                }
-                return null;
-            }
-
-            final Map<Challenge, String> crMap = new HashMap<>();
-            for ( final Challenge loopChallenge : cs.getChallenges() )
-            {
-                crMap.put( loopChallenge, null );
-            }
-
-            return new NmasResponseSet( crMap, cs.getLocale(), cs.getMinRandomRequired(), AbstractResponseSet.STATE.READ, theUser, cs.getIdentifier() );
+            return readNmasUserResponseSet( theUser,  xmlString );
         }
-        catch ( ChaiOperationException e )
+        catch ( IOException | ChaiValidationException | ChaiOperationException e )
         {
             LOGGER.error( "error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage() );
         }
-        catch ( IOException e )
-        {
-            LOGGER.error( "error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage() );
-        }
+
         return null;
     }
 
+
+    static NmasResponseSet readNmasUserResponseSet(
+            final ChaiUser theUser,
+            final String xmlString
+    )
+            throws ChaiValidationException
+    {
+        ChallengeSet cs = null;
+        int parseAttempts = 0;
+        final StringBuilder parsingErrorMsg = new StringBuilder();
+
+        {
+            final int beginIndex = xmlString.indexOf( "<" );
+            if ( beginIndex > 0 )
+            {
+                try
+                {
+                    parseAttempts++;
+                    final String xmlSubstring = xmlString.substring( beginIndex );
+                    LOGGER.trace( "attempting parse of index stripped value: " + xmlSubstring );
+                    cs = parseNmasUserResponseXML( xmlSubstring );
+                    LOGGER.trace( "successfully parsed nmas ChallengeResponseQuestions response after index " + beginIndex );
+                }
+                catch ( IOException e )
+                {
+                    if ( parsingErrorMsg.length() > 0 )
+                    {
+                        parsingErrorMsg.append( ", " );
+                    }
+                    parsingErrorMsg.append( "error parsing index stripped value: " ).append( e.getMessage() );
+                    LOGGER.trace( "unable to parse index stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
+                }
+            }
+        }
+
+        if ( cs == null )
+        {
+            if ( xmlString.startsWith( "<?xml" ) )
+            {
+                try
+                {
+                    parseAttempts++;
+                    cs = parseNmasUserResponseXML( xmlString );
+                }
+                catch ( IOException e )
+                {
+                    parsingErrorMsg.append( "error parsing raw value: " ).append( e.getMessage() );
+                    LOGGER.trace( "unable to parse raw ChallengeResponseQuestions nmas response; will retry after stripping header; error: " + e.getMessage() );
+                }
+                LOGGER.trace( "successfully parsed full nmas ChallengeResponseQuestions response" );
+            }
+        }
+
+        if ( cs == null )
+        {
+            if ( xmlString.length() > 16 )
+            {
+                // first 16 bytes are non-xml header.
+                final String strippedXml = xmlString.substring( 16 );
+                try
+                {
+                    parseAttempts++;
+                    cs = parseNmasUserResponseXML( strippedXml );
+                    LOGGER.trace( "successfully parsed full nmas ChallengeResponseQuestions response" );
+                }
+                catch ( IOException e )
+                {
+                    if ( parsingErrorMsg.length() > 0 )
+                    {
+                        parsingErrorMsg.append( ", " );
+                    }
+                    parsingErrorMsg.append( "error parsing header stripped value: " ).append( e.getMessage() );
+                    LOGGER.trace( "unable to parse stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
+                }
+            }
+        }
+
+
+        if ( cs == null )
+        {
+            final String logMsg = "unable to parse nmas ChallengeResponseQuestions: " + parsingErrorMsg;
+            if ( parseAttempts > 0 && xmlString.length() > 16 )
+            {
+                LOGGER.error( logMsg );
+            }
+            else
+            {
+                LOGGER.trace( logMsg );
+
+            }
+            return null;
+        }
+
+        final Map<Challenge, String> crMap = new HashMap<>();
+        for ( final Challenge loopChallenge : cs.getChallenges() )
+        {
+            crMap.put( loopChallenge, null );
+        }
+
+        return new NmasResponseSet( crMap, cs.getLocale(), cs.getMinRandomRequired(), AbstractResponseSet.STATE.READ, theUser, cs.getIdentifier() );
+    }
+
     static ChallengeSet parseNmasUserResponseXML( final String str )
-            throws IOException, JDOMException, ChaiValidationException
+            throws IOException, ChaiValidationException
     {
         final List<Challenge> returnList = new ArrayList<>();
 
-        final Reader xmlreader = new StringReader( str );
-        final SAXBuilder builder = new SAXBuilder();
-        final Document doc = builder.build( xmlreader );
+        final XmlDocument doc = XmlChai.getFactory().parseString( str, AccessMode.IMMUTABLE );
+        final XmlElement rootElement = doc.getRootElement();
 
-        final Element rootElement = doc.getRootElement();
-        final int minRandom = StringHelper.convertStrToInt( rootElement.getAttributeValue( "RandomQuestions" ), 0 );
+        final int minRandom = StringHelper.convertStrToInt( rootElement.getAttribute( "RandomQuestions" ).orElse( "0" ), 0 );
+        final String guidValue = rootElement.getAttribute( "GUID" ).orElse( null );
 
-        final String guidValue;
+        for ( final XmlElement loopQ : doc.evaluateXpathToElements( "//Challenge" ) )
         {
-            final Attribute guidAttribute = rootElement.getAttribute( "GUID" );
-            guidValue = guidAttribute == null ? null : guidAttribute.getValue();
-        }
 
-        for ( Iterator iter = doc.getDescendants( new ElementFilter( "Challenge" ) ); iter.hasNext(); )
-        {
-            final Element loopQ = ( Element ) iter.next();
-            final int maxLength = StringHelper.convertStrToInt( loopQ.getAttributeValue( "MaxLength" ), 255 );
-            final int minLength = StringHelper.convertStrToInt( loopQ.getAttributeValue( "MinLength" ), 2 );
-            final String defineStrValue = loopQ.getAttributeValue( "Define" );
-            final boolean adminDefined = "Admin".equalsIgnoreCase( defineStrValue );
-            final String typeStrValue = loopQ.getAttributeValue( "Type" );
-            final boolean required = "Required".equalsIgnoreCase( typeStrValue );
-            final String challengeText = loopQ.getText();
+            final int maxLength = StringHelper.convertStrToInt( loopQ.getAttribute( "MaxLength" ).orElse( "" ), 255 );
+            final int minLength = StringHelper.convertStrToInt( loopQ.getAttribute( "MinLength" ).orElse( "" ), 2 );
+            final boolean adminDefined = "Admin".equalsIgnoreCase( loopQ.getAttribute( "Define" ).orElse( null ) );
+            final boolean required = "Required".equalsIgnoreCase( loopQ.getAttribute( "Type" ).orElse( null ) );
+            final String challengeText = loopQ.getText().orElseThrow( () -> new IllegalStateException( "missing challenge text" ) );
 
             final Challenge challenge = new ChaiChallenge( required, challengeText, minLength, maxLength, adminDefined, 0, false );
             returnList.add( challenge );
@@ -424,84 +335,6 @@ public class NmasResponseSet extends AbstractResponseSet
         return success;
     }
 
-    public static Locale localeResolver( final Locale desiredLocale, final Collection<Locale> localePool )
-    {
-        if ( desiredLocale == null || localePool == null || localePool.isEmpty() )
-        {
-            return null;
-        }
-
-        for ( final Locale loopLocale : localePool )
-        {
-            if ( loopLocale.getLanguage().equalsIgnoreCase( desiredLocale.getLanguage() ) )
-            {
-                if ( loopLocale.getCountry().equalsIgnoreCase( desiredLocale.getCountry() ) )
-                {
-                    if ( loopLocale.getVariant().equalsIgnoreCase( desiredLocale.getVariant() ) )
-                    {
-                        return loopLocale;
-                    }
-                }
-            }
-        }
-
-        for ( final Locale loopLocale : localePool )
-        {
-            if ( loopLocale.getLanguage().equalsIgnoreCase( desiredLocale.getLanguage() ) )
-            {
-                if ( loopLocale.getCountry().equalsIgnoreCase( desiredLocale.getCountry() ) )
-                {
-                    return loopLocale;
-                }
-            }
-        }
-
-        for ( final Locale loopLocale : localePool )
-        {
-            if ( loopLocale.getLanguage().equalsIgnoreCase( desiredLocale.getLanguage() ) )
-            {
-                return loopLocale;
-            }
-        }
-
-        final Locale defaultLocale = parseLocaleString( "" );
-        if ( localePool.contains( defaultLocale ) )
-        {
-            return defaultLocale;
-        }
-
-        return null;
-    }
-
-    public static Locale parseLocaleString( final String localeString )
-    {
-        if ( localeString == null )
-        {
-            return new Locale( "" );
-        }
-
-        final StringTokenizer st = new StringTokenizer( localeString, "_" );
-
-        if ( !st.hasMoreTokens() )
-        {
-            return new Locale( "" );
-        }
-
-        final String language = st.nextToken();
-        if ( !st.hasMoreTokens() )
-        {
-            return new Locale( language );
-        }
-
-        final String country = st.nextToken();
-        if ( !st.hasMoreTokens() )
-        {
-            return new Locale( language, country );
-        }
-
-        final String variant = st.nextToken( "" );
-        return new Locale( language, country, variant );
-    }
 
     private static final String NMAS_XML_ROOTNODE = "Challenges";
     private static final String NMAS_XML_ATTR_RANDOM_COUNT = "RandomQuestions";
@@ -513,7 +346,10 @@ public class NmasResponseSet extends AbstractResponseSet
 
     static String csToNmasXML( final ChallengeSet cs, final String guidValue )
     {
-        final Element rootElement = new Element( NMAS_XML_ROOTNODE );
+        final XmlFactory xmlFactory = XmlChai.getFactory();
+        final XmlDocument xmlDocument = xmlFactory.newDocument( NMAS_XML_ROOTNODE );
+        final XmlElement rootElement = xmlDocument.getRootElement();
+
         rootElement.setAttribute( NMAS_XML_ATTR_RANDOM_COUNT, String.valueOf( cs.getMinRandomRequired() ) );
         if ( guidValue != null )
         {
@@ -526,7 +362,7 @@ public class NmasResponseSet extends AbstractResponseSet
 
         for ( final Challenge challenge : cs.getChallenges() )
         {
-            final Element loopElement = new Element( NMAS_XML_NODE_CHALLENGE );
+            final XmlElement loopElement = xmlFactory.newElement( NMAS_XML_NODE_CHALLENGE );
             if ( challenge.getChallengeText() != null )
             {
                 loopElement.setText( challenge.getChallengeText() );
@@ -553,15 +389,17 @@ public class NmasResponseSet extends AbstractResponseSet
             loopElement.setAttribute( NMAS_XML_ATTR_MIN_LENGTH, String.valueOf( challenge.getMinLength() ) );
             loopElement.setAttribute( NMAS_XML_ATTR_MAX_LENGTH, String.valueOf( challenge.getMaxLength() ) );
 
-            rootElement.addContent( loopElement );
+            rootElement.attachElement( loopElement );
         }
 
-        final XMLOutputter outputter = new XMLOutputter();
-        final Format format = Format.getRawFormat();
-        format.setTextMode( Format.TextMode.PRESERVE );
-        format.setLineSeparator( "" );
-        outputter.setFormat( format );
-        return outputter.outputString( rootElement );
+        try
+        {
+            return xmlFactory.outputString( xmlDocument );
+        }
+        catch ( IOException e )
+        {
+            throw new IllegalStateException( "unexpected error serializing xml document for NMAS response set: " + e.getMessage() );
+        }
     }
 
     private static Map<Challenge, Answer> convertAnswerTextMap( final Map<Challenge, String> crMap )
@@ -598,7 +436,7 @@ public class NmasResponseSet extends AbstractResponseSet
         }
 
         @Override
-        public Element toXml()
+        public XmlElement toXml()
         {
             return null;
         }

@@ -19,8 +19,9 @@
 
 package com.novell.ldapchai.cr;
 
+import org.jrivard.xmlchai.XmlChai;
+import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import org.jdom2.Element;
 
 class TextAnswer implements Answer
 {
@@ -39,9 +40,9 @@ class TextAnswer implements Answer
     }
 
     @Override
-    public Element toXml()
+    public XmlElement toXml()
     {
-        final Element answerElement = new Element( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( answer );
         answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.TEXT.toString() );
         return answerElement;
@@ -87,9 +88,9 @@ class TextAnswer implements Answer
         }
 
         @Override
-        public TextAnswer fromXml( final Element element, final boolean caseInsensitive, final String challengeText )
+        public TextAnswer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
         {
-            final String answerValue = element.getText();
+            final String answerValue = element.getText().orElseThrow( () -> new IllegalArgumentException( "missing answer text" ) );
             return new TextAnswer( answerValue, caseInsensitive );
         }
     }

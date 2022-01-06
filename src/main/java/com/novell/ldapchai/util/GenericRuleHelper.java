@@ -21,6 +21,7 @@ package com.novell.ldapchai.util;
 
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiPasswordRule;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import java.util.List;
 

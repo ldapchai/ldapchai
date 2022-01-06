@@ -30,7 +30,7 @@ import com.novell.ldapchai.provider.SearchScope;
 import com.novell.ldapchai.util.GenericRuleHelper;
 import com.novell.ldapchai.util.PasswordRuleHelper;
 import com.novell.ldapchai.util.SearchHelper;
-import com.novell.ldapchai.util.StringHelper;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,7 +64,6 @@ import java.util.Set;
  */
 class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
 {
-
     static final Collection<String> LDAP_PASSWORD_ATTRIBUTES;
 
     static
@@ -78,8 +77,8 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
     }
 
 
-    private final Map<String, String> ruleMap = new HashMap<>();
-    private final Map<String, List<String>> allEntryValues = new HashMap<>();
+    private final Map<String, String> ruleMap;
+    private final Map<String, List<String>> allEntryValues;
 
     NspmPasswordPolicyImpl( final String entryDN, final ChaiProvider chaiProvider )
             throws ChaiUnavailableException, ChaiOperationException
@@ -95,8 +94,8 @@ class NspmPasswordPolicyImpl extends TopImpl implements NspmPasswordPolicy
         final Map<String, Map<String, List<String>>> bigResults = this.getChaiProvider().searchMultiValues( getEntryDN(), searchHelper );
         final Map<String, List<String>> results = bigResults.get( this.getEntryDN() );
 
-        allEntryValues.putAll( results );
-        ruleMap.putAll( createRuleMapUsingAttributeValues( results ) );
+        allEntryValues = Collections.unmodifiableMap( new HashMap<>( results ) );
+        ruleMap = Collections.unmodifiableMap( new HashMap<>( createRuleMapUsingAttributeValues( results ) ) );
     }
 
     @Override

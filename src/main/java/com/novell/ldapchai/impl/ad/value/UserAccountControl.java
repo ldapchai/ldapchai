@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.impl.ad.value;
 
-import com.novell.ldapchai.util.StringHelper;
+import com.novell.ldapchai.util.internal.StringHelper;
 
 public class UserAccountControl
 {

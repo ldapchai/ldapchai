@@ -11,7 +11,6 @@
     <version>0.8.2-SNAPSHOT</version>
     <artifactId>ldapchai</artifactId>
     <packaging>jar</packaging>
-
     <name>LDAP Chai Library</name>
 
     <scm>
@@ -61,9 +60,9 @@
             <version>2.8.9</version>
         </dependency>
         <dependency>
-            <groupId>org.jdom</groupId>
-            <artifactId>jdom2</artifactId>
-            <version>2.0.6.1</version>
+            <groupId>org.jrivard.xmlchai</groupId>
+            <artifactId>xmlchai</artifactId>
+            <version>0.1.0</version>
         </dependency>
         <dependency>
             <groupId>log4j</groupId>
@@ -259,7 +258,7 @@
                             <archive>
                                 <manifest>
                                     <addDefaultImplementationEntries>false</addDefaultImplementationEntries>
-                                    <mainClass>com.novell.ldapchai.util.MainHandler</mainClass>
+                                    <mainClass>com.novell.ldapchai.util.internal.MainHandler</mainClass>
                                 </manifest>
                                 <manifestEntries>
                                     <Archive-Type>jar</Archive-Type>
@@ -283,10 +282,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.1</version>
                 <configuration>
                     <doctitle>LDAP Chai API</doctitle>
                     <windowtitle>LDAP Chai API</windowtitle>
+                    <notimestamp>true</notimestamp>
                     <additionalJOptions>
                         <additionalJOption>-Xmaxerrs</additionalJOption>
                         <additionalJOption>65536</additionalJOption>
@@ -432,22 +432,32 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- https://github.com/github/maven-plugins -->
-            <plugin> <!-- Requires maven 3 -->
-                <groupId>com.github.github</groupId>
-                <artifactId>site-maven-plugin</artifactId>
-                <version>0.12</version>
-                <configuration>
-                    <message>Creating site for ${project.version}</message>
-                </configuration>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jarsigner-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
+                        <id>sign</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>site</goal>
+                            <goal>sign</goal>
                         </goals>
-                        <phase>site</phase>
                     </execution>
                 </executions>
+                <configuration>
+                    <skip>${jarsigner.skip}</skip>
+                    <keystore>${jarsigner.keystore}</keystore>
+                    <alias>${jarsigner.alias}</alias>
+                    <storepass>${jarsigner.storepass}</storepass>
+                    <keypass>${jarsigner.keypass}</keypass>
+                    <verbose>false</verbose>
+                    <removeExistingSignatures>true</removeExistingSignatures>
+                    <includes>
+                        <include>*.jar</include>
+                        <include>*.war</include>
+                    </includes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -507,6 +517,12 @@
             <id>skip-spotbugs</id>
             <properties>
                 <skipSpotbugs>true</skipSpotbugs>
+            </properties>
+        </profile>
+        <profile>
+            <id>enable-jarsigner</id>
+            <properties>
+                <jarsigner.skip>false</jarsigner.skip>
             </properties>
         </profile>
         <profile>
