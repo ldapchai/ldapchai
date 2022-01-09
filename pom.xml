@@ -47,6 +47,8 @@
         <skipJavadoc>false</skipJavadoc>
         <skipSpotbugs>false</skipSpotbugs>
         <checkstyle.skip>false</checkstyle.skip>
+        <jarsigner.skip>true</jarsigner.skip>
+
         <maven.build.timestamp.format>yyyy-MM-dd'T'HH:mm:ss'Z'</maven.build.timestamp.format>
 
         <!-- git.commit.time is populated via git-commit-id-plugin and results in a (hopefully) reproducible maven build -->
