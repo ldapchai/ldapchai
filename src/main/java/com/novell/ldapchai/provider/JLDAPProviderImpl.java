@@ -37,7 +37,7 @@ import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.NamingException;
@@ -60,7 +60,8 @@ import java.util.Set;
  * <p>JLDAP {@code ChaiProvider} implementation.  This
  * class wraps the JLDAP api at <a href="http://www.openldap.org/jldap/">OpenLDAP JLDAP API</a></p>
  *
- * <p>Instances can be obtained using {@link ChaiProviderFactory}.</p>
+ * <p>This implementation can be used by setting {@link ChaiSetting#PROVIDER_IMPLEMENTATION}
+ * to {@code com.novell.ldapchai.provider.JLDAPProverImpl}.</p>
  *
  * @author Jason D. Rivard
  */

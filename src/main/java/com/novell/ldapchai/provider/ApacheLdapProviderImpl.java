@@ -24,7 +24,7 @@ import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
 import org.apache.directory.api.ldap.model.cursor.CursorException;
 import org.apache.directory.api.ldap.model.cursor.EntryCursor;
@@ -77,14 +77,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+
+/**
+ * Apache LDAP API Wrapper.
+ *
+ * <p>This implementation can be used by setting {@link ChaiSetting#PROVIDER_IMPLEMENTATION}
+ * to {@code com.novell.ldapchai.provider.ApacheLdapProviderImpl}.</p>
+ */
 public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProviderImplementor
 {
-
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ApacheLdapProviderImpl.class.getName() );
 
     private String currentLdapUrl;
 
     private LdapConnection connection;
+
+    ApacheLdapProviderImpl()
+    {
+        super();
+    }
 
     @Override
     public Object getConnectionObject()
@@ -103,11 +114,6 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     public Map<String, Object> getProviderProperties()
     {
         return super.getProviderProperties();
-    }
-
-    public ApacheLdapProviderImpl()
-    {
-        super();
     }
 
     @Override

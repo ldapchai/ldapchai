@@ -25,7 +25,7 @@ import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
 
 import javax.naming.ldap.ExtendedRequest;

@@ -256,6 +256,9 @@ public class ChaiConfiguration
         return new ChaiConfigurationBuilder( chaiConfiguration );
     }
 
+    /**
+     * A convenience Builder for {@link ChaiConfiguration} instances.
+     */
     public static class ChaiConfigurationBuilder
     {
         private Serializable implementationConfiguration = null;

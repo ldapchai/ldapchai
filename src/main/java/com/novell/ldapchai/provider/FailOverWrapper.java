@@ -22,7 +22,7 @@ package com.novell.ldapchai.provider;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.lang.reflect.InvocationHandler;

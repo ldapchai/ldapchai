@@ -28,7 +28,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiSetting;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.io.Writer;
 import java.nio.charset.Charset;

@@ -26,6 +26,9 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Settings used by {@link ChaiProviderFactory} instances.
+ */
 public enum ChaiProviderFactorySetting
 {
     /**

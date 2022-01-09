@@ -40,7 +40,7 @@ import com.novell.ldapchai.impl.edir.entry.ext.DeleteLoginConfigRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.DeleteLoginConfigResponse;
 import com.novell.ldapchai.impl.edir.entry.ext.NMASChallengeResponse;
 import com.novell.ldapchai.provider.ChaiProvider;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.internal.StringHelper;
 
 import java.io.IOException;

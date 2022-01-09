@@ -29,9 +29,14 @@ package com.novell.ldapchai.exception;
  */
 public class ChaiException extends Exception
 {
-
-
+    /**
+     * Indicates if this error is expected to be permanent.
+     */
     private final boolean permanent;
+
+    /**
+     * Indicates if this error is related to authentication to the LDAP server.
+     */
     private final boolean authentication;
 
     private final ChaiError errorCode;

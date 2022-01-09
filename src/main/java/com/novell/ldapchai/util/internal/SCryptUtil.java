@@ -17,13 +17,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.util;
-
-import com.novell.ldapchai.util.internal.StringHelper;
+package com.novell.ldapchai.util.internal;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
 
@@ -31,7 +30,7 @@ public class SCryptUtil
 {
     // dkLen
     private static final int SCRYPT_LENGTH = 64;
-    private static final Charset CHARSET = Charset.forName( "UTF-8" );
+    private static final Charset CHARSET = StandardCharsets.UTF_8;
 
     public static boolean check( final String password, final String hashed )
     {

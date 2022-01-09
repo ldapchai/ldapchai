@@ -21,7 +21,7 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiValidationException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.security.SecureRandom;
 import java.time.Instant;

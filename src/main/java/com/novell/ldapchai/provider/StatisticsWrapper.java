@@ -20,7 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;

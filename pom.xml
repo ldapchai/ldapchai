@@ -37,8 +37,8 @@
 
 
     <properties>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
 
         <!-- used by javadoc plugin -->
         <maven.compiler.release>8</maven.compiler.release>
@@ -126,8 +126,30 @@
             </resource>
         </resources>
 
-        <!--reads the git commit info -->
         <plugins>
+
+            <!-- limit API usage to Java 8 -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>animal-sniffer-maven-plugin</artifactId>
+                <version>1.20</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <signature>
+                        <groupId>org.codehaus.mojo.signature</groupId>
+                        <artifactId>java18</artifactId>
+                        <version>1.0</version>
+                    </signature>
+                </configuration>
+            </plugin>
+
+            <!--reads the git commit info -->
             <plugin>
                 <groupId>pl.project13.maven</groupId>
                 <artifactId>git-commit-id-plugin</artifactId>
@@ -223,6 +245,7 @@
                         <configuration>
                             <propertyExpansion>basedir=${basedir}</propertyExpansion>
                             <configLocation>src/build/checkstyle.xml</configLocation>
+                            <excludes>**/module-info.java</excludes>
                             <encoding>UTF-8</encoding>
                             <consoleOutput>true</consoleOutput>
                             <includeTestResources>false</includeTestResources>
@@ -465,8 +488,9 @@
                 <version>3.8.1</version>
                 <configuration>
                     <generatedSourcesDirectory>src/external/java</generatedSourcesDirectory>
-                    <source>9</source>
-                    <target>9</target>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                    <release>${maven.compiler.release}</release>
                     <showWarnings>true</showWarnings>
                     <compilerArgs>
                         <arg>-Xmaxwarns</arg>

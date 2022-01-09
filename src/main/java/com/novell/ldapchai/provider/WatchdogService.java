@@ -19,7 +19,7 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.util.HashSet;
 import java.util.Set;

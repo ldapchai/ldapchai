@@ -42,7 +42,7 @@ import com.novell.ldapchai.impl.edir.entry.ext.PutLoginConfigRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.PutLoginConfigResponse;
 import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretResponse;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.naming.ldap.ExtendedResponse;

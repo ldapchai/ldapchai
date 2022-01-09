@@ -33,6 +33,7 @@ import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.provider.DirectoryVendor;
 import com.novell.ldapchai.provider.SearchScope;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.net.URI;
 import java.security.SecureRandom;

@@ -19,14 +19,14 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class ThreadSafeWrapper extends AbstractWrapper
+class ThreadSafeWrapper extends AbstractWrapper
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ThreadSafeWrapper.class );
 

@@ -20,7 +20,7 @@
 package com.novell.ldapchai.provider;
 
 import com.google.gson.GsonBuilder;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

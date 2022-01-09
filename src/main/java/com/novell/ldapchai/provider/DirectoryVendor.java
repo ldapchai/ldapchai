@@ -27,7 +27,10 @@ import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.impl.openldap.entry.OpenLDAPVendorFactory;
 import com.novell.ldapchai.impl.oracleds.entry.OracleDSVendorFactory;
 
-
+/**
+ * Indicates the Vendor (product/organization) of an LDAP directory server
+ * implementation.
+ */
 public enum DirectoryVendor
 {
     ACTIVE_DIRECTORY ( new ADVendorFactory() ),

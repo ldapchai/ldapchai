@@ -25,7 +25,7 @@ import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -72,7 +72,10 @@ import java.util.Set;
 
 /**
  * <p>Default {@code ChaiProvider} implementation; wraps the standard JNDI ldap API.</p>
- **
+ *
+ * <p>This implementation can be used by setting {@link ChaiSetting#PROVIDER_IMPLEMENTATION}
+ * to {@code com.novell.ldapchai.provider.JNDIProverImpl}.</p>
+ *
  * @author Jason D. Rivard
  */
 public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderImplementor

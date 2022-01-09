@@ -22,7 +22,7 @@ package com.novell.ldapchai.cr;
 import org.jrivard.xmlchai.XmlChai;
 import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
-import com.novell.ldapchai.util.SCryptUtil;
+import com.novell.ldapchai.util.internal.SCryptUtil;
 import org.bouncycastle.crypto.generators.OpenBSDBCrypt;
 
 import java.security.SecureRandom;

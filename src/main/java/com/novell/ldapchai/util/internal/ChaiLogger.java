@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.util;
+package com.novell.ldapchai.util.internal;
 
 /**
  * Internal Chai API logging wrapper.  Users of Chai should ignore this class.

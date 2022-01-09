@@ -24,7 +24,7 @@ import org.jrivard.xmlchai.XmlChai;
 import org.jrivard.xmlchai.XmlDocument;
 import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.ChaiEntryFactory;
-import com.novell.ldapchai.util.ChaiLogger;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;

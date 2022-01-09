@@ -37,31 +37,30 @@ import java.util.Set;
  * <p>{@code ChaiProvider} is the foundation interface for the LDAP Chai API.  {@code ChaiProvider} provides
  * methods to access an ldap directory.</p>
  *
- * <p>Use the {@link ChaiProviderFactory} factory to obtain a {@code ChaiProvider} instance.</p>
+ * <p>Use the {@link ChaiProviderFactory} factory to obtain a {@code ChaiProvider} instance.  After usage is complete
+ * leaks the {@link #close()} method should be called when a {@code ChaiProvider} instance is no longer
+ * used.  Once closed, any operation annotated with {@link LdapOperation} will throw an {@link IllegalStateException}.</p>
  *
- * <p>{@code ChaiProvider}s can be used directly for raw ldap access. However, it is generally desirable to use the
+ * <p>{@code ChaiProvider}s can be used directly for LDAP access. However, it is generally desirable to use the
  * {@link com.novell.ldapchai.ChaiEntry} wrappers instead.  Using a {@code ChaiProvider} requires the caller
- * to keep track of ldap distinguished names (DN) and be aware of context and other ldap concepts.  {@code ChaiEntry}
+ * to keep track of ldap distinguished names (DN) and be aware of context and other LDAP concepts.  {@code ChaiEntry}
  * instances can be obtained using a {@link ChaiEntryFactory} obtained by calling {@link #getEntryFactory()}.</p>
  *
  * <p>It is helpful to think of a {@code ChaiProvider} as a logical connection to the ldap server.
  * Implementations may provide some type of pooling, or an instance of {@code ChaiProvider} may actually
- * represent a single physical connection to the server.</p>
+ * represent a single network connection to the server.</p>
  *
  * <p>{@code ChaiProvider} does not support any notion of asynchronous or non-blocking requests.  Every method call
  * will block until a result or error is returned from the server, or some other type of Exception
  * occurs.</p>
  *
- * <p>The underlying implementations of this interface may use a variety of strategies for actually reaching the ldap directory,
- * including the standard JNDI interface {@link javax.naming.directory} , and Novell's JLDAP API.  Different implementations may or may not provide support
- * for server fail-over or other failure recovery.</p>
+ * <p>The underlying implementations of this interface may use a variety of strategies for actually reaching the LDAP server.
+ * Different implementations may or may not provide support for server fail-over or other failure recovery.</p>
  *
  * <p>{@code ChaiProvider} implementations are <i>not</i> guaranteed to be thread safe by LDAP Chai.  Individual implementations
  * may provide thread safety.  Check with the implementation before sharing an {@code ChaiProvider} instance across multiple
  * threads.  For a guaranteed thread safe ChaiProvider, use {@link com.novell.ldapchai.provider.ChaiProviderFactory#synchronizedProvider(ChaiProvider)}.</p>
  *
- * <p>To prevent leaks the {@link #close()} method should be called when a {@code ChaiProvider} instance is no longer
- * used.  Once closed, any operation annotated with {@link LdapOperation}  will throw an {@link IllegalStateException}.</p>
  *
  * @author Jason D. Rivard                                                          b
  * @see com.novell.ldapchai.ChaiEntry
