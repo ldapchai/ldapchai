@@ -1,5 +1,11 @@
 ldapchai
 ========
+
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.ldapchai/ldapchai/badge.svg?style=flat)](https://maven-badges.herokuapp.com/maven-central/com.github.ldapchai/ldapchai/)
+
+[![Javadocs](https://www.javadoc.io/badge/com.github.ldapchai/ldapchai.svg)](https://www.javadoc.io/doc/com.github.ldapchai/ldapchai)
+
+
 LDAP Chai is an easy-to-use Java LDAP API.  It wraps low-level Java interfaces such as the JNDI API with
 easy to use interfaces.  LDAPChai Includes the following features:
 
@@ -18,7 +24,7 @@ easy to use interfaces.  LDAPChai Includes the following features:
   * Oracle DS
   * OpenLDAP
   * Generic LDAP 
-* LDAP multi-server failover support
+* LDAP multi-server failover support                                                                                      
 * LDAP idle connection watch-dog automatically opens and closes connections based on activity
 * Pagination support for handling large queries from AD and other page-limited LDAP servers.
 * Pluggable LDAP API Provider support
@@ -31,22 +37,7 @@ LDAP Chai is well suited for business applications and general purpose LDAP deve
 
 All operations to LDAP Chai are request/response (no long term iterators on search) so that fail-over can
 happen seamlessly. 
-  
 
-[![Javadocs](https://www.javadoc.io/badge/com.github.ldapchai/ldapchai.svg)](https://www.javadoc.io/doc/com.github.ldapchai/ldapchai)
-
-
-### Maven
-
-LDAP Chai is available from maven central repository.  You can import by adding the following fragment to your _pom.xml_.
-
-```xml
-        <dependency>
-            <groupId>com.github.ldapchai</groupId>
-            <artifactId>ldapchai</artifactId>
-            <version>version</version>
-        </dependency>
-```
 
 ### 0.7 Update:
 

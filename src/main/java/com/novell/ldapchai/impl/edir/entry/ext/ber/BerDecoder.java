@@ -184,6 +184,7 @@ public final class BerDecoder extends Ber
      *
      * @return true if the tagged integer is 0; false otherwise.
      */
+    @SuppressWarnings( "checkstyle:SimplifyBooleanExpression" )
     public boolean parseBoolean()
             throws DecodeException
     {
