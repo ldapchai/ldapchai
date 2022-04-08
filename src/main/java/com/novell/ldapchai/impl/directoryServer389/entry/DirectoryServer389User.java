@@ -30,6 +30,9 @@ import java.time.Instant;
 
 class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
 {
+    public static final String ATTR_PASSWORD_RETRY_COUNT = "passwordRetryCount";
+    public static final String ATTR_ACCOUNT_UNLOCK_TIME = "accountUnlockTime";
+
     DirectoryServer389User( final String userDN, final ChaiProvider chaiProvider )
     {
         super( userDN, chaiProvider );
@@ -76,24 +79,22 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
             throws ChaiUnavailableException, ChaiOperationException
     {
         final Instant expireDate = readPasswordExpirationDate();
-
-        return expireDate == null ? false : expireDate.isBefore( Instant.now() );
-
+        return expireDate != null && expireDate.isBefore( Instant.now() );
     }
 
     @Override
     public void unlockPassword()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        this.writeStringAttribute( "passwordRetryCount", "0" );
+        this.writeStringAttribute( ATTR_PASSWORD_RETRY_COUNT, "0" );
 
         // Only attempt to remove the attribute if it already
         // exists to avoid exceptions trying to remove a
         // non-existent attribute
-        final Instant unlockDate = readDateAttribute( "accountUnlockTime" );
+        final Instant unlockDate = readDateAttribute( ATTR_ACCOUNT_UNLOCK_TIME );
         if ( unlockDate != null )
         {
-            this.deleteAttribute( "accountUnlockTime", null );
+            this.deleteAttribute( ATTR_ACCOUNT_UNLOCK_TIME, null );
         }
     }
 
@@ -101,7 +102,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Instant unlockDate = readDateAttribute( "accountUnlockTime" );
+        final Instant unlockDate = readDateAttribute( ATTR_ACCOUNT_UNLOCK_TIME );
         if ( unlockDate == null )
         {
             return false;
@@ -115,5 +116,12 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
             throws ChaiOperationException, ChaiUnavailableException
     {
         this.writeStringAttribute( ATTR_PASSWORD_EXPIRE_TIME, "19800101010101Z" );
+    }
+
+    @Override
+    public String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return DirectoryServer389Entry.readGUIDImpl( this.getChaiProvider(), this.getEntryDN() );
     }
 }

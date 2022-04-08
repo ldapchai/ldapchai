@@ -20,6 +20,8 @@
 package com.novell.ldapchai.impl.directoryServer389.entry;
 
 import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiGroup;
 import com.novell.ldapchai.provider.ChaiProvider;
 
@@ -28,5 +30,12 @@ class DirectoryServer389Group extends AbstractChaiGroup implements ChaiGroup
     DirectoryServer389Group( final String groupDN, final ChaiProvider chaiProvider )
     {
         super( groupDN, chaiProvider );
+    }
+
+    @Override
+    public String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return DirectoryServer389Entry.readGUIDImpl( this.getChaiProvider(), this.getEntryDN() );
     }
 }

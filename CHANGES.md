@@ -2,5 +2,6 @@
 
 ## [1.8.3] - Released [date]
 ### Changed
-- Chagne log4j dependency to not be bundled in jar
-- Update dependendencies
+- Change log4j dependency to not be bundled in jar
+- Correct readGUID() for DirectoryServer389 to properly read nsUniqueId attribute
+- Update dependencies

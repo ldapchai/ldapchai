@@ -36,7 +36,7 @@ public enum DirectoryVendor
     ACTIVE_DIRECTORY ( new ADVendorFactory() ),
     EDIRECTORY( new EDirectoryVendorFactory() ),
     OPEN_LDAP ( new OpenLDAPVendorFactory() ),
-    DIRECTORY_SERVER_389( new DirectoryServer389VendorFactory() ),
+    DIRECTORY_SERVER_389( DirectoryServer389VendorFactory.getInstance() ),
     ORACLE_DS ( new OracleDSVendorFactory() ),
     GENERIC( new GenericEntryFactory() ),;
 

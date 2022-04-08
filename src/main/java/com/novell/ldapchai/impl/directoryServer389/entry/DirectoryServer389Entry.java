@@ -20,13 +20,30 @@
 package com.novell.ldapchai.impl.directoryServer389.entry;
 
 import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiEntry;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 class DirectoryServer389Entry extends AbstractChaiEntry implements ChaiEntry
 {
+    public static final String ATTR_NS_UNIQUE_ID = "nsUniqueId";
+
     DirectoryServer389Entry( final String entryDN, final ChaiProvider chaiProvider )
     {
         super( entryDN, chaiProvider );
+    }
+
+    @Override
+    public String readGUID()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readGUIDImpl( this.getChaiProvider(), this.getEntryDN() );
+    }
+
+    static String readGUIDImpl( final ChaiProvider chaiProvider, final String entryDN )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        return chaiProvider.readStringAttribute( entryDN, ATTR_NS_UNIQUE_ID );
     }
 }
