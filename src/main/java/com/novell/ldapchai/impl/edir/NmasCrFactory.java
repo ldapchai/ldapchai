@@ -100,7 +100,7 @@ public class NmasCrFactory
         }
         catch ( IOException e )
         {
-            LOGGER.debug( e );
+            LOGGER.debug( "error reading NMAS challenge set policy: " + e );
         }
 
         final int minRandQuestions = StringHelper.convertStrToInt( allValues.get( "nsimNumberRandomQuestions" ), 0 );

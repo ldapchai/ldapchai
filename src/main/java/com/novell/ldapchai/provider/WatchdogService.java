@@ -129,13 +129,11 @@ class WatchdogService
         }
         catch ( Exception e )
         {
-            final StringBuilder sb = new StringBuilder();
-            sb.append( "error during watchdog provider idle check of connection " );
-            sb.append( wdWrapper.getIdentifier() );
-            sb.append( ", error: " );
-            sb.append( e.getMessage() );
+            final String errorMsg = "error during watchdog provider idle check of connection "
+                    + wdWrapper.getIdentifier()
+                    + ", error: " + e.getMessage();
 
-            LOGGER.warn( sb );
+            LOGGER.warn( errorMsg );
         }
     }
 

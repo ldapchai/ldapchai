@@ -48,15 +48,9 @@ public class AnswerFactory
     public static Answer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
     {
         final Optional<String> formatStr = element.getAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT );
-        final Answer.FormatType respFormat;
-        if ( formatStr.isPresent() )
-        {
-            respFormat = Answer.FormatType.valueOf( formatStr.get() );
-        }
-        else
-        {
-            respFormat = Answer.FormatType.TEXT;
-        }
+        final Answer.FormatType respFormat = formatStr
+                .map( Answer.FormatType::valueOf )
+                .orElse( Answer.FormatType.TEXT );
         return respFormat.getFactory().fromXml( element, caseInsensitive, challengeText );
     }
 

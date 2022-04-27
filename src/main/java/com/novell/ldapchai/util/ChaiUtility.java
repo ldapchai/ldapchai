@@ -365,11 +365,9 @@ public final class ChaiUtility
 
         if ( LOGGER.isDebugEnabled() )
         {
-            final StringBuilder debugMsg = new StringBuilder();
-            debugMsg.append( "testAttributeReplication for " ).append( chaiEntry ).append( ":" ).append( attribute );
-            debugMsg.append( " " ).append( testCount ).append( " up," );
-            debugMsg.append( " " ).append( ldapURLs.size() - testCount ).append( " down," );
-            debugMsg.append( " " ).append( successCount ).append( " in sync" );
+            final String debugMsg = "testAttributeReplication for " + chaiEntry + ":" + attribute
+                    + " " + testCount + " up," + " " + ( ldapURLs.size() - testCount ) + " down,"
+                    + " " + successCount + " in sync";
             LOGGER.debug( debugMsg );
         }
 

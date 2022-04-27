@@ -74,10 +74,10 @@ abstract class AbstractWrapper implements InvocationHandler
         }
         catch ( Exception e )
         {
-            LOGGER.fatal( "Chai internal error, no appropriate constructor for " + wrapperClass.getCanonicalName(), e );
+            final String errorMsg = "Chai internal error, unable to create wrapper for " + wrapperClass.getCanonicalName() + e.getMessage();
+            LOGGER.error( errorMsg, e );
+            throw new Exception( errorMsg, e );
         }
-
-        throw new Exception( "Chai internal error, unable to create wrapper for " + wrapperClass.getCanonicalName() );
     }
 
     static Object invoker( final ChaiProvider provider, final Method m, final Object[] args )
