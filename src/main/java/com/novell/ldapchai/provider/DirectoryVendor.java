@@ -37,9 +37,9 @@ public enum DirectoryVendor
     ACTIVE_DIRECTORY ( new ADVendorFactory() ),
     EDIRECTORY( new EDirectoryVendorFactory() ),
     OPEN_LDAP ( new OpenLDAPVendorFactory() ),
-    FREEIPA ( FreeIPAVendorFactory.getInstance() ),
     DIRECTORY_SERVER_389( DirectoryServer389VendorFactory.getInstance() ),
     ORACLE_DS ( new OracleDSVendorFactory() ),
+    FREEIPA ( FreeIPAVendorFactory.getInstance() ),
     GENERIC( new GenericEntryFactory() ),;
 
     private final VendorFactory vendorFactory;
