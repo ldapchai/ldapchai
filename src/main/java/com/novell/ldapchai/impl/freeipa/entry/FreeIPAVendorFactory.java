@@ -39,9 +39,7 @@ import java.util.Set;
 
 public class FreeIPAVendorFactory implements VendorFactory
 {
-    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_NAME = "vendorName";
-    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
-    private static final String ROOT_DSE_ATTRIBUTE_SUPPORTED_EXTENSION = "supportedExtension";
+    private static final String ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION = "ipaTopologyPluginVersion";
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
@@ -90,67 +88,25 @@ public class FreeIPAVendorFactory implements VendorFactory
     public Set<String> interestedDseAttributes()
     {
         return Collections.unmodifiableSet( new HashSet<>( Arrays.asList(
-                ROOT_DSE_ATTRIBUTE_VENDOR_NAME,
-                ROOT_DSE_ATTRIBUTE_VENDOR_VERSION,
-                ROOT_DSE_ATTRIBUTE_SUPPORTED_EXTENSION
+                ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION
         ) ) );
     }
 
     @Override
     public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
     {
-        boolean nameMatch = false;
-        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION ) )
         {
-            for ( final String vendorName : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
+            for ( final String ipaTopologyPluginVersion : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION ) )
             {
-                if ( vendorName.contains( "389 Project" ) )
+                if ( Double.parseDouble( ipaTopologyPluginVersion ) >= 1.0 )
                 {
-                    nameMatch = true;
-                    break;
+                    return true;
                 }
             }
         }
-        if ( !nameMatch )
-        {
-            return false;
-        }
 
-        boolean versionMatch = false;
-        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
-        {
-            for ( final String vendorVersion : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
-            {
-                if ( vendorVersion.contains( "389-Directory" ) )
-                {
-                    versionMatch = true;
-                    break;
-                }
-            }
-        }
-        if ( !versionMatch )
-        {
-            return false;
-        }
-
-        boolean supportedExtensionMatch = false;
-        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_SUPPORTED_EXTENSION ) )
-        {
-            for ( final String supportedExtension : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_SUPPORTED_EXTENSION ) )
-            {
-                if ( supportedExtension.startsWith( "2.16.840.1.113730.3.8." ) )
-                {
-                    supportedExtensionMatch = true;
-                    break;
-                }
-            }
-        }
-        if ( !supportedExtensionMatch )
-        {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     @Override
