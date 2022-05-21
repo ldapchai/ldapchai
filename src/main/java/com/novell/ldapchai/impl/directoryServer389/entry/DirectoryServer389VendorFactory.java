@@ -41,6 +41,7 @@ public class DirectoryServer389VendorFactory implements VendorFactory
 {
     private static final String ROOT_DSE_ATTRIBUTE_VENDOR_NAME = "vendorName";
     private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
+    private static final String ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION = "ipaTopologyPluginVersion";
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
@@ -97,22 +98,32 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     @Override
     public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
     {
-        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
+        if ( rootDseAttributeValues == null )
+        {
+            return false;
+        }
+
+        if ( rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION ) )
+        {
+            return false;
+        }
+
+        if ( rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
         {
             for ( final String vendorName : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
             {
-                if ( vendorName.contains( "389 Project" ) )
+                if ( vendorName.startsWith( "389 Project" ) )
                 {
                     return true;
                 }
             }
         }
 
-        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
+        if ( rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
         {
-            for ( final String vendorName : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
+            for ( final String vendorVersion : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
             {
-                if ( vendorName.contains( "389-Directory" ) )
+                if ( vendorVersion.startsWith( "389-Directory" ) )
                 {
                     return true;
                 }
