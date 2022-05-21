@@ -91,7 +91,8 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     {
         return Collections.unmodifiableSet( new HashSet<>( Arrays.asList(
                 ROOT_DSE_ATTRIBUTE_VENDOR_NAME,
-                ROOT_DSE_ATTRIBUTE_VENDOR_VERSION
+                ROOT_DSE_ATTRIBUTE_VENDOR_VERSION,
+                ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION
         ) ) );
     }
 
