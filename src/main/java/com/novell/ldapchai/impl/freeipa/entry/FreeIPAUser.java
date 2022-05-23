@@ -22,6 +22,7 @@ package com.novell.ldapchai.impl.freeipa.entry;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
@@ -31,19 +32,63 @@ import java.time.Instant;
 import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.Collections;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.time.temporal.ChronoUnit;
 
 class FreeIPAUser extends AbstractChaiUser implements ChaiUser
 {
+    private static final String ATTR_PRINCIPAL_NAME = "krbPrincipalName";
+
     private static final String ATTR_ACCOUNT_LOCK = "nsAccountLock";
     private static final String ATTR_PASSWORD_EXPIRATION_TIME = "krbPasswordExpiration";
     private static final String ATTR_LAST_PASSWORD_CHANGE_TIME = "krbLastPwdChange";
     private static final String ATTR_LAST_FAILED_AUTH_TIME = "krbLastFailedAuth";
     private static final String ATTR_LAST_ADMIN_UNLOCK_TIME = "krbLastAdminUnlock";
     private static final String ATTR_LOGIN_FAILED_COUNT = "krbLoginFailedCount";
+    private static final String ATTR_PWD_POLICY_REFERENCE = "krbPwdPolicyReference";
+
+    private static final String ATTR_IPA_PWD_POLICY_MAX_FAILURE = "krbPwdMaxFailure";
+    private static final String ATTR_IPA_PWD_POLICY_LOCKOUT_DURATION = "krbPwdLockoutDuration";
+    private static final String ATTR_IPA_PWD_POLICY_FAIL_COUNT_INTERVAL = "krbPwdFailureCountInterval";
 
     FreeIPAUser( final String userDN, final ChaiProvider chaiProvider )
     {
         super( userDN, chaiProvider );
+    }
+
+    public String getRealm()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final String principalName = readStringAttribute( ATTR_PRINCIPAL_NAME );
+        if ( principalName != null )
+        {
+            final Pattern pattern = Pattern.compile( "@([^@]+)$" );
+            final Matcher matcher = pattern.matcher( principalName );
+            if ( matcher.find() )
+            {
+                return matcher.group( 1 );
+            }
+        }
+
+        return null;
+    }
+
+    public String getNamingContext()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final String entryDN = getEntryDN();
+        if ( entryDN != null )
+        {
+            final Pattern pattern = Pattern.compile( ",(dc=.*)$" );
+            final Matcher matcher = pattern.matcher( entryDN );
+            if ( matcher.find() )
+            {
+                return matcher.group( 1 );
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -83,6 +128,25 @@ class FreeIPAUser extends AbstractChaiUser implements ChaiUser
     }
 
     @Override
+    public ChaiPasswordPolicy getPasswordPolicy()
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        String pwdPolicyEntryDn = readStringAttribute( ATTR_PWD_POLICY_REFERENCE );
+        if ( pwdPolicyEntryDn == null || pwdPolicyEntryDn.isEmpty() )
+        {
+            pwdPolicyEntryDn = "cn=global_policy,cn=" + getRealm() + ",cn=kerberos," + getNamingContext();
+        }
+
+        final FreeIPAEntry pwdPolicyEntry = new FreeIPAEntry( pwdPolicyEntryDn, getChaiProvider() );
+        if ( pwdPolicyEntry.exists() )
+        {
+            return new FreeIPAPasswordPolicy( pwdPolicyEntryDn, getChaiProvider() );
+        }
+
+        return null;
+    }
+
+    @Override
     public boolean isPasswordExpired()
             throws ChaiUnavailableException, ChaiOperationException
     {
@@ -103,14 +167,50 @@ class FreeIPAUser extends AbstractChaiUser implements ChaiUser
     public boolean isAccountEnabled()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return !this.isLocked();
+        return !readBooleanAttribute( ATTR_ACCOUNT_LOCK );
+    }
+
+    @Override
+    public boolean isPasswordLocked()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final ChaiPasswordPolicy pwdPolicy = getPasswordPolicy();
+        if ( pwdPolicy == null )
+        {
+            return false;
+        }
+
+        try
+        {
+            final int loginFailedCount = readIntAttribute( ATTR_LOGIN_FAILED_COUNT );
+            final int maxFailures = Integer.parseInt( pwdPolicy.getValue( ATTR_IPA_PWD_POLICY_MAX_FAILURE ) );
+
+            if ( loginFailedCount < maxFailures )
+            {
+                return false;
+            }
+
+            final Instant lastFailedAuth = readDateAttribute( ATTR_LAST_FAILED_AUTH_TIME );
+            final int lockoutDuration = Integer.parseInt( pwdPolicy.getValue( ATTR_IPA_PWD_POLICY_LOCKOUT_DURATION ) );
+
+            if ( lastFailedAuth.plus( lockoutDuration, ChronoUnit.SECONDS ).isBefore( Instant.now() ) )
+            {
+                return false;
+            }
+        }
+        catch ( NumberFormatException e )
+        {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
     public boolean isLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        return readBooleanAttribute( ATTR_ACCOUNT_LOCK );
+        return isPasswordExpired();
     }
 
     @Override
