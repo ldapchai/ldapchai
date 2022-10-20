@@ -19,6 +19,10 @@
 
 package com.novell.ldapchai.util.internal;
 
+import org.slf4j.event.Level;
+
+import java.util.function.Supplier;
+
 /**
  * Internal Chai API logging wrapper.  Users of Chai should ignore this class.
  *
@@ -26,92 +30,73 @@ package com.novell.ldapchai.util.internal;
  */
 public class ChaiLogger
 {
-    private final String name;
     private final org.slf4j.Logger logger;
 
-    public static ChaiLogger getLogger( final Class<?> className )
+    private ChaiLogger( final Class<?> clazz )
     {
-        return new ChaiLogger( className.getName() );
+        logger = org.slf4j.LoggerFactory.getLogger( clazz );
     }
 
-    public static ChaiLogger getLogger( final String name )
+    public static ChaiLogger getLogger( final Class<?> clazz )
     {
-        return new ChaiLogger( name );
+        return new ChaiLogger( clazz );
     }
 
-    public ChaiLogger( final String name )
+    public void debug( final Supplier<String> message )
     {
-        this.name = name;
-        logger = org.slf4j.LoggerFactory.getLogger( name );
+        doLog( Level.TRACE, message, null );
     }
 
-    public String getName()
+    public void debug( final Supplier<String> message, final Exception exception )
     {
-        return name;
+        doLog( Level.TRACE, message, exception );
     }
 
-    public void debug( final String message )
+    public void error( final Supplier<String> message )
     {
-        logger.debug( message );
+        doLog( Level.ERROR, message, null );
     }
 
-    public void debug( final String message, final Exception exception )
+    public void error( final Supplier<String> message, final Exception exception )
     {
-        logger.trace( message, exception );
+        doLog( Level.ERROR, message, exception );
     }
 
-    public void error( final String message )
+    public void info( final Supplier<String> message )
     {
-        logger.error( message );
+        doLog( Level.INFO, message, null );
     }
 
-    public void error( final String message, final Exception exception )
+    public void info( final Supplier<String> message, final Exception exception )
     {
-        logger.error( message, exception );
+        doLog( Level.INFO, message, exception );
     }
 
-    public void info( final String message )
+    public void trace( final Supplier<String> message )
     {
-        logger.info( message );
+        doLog( Level.TRACE, message, null );
     }
 
-    public void info( final String message, final Exception exception )
+    public void trace( final Supplier<String> message, final Exception exception )
     {
-        logger.info( message, exception );
+        doLog( Level.TRACE, message, exception );
     }
 
-    public boolean isDebugEnabled()
+    public void warn( final Supplier<String> message )
     {
-        return logger.isDebugEnabled();
+        doLog( Level.WARN, message, null );
     }
 
-    public boolean isInfoEnabled()
+    public void warn( final Supplier<String> message, final Exception exception )
     {
-        return logger.isInfoEnabled();
+        doLog( Level.WARN, message, exception );
     }
 
-    public boolean isTraceEnabled()
+    private void doLog( final Level level, final Supplier<String> message, final Exception exception )
     {
-        return logger.isTraceEnabled();
-    }
+        logger.makeLoggingEventBuilder( level )
+                .setCause( exception )
+                .log( message );
 
-    public void trace( final String message )
-    {
-        logger.trace( message );
-    }
-
-    public void trace( final String message, final Exception exception )
-    {
-        logger.debug( message, exception );
-    }
-
-    public void warn( final String message )
-    {
-        logger.warn( message );
-    }
-
-    public void warn( final String message, final Exception exception )
-    {
-        logger.warn( message, exception );
     }
 }

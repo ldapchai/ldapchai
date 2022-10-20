@@ -329,18 +329,18 @@ public class EdirEntries
                     if ( pwordPolicy.getRuleHelper().isPolicyEnabled() )
                     {
                         // we've got a policy, and rules are enabled, now read the policy.
-                        LOGGER.trace( "using active universal password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN() );
+                        LOGGER.trace( () -> "using active universal password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN() );
                         usedUniversalPolicy = true;
                     }
                     else
                     {
-                        LOGGER.debug( "ignoring unenabled nspm password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN() );
+                        LOGGER.debug( () -> "ignoring unenabled nspm password policy for user " + theUser.getEntryDN() + " at " + policyEntry.getEntryDN() );
                     }
                 }
             }
             catch ( ChaiOperationException e )
             {
-                LOGGER.error( "ldap error reading universal password policy: " + e.getMessage() );
+                LOGGER.error( () -> "ldap error reading universal password policy: " + e.getMessage() );
                 throw e;
             }
 
@@ -350,11 +350,11 @@ public class EdirEntries
                 try
                 {
                     pwordPolicy = readTraditionalPasswordRules( theUser );
-                    LOGGER.trace( "read traditional (non-nmas) password attributes from user entry " + theUser.getEntryDN() );
+                    LOGGER.trace( () -> "read traditional (non-nmas) password attributes from user entry " + theUser.getEntryDN() );
                 }
                 catch ( ChaiOperationException e )
                 {
-                    LOGGER.error( "ldap error reading traditional password policy: " + e.getMessage() );
+                    LOGGER.error( () -> "ldap error reading traditional password policy: " + e.getMessage() );
                 }
             }
 

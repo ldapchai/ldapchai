@@ -48,7 +48,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 
     private static final ChaiProviderInputValidator INPUT_VALIDATOR = new ChaiProviderInputValidator();
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractProvider.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractProvider.class );
 
     protected ChaiConfiguration chaiConfig;
     private ChaiProviderFactory providerFactory;
@@ -660,7 +660,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             final String requestID = request.getID();
             if ( cacheFailureMap.containsKey( requestID ) )
             {
-                LOGGER.debug( "previous extended operation request for " + requestID + " has failed, reissuing cached exception without attempting operation" );
+                LOGGER.debug( () -> "previous extended operation request for " + requestID + " has failed, reissuing cached exception without attempting operation" );
                 throw ( ChaiOperationException ) cacheFailureMap.get( requestID );
             }
         }
@@ -679,7 +679,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
                 final Map<String, Exception> cacheFailureMap = ( Map<String, Exception> ) providerProps.get( EXTENDED_FAILURE_CACHE_KEY );
                 final String requestID = request.getID();
                 cacheFailureMap.put( requestID, opExcep );
-                LOGGER.trace( "caching extended operation for " + requestID );
+                LOGGER.trace( () -> "caching extended operation for " + requestID );
                 throw opExcep;
             }
         }
@@ -721,7 +721,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
             }
             catch ( ChaiOperationException e )
             {
-                LOGGER.warn( "error while attempting to determine directory vendor: " + e.getMessage() );
+                LOGGER.warn( () -> "error while attempting to determine directory vendor: " + e.getMessage() );
                 cachedDirectoryVendor = DirectoryVendor.GENERIC;
             }
         }
@@ -764,7 +764,7 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
         else
         {
-            LOGGER.warn( "unexpected chai api error: " + e.getMessage(), e );
+            LOGGER.warn( () -> "unexpected chai api error: " + e.getMessage(), e );
             throw new IllegalStateException( e.getMessage(), e );
         }
     }

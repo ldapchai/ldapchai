@@ -68,7 +68,7 @@ import java.util.Set;
 
 public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderImplementor
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( JLDAPProviderImpl.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( JLDAPProviderImpl.class );
     private LDAPConnection ldapConnection;
 
     //@todo test case needed
@@ -105,7 +105,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
                     }
                     catch ( Exception e )
                     {
-                        LOGGER.error( "error creating promiscuous ssl ldap socket factory: " + e.getMessage() );
+                        LOGGER.error( () -> "error creating promiscuous ssl ldap socket factory: " + e.getMessage() );
                     }
                 }
                 else if ( chaiConfig.getTrustManager() != null )
@@ -118,7 +118,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
                     }
                     catch ( Exception e )
                     {
-                        LOGGER.error( "error creating configured ssl ldap socket factory: " + e.getMessage() );
+                        LOGGER.error( () -> "error creating configured ssl ldap socket factory: " + e.getMessage() );
                     }
                 }
                 else
@@ -170,7 +170,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
             }
             catch ( LDAPException e )
             {
-                LOGGER.warn( "error closing connection", e );
+                LOGGER.warn( () -> "error closing connection", e );
             }
         }
         super.close();

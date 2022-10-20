@@ -267,7 +267,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         }
         catch ( Exception e )
         {
-            LOGGER.trace( "error during exists check of '" + this.getEntryDN() + "', error: " + e.getMessage() );
+            LOGGER.trace( () -> "error during exists check of '" + this.getEntryDN() + "', error: " + e.getMessage() );
         }
 
         return false;
@@ -361,7 +361,7 @@ public abstract class AbstractChaiEntry implements ChaiEntry
                     }
                     catch ( UnknownHostException | ArrayIndexOutOfBoundsException e )
                     {
-                        LOGGER.error( "error while parsing network address '" + strValue + "' " + e.getMessage() );
+                        LOGGER.error( () -> "error while parsing network address '" + strValue + "' " + e.getMessage() );
                     }
                     break;
 

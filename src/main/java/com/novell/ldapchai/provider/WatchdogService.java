@@ -21,6 +21,8 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.util.internal.ChaiLogger;
 
+import java.io.Closeable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimerTask;
@@ -31,7 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-class WatchdogService
+class WatchdogService implements Closeable
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogService.class );
 
@@ -79,7 +81,7 @@ class WatchdogService
                 if ( !issuedWatchdogWrappers.allValues().isEmpty() )
                 {
                     // if there are active providers.
-                    LOGGER.debug( "starting up " + THREAD_NAME + ", " + watchdogFrequency + "ms check frequency" );
+                    LOGGER.debug( () -> "starting up " + THREAD_NAME + ", " + watchdogFrequency + "ms check frequency" );
 
                     // create a new timer
                     startWatchdogThread();
@@ -133,7 +135,7 @@ class WatchdogService
                     + wdWrapper.getIdentifier()
                     + ", error: " + e.getMessage();
 
-            LOGGER.warn( errorMsg );
+            LOGGER.warn( () -> errorMsg );
         }
     }
 
@@ -152,20 +154,20 @@ class WatchdogService
                 }
                 catch ( Throwable e )
                 {
-                    LOGGER.error( "error during watchdog timer check: " + e.getMessage() );
+                    LOGGER.error( () -> "error during watchdog timer check: " + e.getMessage() );
                 }
 
                 final int currentCollectionSize = issuedWatchdogWrappers.allValues().size();
                 if ( copyCollection.size() != currentCollectionSize )
                 {
-                    LOGGER.trace( "outstanding providers: " + currentCollectionSize );
+                    LOGGER.trace( () -> "outstanding providers: " + currentCollectionSize );
                 }
             }
 
             if ( copyCollection.isEmpty() )
             {
                 // if there are no active providers
-                LOGGER.debug( "exiting " + THREAD_NAME + ", no connections requiring monitoring are in use" );
+                LOGGER.debug( () -> "exiting " + THREAD_NAME + ", no connections requiring monitoring are in use" );
 
                 serviceThreadLock.lock();
                 try
@@ -178,6 +180,31 @@ class WatchdogService
                     serviceThreadLock.unlock();
                 }
             }
+        }
+    }
+
+    @Override
+    public void close()
+    {
+        try
+        {
+            serviceThreadLock.lock();
+            if ( watchdogTimer != null )
+            {
+                watchdogTimer.shutdown();
+                watchdogTimer = null;
+            }
+
+            final Collection<WatchdogWrapper> wrappers = issuedWatchdogWrappers.allValues();
+            for ( final WatchdogWrapper watchdogWrapper : wrappers )
+            {
+                watchdogWrapper.close();
+                issuedWatchdogWrappers.remove( watchdogWrapper );
+            }
+        }
+        finally
+        {
+            serviceThreadLock.unlock();
         }
     }
 }

@@ -47,13 +47,13 @@ class ThreadSafeWrapper extends AbstractWrapper
         if ( !threadSafeEnabled )
         {
             final String errorStr = "attempt to obtain ThreadSafeWrapper wrapper when thread safe is not enabled in chai config";
-            LOGGER.warn( errorStr );
+            LOGGER.warn( () -> errorStr );
             throw new IllegalStateException( errorStr );
         }
 
         if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof ThreadSafeWrapper )
         {
-            LOGGER.warn( "attempt to obtain ThreadSafeWrapper wrapper for already wrapped Provider." );
+            LOGGER.warn( () -> "attempt to obtain ThreadSafeWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 

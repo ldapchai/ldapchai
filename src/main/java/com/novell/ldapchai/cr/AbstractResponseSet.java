@@ -35,7 +35,7 @@ import java.util.Map;
 
 public abstract class AbstractResponseSet implements ResponseSet
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractResponseSet.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractResponseSet.class );
 
     public enum STATE
     {

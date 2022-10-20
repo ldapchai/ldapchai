@@ -76,13 +76,13 @@ class WatchdogWrapper implements ChaiProviderImplementor
             final String errorStr = "attempt to obtain WatchdogWrapper wrapper when watchdog is not enabled in chai config id="
                     + chaiProvider.getIdentifier();
 
-            LOGGER.warn( errorStr );
+            LOGGER.warn( () -> errorStr );
             throw new IllegalStateException( errorStr );
         }
 
         if ( chaiProvider instanceof WatchdogWrapper )
         {
-            LOGGER.debug( "attempt to obtain WatchdogWrapper wrapper for already wrapped Provider id=" + chaiProvider.getIdentifier() );
+            LOGGER.debug( () -> "attempt to obtain WatchdogWrapper wrapper for already wrapped Provider id=" + chaiProvider.getIdentifier() );
             return chaiProvider;
         }
 
@@ -371,7 +371,7 @@ class WatchdogWrapper implements ChaiProviderImplementor
         }
         catch ( ChaiOperationException e )
         {
-            LOGGER.error( "unexpected ChaiOperationException during getDirectoryVendor " + e.getMessage(), e );
+            LOGGER.error( () -> "unexpected ChaiOperationException during getDirectoryVendor " + e.getMessage(), e );
         }
         return null;
     }
@@ -474,14 +474,14 @@ class WatchdogWrapper implements ChaiProviderImplementor
         }
         catch ( ChaiException e )
         {
-            LOGGER.error( "unexpected error attempting to read user password expiration value during"
+            LOGGER.error( () -> "unexpected error attempting to read user password expiration value during"
                     + " watchdog initialization, will assume expiration, error: " + e.getMessage() );
             userPwExpired = true;
         }
 
         if ( userPwExpired )
         {
-            LOGGER.info( "connection user account password is currently expired.  Disabling watchdog timeout. id=" + this.getIdentifier() );
+            LOGGER.info( () -> "connection user account password is currently expired.  Disabling watchdog timeout. id=" + this.getIdentifier() );
             return true;
         }
 

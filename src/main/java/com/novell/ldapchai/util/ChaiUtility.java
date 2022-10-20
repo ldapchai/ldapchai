@@ -316,7 +316,7 @@ public final class ChaiUtility
 
         final List<String> ldapURLs = chaiConfiguration.bindURLsAsList();
 
-        LOGGER.trace( "testAttributeReplication, will test the following ldap urls: " + ldapURLs );
+        LOGGER.trace( () -> "testAttributeReplication, will test the following ldap urls: " + ldapURLs );
 
         int testCount = 0;
         int successCount = 0;
@@ -363,13 +363,12 @@ public final class ChaiUtility
             }
         }
 
-        if ( LOGGER.isDebugEnabled() )
-        {
-            final String debugMsg = "testAttributeReplication for " + chaiEntry + ":" + attribute
-                    + " " + testCount + " up," + " " + ( ldapURLs.size() - testCount ) + " down,"
-                    + " " + successCount + " in sync";
-            LOGGER.debug( debugMsg );
-        }
+        final int finalTestCount = testCount;
+        final int finalSuccessCount = successCount;
+
+        LOGGER.debug( () -> "testAttributeReplication for " + chaiEntry + ":" + attribute
+                + " " + finalTestCount + " up," + " " + ( ldapURLs.size() - finalTestCount ) + " down,"
+                + " " + finalSuccessCount + " in sync" );
 
         return testCount > 0 && testCount == successCount;
     }

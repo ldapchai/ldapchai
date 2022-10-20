@@ -91,7 +91,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         }
         catch ( ChaiOperationException e )
         {
-            LOGGER.debug( "unexpected error while checking [nmas] password policy: " + e.getMessage() );
+            LOGGER.debug( () -> "unexpected error while checking [nmas] password policy: " + e.getMessage() );
             return true;
         }
         if ( response != null )
@@ -100,7 +100,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             final int responseCode = setResponse.getNmasRetCode();
             if ( responseCode != 0 )
             {
-                LOGGER.debug( "nmas response code returned from server while testing nmas password: " + responseCode );
+                LOGGER.debug( () -> "nmas response code returned from server while testing nmas password: " + responseCode );
                 final String errorString = "nmas error " + responseCode;
                 throw new ChaiPasswordPolicyException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
             }
@@ -177,16 +177,16 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
 
                 // NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND
                 case ( -16049 ):
-                    LOGGER.debug( "readPassword() reports: NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND " + responseCode );
+                    LOGGER.debug( () -> "readPassword() reports: NMAS_E_ENTRY_ATTRIBUTE_NOT_FOUND " + responseCode );
                     throw new ChaiOperationException( "object has no password attribute: error " + responseCode, ChaiError.NO_SUCH_ATTRIBUTE );
 
                 default:
-                    LOGGER.debug( "error testing nmas password: " + responseCode );
+                    LOGGER.debug( () -> "error testing nmas password: " + responseCode );
                     throw new ChaiOperationException( "error reading nmas password: error " + responseCode, ChaiError.UNKNOWN );
             }
         }
 
-        LOGGER.debug( "unknown error retrieving password (null response)" );
+        LOGGER.debug( () -> "unknown error retrieving password (null response)" );
         throw new ChaiOperationException( "unknown error retrieving password (null response)", ChaiError.UNKNOWN );
     }
 
@@ -226,7 +226,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
                 final int responseCode = setResponse.getNmasRetCode();
                 if ( responseCode != 0 )
                 {
-                    LOGGER.debug( "error setting nmas password: " + responseCode );
+                    LOGGER.debug( () -> "error setting nmas password: " + responseCode );
                     final String errorString = "nmas error " + responseCode;
                     if ( responseCode == -222 )
                     {
@@ -255,7 +255,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         final int remaining = StringHelper.convertStrToInt( userAttrs.get( ChaiConstant.ATTR_LDAP_LOGIN_GRACE_REMAINING ), 0 );
         if ( remaining != limit )
         {
-            LOGGER.debug( "user " + this.getEntryDN() + " has " + remaining + " grace logins remaining, marking as expired" );
+            LOGGER.debug( () -> "user " + this.getEntryDN() + " has " + remaining + " grace logins remaining, marking as expired" );
             return true;
         }
 
@@ -267,7 +267,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
             final long diff = expireDate.toEpochMilli() - System.currentTimeMillis();
             if ( diff <= 0 )
             {
-                LOGGER.debug( "user " + getEntryDN() + " password expired " + diff + " seconds ago (" + expireDate + ", marking as expired" );
+                LOGGER.debug( () -> "user " + getEntryDN() + " password expired " + diff + " seconds ago (" + expireDate + "), marking as expired" );
                 return true;
             }
         }
@@ -319,7 +319,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
                 final int responseCode = changeResponse.getNmasRetCode();
                 if ( responseCode != 0 )
                 {
-                    LOGGER.debug( "error changing nmas password: " + responseCode );
+                    LOGGER.debug( () -> "error changing nmas password: " + responseCode );
                     final String errorString = "nmas error " + responseCode;
                     throw new ChaiPasswordPolicyException( errorString, ChaiErrors.getErrorForMessage( errorString ) );
                 }

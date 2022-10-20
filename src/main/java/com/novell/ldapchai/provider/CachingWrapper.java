@@ -42,7 +42,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 class CachingWrapper extends AbstractWrapper
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( CachingWrapper.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( CachingWrapper.class );
 
     private final ChaiProvider realProvider;
     private final ChaiProvider memorizedProvider;
@@ -51,7 +51,7 @@ class CachingWrapper extends AbstractWrapper
     {
         if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof CachingWrapper )
         {
-            LOGGER.warn( "Attempt to obtain CachingWrapper wrapper for already wrapped Provider." );
+            LOGGER.warn( () -> "Attempt to obtain CachingWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 
@@ -65,7 +65,7 @@ class CachingWrapper extends AbstractWrapper
     {
         if ( Proxy.isProxyClass( providerImpl.getClass() ) && providerImpl instanceof CachingWrapper )
         {
-            LOGGER.warn( "attempt to obtain CachingWrapper wrapper for already wrapped provider" );
+            LOGGER.warn( () -> "attempt to obtain CachingWrapper wrapper for already wrapped provider" );
             throw new IllegalStateException( "chaiProvider is already wrapped for caching" );
         }
 
@@ -131,7 +131,7 @@ class CachingWrapper extends AbstractWrapper
         {
             if ( memorizedObject instanceof Memorizer )
             {
-                LOGGER.warn( "Attempt to re-memorized already wrapped memorized object" );
+                LOGGER.warn( () -> "Attempt to re-memorized already wrapped memorized object" );
                 return memorizedObject;
             }
 

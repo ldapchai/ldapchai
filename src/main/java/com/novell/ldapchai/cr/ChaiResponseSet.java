@@ -56,7 +56,7 @@ import java.util.TimeZone;
 
 public class ChaiResponseSet extends AbstractResponseSet
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiResponseSet.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiResponseSet.class );
 
     static final String SALT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
@@ -151,7 +151,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
         catch ( ChaiValidationException e )
         {
-            LOGGER.warn( "error writing XML response set", e );
+            LOGGER.warn(  () -> "error writing XML response set", e );
             throw new UnsupportedOperationException( e );
         }
     }
@@ -173,7 +173,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
         catch ( ChaiValidationException e )
         {
-            LOGGER.warn( "error", e );
+            LOGGER.warn( () -> "error", e );
             return false;
         }
 
@@ -232,16 +232,16 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
         catch ( ChaiOperationException e )
         {
-            LOGGER.warn( "ldap error writing response set: " + e.getMessage() );
+            LOGGER.warn( () -> "ldap error writing response set: " + e.getMessage() );
             throw e;
         }
         catch ( ChaiValidationException e )
         {
-            LOGGER.warn( "validation error", e );
+            LOGGER.warn( () -> "validation error", e );
             throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN );
         }
 
-        LOGGER.info( "successfully wrote Chai challenge/response set for user " + user.getEntryDN() );
+        LOGGER.info( () -> "successfully wrote Chai challenge/response set for user " + user.getEntryDN() );
         this.state = STATE.WRITTEN;
 
         return true;
@@ -262,7 +262,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         }
         catch ( ChaiValidationException | IOException e )
         {
-            LOGGER.warn( "validation error", e );
+            LOGGER.warn( () -> "validation error", e );
             throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN );
         }
     }
@@ -383,7 +383,7 @@ public class ChaiResponseSet extends AbstractResponseSet
                         }
                         catch ( ParseException e )
                         {
-                            LOGGER.error( "unexpected error attempting to parse timestamp: " + e.getMessage() );
+                            LOGGER.error( () -> "unexpected error attempting to parse timestamp: " + e.getMessage() );
                         }
                     }
                 }
@@ -413,7 +413,7 @@ public class ChaiResponseSet extends AbstractResponseSet
             }
             catch ( IOException e )
             {
-                LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
+                LOGGER.debug( () -> "error parsing stored response record: " + e.getMessage() );
             }
 
             Locale challengeLocale = Locale.getDefault();

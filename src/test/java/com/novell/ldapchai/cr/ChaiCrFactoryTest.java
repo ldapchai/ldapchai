@@ -2,6 +2,7 @@ package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.provider.ChaiConfiguration;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -13,6 +14,8 @@ import java.util.Map;
 
 public class ChaiCrFactoryTest
 {
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiCrFactoryTest.class );
+
     @Test
     public void testResponseSetAnswers()
             throws Exception
@@ -46,7 +49,8 @@ public class ChaiCrFactoryTest
             Assert.assertTrue("responseSet.test() fail for format type " + formatType,  tested );
             //System.out.println( responseSet.stringValue() );
             final Duration duration = Duration.between( startTime, Instant.now() );
-            System.out.println( " format " + formatType.name() + " time: " + duration.toString() );
+
+            LOGGER.trace( () ->  " format " + formatType.name() + " time: " + duration.toString() );
         }
     }
 }

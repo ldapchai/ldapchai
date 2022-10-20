@@ -167,7 +167,7 @@ class FailOverWrapper implements InvocationHandler
             // Check to make sure we haven't been closed while looping.
             if ( closed || rotationMachine == null )
             {
-                LOGGER.debug( "close detected while inside retry loop, throwing ChaiUnavailableException" );
+                LOGGER.debug( () -> "close detected while inside retry loop, throwing ChaiUnavailableException" );
                 throw new ChaiUnavailableException( "FailOverWrapper closed while retrying connection", ChaiError.COMMUNICATION );
             }
 
@@ -180,7 +180,7 @@ class FailOverWrapper implements InvocationHandler
             }
             catch ( NullPointerException e )
             {
-                LOGGER.debug( "RotationMachine unavailable" );
+                LOGGER.debug( () -> "RotationMachine unavailable" );
                 throw new ChaiUnavailableException( "RotationMachine unavailable while retrying connection", ChaiError.COMMUNICATION );
             }
 
@@ -286,7 +286,7 @@ class FailOverWrapper implements InvocationHandler
                     while ( LAST_KNOWN_GOOD_CACHE.size() > MAX_SIZE_LNG_CACHE )
                     {
                         LAST_KNOWN_GOOD_CACHE.keySet().iterator().remove();
-                        LOGGER.warn( "RotationMachine maximum Last Known Good cache size (" + MAX_SIZE_LNG_CACHE + ") exceeded, reducing cached entries " );
+                        LOGGER.warn( () -> "RotationMachine maximum Last Known Good cache size (" + MAX_SIZE_LNG_CACHE + ") exceeded, reducing cached entries " );
                     }
                 }
             }
@@ -315,7 +315,7 @@ class FailOverWrapper implements InvocationHandler
                 if ( LAST_KNOWN_GOOD_CACHE.containsKey( urlListHashCode ) )
                 {
                     activeSlot.set( LAST_KNOWN_GOOD_CACHE.get( urlListHashCode ) );
-                    LOGGER.debug( "using slot #" + activeSlot.get() + " (" + providerSlots.get(
+                    LOGGER.debug( () -> "using slot #" + activeSlot.get() + " (" + providerSlots.get(
                             activeSlot.get() ).getUrl() + ") as initial bind URL due to Last Known Good cache" );
                 }
             }
@@ -406,13 +406,13 @@ class FailOverWrapper implements InvocationHandler
         {
             if ( providerSlots.size() > 1 )
             {
-                LOGGER.warn( "current server " + providerSlots.get( activeSlot.get() ).getUrl()
+                LOGGER.warn( () -> "current server " + providerSlots.get( activeSlot.get() ).getUrl()
                         + " has failed, failing over to next server in list"
                         + ( ( errorCause != null ) ? ", last error: " + errorCause.getMessage() : "" ) );
             }
             else
             {
-                LOGGER.warn( "unable to reach ldap server " + providerSlots.get( activeSlot.get() ).getUrl()
+                LOGGER.warn( () -> "unable to reach ldap server " + providerSlots.get( activeSlot.get() ).getUrl()
                         + ( ( errorCause != null ) ? ", last error: " + errorCause.getMessage() : "" ) );
             }
             lastFailureTime = System.currentTimeMillis();
@@ -440,7 +440,7 @@ class FailOverWrapper implements InvocationHandler
 
                     if ( providerSlots.size() > 1 )
                     {
-                        LOGGER.info( "failing over to " + providerSlots.get( activeSlot.get() ).getUrl() );
+                        LOGGER.info( () -> "failing over to " + providerSlots.get( activeSlot.get() ).getUrl() );
                     }
 
                     try
@@ -453,11 +453,11 @@ class FailOverWrapper implements InvocationHandler
                         lastConnectionException = e;
                         if ( settings.failOverHelper.errorIsRetryable( e ) )
                         {
-                            LOGGER.debug( "error connecting to ldap server, will retry, " + e.getMessage() );
+                            LOGGER.debug( () -> "error connecting to ldap server, will retry, " + e.getMessage() );
                         }
                         else
                         {
-                            LOGGER.debug( "detected unretryable error while rotating servers: " + e.getMessage() );
+                            LOGGER.debug( () -> "detected unretryable error while rotating servers: " + e.getMessage() );
                             break;
                         }
                     }
@@ -492,7 +492,7 @@ class FailOverWrapper implements InvocationHandler
             catch ( Exception e )
             {
                 final String errorMsg = "unexepected error creating new FailOver ChaiProvider: " + e.getMessage();
-                LOGGER.error( errorMsg );
+                LOGGER.error( () -> errorMsg );
                 throw new IllegalStateException( errorMsg, e );
             }
         }

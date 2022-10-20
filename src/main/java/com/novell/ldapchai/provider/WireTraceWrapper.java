@@ -54,13 +54,13 @@ class WireTraceWrapper extends AbstractWrapper
         if ( !watchDogEnabled )
         {
             final String errorStr = "attempt to obtain WireTrace wrapper when watchdog is not enabled in chai config";
-            LOGGER.warn( errorStr );
+            LOGGER.warn( () -> errorStr );
             throw new IllegalStateException( errorStr );
         }
 
         if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof WireTraceWrapper )
         {
-            LOGGER.warn( "attempt to obtain WireTraceWrapper wrapper for already wrapped Provider." );
+            LOGGER.warn( () -> "attempt to obtain WireTraceWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 
@@ -115,10 +115,7 @@ class WireTraceWrapper extends AbstractWrapper
         final long opNumber = getNextCounter();
         final String messageLabel = "id=" + realProvider.getIdentifier() + ",op#" + opNumber;
 
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace( "begin " + messageLabel + " method " + AbstractProvider.methodToDebugStr( method, args ) );
-        }
+        LOGGER.trace( () -> "begin " + messageLabel + " method " + AbstractProvider.methodToDebugStr( method, args ) );
 
         final long startTime = System.currentTimeMillis();
         final Object result = method.invoke( realProvider, args );
@@ -137,10 +134,10 @@ class WireTraceWrapper extends AbstractWrapper
             }
         }
 
-        if ( LOGGER.isTraceEnabled() )
-        {
-            LOGGER.trace( "finish " + messageLabel + " result: " + ( debugResult == null ? "null" : debugResult ) + " (" + totalTime + "ms)" );
-        }
+        final String finalDebugResult = debugResult;
+        LOGGER.trace( () -> "finish " + messageLabel + " result: "
+                + ( finalDebugResult == null ? "null" : finalDebugResult )
+                + " (" + totalTime + "ms)" );
 
         return result;
     }

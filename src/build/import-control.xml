@@ -44,6 +44,9 @@
     <!-- gson -->
     <allow pkg="com.google.gson"/>
 
+    <!-- logging -->
+    <allow pkg="org.slf4j.event"/>
+
     <!-- jndi/ldap -->
     <allow pkg="javax.naming"/>
 

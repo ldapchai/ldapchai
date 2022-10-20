@@ -114,7 +114,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             final long startTime = System.currentTimeMillis();
             final LdapContext newDirContext;
             newDirContext = new InitialLdapContext( environment, null );
-            LOGGER.trace( "bind successful as " + bindDN + " (" + ( System.currentTimeMillis() - startTime ) + "ms)" );
+            LOGGER.trace( () -> "bind successful as " + bindDN + " (" + ( System.currentTimeMillis() - startTime ) + "ms)" );
             return newDirContext;
         }
         catch ( NamingException e )
@@ -222,14 +222,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             }
             catch ( Exception e )
             {
-                if ( LOGGER.isTraceEnabled() )
-                {
-                    LOGGER.warn( "unexpected error during jndi connection close " + e.getMessage(), e );
-                }
-                else
-                {
-                    LOGGER.warn( "unexpected error during jndi connection close " + e.getMessage() );
-                }
+                LOGGER.warn( () -> "unexpected error during jndi connection close " + e.getMessage(), e );
             }
             finally
             {
@@ -526,7 +519,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             }
             catch ( NamingException e )
             {
-                LOGGER.trace( "unexpected error closing naming exception: " + e.getMessage() );
+                LOGGER.trace( () -> "unexpected error closing naming exception: " + e.getMessage() );
             }
         }
     }
@@ -582,7 +575,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             }
             catch ( NamingException e )
             {
-                LOGGER.trace( "unexpected error closing naming exception: " + e.getMessage() );
+                LOGGER.trace( () -> "unexpected error closing naming exception: " + e.getMessage() );
             }
         }
     }
@@ -957,7 +950,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            LOGGER.trace( "error during write of attribute '" + attributeName + "', error: " + e.getMessage() );
+            LOGGER.trace( () -> "error during write of attribute '" + attributeName + "', error: " + e.getMessage() );
             convertNamingException( e );
         }
     }
@@ -1117,7 +1110,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 }
                 catch ( NoSuchAlgorithmException | KeyManagementException e )
                 {
-                    LOGGER.error( "error configuring promiscuous socket factory" );
+                    LOGGER.error( () -> "error configuring promiscuous socket factory" );
                 }
 
             }
@@ -1134,7 +1127,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                 }
                 catch ( NoSuchAlgorithmException | KeyManagementException e )
                 {
-                    LOGGER.error( "error configuring socket factory from configured trust manager" );
+                    LOGGER.error( () -> "error configuring socket factory from configured trust manager" );
                 }
             }
         }
@@ -1231,7 +1224,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     parseSearchResults( answer );
                     if ( pageCookie != null && previousResultSize == results.size() )
                     {
-                        LOGGER.warn( "ldap paged search has returned an empty result page, current result size=" + results.size() );
+                        LOGGER.warn( () -> "ldap paged search has returned an empty result page, current result size=" + results.size() );
                     }
 
                     // if paging enabled, read the cookie value.
@@ -1328,7 +1321,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     }
                     catch ( UnsupportedOperationException e )
                     {
-                        LOGGER.debug( "unable to use jndi NameInNamespace api: " + e.getMessage() );
+                        LOGGER.debug( () -> "unable to use jndi NameInNamespace api: " + e.getMessage() );
                     }
                 }
 
@@ -1354,9 +1347,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     attrValues.putAll( parseAttributeValues( attributeEnum, returnAllValues ) );
                 }
 
+                final String finalEntryDN = entryDN;
                 if ( results.containsKey( entryDN ) )
                 {
-                    LOGGER.warn( "ignoring duplicate DN in search result from ldap server: " + entryDN );
+                    LOGGER.warn( () -> "ignoring duplicate DN in search result from ldap server: " + finalEntryDN );
                 }
                 else
                 {

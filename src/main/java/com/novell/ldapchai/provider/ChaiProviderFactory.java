@@ -25,6 +25,7 @@ import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.util.internal.ChaiLogger;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -89,9 +90,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Jason D. Rivard
  */
-public final class ChaiProviderFactory
+public final class ChaiProviderFactory implements Closeable
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiProviderFactory.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ChaiProviderFactory.class );
 
     private final Map<ChaiProviderFactorySetting, String> chaiProviderFactorySettingStringMap;
 
@@ -172,11 +173,11 @@ public final class ChaiProviderFactory
             final String errorMsg = "unable to create connection: " + e.getClass().getName() + ":" + e.getMessage();
             if ( e instanceof ChaiException || e instanceof IOException )
             {
-                LOGGER.debug( errorMsg );
+                LOGGER.debug( () -> errorMsg );
             }
             else
             {
-                LOGGER.debug( errorMsg, e );
+                LOGGER.debug( () -> errorMsg, e );
             }
             throw new ChaiUnavailableException( "unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
         }
@@ -200,14 +201,10 @@ public final class ChaiProviderFactory
         }
         else
         {
-            if ( LOGGER.isTraceEnabled() )
-            {
-                final String debugMsg = "creating new ldap connection to "
+                LOGGER.trace( () -> "creating new ldap connection to "
                         + chaiConfiguration.getSetting( ChaiSetting.BIND_URLS )
                         + " as "
-                        + chaiConfiguration.getSetting( ChaiSetting.BIND_DN );
-                LOGGER.trace( debugMsg );
-            }
+                        + chaiConfiguration.getSetting( ChaiSetting.BIND_DN ) );
 
             return createConcreteProvider( this, chaiConfiguration, true );
         }
@@ -254,7 +251,7 @@ public final class ChaiProviderFactory
         catch ( ClassNotFoundException | IllegalAccessException | InstantiationException e )
         {
             final String msg = "unexpected error creating new concrete ChaiProvider instance: " + e.getMessage();
-            LOGGER.error( msg, e );
+            LOGGER.error( () -> msg, e );
             throw new IllegalStateException( msg );
         }
     }
@@ -274,37 +271,37 @@ public final class ChaiProviderFactory
 
         if ( enableWatchdog && !( outputProvider instanceof WatchdogWrapper ) )
         {
-            LOGGER.trace( "adding WatchdogWrapper to provider instance" );
+            LOGGER.trace( () -> "adding WatchdogWrapper to provider instance" );
             outputProvider = WatchdogWrapper.forProvider( this, outputProvider );
         }
 
         if ( enableReadOnly && !( outputProvider instanceof ReadOnlyWrapper ) )
         {
-            LOGGER.trace( "adding ReadOnlyWrapper to provider instance" );
+            LOGGER.trace( () -> "adding ReadOnlyWrapper to provider instance" );
             outputProvider = ReadOnlyWrapper.forProvider( outputProvider );
         }
 
         if ( enableWireTrace && !( outputProvider instanceof WireTraceWrapper ) )
         {
-            LOGGER.trace( "adding WireTraceWrapper to provider instance" );
+            LOGGER.trace( () -> "adding WireTraceWrapper to provider instance" );
             outputProvider = WireTraceWrapper.forProvider( outputProvider );
         }
 
         if ( enableStatistics && !( outputProvider instanceof StatisticsWrapper ) )
         {
-            LOGGER.trace( "adding StatisticsWrapper to provider instance" );
+            LOGGER.trace( () -> "adding StatisticsWrapper to provider instance" );
             outputProvider = StatisticsWrapper.forProvider( outputProvider );
         }
 
         if ( enableCaching && !( outputProvider instanceof CachingWrapper ) )
         {
-            LOGGER.trace( "adding CachingWrapper to provider instance" );
+            LOGGER.trace( () -> "adding CachingWrapper to provider instance" );
             outputProvider = CachingWrapper.forProvider( outputProvider );
         }
 
         if ( threadSafeEnabled && !( outputProvider instanceof ThreadSafeWrapper ) )
         {
-            LOGGER.trace( "adding ThreadSafeWrapper to provider instance" );
+            LOGGER.trace( () -> "adding ThreadSafeWrapper to provider instance" );
             outputProvider = ThreadSafeWrapper.forProvider( outputProvider );
         }
 
@@ -409,6 +406,9 @@ public final class ChaiProviderFactory
     public void close()
     {
         this.closed = true;
+
+        this.centralService.close();
+
         for ( final ChaiProvider chaiProvider : activeProviders() )
         {
             chaiProvider.close();
@@ -424,7 +424,7 @@ public final class ChaiProviderFactory
 
     }
 
-    static class CentralService
+    static class CentralService implements Closeable
     {
         private final WatchdogService watchdogService;
 
@@ -465,6 +465,12 @@ public final class ChaiProviderFactory
                     vendorCacheMap.entrySet().iterator().remove();
                 }
             }
+        }
+
+        @Override
+        public void close()
+        {
+            watchdogService.close();
         }
 
         DirectoryVendor getVendorCache( final ChaiConfiguration chaiConfiguration )

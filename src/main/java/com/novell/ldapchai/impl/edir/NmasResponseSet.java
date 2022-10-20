@@ -59,7 +59,7 @@ import java.util.Map;
 
 public class NmasResponseSet extends AbstractResponseSet
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( NmasResponseSet.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( NmasResponseSet.class );
 
     private final ChaiUser user;
 
@@ -85,12 +85,12 @@ public class NmasResponseSet extends AbstractResponseSet
             }
 
             final String xmlString = new String( responseValue, "UTF8" );
-            LOGGER.trace( "[parse v3]: read ChallengeResponseQuestions from server: " + xmlString );
+            LOGGER.trace( () -> "[parse v3]: read ChallengeResponseQuestions from server: " + xmlString );
             return readNmasUserResponseSet( theUser,  xmlString );
         }
         catch ( IOException | ChaiValidationException | ChaiOperationException e )
         {
-            LOGGER.error( "error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage() );
+            LOGGER.error( () -> "error reading nmas user response for " + theUser.getEntryDN() + ", error: " + e.getMessage() );
         }
 
         return null;
@@ -115,9 +115,9 @@ public class NmasResponseSet extends AbstractResponseSet
                 {
                     parseAttempts++;
                     final String xmlSubstring = xmlString.substring( beginIndex );
-                    LOGGER.trace( "attempting parse of index stripped value: " + xmlSubstring );
+                    LOGGER.trace( () -> "attempting parse of index stripped value: " + xmlSubstring );
                     cs = parseNmasUserResponseXML( xmlSubstring );
-                    LOGGER.trace( "successfully parsed nmas ChallengeResponseQuestions response after index " + beginIndex );
+                    LOGGER.trace( () -> "successfully parsed nmas ChallengeResponseQuestions response after index " + beginIndex );
                 }
                 catch ( IOException e )
                 {
@@ -126,7 +126,7 @@ public class NmasResponseSet extends AbstractResponseSet
                         parsingErrorMsg.append( ", " );
                     }
                     parsingErrorMsg.append( "error parsing index stripped value: " ).append( e.getMessage() );
-                    LOGGER.trace( "unable to parse index stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
+                    LOGGER.trace( () -> "unable to parse index stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
                 }
             }
         }
@@ -143,9 +143,9 @@ public class NmasResponseSet extends AbstractResponseSet
                 catch ( IOException e )
                 {
                     parsingErrorMsg.append( "error parsing raw value: " ).append( e.getMessage() );
-                    LOGGER.trace( "unable to parse raw ChallengeResponseQuestions nmas response; will retry after stripping header; error: " + e.getMessage() );
+                    LOGGER.trace( () -> "unable to parse raw ChallengeResponseQuestions nmas response; will retry after stripping header; error: " + e.getMessage() );
                 }
-                LOGGER.trace( "successfully parsed full nmas ChallengeResponseQuestions response" );
+                LOGGER.trace( () -> "successfully parsed full nmas ChallengeResponseQuestions response" );
             }
         }
 
@@ -159,7 +159,7 @@ public class NmasResponseSet extends AbstractResponseSet
                 {
                     parseAttempts++;
                     cs = parseNmasUserResponseXML( strippedXml );
-                    LOGGER.trace( "successfully parsed full nmas ChallengeResponseQuestions response" );
+                    LOGGER.trace( () -> "successfully parsed full nmas ChallengeResponseQuestions response" );
                 }
                 catch ( IOException e )
                 {
@@ -168,7 +168,7 @@ public class NmasResponseSet extends AbstractResponseSet
                         parsingErrorMsg.append( ", " );
                     }
                     parsingErrorMsg.append( "error parsing header stripped value: " ).append( e.getMessage() );
-                    LOGGER.trace( "unable to parse stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
+                    LOGGER.trace( () -> "unable to parse stripped ChallengeResponseQuestions nmas response; error: " + e.getMessage() );
                 }
             }
         }
@@ -179,11 +179,11 @@ public class NmasResponseSet extends AbstractResponseSet
             final String logMsg = "unable to parse nmas ChallengeResponseQuestions: " + parsingErrorMsg;
             if ( parseAttempts > 0 && xmlString.length() > 16 )
             {
-                LOGGER.error( logMsg );
+                LOGGER.error( () -> logMsg );
             }
             else
             {
-                LOGGER.trace( logMsg );
+                LOGGER.trace( () -> logMsg );
 
             }
             return null;
@@ -276,23 +276,23 @@ public class NmasResponseSet extends AbstractResponseSet
             final ExtendedResponse response = user.getChaiProvider().extendedOperation( request );
             if ( response != null && ( ( PutLoginConfigResponse ) response ).getNmasRetCode() != 0 )
             {
-                LOGGER.debug( "nmas error writing question: " + ( ( PutLoginConfigResponse ) response ).getNmasRetCode() );
+                LOGGER.debug( () -> "nmas error writing question: " + ( ( PutLoginConfigResponse ) response ).getNmasRetCode() );
                 return false;
             }
         }
         catch ( UnsupportedEncodingException e )
         {
-            LOGGER.error( "error while writing nmas questions: " + e.getMessage() );
+            LOGGER.error( () -> "error while writing nmas questions: " + e.getMessage() );
             return false;
         }
         catch ( ChaiOperationException e )
         {
-            LOGGER.error( "error while writing nmas questions: " + e.getMessage() );
+            LOGGER.error( () -> "error while writing nmas questions: " + e.getMessage() );
             throw e;
         }
         catch ( ChaiValidationException e )
         {
-            LOGGER.error( "error while writing nmas questions: " + e.getMessage() );
+            LOGGER.error( () -> "error while writing nmas questions: " + e.getMessage() );
             throw ChaiOperationException.forErrorMessage( e.getMessage() );
         }
 
@@ -316,19 +316,19 @@ public class NmasResponseSet extends AbstractResponseSet
                 final ExtendedResponse response = user.getChaiProvider().extendedOperation( request );
                 if ( response != null && ( ( PutLoginSecretResponse ) response ).getNmasRetCode() != 0 )
                 {
-                    LOGGER.debug( "nmas error writing answer: " + ( ( PutLoginSecretResponse ) response ).getNmasRetCode() );
+                    LOGGER.debug( () -> "nmas error writing answer: " + ( ( PutLoginSecretResponse ) response ).getNmasRetCode() );
                     success = false;
                 }
             }
             catch ( Exception e )
             {
-                LOGGER.error( "error while writing nmas answer: " + e.getMessage() );
+                LOGGER.error( () -> "error while writing nmas answer: " + e.getMessage() );
             }
         }
 
         if ( success )
         {
-            LOGGER.info( "successfully wrote NMAS challenge/response set for user " + user.getEntryDN() );
+            LOGGER.info( () -> "successfully wrote NMAS challenge/response set for user " + user.getEntryDN() );
             this.state = STATE.WRITTEN;
         }
 

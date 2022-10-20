@@ -72,7 +72,7 @@ class WatchdogProviderHolder
 
         chaiProviderFactory.getCentralService().getWatchdogService().registerInstance( watchdogWrapper );
 
-        LOGGER.trace( "created WatchdogProviderHolder " + getIdentifier() );
+        LOGGER.trace( () -> "created WatchdogProviderHolder " + getIdentifier() );
     }
 
     HolderStatus getStatus()
@@ -290,7 +290,7 @@ class WatchdogProviderHolder
             wdStatus = HolderStatus.ACTIVE;
             connectionEstablishedTime = Instant.now();
 
-            LOGGER.debug( "re-opened ldap connection id=" + getIdentifier() );
+            LOGGER.trace( () -> "re-opened ldap connection id=" + getIdentifier() );
 
             return realProvider;
         }
@@ -300,7 +300,7 @@ class WatchdogProviderHolder
                     + getIdentifier()
                     + ", error: "
                     + e.getMessage();
-            LOGGER.debug( msg );
+            LOGGER.debug( () -> msg );
             throw e;
         }
     }
@@ -316,7 +316,7 @@ class WatchdogProviderHolder
 
         wdStatus = HolderStatus.IDLE;
 
-        LOGGER.debug( "disconnecting underlying connection: " + debugMsg );
+        LOGGER.trace( () -> "disconnecting underlying connection: " + debugMsg );
 
         if ( realProvider != null )
         {

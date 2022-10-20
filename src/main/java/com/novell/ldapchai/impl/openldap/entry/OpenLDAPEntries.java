@@ -59,7 +59,7 @@ public class OpenLDAPEntries
             {
                 final String pwdPolicySubentryValue = searchEntry.readStringAttribute(
                         ChaiConstant.ATTR_OPENLDAP_PASSWORD_SUB_ENTRY );
-                LOGGER.trace( "pwdPolicySubentryValue = " + pwdPolicySubentryValue );
+                LOGGER.trace( () -> "pwdPolicySubentryValue = " + pwdPolicySubentryValue );
                 if ( pwdPolicySubentryValue != null && !pwdPolicySubentryValue.isEmpty() )
                 {
                     final OpenLDAPEntry policyEntry = new OpenLDAPEntry( pwdPolicySubentryValue,
@@ -79,7 +79,7 @@ public class OpenLDAPEntries
         }
 
         final String passwordPolicyDn = person.getChaiProvider().getChaiConfiguration().getSetting( ChaiSetting.OPENLDAP_PASSWORD_POLICY_DN );
-        LOGGER.debug( "passwordPolicyDn = " + passwordPolicyDn );
+        LOGGER.debug( () -> "passwordPolicyDn = " + passwordPolicyDn );
         if ( passwordPolicyDn != null && passwordPolicyDn.trim().length() > 0 )
         {
             final OpenLDAPPasswordPolicy defaultPolicy = new OpenLDAPPasswordPolicy( passwordPolicyDn, person.getChaiProvider() );

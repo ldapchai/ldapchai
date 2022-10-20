@@ -55,13 +55,13 @@ abstract class AbstractWrapper implements InvocationHandler
         if ( !isEnabled )
         {
             final String errorStr = "attempt to obtain " + wrapperClass.getName() + " wrapper when not enabled in chaiConfiguration";
-            LOGGER.warn( errorStr );
+            LOGGER.warn( () -> errorStr );
             throw new IllegalStateException( errorStr );
         }
 
         if ( Proxy.isProxyClass( chaiProvider.getClass() ) && wrapperClass.isInstance( chaiProvider ) )
         {
-            LOGGER.warn( "attempt to obtain " + wrapperClass.getName() + " wrapper for already wrapped ChaiProvider." );
+            LOGGER.warn( () -> "attempt to obtain " + wrapperClass.getName() + " wrapper for already wrapped ChaiProvider." );
             return chaiProvider;
         }
 
@@ -75,7 +75,7 @@ abstract class AbstractWrapper implements InvocationHandler
         catch ( Exception e )
         {
             final String errorMsg = "Chai internal error, unable to create wrapper for " + wrapperClass.getCanonicalName() + e.getMessage();
-            LOGGER.error( errorMsg, e );
+            LOGGER.error( () -> errorMsg, e );
             throw new Exception( errorMsg, e );
         }
     }
@@ -91,7 +91,7 @@ abstract class AbstractWrapper implements InvocationHandler
         catch ( IllegalAccessException e )
         {
             final String errorMsg = "unexpected api error: " + e.getMessage();
-            LOGGER.warn( errorMsg, e );
+            LOGGER.warn( () -> errorMsg, e );
             throw new IllegalStateException( errorMsg );
         }
         catch ( InvocationTargetException e )
@@ -104,7 +104,7 @@ abstract class AbstractWrapper implements InvocationHandler
             else
             {
                 final String errorMsg = "unexpected api error: " + e.getMessage();
-                LOGGER.warn( errorMsg, e );
+                LOGGER.warn( () -> errorMsg, e );
                 throw new IllegalStateException( errorMsg );
             }
         }

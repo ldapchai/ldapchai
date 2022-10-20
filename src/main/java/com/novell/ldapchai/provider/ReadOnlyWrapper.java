@@ -38,7 +38,7 @@ class ReadOnlyWrapper implements InvocationHandler
 {
 
 
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ReadOnlyWrapper.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( ReadOnlyWrapper.class );
 
     /**
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
@@ -49,7 +49,7 @@ class ReadOnlyWrapper implements InvocationHandler
     {
         if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof ReadOnlyWrapper )
         {
-            LOGGER.warn( "attempt to obtain ReadOnlyWrapper wrapper for already wrapped Provider." );
+            LOGGER.warn( () -> "attempt to obtain ReadOnlyWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 

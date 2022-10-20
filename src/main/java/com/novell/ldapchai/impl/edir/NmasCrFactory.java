@@ -75,7 +75,7 @@ public class NmasCrFactory
     {
         if ( challengeSetDN == null || challengeSetDN.length() < 1 )
         {
-            LOGGER.trace( "challengeSetDN is null, return null for readNmasAssignedChallengeSetPolicy()" );
+            LOGGER.trace( () -> "challengeSetDN is null, return null for readNmasAssignedChallengeSetPolicy()" );
             return null;
         }
 
@@ -100,7 +100,7 @@ public class NmasCrFactory
         }
         catch ( IOException e )
         {
-            LOGGER.debug( "error reading NMAS challenge set policy: " + e );
+            LOGGER.debug( () -> "error reading NMAS challenge set policy: " + e );
         }
 
         final int minRandQuestions = StringHelper.convertStrToInt( allValues.get( "nsimNumberRandomQuestions" ), 0 );
@@ -141,13 +141,13 @@ public class NmasCrFactory
         }
         catch ( ClassCastException e )
         {
-            LOGGER.trace( "password policy is not an nmas password policy, unable to read challenge set policy" );
+            LOGGER.trace( () -> "password policy is not an nmas password policy, unable to read challenge set policy" );
             return null;
         }
 
         if ( challengeSetDN == null )
         {
-            LOGGER.trace( "password policy does not have a challengeSetDN, return null for readAssignedChallengeSet()" );
+            LOGGER.trace( () -> "password policy does not have a challengeSetDN, return null for readAssignedChallengeSet()" );
             return null;
         }
 
@@ -172,7 +172,7 @@ public class NmasCrFactory
 
         if ( passwordPolicy == null )
         {
-            LOGGER.trace( "user does not have an assigned password policy, return null for readAssignedChallengeSet()" );
+            LOGGER.trace( () -> "user does not have an assigned password policy, return null for readAssignedChallengeSet()" );
             return null;
         }
 
@@ -216,7 +216,7 @@ public class NmasCrFactory
         if ( response != null && response.getNmasRetCode() != 0 )
         {
             final String errorMsg = "nmas error clearing loginResponseConfig: " + response.getNmasRetCode();
-            LOGGER.debug( errorMsg );
+            LOGGER.debug( () -> errorMsg );
             throw new ChaiOperationException( errorMsg, ChaiError.UNKNOWN );
         }
     }

@@ -282,7 +282,7 @@ public class OracleDSPasswordPolicy extends OracleDSEntry implements ChaiPasswor
             }
             catch ( Exception e )
             {
-                LOGGER.error( "error while parsing " + ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT + " value: " + e.getMessage() );
+                LOGGER.error( () -> "error while parsing " + ChaiConstant.ATTR_ORACLEDS_PASSWORD_POLICY_HISTORY_COUNT + " value: " + e.getMessage() );
             }
         }
 

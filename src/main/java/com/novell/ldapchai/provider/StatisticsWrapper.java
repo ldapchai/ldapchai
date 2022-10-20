@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.LongAdder;
  */
 class StatisticsWrapper implements InvocationHandler
 {
-    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( StatisticsWrapper.class.getName() );
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( StatisticsWrapper.class );
 
     /**
      * The standard wrapper manages updating statistics and handling the wire trace functionality.
@@ -55,7 +55,7 @@ class StatisticsWrapper implements InvocationHandler
     {
         if ( Proxy.isProxyClass( chaiProvider.getClass() ) && chaiProvider instanceof StatisticsWrapper )
         {
-            LOGGER.warn( "attempt to obtain StatisticsWrapper wrapper for already wrapped Provider." );
+            LOGGER.warn( () -> "attempt to obtain StatisticsWrapper wrapper for already wrapped Provider." );
             return chaiProvider;
         }
 

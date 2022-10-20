@@ -273,16 +273,16 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
 
         // read all attribute values from entry.
         allEntryValues.putAll( readStringAttributes( LDAP_PASSWORD_ATTRIBUTES ) );
-        LOGGER.trace( "allEntryValues = " + allEntryValues );
+        LOGGER.trace( () -> "allEntryValues = " + allEntryValues );
         final String pwdCheckQuality = allEntryValues.get( ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_CHECK_QUALITY );
-        LOGGER.debug( "pwdCheckQuality = " + pwdCheckQuality );
+        LOGGER.debug( () -> "pwdCheckQuality = " + pwdCheckQuality );
         if ( Objects.equals( "1", pwdCheckQuality ) || Objects.equals( "2", pwdCheckQuality ) )
         {
             allEntryValues.putAll( readCheckPasswordAttributes() );
         }
-        LOGGER.trace( "allEntryValues = " + allEntryValues );
+        LOGGER.trace( () -> "allEntryValues = " + allEntryValues );
         ruleMap.putAll( createRuleMapUsingAttributeValues( allEntryValues ) );
-        LOGGER.trace( "ruleMap = " + ruleMap );
+        LOGGER.trace( () -> "ruleMap = " + ruleMap );
 
         this.provider = chaiProvider;
     }
@@ -312,7 +312,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
         }
         catch ( IOException e )
         {
-            LOGGER.debug( "unable to read openldap password policy configuration attributes from " + policyFileUrl + ", error=" + e.getMessage() );
+            LOGGER.debug( () -> "unable to read openldap password policy configuration attributes from " + policyFileUrl + ", error=" + e.getMessage() );
         }
         finally
         {
@@ -349,7 +349,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             {
                 returnMap.put( rule.getKey(), attribute.getDefaultValue() );
                 final String attributeName = attribute.getLdapAttribute();
-                LOGGER.trace( "attributeName = " + attributeName );
+                LOGGER.trace( () -> "attributeName = " + attributeName );
                 if ( attributeName != null && entryValues != null && entryValues.containsKey( attributeName ) )
                 {
                     returnMap.put( rule.getKey(), entryValues.get( attributeName ) );
@@ -374,7 +374,7 @@ public class OpenLDAPPasswordPolicy extends OpenLDAPEntry implements ChaiPasswor
             }
             catch ( Exception e )
             {
-                LOGGER.error( "error while parsing " + ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT + " value: "
+                LOGGER.error( () -> "error while parsing " + ChaiConstant.ATTR_OPENLDAP_PASSWORD_POLICY_HISTORY_COUNT + " value: "
                         + e.getMessage() );
             }
         }

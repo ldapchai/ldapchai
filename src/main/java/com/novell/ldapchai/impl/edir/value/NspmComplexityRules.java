@@ -115,7 +115,7 @@ public class NspmComplexityRules
         }
         catch ( IOException | IllegalArgumentException e )
         {
-            LOGGER.debug( "error parsing stored response record: " + e.getMessage() );
+            LOGGER.debug( () -> "error parsing stored response record: " + e.getMessage() );
         }
         return returnList;
     }
