@@ -26,6 +26,7 @@ import com.novell.ldapchai.impl.edir.entry.EDirectoryVendorFactory;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
 import com.novell.ldapchai.impl.openldap.entry.OpenLDAPVendorFactory;
 import com.novell.ldapchai.impl.oracleds.entry.OracleDSVendorFactory;
+import com.novell.ldapchai.impl.freeipa.entry.FreeIPAVendorFactory;
 
 /**
  * Indicates the Vendor (product/organization) of an LDAP directory server
@@ -38,6 +39,7 @@ public enum DirectoryVendor
     OPEN_LDAP ( new OpenLDAPVendorFactory() ),
     DIRECTORY_SERVER_389( DirectoryServer389VendorFactory.getInstance() ),
     ORACLE_DS ( new OracleDSVendorFactory() ),
+    FREEIPA ( FreeIPAVendorFactory.getInstance() ),
     GENERIC( new GenericEntryFactory() ),;
 
     private final VendorFactory vendorFactory;
