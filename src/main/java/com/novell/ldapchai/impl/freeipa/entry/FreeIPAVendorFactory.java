@@ -17,7 +17,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.directoryServer389.entry;
+package com.novell.ldapchai.impl.freeipa.entry;
 
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
@@ -37,47 +37,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DirectoryServer389VendorFactory implements VendorFactory
+public class FreeIPAVendorFactory implements VendorFactory
 {
-    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_NAME = "vendorName";
-    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
     private static final String ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION = "ipaTopologyPluginVersion";
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
-    private static final DirectoryServer389VendorFactory SINGLETON = new DirectoryServer389VendorFactory();
+    private static final FreeIPAVendorFactory SINGLETON = new FreeIPAVendorFactory();
 
-    public static DirectoryServer389VendorFactory getInstance()
+    public static FreeIPAVendorFactory getInstance()
     {
         return SINGLETON;
     }
 
-    private DirectoryServer389VendorFactory()
+    private FreeIPAVendorFactory()
     {
     }
 
     @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
-        return new DirectoryServer389User( entryDN, provider );
+        return new FreeIPAUser( entryDN, provider );
     }
 
     @Override
     public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
-        return new DirectoryServer389Group( entryDN, provider );
+        return new FreeIPAGroup( entryDN, provider );
     }
 
     @Override
     public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
-        return new DirectoryServer389Entry( entryDN, provider );
+        return new FreeIPAEntry( entryDN, provider );
     }
 
     @Override
     public DirectoryVendor getDirectoryVendor()
     {
-        return DirectoryVendor.GENERIC;
+        return DirectoryVendor.FREEIPA;
     }
 
     @Override
@@ -90,8 +88,6 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     public Set<String> interestedDseAttributes()
     {
         return Collections.unmodifiableSet( new HashSet<>( Arrays.asList(
-                ROOT_DSE_ATTRIBUTE_VENDOR_NAME,
-                ROOT_DSE_ATTRIBUTE_VENDOR_VERSION,
                 ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION
         ) ) );
     }
@@ -99,32 +95,11 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     @Override
     public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
     {
-        if ( rootDseAttributeValues == null )
+        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION ) )
         {
-            return false;
-        }
-
-        if ( rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION ) )
-        {
-            return false;
-        }
-
-        if ( rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
-        {
-            for ( final String vendorName : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_NAME ) )
+            for ( final String ipaTopologyPluginVersion : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION ) )
             {
-                if ( vendorName.startsWith( "389 Project" ) )
-                {
-                    return true;
-                }
-            }
-        }
-
-        if ( rootDseAttributeValues.containsKey( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
-        {
-            for ( final String vendorVersion : rootDseAttributeValues.get( ROOT_DSE_ATTRIBUTE_VENDOR_VERSION ) )
-            {
-                if ( vendorVersion.startsWith( "389-Directory" ) )
+                if ( Double.parseDouble( ipaTopologyPluginVersion ) >= 1.0 )
                 {
                     return true;
                 }

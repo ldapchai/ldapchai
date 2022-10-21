@@ -87,7 +87,7 @@ public enum ChaiPasswordRule
     MaximumSequentialRepeat( "chai.pwrule.sequentialRepeat.max", RuleType.MAX, "0" ),
     ChangeMessage( "chai.pwrule.changeMessage", RuleType.TEXT, "" ),
     ExpirationInterval( "chai.pwrule.expirationInterval", RuleType.NUMERIC, "0" ),
-    MinimumLifetime( "chai.pwrule.lifetime.minimimum", RuleType.NUMERIC, "0" ),
+    MinimumLifetime( "chai.pwrule.lifetime.minimum", RuleType.NUMERIC, "0" ),
     CaseSensitive( "chai.pwrule.caseSensitive", RuleType.BOOLEAN, "true" ),
     EnforceAtLogin( "chai.pwrule.enforceAtLogin", RuleType.BOOLEAN, "false" ),
     ChallengeResponseEnabled( "chai.pwrule.challengeResponseEnabled", RuleType.BOOLEAN, "false" ),
