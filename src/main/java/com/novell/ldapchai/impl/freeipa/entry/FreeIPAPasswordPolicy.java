@@ -197,7 +197,7 @@ public class FreeIPAPasswordPolicy extends FreeIPAEntry implements ChaiPasswordP
             }
             catch ( NumberFormatException e )
             {
-                LOGGER.trace( "Failed to parse " + ATTR_IPA_PWD_POLICY_MIN_DIFF_CHARS + " value as integer" );
+                LOGGER.trace( () -> "failed to parse " + ATTR_IPA_PWD_POLICY_MIN_DIFF_CHARS + " value as integer" );
             }
         }
 
@@ -214,7 +214,7 @@ public class FreeIPAPasswordPolicy extends FreeIPAEntry implements ChaiPasswordP
             }
             catch ( NumberFormatException e )
             {
-                LOGGER.trace( "Failed to parse " + ATTR_IPA_PWD_POLICY_PWD_HISTORY_LENGTH + " value as integer" );
+                LOGGER.trace( () -> "failed to parse " + ATTR_IPA_PWD_POLICY_PWD_HISTORY_LENGTH + " value as integer" );
             }
         }
 
