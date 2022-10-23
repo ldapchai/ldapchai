@@ -45,14 +45,7 @@ public class DirectoryServer389VendorFactory implements VendorFactory
 
     private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
-    private static final DirectoryServer389VendorFactory SINGLETON = new DirectoryServer389VendorFactory();
-
-    public static DirectoryServer389VendorFactory getInstance()
-    {
-        return SINGLETON;
-    }
-
-    private DirectoryServer389VendorFactory()
+    public DirectoryServer389VendorFactory()
     {
     }
 

@@ -21,6 +21,7 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.ad.entry.ADVendorFactory;
+import com.novell.ldapchai.impl.apacheds.entry.ApacheDSVendorFactory;
 import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389VendorFactory;
 import com.novell.ldapchai.impl.edir.entry.EDirectoryVendorFactory;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
@@ -37,9 +38,10 @@ public enum DirectoryVendor
     ACTIVE_DIRECTORY ( new ADVendorFactory() ),
     EDIRECTORY( new EDirectoryVendorFactory() ),
     OPEN_LDAP ( new OpenLDAPVendorFactory() ),
-    DIRECTORY_SERVER_389( DirectoryServer389VendorFactory.getInstance() ),
+    DIRECTORY_SERVER_389( new DirectoryServer389VendorFactory() ),
     ORACLE_DS ( new OracleDSVendorFactory() ),
     FREEIPA ( FreeIPAVendorFactory.getInstance() ),
+    APACHE_DS( new ApacheDSVendorFactory() ),
     GENERIC( new GenericEntryFactory() ),;
 
     private final VendorFactory vendorFactory;
