@@ -25,6 +25,10 @@
 <import-control pkg="com.novell.ldapchai">
     <allow pkg="com.novell.ldapchai"/>
 
+    <!-- testing -->
+    <allow pkg="org.junit.jupiter.api"/>
+    <allow pkg="org.openjdk.jmh"/>
+
     <!-- java core -->
     <allow pkg="java.text"/>
     <allow pkg="java.math"/>

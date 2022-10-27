@@ -1,16 +1,33 @@
+/*
+ * LDAP Chai API
+ * Copyright (c) 2006-2017 Novell, Inc.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 package com.novell.ldapchai.cr;
 
 import com.novell.ldapchai.TestHelper;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
-import com.novell.ldapchai.impl.edir.NmasResponseSet;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 public class StoredResponsesTest
@@ -29,16 +46,16 @@ public class StoredResponsesTest
             testAnswers.put( "What is your PIN?", "123456" );
         }
 
-        Assert.assertNotNull( responseSet );
-        Assert.assertNotNull( responseSet.getChallengeSet() );
-        Assert.assertNotNull( responseSet.getHelpdeskResponses() );
+        Assertions.assertNotNull( responseSet );
+        Assertions.assertNotNull( responseSet.getChallengeSet() );
+        Assertions.assertNotNull( responseSet.getHelpdeskResponses() );
 
-        Assert.assertEquals( 5, responseSet.getChallengeSet().getChallenges().size() );
-        Assert.assertEquals( 3, responseSet.getChallengeSet().getRandomChallenges().size() );
-        Assert.assertEquals( 2, responseSet.getChallengeSet().getRequiredChallenges().size() );
+        Assertions.assertEquals( 5, responseSet.getChallengeSet().getChallenges().size() );
+        Assertions.assertEquals( 3, responseSet.getChallengeSet().getRandomChallenges().size() );
+        Assertions.assertEquals( 2, responseSet.getChallengeSet().getRequiredChallenges().size() );
 
-        Assert.assertEquals( 1, responseSet.getChallengeSet().getMinRandomRequired() );
-        Assert.assertEquals( 3, responseSet.getChallengeSet().minimumResponses() );
+        Assertions.assertEquals( 1, responseSet.getChallengeSet().getMinRandomRequired() );
+        Assertions.assertEquals( 3, responseSet.getChallengeSet().minimumResponses() );
 
         final Map<Challenge, String> challengeTestMap = new HashMap<>();
         for ( final Challenge challenge : responseSet.getChallengeSet().getChallenges() )
@@ -49,7 +66,7 @@ public class StoredResponsesTest
             }
         }
 
-        Assert.assertTrue( responseSet.test( challengeTestMap ) );
+        Assertions.assertTrue( responseSet.test( challengeTestMap ) );
     }
 
     @Test
@@ -65,16 +82,16 @@ public class StoredResponsesTest
             testAnswers.put( "Who is your favorite author?", "author" );
         }
 
-        Assert.assertNotNull( responseSet );
-        Assert.assertNotNull( responseSet.getChallengeSet() );
-        Assert.assertNotNull( responseSet.getHelpdeskResponses() );
+        Assertions.assertNotNull( responseSet );
+        Assertions.assertNotNull( responseSet.getChallengeSet() );
+        Assertions.assertNotNull( responseSet.getHelpdeskResponses() );
 
-        Assert.assertEquals( 4, responseSet.getChallengeSet().getChallenges().size() );
-        Assert.assertEquals( 4, responseSet.getChallengeSet().getRandomChallenges().size() );
-        Assert.assertEquals( 0, responseSet.getChallengeSet().getRequiredChallenges().size() );
+        Assertions.assertEquals( 4, responseSet.getChallengeSet().getChallenges().size() );
+        Assertions.assertEquals( 4, responseSet.getChallengeSet().getRandomChallenges().size() );
+        Assertions.assertEquals( 0, responseSet.getChallengeSet().getRequiredChallenges().size() );
 
-        Assert.assertEquals( 2, responseSet.getChallengeSet().getMinRandomRequired() );
-        Assert.assertEquals( 2, responseSet.getChallengeSet().minimumResponses() );
+        Assertions.assertEquals( 2, responseSet.getChallengeSet().getMinRandomRequired() );
+        Assertions.assertEquals( 2, responseSet.getChallengeSet().minimumResponses() );
 
         final Map<Challenge, String> challengeTestMap = new HashMap<>();
         for ( final Challenge challenge : responseSet.getChallengeSet().getChallenges() )
@@ -85,7 +102,7 @@ public class StoredResponsesTest
             }
         }
 
-        Assert.assertTrue( responseSet.test( challengeTestMap ) );
+        Assertions.assertTrue( responseSet.test( challengeTestMap ) );
     }
 
 

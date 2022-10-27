@@ -19,28 +19,27 @@
 
 package com.novell.ldapchai.util;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.LinkedHashMap;
 
 public class SearchHelperTest
 {
-
     @Test
     public void testAndFilter()
             throws Exception
     {
         final LinkedHashMap<String, String> props = new LinkedHashMap<>();
-        props.put("objectClass", "inetOrgPerson");
-        props.put("cn", "joe");
+        props.put( "objectClass", "inetOrgPerson" );
+        props.put( "cn", "joe" );
 
         final SearchHelper sh = new SearchHelper();
-        sh.setFilterAnd(props);
+        sh.setFilterAnd( props );
 
         final String expectedFilter = "(&(objectClass=inetOrgPerson)(cn=joe))";
         final String filterFromHelper = sh.getFilter();
 
-        Assert.assertEquals(expectedFilter, filterFromHelper);
+        Assertions.assertEquals( expectedFilter, filterFromHelper );
     }
 }

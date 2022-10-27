@@ -19,27 +19,25 @@
 
 package com.novell.ldapchai;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class ChaiPasswordRuleTest
 {
-
-
     @Test
     public void testUniquePasswordRules()
             throws Exception
     {
         final int ruleCount = ChaiPasswordRule.values().length;
         final Set<String> rulePropNames = new HashSet<>();
-        for (final ChaiPasswordRule rule : ChaiPasswordRule.values()) {
-            rulePropNames.add(rule.getKey());
+        for ( final ChaiPasswordRule rule : ChaiPasswordRule.values() )
+        {
+            rulePropNames.add( rule.getKey() );
         }
 
-        Assert.assertEquals(ruleCount, rulePropNames.size());
+        Assertions.assertEquals( ruleCount, rulePropNames.size() );
     }
-
 }

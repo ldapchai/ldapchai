@@ -19,36 +19,35 @@
 
 package com.novell.ldapchai.provider;
 
-import com.novell.ldapchai.provider.ChaiSetting;
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public class ChaiSettingTest
 {
-
     @Test
     public void testUniqueSettingKeys()
             throws Exception
     {
         final int settingCount = ChaiSetting.values().length;
-        final Set<String> settingPropNames = new HashSet<String>();
-        for (final ChaiSetting setting : ChaiSetting.values()) {
-            settingPropNames.add(setting.getKey());
+        final Set<String> settingPropNames = new HashSet<>();
+        for ( final ChaiSetting setting : ChaiSetting.values() )
+        {
+            settingPropNames.add( setting.getKey() );
         }
 
-        Assert.assertEquals(settingCount, settingPropNames.size());
+        Assertions.assertEquals( settingCount, settingPropNames.size() );
     }
 
     @Test
     public void testValidatedDefaults()
             throws Exception
     {
-        for (final ChaiSetting setting : ChaiSetting.values()) {
-            setting.validateValue(setting.getDefaultValue());
+        for ( final ChaiSetting setting : ChaiSetting.values() )
+        {
+            setting.validateValue( setting.getDefaultValue() );
         }
     }
 }

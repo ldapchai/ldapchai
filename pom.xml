@@ -89,9 +89,9 @@
 
         <!-- Test dependencies -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.9.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -249,16 +249,28 @@
                         <version>10.3.4</version>
                     </dependency>
                 </dependencies>
+                <configuration>
+                <sourceDirectories>
+                    <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                </sourceDirectories>
+                </configuration>
                 <executions>
                     <execution>
                         <id>validate</id>
                         <phase>validate</phase>
                         <configuration>
+                            <sourceDirectories>
+                                <sourceDirectory>${project.build.sourceDirectory}</sourceDirectory>
+                                <sourceDirectory>${project.build.testSourceDirectory}</sourceDirectory>
+                            </sourceDirectories>
+                            <cacheFile>${project.build.directory}/checkstyle/base/checkstyle-cachefile</cacheFile>
+                            <outputFile>${project.build.directory}/checkstyle/base/checkstyle-result.xml</outputFile>
+                            <rulesFiles>${project.build.directory}/checkstyle/base/checkstyle-rules.xml</rulesFiles>
                             <propertyExpansion>basedir=${basedir}</propertyExpansion>
                             <configLocation>src/build/checkstyle.xml</configLocation>
-                            <excludes>**/module-info.java</excludes>
-                            <encoding>UTF-8</encoding>
+                            <suppressionsLocation>src/build/checkstyle-suppression.xml</suppressionsLocation>
                             <consoleOutput>true</consoleOutput>
+                            <includeTestSourceDirectory>true</includeTestSourceDirectory>
                             <includeTestResources>false</includeTestResources>
                             <failsOnError>true</failsOnError>
                         </configuration>
