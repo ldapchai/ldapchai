@@ -281,6 +281,28 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>net.nicoulaj.maven.plugins</groupId>
+                <artifactId>checksum-maven-plugin</artifactId>
+                <version>1.11</version>
+                <executions>
+                    <execution>
+                        <id>output-checksums</id>
+                        <goals>
+                            <goal>artifacts</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <algorithms>
+                                <algorithm>SHA-1</algorithm>
+                                <algorithm>SHA-256</algorithm>
+                                <algorithm>SHA-512</algorithm>
+                            </algorithms>
+                            <failOnError>false</failOnError>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
                 <version>3.0.0-M7</version>
@@ -288,7 +310,6 @@
                     <skipTests>${skipTests}</skipTests>
                 </configuration>
             </plugin>
-
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <groupId>org.apache.maven.plugins</groupId>
