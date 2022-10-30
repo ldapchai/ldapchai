@@ -469,4 +469,15 @@ public interface ChaiEntry
      */
     String readGUID()
             throws ChaiOperationException, ChaiUnavailableException;
+
+    /**
+     * <p>Indicate if an entry has children entry.  The implementation is vendor specific and may be intensive.
+     * If this method returns true, {@link #getChildObjects()}</p>
+     *
+     * @return True if this entry has any child entries.
+     * @throws ChaiOperationException        If there is an error during the operation
+     * @throws ChaiUnavailableException      If the directory server(s) are unavailable
+     */
+    boolean hasChildren()
+        throws ChaiOperationException, ChaiUnavailableException;
 }

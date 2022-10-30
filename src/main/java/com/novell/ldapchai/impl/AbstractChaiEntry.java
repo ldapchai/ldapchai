@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 
@@ -501,10 +502,8 @@ public abstract class AbstractChaiEntry implements ChaiEntry
     public void writeDateAttribute( final String attributeName, final Instant instant )
             throws ChaiUnavailableException, ChaiOperationException
     {
-        if ( instant == null )
-        {
-            throw new NullPointerException( "instant cannot be null" );
-        }
+        Objects.requireNonNull( instant );
+
         final String strValue = getChaiProvider().getDirectoryVendor().getVendorFactory().instantToString( instant );
         writeStringAttribute( attributeName, strValue );
     }
@@ -520,5 +519,19 @@ public abstract class AbstractChaiEntry implements ChaiEntry
         }
         final byte[] guidValue = guidValues[0];
         return StringHelper.base64Encode( guidValue );
+    }
+
+    @Override
+    public boolean hasChildren()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final SearchHelper searchHelper = new SearchHelper();
+        searchHelper.setFilter( SearchHelper.DEFAULT_FILTER );
+        searchHelper.setMaxResults( 1 );
+        searchHelper.setAttributes( Collections.emptyList() );
+        searchHelper.setSearchScope( SearchScope.ONE );
+
+        final Map<String, Map<String, String>> subSearchResults = chaiProvider.search( getEntryDN(), searchHelper );
+        return !subSearchResults.isEmpty();
     }
 }

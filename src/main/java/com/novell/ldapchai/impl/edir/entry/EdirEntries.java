@@ -64,11 +64,15 @@ import java.util.Set;
  */
 public class EdirEntries
 {
+    private static final String EDIR_TIMESTAMP_PATTERN = "yyyyMMddHHmmss'Z'";
+
     private static final DateTimeFormatter EDIR_TIMESTAMP_FORMATTER = new DateTimeFormatterBuilder()
-            .appendPattern( "yyyyMMddHHmmss'Z'" )
+            .appendPattern( EDIR_TIMESTAMP_PATTERN )
             .toFormatter();
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( EdirEntries.class );
+
+    static final String EDIR_ATTR_SUBORDINATE_COUNT = "subordinateCount";
 
     /**
      * Convert a Instant to the Zulu String format.

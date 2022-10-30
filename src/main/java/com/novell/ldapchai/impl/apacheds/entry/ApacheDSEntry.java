@@ -27,7 +27,8 @@ import com.novell.ldapchai.provider.ChaiProvider;
 
 class ApacheDSEntry extends AbstractChaiEntry implements ChaiEntry
 {
-    public static final String APACHE_DS_ATTR_ENTRY_UUID = "entryUUID";
+    static final String APACHE_DS_ATTR_ENTRY_UUID = "entryUUID";
+    static final String APACHE_DS_ATTR_HAS_SUBORDINATES = "hasSubordinates";
 
     ApacheDSEntry( final String entryDN, final ChaiProvider chaiProvider )
     {
@@ -45,5 +46,12 @@ class ApacheDSEntry extends AbstractChaiEntry implements ChaiEntry
             throws ChaiUnavailableException, ChaiOperationException
     {
         return chaiProvider.readStringAttribute( entryDN, APACHE_DS_ATTR_ENTRY_UUID );
+    }
+
+    @Override
+    public boolean hasChildren()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readBooleanAttribute( APACHE_DS_ATTR_HAS_SUBORDINATES );
     }
 }

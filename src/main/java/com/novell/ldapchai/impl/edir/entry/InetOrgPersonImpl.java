@@ -383,4 +383,13 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
     {
         return readDateAttribute( "loginExpirationTime" );
     }
+
+    @Override
+    public boolean hasChildren()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        return readIntAttribute( EdirEntries.EDIR_ATTR_SUBORDINATE_COUNT ) > 0;
+    }
 }
+
+
