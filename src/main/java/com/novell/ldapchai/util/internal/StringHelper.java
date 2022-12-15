@@ -197,7 +197,7 @@ public final class StringHelper
             return "";
         }
 
-        final List<String> tempList = new ArrayList<>();
+        final List<String> tempList = new ArrayList<>( map.size() );
         for ( final Map.Entry<String, String> entry : map.entrySet() )
         {
             tempList.add( entry.getKey() + "=" + entry.getValue() );
