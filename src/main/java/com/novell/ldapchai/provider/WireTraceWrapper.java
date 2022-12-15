@@ -25,6 +25,10 @@ import com.novell.ldapchai.util.internal.ChaiLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -37,7 +41,7 @@ class WireTraceWrapper extends AbstractWrapper
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WireTraceWrapper.class );
 
-    private AtomicLong operationCounter = new AtomicLong( 0 );
+    private final AtomicLong operationCounter = new AtomicLong( 0 );
 
     /**
      * Wrap a pre-existing ChaiProvider with a WatchdogWrapper instance.
@@ -109,35 +113,25 @@ class WireTraceWrapper extends AbstractWrapper
 
     private Object traceInvocation(
             final Method method,
-            final Object[] args )
+            final Object[] args
+    )
             throws Throwable
     {
         final long opNumber = getNextCounter();
+
         final String messageLabel = "id=" + realProvider.getIdentifier() + ",op#" + opNumber;
 
-        LOGGER.trace( () -> "begin " + messageLabel + " method " + AbstractProvider.methodToDebugStr( method, args ) );
+        LOGGER.trace( () -> "begin " + messageLabel + " method " + methodToDebugStr( method, args ) );
 
-        final long startTime = System.currentTimeMillis();
+        final Instant startTime = Instant.now();
+
         final Object result = method.invoke( realProvider, args );
-        final long totalTime = System.currentTimeMillis() - startTime;
 
-        String debugResult = null;
-        if ( result != null )
-        {
-            try
-            {
-                debugResult = ( new GsonBuilder().disableHtmlEscaping().create() ).toJson( result );
-            }
-            catch ( Exception e )
-            {
-                debugResult = toString();
-            }
-        }
+        final Duration totalTime = Duration.between( startTime, Instant.now() );
 
-        final String finalDebugResult = debugResult;
         LOGGER.trace( () -> "finish " + messageLabel + " result: "
-                + ( finalDebugResult == null ? "null" : finalDebugResult )
-                + " (" + totalTime + "ms)" );
+                + objectToDebugString( result )
+                + " (" + ChaiLogger.format( totalTime ) + ")" );
 
         return result;
     }
@@ -145,5 +139,77 @@ class WireTraceWrapper extends AbstractWrapper
     private long getNextCounter()
     {
         return operationCounter.incrementAndGet();
+    }
+
+    private String objectToDebugString( final Object object )
+    {
+        if ( object == null )
+        {
+            return "[null]";
+        }
+
+        try
+        {
+            return ( new GsonBuilder().disableHtmlEscaping().create() ).toJson( object );
+        }
+        catch ( Exception e )
+        {
+            LOGGER.debug( () -> "error converting object to debug string: " + e.getMessage() );
+            return "[error:" + e.getMessage() + "]";
+        }
+    }
+
+
+    static String methodToDebugStr( final Method theMethod, final Object... parameters )
+    {
+        final StringBuilder debugStr = new StringBuilder();
+        debugStr.append( theMethod.getName() );
+        debugStr.append( '(' );
+        if ( parameters != null )
+        {
+            for ( final Iterator<Object> iter = Arrays.asList( parameters ).iterator(); iter.hasNext(); )
+            {
+                final Object nextValue = iter.next();
+                try
+                {
+                    debugStr.append( parameterToString( nextValue ) );
+                }
+                catch ( Throwable e )
+                {
+                    debugStr.append( "<binary>" );
+                }
+                if ( iter.hasNext() )
+                {
+                    debugStr.append( ',' );
+                }
+            }
+        }
+        debugStr.append( ')' );
+
+        return debugStr.toString();
+    }
+
+    private static String parameterToString( final Object nextValue )
+    {
+        if ( nextValue == null )
+        {
+            return "null";
+        }
+        else if ( nextValue.getClass().isArray() )
+        {
+            final StringBuilder sb = new StringBuilder();
+            sb.append( "[" );
+            for ( final Object loopValue : ( Object[] ) nextValue )
+            {
+                sb.append( parameterToString( loopValue ) );
+                sb.append( "," );
+            }
+            sb.append( "]" );
+            return sb.toString();
+        }
+        else
+        {
+            return String.valueOf( nextValue );
+        }
     }
 }

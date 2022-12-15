@@ -22,6 +22,7 @@ package com.novell.ldapchai.impl.oracleds.entry;
 import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -33,8 +34,6 @@ import java.util.Set;
 public class OracleDSVendorFactory implements VendorFactory
 {
     private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
-
-    private static final ErrorMap ERROR_MAP = new OracleDSErrorMap();
 
     @Override
     public InetOrgPerson newChaiUser( final String userDN, final ChaiProvider chaiProvider )
@@ -63,9 +62,8 @@ public class OracleDSVendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        return OracleDSErrorMap.errorMap();
     }
-
 
     @Override
     public Set<String> interestedDseAttributes()
@@ -100,5 +98,11 @@ public class OracleDSVendorFactory implements VendorFactory
     public String instantToString( final Instant input )
     {
         return OracleDSEntries.convertDateToZulu( input );
+    }
+
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
     }
 }

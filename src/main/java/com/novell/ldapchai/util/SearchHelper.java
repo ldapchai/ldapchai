@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 
@@ -352,40 +353,17 @@ public class SearchHelper implements Serializable
         }
 
         final SearchHelper that = ( SearchHelper ) o;
-
-        if ( maxResults != that.maxResults )
-        {
-            return false;
-        }
-        if ( timeLimit != that.timeLimit )
-        {
-            return false;
-        }
-        if ( attributes != null ? !attributes.equals( that.attributes ) : that.attributes != null )
-        {
-            return false;
-        }
-        if ( filter != null ? !filter.equals( that.filter ) : that.filter != null )
-        {
-            return false;
-        }
-        if ( searchScope != that.searchScope )
-        {
-            return false;
-        }
-
-        return true;
+        return maxResults == that.maxResults
+                && timeLimit == that.timeLimit
+                && Objects.equals( filter, that.filter )
+                && searchScope == that.searchScope
+                && Objects.equals( attributes, that.attributes );
     }
 
     @Override
     public int hashCode()
     {
-        int result = filter != null ? filter.hashCode() : 0;
-        result = 31 * result + ( searchScope != null ? searchScope.hashCode() : 0 );
-        result = 31 * result + ( attributes != null ? attributes.hashCode() : 0 );
-        result = 31 * result + maxResults;
-        result = 31 * result + timeLimit;
-        return result;
+        return Objects.hash( filter, searchScope, attributes, maxResults, timeLimit );
     }
 
     /**
@@ -400,9 +378,22 @@ public class SearchHelper implements Serializable
         sb.append( "SearchHelper: " );
         sb.append( "filter: " ).append( filter ).append( ", " );
         sb.append( "scope: " ).append( this.getSearchScope() ).append( ", " );
+
         if ( attributes != null )
         {
-            sb.append( "attributes: " ).append( Arrays.toString( attributes.toArray( new String[0] ) ) );
+            sb.append( "attributes: [" );
+            sb.append( String.join( ",", attributes ) );
+            sb.append( "]" );
+        }
+
+        if ( maxResults >= 0 )
+        {
+            sb.append( ", max=" ).append( maxResults );
+        }
+
+        if ( timeLimit >= 0 )
+        {
+            sb.append( ", timeLimit=" ).append( timeLimit );
         }
 
         return sb.toString();

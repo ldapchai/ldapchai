@@ -22,11 +22,12 @@ package com.novell.ldapchai.impl.freeipa.entry;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.impl.edir.EdirErrorMap;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
+import com.novell.ldapchai.impl.openldap.OpenLDAPErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -40,8 +41,6 @@ import java.util.Set;
 public class FreeIPAVendorFactory implements VendorFactory
 {
     private static final String ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION = "ipaTopologyPluginVersion";
-
-    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
     private static final FreeIPAVendorFactory SINGLETON = new FreeIPAVendorFactory();
 
@@ -81,7 +80,7 @@ public class FreeIPAVendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        return OpenLDAPErrorMap.instance();
     }
 
     @Override
@@ -119,5 +118,11 @@ public class FreeIPAVendorFactory implements VendorFactory
     public String instantToString( final Instant input )
     {
         return EdirEntries.convertInstantToZulu( input );
+    }
+
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
     }
 }

@@ -27,10 +27,6 @@ import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
@@ -179,7 +175,7 @@ public final class ChaiProviderFactory implements Closeable
             {
                 LOGGER.debug( () -> errorMsg, e );
             }
-            throw new ChaiUnavailableException( "unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ) );
+            throw new ChaiUnavailableException( "unable to create connection: " + e.getMessage(), ChaiErrors.getErrorForMessage( e.getMessage() ), e );
         }
 
         providerImpl = addProviderWrappers( providerImpl );
@@ -308,30 +304,6 @@ public final class ChaiProviderFactory implements Closeable
         return outputProvider;
     }
 
-    /**
-     * Returns a thread-safe "wrapped" {@code ChaiProvider}.  All ldap operations will be forced through a single
-     * lock and then sent to the backing provider.
-     * Depending on the ldap server and the configured timeouts, calling methods on a synchronized
-     * provider may result in significant blocking delays.
-     *
-     * @param theProvider The provider to be "wrapped" in a synchronized provider.
-     * @return A synchronized view of the specified provider
-     */
-    private static ChaiProvider synchronizedProvider( final ChaiProvider theProvider )
-    {
-        if ( theProvider instanceof SynchronizedProvider )
-        {
-            return theProvider;
-        }
-        else
-        {
-            return ( ChaiProvider ) Proxy.newProxyInstance(
-                    theProvider.getClass().getClassLoader(),
-                    theProvider.getClass().getInterfaces(),
-                    new SynchronizedProvider( theProvider ) );
-        }
-    }
-
     public static ChaiProviderFactory newProviderFactory()
     {
         return new ChaiProviderFactory( ChaiProviderFactorySetting.getDefaultSettings() );
@@ -347,50 +319,9 @@ public final class ChaiProviderFactory implements Closeable
         return new ChaiProviderFactory( Collections.unmodifiableMap( effectiveSettings ) );
     }
 
-    private static class SynchronizedProvider implements InvocationHandler
-    {
-        private final ChaiProvider realProvider;
-        private final Object lock = new Object();
-
-        SynchronizedProvider( final ChaiProvider realProvider )
-        {
-            this.realProvider = realProvider;
-        }
-
-        @Override
-        public Object invoke( final Object proxy, final Method method, final Object[] args )
-                throws Throwable
-        {
-            if ( method.getAnnotation( ChaiProviderImplementor.LdapOperation.class ) != null )
-            {
-                synchronized ( lock )
-                {
-                    return doInvocation( method, args );
-                }
-            }
-            else
-            {
-                return doInvocation( method, args );
-            }
-        }
-
-        public Object doInvocation( final Method method, final Object[] args )
-                throws Throwable
-        {
-            try
-            {
-                return method.invoke( realProvider, args );
-            }
-            catch ( InvocationTargetException e )
-            {
-                throw e.getCause();
-            }
-        }
-    }
-
     public Map<ChaiProviderFactorySetting, String> getChaiProviderFactorySettings()
     {
-        return Collections.unmodifiableMap( chaiProviderFactorySettingStringMap );
+        return chaiProviderFactorySettingStringMap;
     }
 
     CentralService getCentralService()

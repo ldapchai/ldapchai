@@ -25,6 +25,7 @@ import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.ad.ADErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -36,8 +37,6 @@ import java.util.Set;
 public class ADVendorFactory implements VendorFactory
 {
     private static final String ROOT_DSE_ATTRIBUTE_NAMING_CONTEXT = "rootDomainNamingContext";
-
-    private static final ErrorMap ERROR_MAP = new ADErrorMap();
 
     @Override
     public User newChaiUser( final String userDN, final ChaiProvider chaiProvider )
@@ -66,7 +65,7 @@ public class ADVendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        return ADErrorMap.instance();
     }
 
     @Override
@@ -102,5 +101,11 @@ public class ADVendorFactory implements VendorFactory
     public String instantToString( final Instant input )
     {
         return ADEntries.convertDateToWinEpoch( input );
+    }
+
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
     }
 }

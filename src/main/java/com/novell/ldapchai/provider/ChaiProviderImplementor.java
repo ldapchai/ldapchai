@@ -21,8 +21,6 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 
-import java.util.Map;
-
 /**
  * Service Provider Interface (SPI) required for {@link ChaiProvider} implementations.  Any implementation of {@code ChaiProvider}
  * must also implement this interface as well.  Chai clients can safely ignore this interface.
@@ -64,8 +62,6 @@ public interface ChaiProviderImplementor extends ChaiProvider
     ConnectionState getConnectionState();
 
     String getCurrentConnectionURL();
-
-    Map<String, Object> getProviderProperties();
 
     boolean errorIsRetryable( Exception e );
 

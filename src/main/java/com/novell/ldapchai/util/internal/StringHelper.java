@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class StringHelper
+public final class StringHelper
 {
     private StringHelper()
     {
@@ -51,7 +51,7 @@ public class StringHelper
      */
     public static boolean convertStrToBoolean( final String string )
     {
-        return !( string == null || string.length() < 1 ) && ( "true".equalsIgnoreCase( string )
+        return !StringHelper.isEmpty( string ) && ( "true".equalsIgnoreCase( string )
                 || "1".equalsIgnoreCase( string )
                 || "yes".equalsIgnoreCase( string )
                 || "y".equalsIgnoreCase( string )
@@ -90,7 +90,7 @@ public class StringHelper
      * method, this method will not throw an exception.
      *
      * @param string       value to test
-     * @param defaultValue value to return in case of difficulting converting.
+     * @param defaultValue value to return in case of difficulties converting.
      * @return the int value contained in the string, otherwise the default value.
      */
     public static long convertStrToLong( final String string, final long defaultValue )
@@ -113,13 +113,13 @@ public class StringHelper
     /**
      * Break apart a string using a tokenizer into a {@code List} of {@code String}s.
      *
-     * @param inputString a string containing zero or or more segments
-     * @param seperator   seperator to use for the split, or null for the default
+     * @param inputString a string containing zero or more segments
+     * @param separator   separator to use for the split, or null for the default
      * @return a {@code List} of {@code String}s.  An emtpy list is returned if <i>inputString</i> is null.
      */
     public static List<String> tokenizeString(
             final String inputString,
-            final String seperator
+            final String separator
     )
     {
         if ( inputString == null || inputString.length() < 1 )
@@ -127,14 +127,14 @@ public class StringHelper
             return Collections.emptyList();
         }
 
-        final List<String> values = new ArrayList<>( Arrays.asList( inputString.split( seperator ) ) );
+        final List<String> values = new ArrayList<>( Arrays.asList( inputString.split( separator ) ) );
         return Collections.unmodifiableList( values );
     }
 
     public static Map<String, String> tokenizeString(
             final String inputString,
-            final String seperator,
-            final String subSeperator
+            final String separator,
+            final String subSeparator
     )
     {
         if ( inputString == null || inputString.length() < 1 )
@@ -144,12 +144,12 @@ public class StringHelper
 
         final Map<String, String> returnProps = new LinkedHashMap<>();
 
-        final List<String> values = tokenizeString( inputString, seperator );
+        final List<String> values = tokenizeString( inputString, separator );
         for ( final String loopValue : values )
         {
             if ( loopValue != null && loopValue.length() > 0 )
             {
-                final int subSeperatorPosition = loopValue.indexOf( subSeperator );
+                final int subSeperatorPosition = loopValue.indexOf( subSeparator );
                 if ( subSeperatorPosition != -1 )
                 {
                     final String key = loopValue.substring( 0, subSeperatorPosition );
@@ -165,7 +165,10 @@ public class StringHelper
         return returnProps;
     }
 
-    public static String stringCollectionToString( final Collection<String> c, final String separator )
+    public static String stringCollectionToString(
+            final Collection<String> c,
+            final String separator
+    )
     {
         if ( c == null || c.isEmpty() )
         {
@@ -208,7 +211,10 @@ public class StringHelper
         return value == null || value.length() == 0;
     }
 
-    public static <E extends Enum<E>> boolean enumArrayContainsValue( final E[] enumArray, final E enumValue )
+    public static <E extends Enum<E>> boolean enumArrayContainsValue(
+            final E[] enumArray,
+            final E enumValue
+    )
     {
         if ( enumArray == null || enumArray.length == 0 )
         {

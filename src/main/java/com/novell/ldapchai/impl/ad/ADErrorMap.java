@@ -21,7 +21,6 @@ package com.novell.ldapchai.impl.ad;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,11 +28,15 @@ import java.util.List;
 
 public class ADErrorMap implements ErrorMap
 {
+    private static final ADErrorMap SINGLETON = new ADErrorMap();
 
-    @Override
-    public DirectoryVendor forDirectoryVendor()
+    private ADErrorMap()
     {
-        return DirectoryVendor.ACTIVE_DIRECTORY;
+    }
+
+    public static ADErrorMap instance()
+    {
+        return SINGLETON;
     }
 
     @Override

@@ -48,7 +48,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
         }
         catch ( ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -63,7 +63,7 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
         }
         catch ( ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 

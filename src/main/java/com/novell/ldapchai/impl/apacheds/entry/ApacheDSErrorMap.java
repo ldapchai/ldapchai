@@ -21,16 +21,19 @@ package com.novell.ldapchai.impl.apacheds.entry;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.DirectoryVendor;
 import com.novell.ldapchai.util.internal.StringHelper;
 
 class ApacheDSErrorMap implements ErrorMap
 {
+    private static final ApacheDSErrorMap SINGLETON = new ApacheDSErrorMap();
 
-    @Override
-    public DirectoryVendor forDirectoryVendor()
+    private ApacheDSErrorMap()
     {
-        return DirectoryVendor.APACHE_DS;
+    }
+
+    public static ApacheDSErrorMap instance()
+    {
+        return SINGLETON;
     }
 
     @Override

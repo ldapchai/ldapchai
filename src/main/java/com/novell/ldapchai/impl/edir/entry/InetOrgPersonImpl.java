@@ -37,12 +37,13 @@ import com.novell.ldapchai.impl.edir.entry.ext.PwdPolicyCheckRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.PwdPolicyCheckResponse;
 import com.novell.ldapchai.impl.edir.entry.ext.SetPwdRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.SetPwdResponse;
-
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiSetting;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.internal.StringHelper;
 
 import javax.naming.ldap.ExtendedResponse;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -50,6 +51,8 @@ import java.util.Map;
 
 class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiUser
 {
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( InetOrgPersonImpl.class );
+
     private static final String PW_EXPIRATION_ZULU_TIMESTAMP = "19800101010101Z";
 
     @Override
@@ -132,9 +135,7 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
         catch ( ChaiOperationException e )
         {
             final String errorMsg = "error writing to " + writeAttribute + ": " + e.getMessage();
-            final ChaiOperationException newException = new ChaiOperationException( errorMsg, e.getErrorCode() );
-            newException.initCause( e );
-            throw newException;
+            throw new ChaiOperationException( errorMsg, e.getErrorCode(), e );
         }
     }
 
@@ -261,13 +262,16 @@ class InetOrgPersonImpl extends AbstractChaiUser implements InetOrgPerson, ChaiU
 
         //check the time
         final String petExpireString = userAttrs.get( ATTR_PASSWORD_EXPIRE_TIME );
-        if ( petExpireString != null && petExpireString.length() > 0 )
+        if ( !StringHelper.isEmpty( petExpireString ) )
         {
             final Instant expireDate = EdirEntries.convertZuluToInstant( petExpireString );
-            final long diff = expireDate.toEpochMilli() - System.currentTimeMillis();
-            if ( diff <= 0 )
+            final Duration diff = Duration.between( Instant.now(), expireDate );
+
+            if ( diff.isNegative() )
             {
-                LOGGER.debug( () -> "user " + getEntryDN() + " password expired " + diff + " seconds ago (" + expireDate + "), marking as expired" );
+                LOGGER.debug( () -> "user " + getEntryDN() + " password expired "
+                        + ChaiLogger.format( diff ) + " ago at "
+                        + ChaiLogger.format( expireDate ) + ", marking as expired" );
                 return true;
             }
         }

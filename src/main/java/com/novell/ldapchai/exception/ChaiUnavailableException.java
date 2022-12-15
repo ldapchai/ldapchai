@@ -28,7 +28,6 @@ package com.novell.ldapchai.exception;
  */
 public class ChaiUnavailableException extends ChaiException
 {
-
     /**
      * Generate a new {@code ChaiUnavailableException} based on the supplied
      * error message.  The message is scanned for known {@link ChaiError}
@@ -43,14 +42,40 @@ public class ChaiUnavailableException extends ChaiException
         return new ChaiUnavailableException( errorMessage, ChaiErrors.getErrorForMessage( errorMessage ) );
     }
 
+    public static ChaiUnavailableException forErrorMessage( final String errorMessage, final Throwable cause )
+    {
+        return new ChaiUnavailableException( errorMessage, ChaiErrors.getErrorForMessage( errorMessage ), cause );
+    }
+
     public ChaiUnavailableException( final String message, final ChaiError errorCode )
     {
         super( message, errorCode );
     }
 
-    public ChaiUnavailableException( final String message, final ChaiError errorCode, final boolean permenant, final boolean authentication )
+    public ChaiUnavailableException( final String message, final ChaiError errorCode, final Throwable cause )
     {
-        super( message, errorCode, permenant, authentication );
+        super( message, errorCode, cause );
+    }
+
+    public ChaiUnavailableException(
+            final String message,
+            final ChaiError errorCode,
+            final boolean permanent,
+            final boolean authentication
+    )
+    {
+        super( message, errorCode, permanent, authentication );
+    }
+
+    public ChaiUnavailableException(
+            final String message,
+            final ChaiError errorCode,
+            final boolean permanent,
+            final boolean authentication,
+            final Throwable cause
+    )
+    {
+        super( message, errorCode, permanent, authentication, cause );
     }
 }
 

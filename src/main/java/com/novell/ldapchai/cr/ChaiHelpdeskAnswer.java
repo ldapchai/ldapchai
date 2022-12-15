@@ -95,7 +95,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         catch ( Exception e )
         {
             final String errorMsg = "unexpected error performing helpdesk answer crypt operation: " + e.getMessage();
-            throw new ChaiOperationException( errorMsg, ChaiError.CHAI_INTERNAL_ERROR );
+            throw new ChaiOperationException( errorMsg, ChaiError.CHAI_INTERNAL_ERROR, e );
         }
     }
 

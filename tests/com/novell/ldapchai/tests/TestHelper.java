@@ -111,7 +111,7 @@ public class TestHelper {
         return ChaiFactory.createChaiUser(createDN, testContainer.getChaiProvider());
     }
 
-    static synchronized ChaiEntry createTestContainer()
+    static ChaiEntry createTestContainer()
             throws Exception
     {
         final String ouName = "ou=test" + testContainerCounter++ + "," + testContainer;

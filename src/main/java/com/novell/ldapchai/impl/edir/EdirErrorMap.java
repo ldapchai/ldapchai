@@ -21,16 +21,19 @@ package com.novell.ldapchai.impl.edir;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.DirectoryVendor;
 import com.novell.ldapchai.util.internal.StringHelper;
 
 public class EdirErrorMap implements ErrorMap
 {
+    private static final EdirErrorMap SINGLETON = new EdirErrorMap();
 
-    @Override
-    public DirectoryVendor forDirectoryVendor()
+    private EdirErrorMap()
     {
-        return DirectoryVendor.EDIRECTORY;
+    }
+
+    public static EdirErrorMap instance()
+    {
+        return SINGLETON;
     }
 
     @Override

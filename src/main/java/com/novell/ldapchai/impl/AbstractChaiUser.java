@@ -173,7 +173,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         }
         catch ( ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -187,7 +187,7 @@ public abstract class AbstractChaiUser extends AbstractChaiEntry implements Chai
         }
         catch ( ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 

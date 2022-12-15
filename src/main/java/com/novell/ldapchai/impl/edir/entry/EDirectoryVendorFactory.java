@@ -20,12 +20,17 @@
 package com.novell.ldapchai.impl.edir.entry;
 
 import com.novell.ldapchai.ChaiEntry;
-import com.novell.ldapchai.impl.VendorFactory;
+import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.provider.ChaiProviderFactory;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
+import com.novell.ldapchai.provider.ChaiSetting;
 import com.novell.ldapchai.provider.DirectoryVendor;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -42,9 +47,9 @@ import java.util.Set;
  */
 public class EDirectoryVendorFactory implements VendorFactory
 {
-    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( EDirectoryVendorFactory.class );
 
-    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
+    private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
 
     @Override
     public InetOrgPerson newChaiUser( final String userDN, final ChaiProvider chaiProvider )
@@ -73,7 +78,7 @@ public class EDirectoryVendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        return EdirErrorMap.instance();
     }
 
     @Override
@@ -109,5 +114,38 @@ public class EDirectoryVendorFactory implements VendorFactory
     public String instantToString( final Instant input )
     {
         return EdirEntries.convertInstantToZulu( input );
+    }
+
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        final boolean doPwExpCheck = chaiProvider.getChaiConfiguration().getBooleanSetting( ChaiSetting.WATCHDOG_DISABLE_IF_PW_EXPIRED );
+        if ( !doPwExpCheck )
+        {
+            return true;
+        }
+
+        boolean userPwExpired;
+        try
+        {
+            final String bindUserDN = chaiProvider.getChaiConfiguration().getSetting( ChaiSetting.BIND_DN );
+            final ChaiUser bindUser = chaiProvider.getEntryFactory().newChaiUser( bindUserDN );
+            userPwExpired = bindUser.isPasswordExpired();
+        }
+        catch ( ChaiException e )
+        {
+            LOGGER.error( () -> "unexpected error attempting to read user password expiration value during"
+                    + " watchdog initialization, will assume expiration, error: " + e.getMessage() );
+            userPwExpired = true;
+        }
+
+        if ( userPwExpired )
+        {
+            LOGGER.info( () -> "connection user account password is currently expired; disabling"
+                    + " watchdog timeout for connection id=" + chaiProvider.getIdentifier() );
+            return false;
+        }
+
+        return true;
     }
 }

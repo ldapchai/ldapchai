@@ -23,10 +23,11 @@ import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
+import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.openldap.OpenLDAPErrorMap;
-import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -37,9 +38,6 @@ import java.util.Set;
 
 public class OpenLDAPVendorFactory implements VendorFactory
 {
-
-    private static final ErrorMap ERROR_MAP = new OpenLDAPErrorMap();
-
     @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
@@ -67,7 +65,7 @@ public class OpenLDAPVendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        return OpenLDAPErrorMap.instance();
     }
 
     @Override
@@ -107,4 +105,9 @@ public class OpenLDAPVendorFactory implements VendorFactory
         return OpenLDAPEntries.convertDateToZulu( input );
     }
 
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
+    }
 }

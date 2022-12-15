@@ -293,7 +293,7 @@ public class NmasResponseSet extends AbstractResponseSet
         catch ( ChaiValidationException e )
         {
             LOGGER.error( () -> "error while writing nmas questions: " + e.getMessage() );
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
 
         boolean success = true;

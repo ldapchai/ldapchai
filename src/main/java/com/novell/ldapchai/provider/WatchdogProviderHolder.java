@@ -25,260 +25,227 @@ import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
 
 /**
- * A ProviderHolder holds the underlying connection used by a <code>WatchdogWrapper</code> instance.
+ * A ProviderHolder holds the underlying connection used by a <code>WatchdogWrapper</code>
+ * instance.
  */
 class WatchdogProviderHolder
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogProviderHolder.class );
 
-    private volatile ChaiProviderImplementor realProvider;
-    private volatile HolderStatus wdStatus = HolderStatus.ACTIVE;
-    private volatile Instant lastActivity = Instant.now();
-    private volatile Instant connectionEstablishedTime = Instant.now();
+    /**
+     * Lock for consumers of a provider, used to tell if any consumers of the provider are active.
+     */
+    private final ReadWriteLock usageLock = new ReentrantReadWriteLock();
 
-    private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
-    private final int counter = ID_COUNTER.getAndIncrement();
+    /**
+     * Lock around mutations of the provider (via the {@link InternalHolder}).
+     */
+    private final Lock providerChangeLock = new ReentrantLock();
 
-    private final AtomicInteger activeOpCounter = new AtomicInteger();
-
-    private final boolean allowDisconnect;
-    private final ReadWriteLock statusChangeLock = new ReentrantReadWriteLock(  );
-
-    private final WatchdogWrapper watchdogWrapper;
+    private final String wrapperIdentifier;
     private final ChaiProviderFactory chaiProviderFactory;
     private final WatchdogWrapper.Settings settings;
     private final ChaiConfiguration chaiConfiguration;
 
-    enum HolderStatus
-    {
-        ACTIVE,
-        IDLE,
-        CLOSED,
-    }
+    private volatile InternalHolder miniHolder;
+    private volatile Instant lastActivity = Instant.now();
+    private volatile boolean closed = false;
 
-    WatchdogProviderHolder( final WatchdogWrapper watchdogWrapper, final ChaiProviderImplementor chaiProviderImplementor )
+    WatchdogProviderHolder(
+            final String wrapperIdentifier,
+            final ChaiProviderImplementor chaiProviderImplementor,
+            final WatchdogWrapper.Settings settings
+    )
     {
-        this.watchdogWrapper = watchdogWrapper;
+        this.wrapperIdentifier = wrapperIdentifier;
         this.chaiConfiguration = chaiProviderImplementor.getChaiConfiguration();
-        this.settings = watchdogWrapper.getSettings();
-        this.realProvider = chaiProviderImplementor;
+        this.settings = settings;
         this.chaiProviderFactory = chaiProviderImplementor.getProviderFactory();
-        allowDisconnect = !watchdogWrapper.checkForPwExpiration( realProvider );
 
-        chaiProviderFactory.getCentralService().getWatchdogService().registerInstance( watchdogWrapper );
+        this.miniHolder = new InternalHolder( chaiProviderImplementor );
 
-        LOGGER.trace( () -> "created WatchdogProviderHolder " + getIdentifier() );
+        LOGGER.trace( () -> "created WatchdogProviderHolder " + wrapperIdentifier );
     }
 
-    HolderStatus getStatus()
+    public boolean isConnected()
     {
-        return wdStatus;
-    }
-
-    public String getIdentifier()
-    {
-        statusChangeLock.readLock().lock();
-
-        try
-        {
-            if ( wdStatus != HolderStatus.CLOSED && realProvider != null )
-            {
-                return "w" + counter + "-" + realProvider.getIdentifier();
-            }
-            else
-            {
-                return "w" + counter;
-            }
-        }
-        finally
-        {
-            statusChangeLock.readLock().unlock();
-        }
+        return !closed && miniHolder != null;
     }
 
     public void close()
     {
-        statusChangeLock.writeLock().lock();
+        // when close is called, locks aren't necessary.  we just close the real provider (if it exists) and null it.
+        closed = true;
 
         try
         {
-            wdStatus = HolderStatus.CLOSED;
-            if ( realProvider != null )
+
+            final InternalHolder localMiniHolder = miniHolder;
+            if ( localMiniHolder != null )
             {
-                realProvider.close();
+                localMiniHolder.getRealProvider().close();
             }
-            realProvider = null;
-            lastActivity = Instant.now();
+        }
+        catch ( final Exception e )
+        {
+            LOGGER.debug( () -> "error while closing connection: " + e.getMessage(), e );
+        }
+
+        miniHolder = null;
+    }
+
+    Object getConnectionObject()
+            throws Exception
+    {
+        usageLock.readLock().lock();
+        try
+        {
+            return getProvider().getConnectionObject();
         }
         finally
         {
-            statusChangeLock.writeLock().unlock();
+            usageLock.readLock().unlock();
         }
     }
 
     <T> T execute( final LdapFunction<T> ldapFunction )
             throws ChaiOperationException, ChaiUnavailableException
     {
-        statusChangeLock.writeLock().lock();
-        try
-        {
-            activeOpCounter.incrementAndGet();
-        }
-        finally
-        {
-            statusChangeLock.writeLock().unlock();
-        }
-
+        usageLock.readLock().lock();
         try
         {
             lastActivity = Instant.now();
-            return ldapFunction.execute( getProvider() );
-        }
-        catch ( ChaiUnavailableException | ChaiOperationException e )
-        {
-            e.fillInStackTrace();
-            throw e;
+            final T result = ldapFunction.execute( getProvider() );
+            lastActivity = Instant.now();
+            return result;
         }
         finally
         {
-            statusChangeLock.writeLock().lock();
+            usageLock.readLock().unlock();
+        }
+    }
+
+    private ChaiProviderImplementor getProvider( )
+            throws ChaiUnavailableException
+    {
+        providerChangeLock.lock();
+        try
+        {
+            if ( miniHolder != null && !miniHolder.getRealProvider().isConnected() )
+            {
+                disconnectRealProvider( () -> "underlying connection has already been closed" );
+            }
+
+            if ( closed )
+            {
+                throw new IllegalStateException( "ChaiProvider instance has been closed" );
+            }
+
+            if ( miniHolder != null )
+            {
+                return miniHolder.getRealProvider();
+            }
+
+            return restoreRealProvider();
+        }
+        finally
+        {
+            providerChangeLock.unlock();
+        }
+    }
+
+    /**
+     * This method is invoked periodically by the {@link WatchdogService} to check watchdog instances.
+     */
+    void periodicStatusCheck()
+    {
+        if ( miniHolder == null )
+        {
+            return;
+        }
+
+        // write lock success indicates the provider is not in use, if there
+        // is an active connection then no need to check these statuses
+        if ( usageLock.writeLock().tryLock() )
+        {
+            providerChangeLock.lock();
             try
             {
-                lastActivity = Instant.now();
-                activeOpCounter.decrementAndGet();
+                checkMaxLifetimeDuration();
+                checkIdleTimeout();
             }
             finally
             {
-                statusChangeLock.writeLock().unlock();
+                providerChangeLock.unlock();
+                usageLock.writeLock().unlock();
             }
         }
-
-    }
-
-
-    ChaiProviderImplementor getProvider( )
-            throws ChaiUnavailableException
-    {
-        statusChangeLock.writeLock().lock();
-        try
+        else
         {
-            return getProviderImpl();
+            checkOperationTimeout();
         }
-        finally
-        {
-            lastActivity = Instant.now();
-            statusChangeLock.writeLock().unlock();
-        }
-    }
-
-    void checkStatus()
-    {
-        statusChangeLock.writeLock().lock();
-
-        try
-        {
-            if ( activeOpCounter.get() == 0 )
-            {
-                checkMaxLifetimeDuration();
-
-                checkIdleTimeout();
-            }
-            else
-            {
-                checkOperationTimeout();
-            }
-
-        }
-        finally
-        {
-            statusChangeLock.writeLock().unlock();
-        }
-    }
-
-    /* internal un-synchronized methods below */
-
-    private ChaiProviderImplementor getProviderImpl( )
-            throws ChaiUnavailableException
-    {
-        if ( realProvider != null && !realProvider.isConnected() )
-        {
-            disconnectRealProvider( "underlying connection has already been closed" );
-        }
-
-        switch ( wdStatus )
-        {
-            case CLOSED:
-                throw new IllegalStateException( "ChaiProvider instance has been closed" );
-
-            case ACTIVE:
-                return realProvider;
-
-            case IDLE:
-                return restoreRealProvider();
-
-            default:
-                throw new IllegalStateException( "unexpected internal ProviderState encountered: " + wdStatus );
-        }
-
     }
 
     private void checkIdleTimeout()
     {
-        if ( wdStatus == HolderStatus.ACTIVE )
+        final Duration idleDuration = Duration.between( lastActivity, Instant.now() );
+        if ( idleDuration.toMillis() > settings.getIdleTimeoutMS() )
         {
-            final Duration idleDuration = Duration.between( lastActivity, Instant.now() );
-            if ( idleDuration.toMillis() > settings.getIdleTimeoutMS() )
-            {
-                final String msg = "ldap idle timeout detected ("
-                        + idleDuration.toString()
-                        + "), closing connection id="
-                        + watchdogWrapper.getIdentifier();
+            final Supplier<String> msg = () -> "watchdog idle timeout detected ("
+                    + ChaiLogger.format( idleDuration )
+                    + "), closing connection id="
+                    + wrapperIdentifier;
 
-                disconnectRealProvider( msg );
-            }
+            disconnectRealProvider( msg );
         }
     }
 
     private void checkMaxLifetimeDuration()
     {
-        if ( wdStatus == HolderStatus.ACTIVE )
+        final Duration maxConnectionLifetime = settings.getMaxConnectionLifetime();
+        if ( !miniHolder.getAllowDisconnectSupplier().getAsBoolean() || maxConnectionLifetime == null )
         {
-            final Duration maxConnectionLifetime = settings.getMaxConnectionLifetime();
-            if ( !allowDisconnect || maxConnectionLifetime == null )
-            {
-                return;
-            }
+            return;
+        }
 
-            final Duration ageOfConnection = Duration.between( connectionEstablishedTime, Instant.now() );
-            if ( ageOfConnection.compareTo( maxConnectionLifetime ) > 0 )
-            {
-                final String msg = "connection lifetime (" + ageOfConnection.toString()
-                        + ") exceeded maximum configured lifetime (" + maxConnectionLifetime.toString() + ")";
+        final Duration ageOfConnection = Duration.between( miniHolder.getConnectionEstablishedTime(), Instant.now() );
+        if ( ageOfConnection.compareTo( maxConnectionLifetime ) > 0 )
+        {
+            final Supplier<String> msg = () -> "connection lifetime ("
+                    + ChaiLogger.format( ageOfConnection )
+                    + ") exceeded maximum configured lifetime ("
+                    + ChaiLogger.format( maxConnectionLifetime ) + ")";
 
-                disconnectRealProvider( msg );
-            }
+            disconnectRealProvider( msg );
         }
     }
 
     private void checkOperationTimeout()
     {
-        if ( wdStatus == HolderStatus.ACTIVE )
+        if ( miniHolder == null )
         {
-            final Duration operationDuration = Duration.between( lastActivity, Instant.now() );
-            if ( operationDuration.toMillis() > settings.getOperationTimeoutMS() )
-            {
-                final String msg = "ldap operation timeout detected ("
-                        + operationDuration.toString()
-                        + "), closing questionable connection id="
-                        + watchdogWrapper.getIdentifier();
-                disconnectRealProvider( msg );
-            }
+            return;
         }
+
+        final Duration operationDuration = Duration.between( lastActivity, Instant.now() );
+        if ( operationDuration.toMillis() > settings.getOperationTimeoutMS() )
+        {
+            final Supplier<String> msg = () -> "ldap operation timeout detected ("
+                    + ChaiLogger.format( operationDuration )
+                    + "), closing questionable connection id="
+                    + wrapperIdentifier;
+
+            disconnectRealProvider( msg );
+        }
+
     }
 
     private ChaiProviderImplementor restoreRealProvider()
@@ -286,18 +253,18 @@ class WatchdogProviderHolder
     {
         try
         {
-            realProvider = chaiProviderFactory.createFailOverOrConcreteProvider( chaiConfiguration );
-            wdStatus = HolderStatus.ACTIVE;
-            connectionEstablishedTime = Instant.now();
+            LOGGER.trace( () -> "attempting to re-open ldap connection id=" + wrapperIdentifier );
+            final Instant startTime = Instant.now();
+            final ChaiProviderImplementor newProvider = chaiProviderFactory.createFailOverOrConcreteProvider( chaiConfiguration );
+            miniHolder = new InternalHolder( newProvider );
+            LOGGER.trace( () -> "re-opened ldap connection id=" + wrapperIdentifier, Duration.between( startTime, Instant.now() ) );
 
-            LOGGER.trace( () -> "re-opened ldap connection id=" + getIdentifier() );
-
-            return realProvider;
+            return newProvider;
         }
         catch ( ChaiUnavailableException e )
         {
             final String msg = "error reopening ldap connection for id="
-                    + getIdentifier()
+                    + wrapperIdentifier
                     + ", error: "
                     + e.getMessage();
             LOGGER.debug( () -> msg );
@@ -306,27 +273,98 @@ class WatchdogProviderHolder
     }
 
     private void disconnectRealProvider(
-            final String debugMsg
+            final Supplier<String> debugMsg
     )
     {
-        if ( !allowDisconnect )
+        final InternalHolder localHolder = miniHolder;
+
+        if ( localHolder == null )
         {
             return;
         }
 
-        wdStatus = HolderStatus.IDLE;
-
-        LOGGER.trace( () -> "disconnecting underlying connection: " + debugMsg );
-
-        if ( realProvider != null )
+        if ( !localHolder.getAllowDisconnectSupplier().getAsBoolean() )
         {
-            this.realProvider.close();
-            this.realProvider = null;
+            return;
         }
+
+        localHolder.getRealProvider().close();
+        this.miniHolder = null;
+
+        LOGGER.trace( debugMsg );
     }
 
     interface LdapFunction<T>
     {
         T execute( ChaiProvider chaiProvider ) throws ChaiOperationException, ChaiUnavailableException;
+    }
+
+    /**
+     * Internal holder, a basic wrapper around a {@code ChaiProviderImplementor}, this forces the accompanying
+     * members of this class to get recreated when the {@code #realProvider} is recreated.
+     */
+    private static class InternalHolder
+    {
+        private final ChaiProviderImplementor realProvider;
+        private final DetectAllowDisconnectSupplier allowDisconnectSupplier = new DetectAllowDisconnectSupplier();
+        private final Instant connectionEstablishedTime = Instant.now();
+
+        InternalHolder( final ChaiProviderImplementor realProvider )
+        {
+            this.realProvider = realProvider;
+        }
+
+        public ChaiProviderImplementor getRealProvider()
+        {
+            return realProvider;
+        }
+
+        public DetectAllowDisconnectSupplier getAllowDisconnectSupplier()
+        {
+            return allowDisconnectSupplier;
+        }
+
+        public Instant getConnectionEstablishedTime()
+        {
+            return connectionEstablishedTime;
+        }
+
+        class DetectAllowDisconnectSupplier implements BooleanSupplier
+        {
+            private boolean supplied;
+            private boolean result;
+
+            @Override
+            public boolean getAsBoolean()
+            {
+                if ( !supplied )
+                {
+                    result = impl();
+                }
+                return result;
+            }
+
+            public boolean impl()
+            {
+                final ChaiProviderImplementor provider = realProvider;
+                if ( provider != null )
+                {
+                    try
+                    {
+                        final DirectoryVendor vendor = provider.getDirectoryVendor();
+                        if ( vendor != null )
+                        {
+                            supplied = true;
+                            return vendor.getVendorFactory().allowWatchdogDisconnect( provider );
+                        }
+                    }
+                    catch ( final ChaiUnavailableException e )
+                    {
+                        LOGGER.debug( () -> "error while determining if watchdog disconnect is allowed for provider: " + e.getMessage(), e );
+                    }
+                }
+                return true;
+            }
+        }
     }
 }

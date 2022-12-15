@@ -73,7 +73,7 @@ public class InetOrgPerson extends AbstractChaiUser implements ChaiUser
         }
         catch ( ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 

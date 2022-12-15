@@ -26,26 +26,23 @@ import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
 import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
 {
-
     private static final ChaiProviderInputValidator INPUT_VALIDATOR = new ChaiProviderInputValidator();
 
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( AbstractProvider.class );
@@ -54,79 +51,14 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     private ChaiProviderFactory providerFactory;
     protected volatile ConnectionState state = ConnectionState.NEW;
 
-    private Map<String, Object> providerProperties = new HashMap<>();
+    private final Map<String, Object> cacheFailureMap = new HashMap<>();
     private DirectoryVendor cachedDirectoryVendor;
 
     private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
     private final int counter = ID_COUNTER.getAndIncrement();
 
-
-    static String methodToDebugStr( final Method theMethod, final Object... parameters )
-    {
-        final StringBuilder debugStr = new StringBuilder();
-        debugStr.append( theMethod.getName() );
-        debugStr.append( '(' );
-        if ( parameters != null )
-        {
-            for ( final Iterator iter = Arrays.asList( parameters ).iterator(); iter.hasNext(); )
-            {
-                final Object nextValue = iter.next();
-                try
-                {
-                    debugStr.append( parameterToString( nextValue ) );
-                }
-                catch ( Throwable e )
-                {
-                    debugStr.append( "<binary>" );
-                }
-                if ( iter.hasNext() )
-                {
-                    debugStr.append( ',' );
-                }
-            }
-        }
-        debugStr.append( ')' );
-
-        return debugStr.toString();
-    }
-
-    private static String parameterToString( final Object nextValue )
-    {
-        if ( nextValue == null )
-        {
-            return "null";
-        }
-        else if ( nextValue.getClass().isArray() )
-        {
-            final StringBuilder sb = new StringBuilder();
-            sb.append( "[" );
-            for ( final Object loopValue : ( Object[] ) nextValue )
-            {
-                sb.append( parameterToString( loopValue ) );
-                sb.append( "," );
-            }
-            sb.append( "]" );
-            return sb.toString();
-        }
-        else
-        {
-            return String.valueOf( nextValue );
-        }
-    }
-
-    @Override
-    public Map<String, Object> getProviderProperties()
-    {
-        return providerProperties;
-    }
-
     AbstractProvider()
     {
-        {
-            // populate the extended for
-            final Map<String, Exception> cacheFailureMap = new HashMap<>();
-            getProviderProperties().put( EXTENDED_FAILURE_CACHE_KEY, cacheFailureMap );
-        }
     }
 
     /**
@@ -647,16 +579,12 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         }
     }
 
-    protected static final String EXTENDED_FAILURE_CACHE_KEY = "extendedFailureCache";
-
     protected void preCheckExtendedOperation( final ExtendedRequest request )
             throws ChaiOperationException
     {
         final boolean cacheFailures = "true".equalsIgnoreCase( this.getChaiConfiguration().getSetting( ChaiSetting.EXTENDED_OPERATION_FAILURE_CACHE ) );
         if ( cacheFailures )
         {
-            final Map<String, Object> providerProps = this.getProviderProperties();
-            final Map<String, Exception> cacheFailureMap = ( Map<String, Exception> ) providerProps.get( EXTENDED_FAILURE_CACHE_KEY );
             final String requestID = request.getID();
             if ( cacheFailureMap.containsKey( requestID ) )
             {
@@ -672,11 +600,9 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
         final boolean cacheFailures = this.getChaiConfiguration().getBooleanSetting( ChaiSetting.EXTENDED_OPERATION_FAILURE_CACHE );
         if ( cacheFailures )
         {
-            final ChaiOperationException opExcep = ChaiOperationException.forErrorMessage( e.getMessage() );
+            final ChaiOperationException opExcep = ChaiOperationException.forErrorMessage( e.getMessage(), e );
             if ( opExcep.getErrorCode() == ChaiError.UNSUPPORTED_OPERATION )
             {
-                final Map<String, Object> providerProps = this.getProviderProperties();
-                final Map<String, Exception> cacheFailureMap = ( Map<String, Exception> ) providerProps.get( EXTENDED_FAILURE_CACHE_KEY );
                 final String requestID = request.getID();
                 cacheFailureMap.put( requestID, opExcep );
                 LOGGER.trace( () -> "caching extended operation for " + requestID );
@@ -689,50 +615,46 @@ abstract class AbstractProvider implements ChaiProvider, ChaiProviderImplementor
     public DirectoryVendor getDirectoryVendor()
             throws ChaiUnavailableException
     {
-        if ( cachedDirectoryVendor == null )
+        if ( cachedDirectoryVendor != null )
         {
+            return cachedDirectoryVendor;
+        }
+
+        {
+            final DirectoryVendor centralCachedVendor = getProviderFactory().getCentralService().getVendorCache( this.chaiConfig );
+            if ( centralCachedVendor != null )
             {
-                final DirectoryVendor centralCachedVendor = getProviderFactory().getCentralService().getVendorCache( this.chaiConfig );
-                if ( centralCachedVendor != null )
-                {
-                    return centralCachedVendor;
-                }
+                return centralCachedVendor;
             }
+        }
 
-
-            final String defaultVendor = this.getChaiConfiguration().getSetting( ChaiSetting.DEFAULT_VENDOR );
-            if ( defaultVendor != null )
-            {
-                for ( final DirectoryVendor vendor : DirectoryVendor.values() )
-                {
-                    if ( vendor.toString().equals( defaultVendor ) )
-                    {
-                        cachedDirectoryVendor = vendor;
-                        return vendor;
-                    }
-                }
-            }
-
+        final Optional<DirectoryVendor> optionalDefaultVendor = getChaiConfiguration().getDefaultVendor();
+        if ( optionalDefaultVendor.isPresent() )
+        {
+            cachedDirectoryVendor = optionalDefaultVendor.get();
+        }
+        else
+        {
             try
             {
                 final ChaiEntry rootDseEntry = ChaiUtility.getRootDSE( this );
                 cachedDirectoryVendor = ChaiUtility.determineDirectoryVendor( rootDseEntry );
-                getProviderFactory().getCentralService().addVendorCache( this.chaiConfig, cachedDirectoryVendor );
             }
             catch ( ChaiOperationException e )
             {
-                LOGGER.warn( () -> "error while attempting to determine directory vendor: " + e.getMessage() );
-                cachedDirectoryVendor = DirectoryVendor.GENERIC;
+                LOGGER.warn( () -> "error while attempting to determine directory vendor: " + e.getMessage(), e );
+                return DirectoryVendor.GENERIC;
             }
         }
 
+        getProviderFactory().getCentralService().addVendorCache( this.chaiConfig, cachedDirectoryVendor );
         return cachedDirectoryVendor;
     }
 
     @Override
     public String getIdentifier()
     {
-        return String.valueOf( counter );
+        return "providerId=" + counter;
     }
 
     @Override

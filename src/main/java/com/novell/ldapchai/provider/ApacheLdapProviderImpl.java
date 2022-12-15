@@ -111,12 +111,6 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
 
     @Override
-    public Map<String, Object> getProviderProperties()
-    {
-        return super.getProviderProperties();
-    }
-
-    @Override
     public String toString()
     {
         return super.toString();
@@ -208,15 +202,15 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
             final String message = e.getMessage();
             if ( message.contains( "Cannot connect on the server" ) )
             {
-                throw new ChaiUnavailableException( message, ChaiError.COMMUNICATION, false, false );
+                throw new ChaiUnavailableException( message, ChaiError.COMMUNICATION, false, false, e );
             }
-            throw ChaiUnavailableException.forErrorMessage( message );
+            throw ChaiUnavailableException.forErrorMessage( message, e );
         }
         catch ( Exception e )
         {
             e.printStackTrace();
             final String message = e.getMessage();
-            throw new ChaiUnavailableException( message, ChaiError.UNKNOWN, false, false );
+            throw new ChaiUnavailableException( message, ChaiError.UNKNOWN, false, false, e );
         }
 
         connection = newConnection;
@@ -249,19 +243,6 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
     }
 
     @Override
-    public DirectoryVendor getDirectoryVendor()
-            throws ChaiUnavailableException
-    {
-        return super.getDirectoryVendor();
-    }
-
-    @Override
-    public String getIdentifier()
-    {
-        return super.getIdentifier();
-    }
-
-    @Override
     public boolean compareStringAttribute( final String entryDN, final String attributeName, final String value )
             throws ChaiOperationException, ChaiUnavailableException, IllegalStateException
     {
@@ -274,7 +255,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -317,7 +298,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -339,7 +320,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -359,7 +340,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -390,7 +371,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -517,7 +498,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -598,7 +579,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
 
     }
@@ -625,7 +606,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -659,7 +640,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -697,7 +678,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -821,13 +802,9 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
             return Collections.unmodifiableMap( returnObj );
 
         }
-        catch ( CursorException e )
+        catch ( final CursorException | LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
-        }
-        catch ( LdapException e )
-        {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -853,7 +830,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -877,7 +854,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
 
     }
@@ -904,7 +881,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -933,7 +910,7 @@ public class ApacheLdapProviderImpl extends AbstractProvider implements ChaiProv
         }
         catch ( LdapException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getMessage(), e );
         }
     }
 

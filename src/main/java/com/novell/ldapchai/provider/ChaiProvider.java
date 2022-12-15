@@ -59,10 +59,10 @@ import java.util.Set;
  *
  * <p>{@code ChaiProvider} implementations are <i>not</i> guaranteed to be thread safe by LDAP Chai.  Individual implementations
  * may provide thread safety.  Check with the implementation before sharing an {@code ChaiProvider} instance across multiple
- * threads.  For a guaranteed thread safe ChaiProvider, use {@link com.novell.ldapchai.provider.ChaiProviderFactory#synchronizedProvider(ChaiProvider)}.</p>
+ * threads.</p>
  *
  *
- * @author Jason D. Rivard                                                          b
+ * @author Jason D. Rivard
  * @see com.novell.ldapchai.ChaiEntry
  */
 public interface ChaiProvider

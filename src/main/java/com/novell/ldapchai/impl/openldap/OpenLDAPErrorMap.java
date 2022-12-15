@@ -21,7 +21,6 @@ package com.novell.ldapchai.impl.openldap;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,10 +36,15 @@ import java.util.List;
  */
 public class OpenLDAPErrorMap implements ErrorMap
 {
-    @Override
-    public DirectoryVendor forDirectoryVendor()
+    private static final OpenLDAPErrorMap SINGLETON = new OpenLDAPErrorMap();
+
+    private OpenLDAPErrorMap()
     {
-        return DirectoryVendor.OPEN_LDAP;
+    }
+
+    public static OpenLDAPErrorMap instance()
+    {
+        return SINGLETON;
     }
 
     @Override

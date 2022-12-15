@@ -191,7 +191,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -231,7 +231,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -247,7 +247,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -266,7 +266,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -288,7 +288,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -312,7 +312,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         catch ( LDAPException e )
         {
             cacheExtendedOperationException( request, e );
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
 
         try
@@ -347,7 +347,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -374,7 +374,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -412,7 +412,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -437,7 +437,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -563,7 +563,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -588,7 +588,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -609,7 +609,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -642,7 +642,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
         }
         catch ( LDAPException e )
         {
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
     }
 
@@ -761,7 +761,7 @@ public class JLDAPProviderImpl extends AbstractProvider implements ChaiProviderI
                 return Collections.unmodifiableMap( returnMap );
             }
 
-            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage() );
+            throw ChaiOperationException.forErrorMessage( e.getLDAPErrorMessage(), e );
         }
         return Collections.unmodifiableMap( returnMap );
     }

@@ -60,9 +60,22 @@ public class ChaiException extends Exception
         this( message, errorCode, ChaiErrors.isPermanent( message ), ChaiErrors.isAuthenticationRelated( message ) );
     }
 
+    protected ChaiException( final String message, final ChaiError errorCode, final Throwable cause )
+    {
+        this( message, errorCode, ChaiErrors.isPermanent( message ), ChaiErrors.isAuthenticationRelated( message ), cause );
+    }
+
     public ChaiException( final String message, final ChaiError errorCode, final boolean permanent, final boolean authentication )
     {
         super( message );
+        this.permanent = permanent;
+        this.authentication = authentication;
+        this.errorCode = errorCode;
+    }
+
+    public ChaiException( final String message, final ChaiError errorCode, final boolean permanent, final boolean authentication, final Throwable cause )
+    {
+        super( message, cause );
         this.permanent = permanent;
         this.authentication = authentication;
         this.errorCode = errorCode;

@@ -25,6 +25,7 @@ import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ErrorMap;
 import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 import com.novell.ldapchai.util.internal.StringHelper;
 
@@ -44,7 +45,6 @@ public class ApacheDSVendorFactory implements VendorFactory
     private static final String LDAP_ATTR_VENDOR_NAME = "vendorName";
     private static final String APACHE_DS_VENDOR_NAME = "Apache Software Foundation";
 
-    private static final ErrorMap ERROR_MAP = new ApacheDSErrorMap();
     public static final String APACHE_DS_TIMESTAMP_PATTERN = "uuuuMMddHHmmss.SSSX";
 
     @Override
@@ -74,7 +74,7 @@ public class ApacheDSVendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        return ApacheDSErrorMap.instance();
     }
 
     @Override
@@ -134,4 +134,9 @@ public class ApacheDSVendorFactory implements VendorFactory
         return dateTimeFormatter.format( offsetDateTime );
     }
 
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
+    }
 }

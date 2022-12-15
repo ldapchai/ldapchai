@@ -22,11 +22,12 @@ package com.novell.ldapchai.impl.directoryServer389.entry;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -42,8 +43,6 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     private static final String ROOT_DSE_ATTRIBUTE_VENDOR_NAME = "vendorName";
     private static final String ROOT_DSE_ATTRIBUTE_VENDOR_VERSION = "vendorVersion";
     private static final String ROOT_DSE_ATTRIBUTE_IPA_TOPOLOGY_PLUGIN_VERSION = "ipaTopologyPluginVersion";
-
-    private static final ErrorMap ERROR_MAP = new EdirErrorMap();
 
     public DirectoryServer389VendorFactory()
     {
@@ -76,7 +75,8 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        return ERROR_MAP;
+        // @todo DS389 should have it's own error map
+        return EdirErrorMap.instance();
     }
 
     @Override
@@ -137,5 +137,11 @@ public class DirectoryServer389VendorFactory implements VendorFactory
     public String instantToString( final Instant input )
     {
         return EdirEntries.convertInstantToZulu( input );
+    }
+
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
     }
 }

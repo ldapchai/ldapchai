@@ -21,6 +21,9 @@ package com.novell.ldapchai.util.internal;
 
 import org.slf4j.event.Level;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Supplier;
 
 /**
@@ -28,7 +31,7 @@ import java.util.function.Supplier;
  *
  * @author Jason D. Rivard
  */
-public class ChaiLogger
+public final class ChaiLogger
 {
     private final org.slf4j.Logger logger;
 
@@ -44,59 +47,103 @@ public class ChaiLogger
 
     public void debug( final Supplier<String> message )
     {
-        doLog( Level.TRACE, message, null );
+        doLog( Level.TRACE, message, null, null );
     }
 
     public void debug( final Supplier<String> message, final Exception exception )
     {
-        doLog( Level.TRACE, message, exception );
+        doLog( Level.TRACE, message, null, exception );
+    }
+
+    public void debug( final Supplier<String> message, final Duration duration )
+    {
+        doLog( Level.TRACE, message, duration, null );
     }
 
     public void error( final Supplier<String> message )
     {
-        doLog( Level.ERROR, message, null );
+        doLog( Level.ERROR, message, null, null );
     }
 
     public void error( final Supplier<String> message, final Exception exception )
     {
-        doLog( Level.ERROR, message, exception );
+        doLog( Level.ERROR, message, null, exception );
     }
 
     public void info( final Supplier<String> message )
     {
-        doLog( Level.INFO, message, null );
+        doLog( Level.INFO, message, null, null );
     }
 
     public void info( final Supplier<String> message, final Exception exception )
     {
-        doLog( Level.INFO, message, exception );
+        doLog( Level.INFO, message, null, exception );
     }
 
     public void trace( final Supplier<String> message )
     {
-        doLog( Level.TRACE, message, null );
+        doLog( Level.TRACE, message, null, null );
+    }
+
+    public void trace( final Supplier<String> message, final Duration duration )
+    {
+        doLog( Level.TRACE, message, duration, null );
     }
 
     public void trace( final Supplier<String> message, final Exception exception )
     {
-        doLog( Level.TRACE, message, exception );
+        doLog( Level.TRACE, message, null, exception );
     }
 
     public void warn( final Supplier<String> message )
     {
-        doLog( Level.WARN, message, null );
+        doLog( Level.WARN, message, null, null );
     }
 
     public void warn( final Supplier<String> message, final Exception exception )
     {
-        doLog( Level.WARN, message, exception );
+        doLog( Level.WARN, message, null, exception );
     }
 
-    private void doLog( final Level level, final Supplier<String> message, final Exception exception )
+    private void doLog(
+            final Level level,
+            final Supplier<String> message,
+            final Duration duration,
+            final Exception exception
+    )
     {
         logger.makeLoggingEventBuilder( level )
                 .setCause( exception )
-                .log( message );
+                .log( appendDurationToMessage( message, duration ) );
 
+    }
+
+    private static Supplier<String> appendDurationToMessage(
+            final Supplier<String> message,
+            final Duration duration
+    )
+    {
+        if ( duration == null )
+        {
+            return message;
+        }
+
+        return () -> message.get() + " (" + ChaiLogger.format( duration ) + ")";
+    }
+
+    public static String format( final Instant instant )
+    {
+        return instant == null ? "" : instant.truncatedTo( ChronoUnit.MILLIS ).toString();
+    }
+
+    public static String format( final Duration duration )
+    {
+        if ( duration == null )
+        {
+            return "";
+        }
+
+        final Duration msDuration = Duration.ofMillis( duration.toMillis() );
+        return msDuration.toString();
     }
 }

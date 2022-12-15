@@ -192,7 +192,7 @@ class UserImpl extends AbstractChaiUser implements User, Top, ChaiUser
         {
             if ( e.getErrorCode() == ChaiError.UNKNOWN )
             {
-                throw new ChaiOperationException( e.getMessage(), ChaiError.PASSWORD_BADPASSWORD );
+                throw new ChaiOperationException( e.getMessage(), ChaiError.PASSWORD_BADPASSWORD, e );
             }
             else
             {

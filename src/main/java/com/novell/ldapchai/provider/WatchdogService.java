@@ -22,10 +22,11 @@ package com.novell.ldapchai.provider;
 import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import java.io.Closeable;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
@@ -81,7 +82,8 @@ class WatchdogService implements Closeable
                 if ( !issuedWatchdogWrappers.allValues().isEmpty() )
                 {
                     // if there are active providers.
-                    LOGGER.debug( () -> "starting up " + THREAD_NAME + ", " + watchdogFrequency + "ms check frequency" );
+                    LOGGER.debug( () -> "starting up " + THREAD_NAME + ", "
+                            + ChaiLogger.format( Duration.of( watchdogFrequency, ChronoUnit.MILLIS ) ) + " check frequency" );
 
                     // create a new timer
                     startWatchdogThread();
@@ -126,7 +128,7 @@ class WatchdogService implements Closeable
         {
             if ( wdWrapper != null )
             {
-                wdWrapper.checkStatus();
+                wdWrapper.periodicStatusCheck();
             }
         }
         catch ( Exception e )
@@ -139,7 +141,7 @@ class WatchdogService implements Closeable
         }
     }
 
-    private class WatchdogTask extends TimerTask implements Runnable
+    private class WatchdogTask implements Runnable
     {
         @Override
         public void run()
@@ -156,12 +158,12 @@ class WatchdogService implements Closeable
                 {
                     LOGGER.error( () -> "error during watchdog timer check: " + e.getMessage() );
                 }
+            }
 
-                final int currentCollectionSize = issuedWatchdogWrappers.allValues().size();
-                if ( copyCollection.size() != currentCollectionSize )
-                {
-                    LOGGER.trace( () -> "outstanding providers: " + currentCollectionSize );
-                }
+            final int currentCollectionSize = issuedWatchdogWrappers.allValues().size();
+            if ( copyCollection.size() != currentCollectionSize )
+            {
+                LOGGER.trace( () -> "outstanding providers: " + currentCollectionSize );
             }
 
             if ( copyCollection.isEmpty() )

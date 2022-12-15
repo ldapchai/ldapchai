@@ -22,11 +22,12 @@ package com.novell.ldapchai.impl.generic.entry;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.edir.EdirErrorMap;
 import com.novell.ldapchai.impl.edir.entry.EdirEntries;
 import com.novell.ldapchai.provider.ChaiProvider;
+import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
@@ -37,9 +38,6 @@ import java.util.Set;
 
 public class GenericEntryFactory implements VendorFactory
 {
-
-    private static ErrorMap errorMap;
-
     @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
@@ -67,11 +65,7 @@ public class GenericEntryFactory implements VendorFactory
     @Override
     public ErrorMap getErrorMap()
     {
-        if ( errorMap == null )
-        {
-            errorMap = new EdirErrorMap();
-        }
-        return errorMap;
+        return EdirErrorMap.instance();
     }
 
     @Override
@@ -96,5 +90,11 @@ public class GenericEntryFactory implements VendorFactory
     public String instantToString( final Instant input )
     {
         return EdirEntries.convertInstantToZulu( input );
+    }
+
+    @Override
+    public boolean allowWatchdogDisconnect( final ChaiProviderImplementor chaiProvider )
+    {
+        return true;
     }
 }

@@ -30,6 +30,7 @@ import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
+import javax.naming.NamingException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
@@ -107,13 +108,9 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         {
             getChaiProvider().extendedOperation( new OpenLDAPModifyPasswordRequest( this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration() ) );
         }
-        catch ( javax.naming.NamingException e )
+        catch ( NamingException | ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
-        }
-        catch ( ChaiOperationException e )
-        {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 
@@ -125,13 +122,9 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
         {
             getChaiProvider().extendedOperation( new OpenLDAPModifyPasswordRequest( this.getEntryDN(), newPassword, getChaiProvider().getChaiConfiguration() ) );
         }
-        catch ( javax.naming.NamingException e )
+        catch ( NamingException | ChaiOperationException e )
         {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
-        }
-        catch ( ChaiOperationException e )
-        {
-            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage() );
+            throw ChaiPasswordPolicyException.forErrorMessage( e.getMessage(), e );
         }
     }
 

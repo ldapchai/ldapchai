@@ -238,7 +238,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         catch ( ChaiValidationException e )
         {
             LOGGER.warn( () -> "validation error", e );
-            throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN );
+            throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN, e );
         }
 
         LOGGER.info( () -> "successfully wrote Chai challenge/response set for user " + user.getEntryDN() );
@@ -263,7 +263,7 @@ public class ChaiResponseSet extends AbstractResponseSet
         catch ( ChaiValidationException | IOException e )
         {
             LOGGER.warn( () -> "validation error", e );
-            throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN );
+            throw new ChaiOperationException( e.getMessage(), ChaiError.UNKNOWN, e );
         }
     }
 

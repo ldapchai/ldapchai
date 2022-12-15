@@ -25,9 +25,9 @@ import com.novell.ldapchai.ChaiRequestControl;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.ChaiUtility;
 import com.novell.ldapchai.util.SearchHelper;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.naming.CommunicationException;
@@ -60,6 +60,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -103,7 +105,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     private LdapContext jndiConnection;
     private SocketFactory socketFactory;
 
-    private static LdapContext generateNewJndiContext( final Hashtable environment )
+    private static LdapContext generateNewJndiContext( final Hashtable<String, Object> environment )
             throws ChaiOperationException, ChaiUnavailableException
     {
         final String url = String.valueOf( environment.get( Context.PROVIDER_URL ) );
@@ -111,10 +113,11 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         try
         {
-            final long startTime = System.currentTimeMillis();
+            final Instant startTime = Instant.now();
             final LdapContext newDirContext;
             newDirContext = new InitialLdapContext( environment, null );
-            LOGGER.trace( () -> "bind successful as " + bindDN + " (" + ( System.currentTimeMillis() - startTime ) + "ms)" );
+            final Duration duration = Duration.between( startTime, Instant.now() );
+            LOGGER.trace( () -> "bind successful as " + bindDN, duration );
             return newDirContext;
         }
         catch ( NamingException e )
@@ -134,14 +137,14 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
                     logMsg.append( "; " ).append( rootCause.getMessage() );
                 }
                 logMsg.append( ")" );
-                throw new ChaiUnavailableException( logMsg.toString(), ChaiError.COMMUNICATION, false, true );
+                throw new ChaiUnavailableException( logMsg.toString(), ChaiError.COMMUNICATION, false, true, e );
             }
             else
             {
                 logMsg.append( e.getMessage() );
 
                 //check for bad password or intruder detection
-                throw ChaiUnavailableException.forErrorMessage( logMsg.toString() );
+                throw ChaiUnavailableException.forErrorMessage( logMsg.toString(), e );
             }
         }
     }
@@ -268,7 +271,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
         finally
         {
@@ -331,7 +334,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -352,7 +355,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -372,7 +375,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -402,7 +405,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -420,6 +423,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         preCheckExtendedOperation( request );
 
         final LdapContext ldapConnection = getLdapConnection();
+
         try
         {
             return ldapConnection.extendedOperation( request );
@@ -428,10 +432,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         {
             cacheExtendedOperationException( request, e );
 
-            // guaranteed to throw ChaiException
-            convertNamingException( e );
-
-            throw new IllegalStateException( "unexpected chai api error: " + e.getMessage() );
+            throw convertNamingException( e );
         }
         catch ( Throwable t )
         {
@@ -504,8 +505,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
-            return null;
+            throw convertNamingException( e );
         }
         finally
         {
@@ -535,7 +535,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         getInputValidator().readMultiStringAttribute( entryDN, attributeName );
 
         final Set<String> attributeValues = new HashSet<>();
-        NamingEnumeration namingEnum = null;
+        NamingEnumeration<?> namingEnum = null;
 
         try
         {
@@ -561,8 +561,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
-            return null;
+            throw convertNamingException( e );
         }
         finally
         {
@@ -646,8 +645,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
-            return null;
+            throw convertNamingException( e );
         }
         finally
         {
@@ -694,7 +692,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -837,7 +835,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
         finally
         {
@@ -897,7 +895,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
         finally
         {
@@ -951,7 +949,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         catch ( NamingException e )
         {
             LOGGER.trace( () -> "error during write of attribute '" + attributeName + "', error: " + e.getMessage() );
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -1002,7 +1000,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         }
         catch ( NamingException e )
         {
-            convertNamingException( e );
+            throw convertNamingException( e );
         }
     }
 
@@ -1028,7 +1026,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     @Override
     public String getCurrentConnectionURL()
     {
-        return this.getChaiConfiguration().bindURLsAsList().get( 0 );
+        return this.getChaiConfiguration().getDebugUrl();
     }
 
     @Override
@@ -1037,23 +1035,23 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
     {
         this.chaiConfig = chaiConfig;
         final String connectionURL = chaiConfig.bindURLsAsList().get( 0 );
-        final Hashtable env = generateJndiEnvironment( connectionURL );
+        final Hashtable<String, Object> env = generateJndiEnvironment( connectionURL );
         try
         {
             jndiConnection = generateNewJndiContext( env );
         }
         catch ( ChaiOperationException e )
         {
-            throw new ChaiUnavailableException( "bind failed (" + e.getMessage() + ")", e.getErrorCode() );
+            throw new ChaiUnavailableException( "bind failed (" + e.getMessage() + ")", e.getErrorCode(), e );
         }
 
         super.init( chaiConfig, providerFactory );
     }
 
-    private Hashtable generateJndiEnvironment( final String ldapURL )
+    private Hashtable<String, Object> generateJndiEnvironment( final String ldapURL )
     {
         // Populate the hashtable with the attributes to connect to eDirectory.
-        final Hashtable<String, String> env = new Hashtable<>();
+        final Hashtable<String, Object> env = new Hashtable<>();
 
         // add in basic connection info
         env.put( Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory" );
@@ -1245,8 +1243,7 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             }
             catch ( NamingException e )
             {
-                convertNamingException( e );
-                throw new ChaiOperationException( "unexpected error during search: " + e.getMessage(), ChaiError.CHAI_INTERNAL_ERROR );
+                throw convertNamingException( e );
             }
             finally
             {
@@ -1422,12 +1419,12 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
         catch ( NamingException e )
         {
             final String errorMsg = "error creating new jndiConnection instance: " + e.getMessage();
-            throw new ChaiUnavailableException( errorMsg, ChaiError.CHAI_INTERNAL_ERROR );
+            throw new ChaiUnavailableException( errorMsg, ChaiError.CHAI_INTERNAL_ERROR, e );
         }
     }
 
-    private void convertNamingException( final NamingException e )
-            throws ChaiOperationException, ChaiUnavailableException
+    private ChaiOperationException convertNamingException( final NamingException e )
+            throws ChaiUnavailableException
     {
         // important safety tip: naming exceptions sometimes come with null messages....
         final StringBuilder errorMsg = new StringBuilder();
@@ -1452,10 +1449,10 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
 
         if ( errorIsRetryable( e ) )
         {
-            throw new ChaiUnavailableException( errorMsg.toString(), ChaiError.COMMUNICATION, false, false );
+            throw new ChaiUnavailableException( errorMsg.toString(), ChaiError.COMMUNICATION, false, false, e );
         }
 
-        throw ChaiOperationException.forErrorMessage( errorMsg.toString() );
+        return ChaiOperationException.forErrorMessage( errorMsg.toString(), e );
     }
 
 

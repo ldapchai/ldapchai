@@ -29,10 +29,14 @@ package com.novell.ldapchai.exception;
  */
 public class ChaiOperationException extends ChaiException
 {
-
     public static ChaiOperationException forErrorMessage( final String errorMessage )
     {
         return new ChaiOperationException( errorMessage, ChaiErrors.getErrorForMessage( errorMessage ) );
+    }
+
+    public static ChaiOperationException forErrorMessage( final String errorMessage, final Throwable cause )
+    {
+        return new ChaiOperationException( errorMessage, ChaiErrors.getErrorForMessage( errorMessage ), cause );
     }
 
     public ChaiOperationException( final String message, final ChaiError errorCode )
@@ -40,9 +44,14 @@ public class ChaiOperationException extends ChaiException
         super( message, errorCode );
     }
 
-    public ChaiOperationException( final String message, final ChaiError errorCode, final boolean permenant, final boolean authentication )
+    public ChaiOperationException( final String message, final ChaiError errorCode, final Throwable cause )
     {
-        super( message, errorCode, permenant, authentication );
+        super( message, errorCode, cause );
+    }
+
+    public ChaiOperationException( final String message, final ChaiError errorCode, final boolean permanent, final boolean authentication )
+    {
+        super( message, errorCode, permanent, authentication );
     }
 
 }

@@ -17,13 +17,29 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.exception;
+package com.novell.ldapchai.util.internal;
 
-public interface ErrorMap
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.time.Duration;
+import java.time.Instant;
+
+class ChaiLoggerTest
 {
-    ChaiError errorForMessage( String message );
+    @Test
+    void testFormatDuration()
+    {
+        final Duration testDuration = Duration.parse( "PT11.22886S" );
+        final String formatted = ChaiLogger.format( testDuration );
+        Assertions.assertEquals( "PT11.228S", formatted );
+    }
 
-    boolean isPermanent( String message );
-
-    boolean isAuthenticationRelated( String message );
+    @Test
+    void testFormatInstance()
+    {
+        final Instant testInstant = Instant.parse( "2000-01-01T13:11:44.404946Z" );
+        final String formatted = ChaiLogger.format( testInstant );
+        Assertions.assertEquals( "2000-01-01T13:11:44.404Z", formatted );
+    }
 }

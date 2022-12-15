@@ -21,7 +21,6 @@ package com.novell.ldapchai.impl.oracleds.entry;
 
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ErrorMap;
-import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -29,10 +28,15 @@ import java.util.List;
 
 public class OracleDSErrorMap implements ErrorMap
 {
-    @Override
-    public DirectoryVendor forDirectoryVendor()
+    private static final OracleDSErrorMap SINGLETON = new OracleDSErrorMap();
+
+    private OracleDSErrorMap()
     {
-        return DirectoryVendor.ORACLE_DS;
+    }
+
+    public static OracleDSErrorMap errorMap()
+    {
+        return SINGLETON;
     }
 
     @Override

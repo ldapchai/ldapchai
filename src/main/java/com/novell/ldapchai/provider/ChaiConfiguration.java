@@ -29,6 +29,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
@@ -111,10 +113,6 @@ public class ChaiConfiguration
     }
 
     /**
-     *
-     */
-
-    /**
      * Returns a string value suitable for debugging.  Sensitive values such as passwords are
      * not included.
      *
@@ -187,9 +185,31 @@ public class ChaiConfiguration
         return Collections.unmodifiableList( splitUrls );
     }
 
+    public String getDebugUrl()
+    {
+        return bindURLsAsList().get( 0 ) + "/" + getSetting( ChaiSetting.BIND_DN );
+    }
+
     String getBindPassword()
     {
         return settings.get( ChaiSetting.BIND_PASSWORD.getKey() );
+    }
+
+    Optional<DirectoryVendor> getDefaultVendor()
+    {
+        final String defaultVendor = this.getSetting( ChaiSetting.DEFAULT_VENDOR );
+        if ( defaultVendor != null )
+        {
+            for ( final DirectoryVendor vendor : DirectoryVendor.values() )
+            {
+                if ( vendor.toString().equals( defaultVendor ) )
+                {
+                    return Optional.of( vendor );
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     int getIntSetting( final ChaiSetting name )
@@ -254,6 +274,32 @@ public class ChaiConfiguration
     public static ChaiConfigurationBuilder builder( final ChaiConfiguration chaiConfiguration )
     {
         return new ChaiConfigurationBuilder( chaiConfiguration );
+    }
+
+    @Override
+    public boolean equals( final Object o )
+    {
+        if ( this == o )
+        {
+            return true;
+        }
+        if ( o == null || getClass() != o.getClass() )
+        {
+            return false;
+        }
+
+        final ChaiConfiguration that = ( ChaiConfiguration ) o;
+        return Objects.equals( implementationConfiguration, that.implementationConfiguration )
+                && Objects.equals( settings, that.settings )
+                && Arrays.equals( trustManager, that.trustManager );
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = Objects.hash( implementationConfiguration, settings );
+        result = 31 * result + Arrays.hashCode( trustManager );
+        return result;
     }
 
     /**

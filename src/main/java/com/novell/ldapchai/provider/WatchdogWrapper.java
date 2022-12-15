@@ -21,12 +21,10 @@ package com.novell.ldapchai.provider;
 
 import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.ChaiRequestControl;
-import com.novell.ldapchai.ChaiUser;
-import com.novell.ldapchai.exception.ChaiException;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
-import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.SearchHelper;
+import com.novell.ldapchai.util.internal.ChaiLogger;
 
 import javax.naming.ldap.ExtendedRequest;
 import javax.naming.ldap.ExtendedResponse;
@@ -35,6 +33,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A {@link ChaiProvider} implementation wrapper that handles automatic idle disconnects.
@@ -47,6 +46,9 @@ import java.util.Set;
 class WatchdogWrapper implements ChaiProviderImplementor
 {
     private static final ChaiLogger LOGGER = ChaiLogger.getLogger( WatchdogWrapper.class );
+
+    private static final AtomicInteger ID_COUNTER = new AtomicInteger( 0 );
+    private final String identifier = "w" + ID_COUNTER.getAndIncrement();
 
     private final WatchdogProviderHolder providerHolder;
     private final ChaiConfiguration chaiConfiguration;
@@ -61,7 +63,8 @@ class WatchdogWrapper implements ChaiProviderImplementor
         this.chaiConfiguration = chaiProviderImplementor.getChaiConfiguration();
         this.chaiProviderFactory = chaiProviderFactory;
         this.settings = Settings.fromConfig( chaiConfiguration );
-        this.providerHolder = new WatchdogProviderHolder( this, chaiProviderImplementor );
+        this.providerHolder = new WatchdogProviderHolder( identifier, chaiProviderImplementor, settings );
+        chaiProviderFactory.getCentralService().getWatchdogService().registerInstance( this );
     }
 
     static ChaiProviderImplementor forProvider(
@@ -93,13 +96,13 @@ class WatchdogWrapper implements ChaiProviderImplementor
     public Object getConnectionObject()
             throws Exception
     {
-        return providerHolder.getProvider().getConnectionObject();
+        return providerHolder.getConnectionObject();
     }
 
     @Override
     public ConnectionState getConnectionState()
     {
-        if ( providerHolder.getStatus() == WatchdogProviderHolder.HolderStatus.CLOSED )
+        if ( providerHolder.isConnected() )
         {
             return ConnectionState.CLOSED;
         }
@@ -110,40 +113,13 @@ class WatchdogWrapper implements ChaiProviderImplementor
     @Override
     public String getCurrentConnectionURL()
     {
-        try
-        {
-            return providerHolder.getProvider().getCurrentConnectionURL();
-        }
-        catch ( ChaiUnavailableException e )
-        {
-            throw new IllegalStateException( "unexpected error trying to load internal provider: " + e.getMessage(), e );
-        }
-    }
-
-    @Override
-    public Map<String, Object> getProviderProperties()
-    {
-        try
-        {
-            return providerHolder.getProvider().getProviderProperties();
-        }
-        catch ( ChaiUnavailableException e )
-        {
-            throw new IllegalStateException( "unexpected error trying to load internal provider: " + e.getMessage(), e );
-        }
+        return this.getChaiConfiguration().bindURLsAsList().get( 0 );
     }
 
     @Override
     public boolean errorIsRetryable( final Exception e )
     {
-        try
-        {
-            return providerHolder.getProvider().errorIsRetryable( e );
-        }
-        catch ( ChaiUnavailableException e1 )
-        {
-            throw new IllegalStateException( "unexpected error trying to load internal provider: " + e.getMessage(), e );
-        }
+        throw new IllegalStateException( "not implemented" );
     }
 
     @Override
@@ -155,9 +131,7 @@ class WatchdogWrapper implements ChaiProviderImplementor
     @Override
     public String getIdentifier()
     {
-        return providerHolder == null
-                ? "[null provider holder]"
-                : providerHolder.getIdentifier();
+        return identifier;
     }
 
     @Override
@@ -367,13 +341,14 @@ class WatchdogWrapper implements ChaiProviderImplementor
     {
         try
         {
-            return providerHolder.execute( chaiProvider -> chaiProvider.getDirectoryVendor() );
+            return providerHolder.execute( ChaiProvider::getDirectoryVendor );
         }
         catch ( ChaiOperationException e )
         {
-            LOGGER.error( () -> "unexpected ChaiOperationException during getDirectoryVendor " + e.getMessage(), e );
+            final String msg = "unexpected ChaiOperationException during getDirectoryVendor " + e.getMessage();
+            LOGGER.error( () -> msg, e );
+            throw ChaiUnavailableException.forErrorMessage( msg, e );
         }
-        return null;
     }
 
     @Override
@@ -390,7 +365,7 @@ class WatchdogWrapper implements ChaiProviderImplementor
     @Override
     public boolean isConnected()
     {
-        return providerHolder.getStatus() == WatchdogProviderHolder.HolderStatus.ACTIVE;
+        return providerHolder.isConnected();
     }
 
     @Override
@@ -410,9 +385,9 @@ class WatchdogWrapper implements ChaiProviderImplementor
         return ChaiEntryFactory.newChaiFactory( this );
     }
 
-    void checkStatus()
+    void periodicStatusCheck()
     {
-        providerHolder.checkStatus();
+        providerHolder.periodicStatusCheck();
     }
 
     static class Settings
@@ -452,40 +427,6 @@ class WatchdogWrapper implements ChaiProviderImplementor
                     ChronoUnit.MILLIS );
             return new Settings( operationTimeout, idleTimeout, maxConnectionLifetime );
         }
-    }
-
-    boolean checkForPwExpiration(
-            final ChaiProviderImplementor chaiProvider
-    )
-
-    {
-        final boolean doPwExpCheck = chaiProvider.getChaiConfiguration().getBooleanSetting( ChaiSetting.WATCHDOG_DISABLE_IF_PW_EXPIRED );
-        if ( !doPwExpCheck )
-        {
-            return false;
-        }
-
-        boolean userPwExpired;
-        try
-        {
-            final String bindUserDN = chaiProvider.getChaiConfiguration().getSetting( ChaiSetting.BIND_DN );
-            final ChaiUser bindUser = chaiProvider.getEntryFactory().newChaiUser( bindUserDN );
-            userPwExpired = bindUser.isPasswordExpired();
-        }
-        catch ( ChaiException e )
-        {
-            LOGGER.error( () -> "unexpected error attempting to read user password expiration value during"
-                    + " watchdog initialization, will assume expiration, error: " + e.getMessage() );
-            userPwExpired = true;
-        }
-
-        if ( userPwExpired )
-        {
-            LOGGER.info( () -> "connection user account password is currently expired.  Disabling watchdog timeout. id=" + this.getIdentifier() );
-            return true;
-        }
-
-        return false;
     }
 
     @Override
