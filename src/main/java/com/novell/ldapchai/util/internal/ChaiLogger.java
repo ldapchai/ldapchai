@@ -19,7 +19,8 @@
 
 package com.novell.ldapchai.util.internal;
 
-import org.slf4j.event.Level;
+
+import org.apache.log4j.Level;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -33,11 +34,11 @@ import java.util.function.Supplier;
  */
 public final class ChaiLogger
 {
-    private final org.slf4j.Logger logger;
+    private final org.apache.log4j.Logger logger;
 
     private ChaiLogger( final Class<?> clazz )
     {
-        logger = org.slf4j.LoggerFactory.getLogger( clazz );
+        logger = org.apache.log4j.Logger.getLogger( clazz.getName() );
     }
 
     public static ChaiLogger getLogger( final Class<?> clazz )
@@ -112,10 +113,7 @@ public final class ChaiLogger
             final Exception exception
     )
     {
-        logger.makeLoggingEventBuilder( level )
-                .setCause( exception )
-                .log( appendDurationToMessage( message, duration ) );
-
+        logger.log( level, appendDurationToMessage( message, duration ), exception );
     }
 
     private static Supplier<String> appendDurationToMessage(
