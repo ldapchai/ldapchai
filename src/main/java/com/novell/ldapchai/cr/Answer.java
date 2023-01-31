@@ -47,16 +47,16 @@ public interface Answer
     enum FormatType
     {
         TEXT( new TextAnswer.TextAnswerFactory(), 0, 0 ),
-        MD5( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 1_00_000 ),
-        SHA1( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 1_000_000 ),
-        SHA1_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 1_000_000 ),
-        SHA256_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 500_000 ),
-        SHA512_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 500_000 ),
-        BCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 16, 10 ),
-        SCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(),  16, 2048 ),
-        PBKDF2( new PKDBF2Answer.PKDBF2AnswerFactory(), 32, 10_000 ),
-        PBKDF2_SHA256( new PKDBF2Answer.PKDBF2AnswerFactory(), 32, 10_000 ),
-        PBKDF2_SHA512( new PKDBF2Answer.PKDBF2AnswerFactory(), 32, 10_000 ),
+        MD5( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 10_000_000 ),
+        SHA1( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 10_000_000 ),
+        SHA1_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 10_000_000 ),
+        SHA256_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 5_000_000 ),
+        SHA512_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 5_000_000 ),
+        BCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 16, 15 ),
+        SCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 32, 16 * 1024 ),
+        PBKDF2( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 1_000_000 ),
+        PBKDF2_SHA256( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 1_000_000 ),
+        PBKDF2_SHA512( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 1_000_000 ),
         HELPDESK( new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory(), 0, 0 ),
         NMAS( null, -1, -1 ),;
 

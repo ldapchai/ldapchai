@@ -42,18 +42,17 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode( Mode.Throughput )
+@BenchmarkMode( Mode.AverageTime )
 @OutputTimeUnit( TimeUnit.MILLISECONDS )
 @State( Scope.Benchmark )
 @Fork( jvmArgs =
         {
-                "-Xms256M", "-Xmx256M"
-        } )
+                "-Xms1G", "-Xmx1G"
+        }, value = 1 )
 @Warmup( iterations = 3 )
-@Measurement( iterations = 8 )
+@Measurement( iterations = 2 )
 public class CRBenchMark
 {
-
     @Param( {
             "MD5",
             "SHA1",

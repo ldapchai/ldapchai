@@ -29,18 +29,16 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import java.security.SecureRandom;
 
-class PKDBF2Answer implements Answer
+class PBKDF2Answer implements Answer
 {
-
-    private String hashedAnswer;
-    private String plainAnswer;
+    private final String hashedAnswer;
     private final String salt;
     private final int hashCount;
     private final boolean caseInsensitive;
 
     private final FormatType formatType;
 
-    private PKDBF2Answer(
+    private PBKDF2Answer(
             final FormatType formatType,
             final String answerHash,
             final String salt,
@@ -77,7 +75,7 @@ class PKDBF2Answer implements Answer
         this.caseInsensitive = caseInsensitive;
     }
 
-    private PKDBF2Answer( final AnswerConfiguration answerConfiguration, final String answer )
+    private PBKDF2Answer( final AnswerConfiguration answerConfiguration, final String answer )
     {
         this.hashCount = answerConfiguration.iterations;
         this.caseInsensitive = answerConfiguration.caseInsensitive;
@@ -89,32 +87,15 @@ class PKDBF2Answer implements Answer
             throw new IllegalArgumentException( "missing answerHash text" );
         }
 
-        this.plainAnswer = answer;
+        this.hashedAnswer = hashValue( answer );
     }
 
-    private String getHashedAnswer()
-    {
-        if ( hashedAnswer != null )
-        {
-            return hashedAnswer;
-        }
-
-        if ( plainAnswer != null )
-        {
-            // make hash
-            final String casedAnswer = caseInsensitive ? plainAnswer.toLowerCase() : plainAnswer;
-            this.hashedAnswer = hashValue( casedAnswer );
-            return this.hashedAnswer;
-        }
-
-        return null;
-    }
 
     @Override
     public XmlElement toXml()
     {
         final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
-        answerElement.setText( getHashedAnswer() );
+        answerElement.setText( this.hashedAnswer );
         if ( salt != null && salt.length() > 0 )
         {
             answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_SALT, salt );
@@ -138,7 +119,6 @@ class PKDBF2Answer implements Answer
 
         final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
         final String hashedTest = hashValue( casedResponse );
-        final String hashedAnswer = getHashedAnswer();
 
         if ( hashedTest != null && hashedAnswer != null )
         {
@@ -211,7 +191,7 @@ class PKDBF2Answer implements Answer
         return new AnswerBean(
                 formatType,
                 null,
-                getHashedAnswer(),
+                hashedAnswer,
                 salt,
                 hashCount,
                 caseInsensitive );
@@ -220,12 +200,12 @@ class PKDBF2Answer implements Answer
     static class PKDBF2AnswerFactory implements ImplementationFactory
     {
         @Override
-        public PKDBF2Answer newAnswer(
+        public PBKDF2Answer newAnswer(
                 final AnswerConfiguration answerConfiguration,
                 final String answer
         )
         {
-            return new PKDBF2Answer( answerConfiguration, answer );
+            return new PBKDF2Answer( answerConfiguration, answer );
         }
 
         @Override
@@ -239,7 +219,7 @@ class PKDBF2Answer implements Answer
                 throw new IllegalArgumentException( "missing answer value" );
             }
 
-            return new PKDBF2Answer(
+            return new PBKDF2Answer(
                     input.getType(),
                     input.getAnswerHash(),
                     input.getSalt(),
@@ -249,7 +229,7 @@ class PKDBF2Answer implements Answer
         }
 
         @Override
-        public PKDBF2Answer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
+        public PBKDF2Answer fromXml( final XmlElement element, final boolean caseInsensitive, final String challengeText )
         {
             final String answerValue = element.getText().orElseThrow( () -> new IllegalArgumentException( "missing answer value" ) );
 
@@ -267,7 +247,7 @@ class PKDBF2Answer implements Answer
             {
                 /* noop */
             }
-            return new PKDBF2Answer( formatTypeEnum, answerValue, salt, saltCount, caseInsensitive );
+            return new PBKDF2Answer( formatTypeEnum, answerValue, salt, saltCount, caseInsensitive );
         }
     }
 }
