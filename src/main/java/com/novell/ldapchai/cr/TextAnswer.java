@@ -19,9 +19,9 @@
 
 package com.novell.ldapchai.cr;
 
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 class TextAnswer implements Answer
 {
@@ -42,7 +42,7 @@ class TextAnswer implements Answer
     @Override
     public XmlElement toXml()
     {
-        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlFactory.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( answer );
         answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.TEXT.toString() );
         return answerElement;

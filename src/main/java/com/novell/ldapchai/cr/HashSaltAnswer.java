@@ -19,11 +19,10 @@
 
 package com.novell.ldapchai.cr;
 
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlElement;
-
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.util.internal.StringHelper;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -146,7 +145,7 @@ class HashSaltAnswer implements Answer
     @Override
     public XmlElement toXml()
     {
-        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlFactory.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( version.toString() + VERSION_SEPARATOR + answerHash );
 
         if ( !StringHelper.isEmpty( salt ) )

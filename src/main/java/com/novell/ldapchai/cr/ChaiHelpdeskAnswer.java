@@ -19,12 +19,12 @@
 
 package com.novell.ldapchai.cr;
 
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiError;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.util.internal.StringHelper;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
@@ -59,7 +59,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
     public XmlElement toXml()
             throws ChaiOperationException
     {
-        final XmlElement answerElement = XmlChai.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
+        final XmlElement answerElement = XmlFactory.getFactory().newElement( ChaiResponseSet.XML_NODE_ANSWER_VALUE );
         answerElement.setText( encryptValue( answer, challengeText ) );
         answerElement.setAttribute( ChaiResponseSet.XML_ATTRIBUTE_CONTENT_FORMAT, FormatType.HELPDESK.toString() );
         return answerElement;

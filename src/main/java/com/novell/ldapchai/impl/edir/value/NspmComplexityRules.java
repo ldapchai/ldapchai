@@ -19,12 +19,12 @@
 
 package com.novell.ldapchai.impl.edir.value;
 
-import org.jrivard.xmlchai.AccessMode;
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlDocument;
-import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.ChaiEntryFactory;
 import com.novell.ldapchai.util.internal.ChaiLogger;
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -85,7 +85,7 @@ public class NspmComplexityRules
         final List<Policy> returnList = new ArrayList<>();
         try
         {
-            final XmlDocument doc = XmlChai.getFactory().parseString( input, AccessMode.IMMUTABLE );
+            final XmlDocument doc = XmlFactory.getFactory().parseString( input, AccessMode.IMMUTABLE );
             final XmlElement rootElement = doc.getRootElement();
 
             final List<XmlElement> policyElements = rootElement.getChildren( "Policy" );

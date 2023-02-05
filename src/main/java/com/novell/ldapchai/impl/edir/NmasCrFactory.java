@@ -19,10 +19,6 @@
 
 package com.novell.ldapchai.impl.edir;
 
-import org.jrivard.xmlchai.AccessMode;
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlDocument;
-import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiPasswordPolicy;
 import com.novell.ldapchai.ChaiUser;
@@ -42,6 +38,10 @@ import com.novell.ldapchai.impl.edir.entry.ext.NMASChallengeResponse;
 import com.novell.ldapchai.provider.ChaiProvider;
 import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.internal.StringHelper;
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -252,7 +252,7 @@ public class NmasCrFactory
     {
         final List<Challenge> returnList = new ArrayList<>();
 
-        final XmlDocument doc = XmlChai.getFactory().parseString( str, AccessMode.IMMUTABLE );
+        final XmlDocument doc = XmlFactory.getFactory().parseString( str, AccessMode.IMMUTABLE );
         final boolean required = doc.getRootElement().getName().equals( "RequiredQuestions" );
 
 

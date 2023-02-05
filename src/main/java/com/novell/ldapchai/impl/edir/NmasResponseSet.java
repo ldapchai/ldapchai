@@ -19,11 +19,6 @@
 
 package com.novell.ldapchai.impl.edir;
 
-import org.jrivard.xmlchai.AccessMode;
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlDocument;
-import org.jrivard.xmlchai.XmlElement;
-import org.jrivard.xmlchai.XmlFactory;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.AbstractResponseSet;
 import com.novell.ldapchai.cr.Answer;
@@ -44,6 +39,10 @@ import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretRequest;
 import com.novell.ldapchai.impl.edir.entry.ext.PutLoginSecretResponse;
 import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.internal.StringHelper;
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 import javax.naming.ldap.ExtendedResponse;
 import java.io.IOException;
@@ -203,7 +202,7 @@ public class NmasResponseSet extends AbstractResponseSet
     {
         final List<Challenge> returnList = new ArrayList<>();
 
-        final XmlDocument doc = XmlChai.getFactory().parseString( str, AccessMode.IMMUTABLE );
+        final XmlDocument doc = XmlFactory.getFactory().parseString( str, AccessMode.IMMUTABLE );
         final XmlElement rootElement = doc.getRootElement();
 
         final int minRandom = StringHelper.convertStrToInt( rootElement.getAttribute( "RandomQuestions" ).orElse( "0" ), 0 );
@@ -346,7 +345,7 @@ public class NmasResponseSet extends AbstractResponseSet
 
     static String csToNmasXML( final ChallengeSet cs, final String guidValue )
     {
-        final XmlFactory xmlFactory = XmlChai.getFactory();
+        final XmlFactory xmlFactory = XmlFactory.getFactory();
         final XmlDocument xmlDocument = xmlFactory.newDocument( NMAS_XML_ROOTNODE );
         final XmlElement rootElement = xmlDocument.getRootElement();
 

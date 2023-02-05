@@ -19,12 +19,6 @@
 
 package com.novell.ldapchai.cr;
 
-import org.jrivard.xmlchai.AccessMode;
-import org.jrivard.xmlchai.XmlChai;
-import org.jrivard.xmlchai.XmlDocument;
-import org.jrivard.xmlchai.XmlElement;
-
-import org.jrivard.xmlchai.XmlFactory;
 import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.cr.bean.AnswerBean;
@@ -34,12 +28,15 @@ import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.exception.ChaiValidationException;
 import com.novell.ldapchai.provider.ChaiSetting;
-import com.novell.ldapchai.util.internal.ChaiLogger;
 import com.novell.ldapchai.util.ConfigObjectRecord;
+import com.novell.ldapchai.util.internal.ChaiLogger;
+import org.jrivard.xmlchai.AccessMode;
+import org.jrivard.xmlchai.XmlDocument;
+import org.jrivard.xmlchai.XmlElement;
+import org.jrivard.xmlchai.XmlFactory;
 
 import java.io.IOException;
 import java.io.Writer;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -270,7 +267,7 @@ public class ChaiResponseSet extends AbstractResponseSet
     static String rsToChaiXML( final ChaiResponseSet rs )
             throws ChaiValidationException, ChaiOperationException
     {
-        final XmlDocument doc = XmlChai.getFactory().newDocument( XML_NODE_ROOT );
+        final XmlDocument doc = XmlFactory.getFactory().newDocument( XML_NODE_ROOT );
         final XmlElement rootElement = doc.getRootElement();
 
         rootElement.setAttribute( XML_ATTRIBUTE_MIN_RANDOM_REQUIRED, String.valueOf( rs.getChallengeSet().getMinRandomRequired() ) );
@@ -317,7 +314,7 @@ public class ChaiResponseSet extends AbstractResponseSet
 
         try
         {
-            return XmlChai.getFactory().outputString( doc, XmlFactory.OutputFlag.Compact );
+            return XmlFactory.getFactory().outputString( doc, XmlFactory.OutputFlag.Compact );
         }
         catch ( IOException e )
         {
@@ -328,11 +325,10 @@ public class ChaiResponseSet extends AbstractResponseSet
     private static XmlElement challengeToXml( final Challenge loopChallenge, final Answer answer, final String elementName )
             throws ChaiOperationException
     {
-        final XmlElement responseElement = XmlChai.getFactory().newElement( elementName );
+        final XmlElement responseElement = XmlFactory.getFactory().newElement( elementName );
         {
-            final XmlElement challengeElement = XmlChai.getFactory().newElement( XML_NODE_CHALLENGE );
+            final XmlElement challengeElement = responseElement.newChildElement( XML_NODE_CHALLENGE );
             challengeElement.setText( loopChallenge.getChallengeText() );
-            responseElement.attachElement( challengeElement );
         }
         {
             final XmlElement answerElement = answer.toXml();
@@ -365,7 +361,7 @@ public class ChaiResponseSet extends AbstractResponseSet
 
             try
             {
-                final XmlDocument doc = XmlChai.getFactory().parseString( input, AccessMode.IMMUTABLE );
+                final XmlDocument doc = XmlFactory.getFactory().parseString( input, AccessMode.IMMUTABLE );
                 final XmlElement rootElement = doc.getRootElement();
                 minRandRequired = Integer.parseInt( rootElement.getAttribute( XML_ATTRIBUTE_MIN_RANDOM_REQUIRED ).orElse( "0" ) );
                 localeAttr = rootElement.getAttribute( XML_ATTRIBUTE_LOCALE ).orElse( null );
