@@ -116,17 +116,17 @@ public final class ChaiLogger
         logger.log( level, appendDurationToMessage( message, duration ), exception );
     }
 
-    private static Supplier<String> appendDurationToMessage(
+    private static String appendDurationToMessage(
             final Supplier<String> message,
             final Duration duration
     )
     {
         if ( duration == null )
         {
-            return message;
+            return message.get();
         }
 
-        return () -> message.get() + " (" + ChaiLogger.format( duration ) + ")";
+        return message.get() + " (" + ChaiLogger.format( duration ) + ")";
     }
 
     public static String format( final Instant instant )
