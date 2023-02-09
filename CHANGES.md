@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.8.4] - Released 2022-10-30
+- Revert logging to Log4j and replace library with reload4j
+  -  Will re-address SLF4J in a future update
+- Update C/R hash iteration defaults to modern values
+  - 1,000,000 for default PBKDF2/SHA512 method
+- Improved lock management for fail-over wrapper
+
 ## [0.8.3] - Released 2022-10-30
 - Change logging API to SLF4J
 - Correct readGUID() for DirectoryServer389 to properly read nsUniqueId attribute
