@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.8.4] - Released 2022-10-30
+## [0.8.4] - Released 2023-02-08
 - Revert logging to Log4j and replace library with reload4j
   -  Will re-address SLF4J in a future update
 - Update C/R hash iteration defaults to modern values
