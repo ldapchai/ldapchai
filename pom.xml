@@ -8,10 +8,11 @@
     </parent>
 
     <groupId>com.github.ldapchai</groupId>
-    <version>0.8.5-SNAPSHOT</version>
+    <version>0.8.5</version>
     <artifactId>ldapchai</artifactId>
     <packaging>jar</packaging>
     <name>LDAP Chai Library</name>
+    <description>The LDAP Chai API, easy to use LDAP for Java developers.</description>
     <url>https://github.com/ldapchai/ldapchai</url>
 
     <scm>
@@ -25,9 +26,6 @@
         <url>https://github.com/ldapchai/ldapchai</url>
     </organization>
 
-    <description>
-        The LDAP Chai API, easy to use LDAP for Java developers.
-    </description>
 
     <licenses>
         <license>
