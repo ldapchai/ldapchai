@@ -19,9 +19,10 @@
 
 package com.novell.ldapchai.cr;
 
-import org.jrivard.xmlchai.XmlElement;
 import com.novell.ldapchai.cr.bean.AnswerBean;
 import com.novell.ldapchai.exception.ChaiOperationException;
+import com.novell.ldapchai.util.internal.StringHelper;
+import org.jrivard.xmlchai.XmlElement;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,28 +48,40 @@ public interface Answer
     enum FormatType
     {
         TEXT( new TextAnswer.TextAnswerFactory(), 0, 0 ),
-        MD5( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 10_000_000 ),
-        SHA1( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 10_000_000 ),
-        SHA1_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 10_000_000 ),
-        SHA256_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 5_000_000 ),
-        SHA512_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 5_000_000 ),
-        BCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 16, 15 ),
-        SCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 32, 16 * 1024 ),
-        PBKDF2( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 1_000_000 ),
-        PBKDF2_SHA256( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 1_000_000 ),
-        PBKDF2_SHA512( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 1_000_000 ),
+        MD5( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 2_000_000, Flag.HashThreadingEligible ),
+        SHA1( new HashSaltAnswer.HashSaltAnswerFactory(), 0, 2_000_000, Flag.HashThreadingEligible ),
+        SHA1_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 2_000_000, Flag.HashThreadingEligible ),
+        SHA256_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 2_000_000, Flag.HashThreadingEligible ),
+        SHA512_SALT( new HashSaltAnswer.HashSaltAnswerFactory(), 32, 2_000_000, Flag.HashThreadingEligible ),
+        BCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 16, 15, Flag.HashThreadingEligible ),
+        SCRYPT( new PasswordCryptAnswer.PasswordCryptAnswerFactory(), 32, 16 * 1024, Flag.HashThreadingEligible ),
+        PBKDF2( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 500_000, Flag.HashThreadingEligible ),
+        PBKDF2_SHA256( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 500_000, Flag.HashThreadingEligible ),
+        PBKDF2_SHA512( new PBKDF2Answer.PKDBF2AnswerFactory(), 32, 500_000, Flag.HashThreadingEligible ),
         HELPDESK( new ChaiHelpdeskAnswer.ChaiHelpdeskAnswerFactory(), 0, 0 ),
         NMAS( null, -1, -1 ),;
 
         private final transient ImplementationFactory factory;
         private final int saltLength;
         private final int defaultIterations;
+        private final boolean hashThreadingEligible;
 
-        FormatType( final ImplementationFactory implementationClass, final int saltLength, final int defaultIterations )
+        FormatType(
+                final ImplementationFactory implementationClass,
+                final int saltLength,
+                final int defaultIterations,
+                final Flag... flags
+        )
         {
             this.factory = implementationClass;
             this.saltLength = saltLength;
             this.defaultIterations = defaultIterations;
+            this.hashThreadingEligible = StringHelper.enumArrayContainsValue( flags, Flag.HashThreadingEligible );
+        }
+
+        private enum Flag
+        {
+            HashThreadingEligible,
         }
 
         public ImplementationFactory getFactory()
@@ -84,6 +97,11 @@ public interface Answer
         public int getSaltLength()
         {
             return saltLength;
+        }
+
+        public boolean isHashThreadingEligible()
+        {
+            return hashThreadingEligible;
         }
 
         public static List<FormatType> implementedValues()

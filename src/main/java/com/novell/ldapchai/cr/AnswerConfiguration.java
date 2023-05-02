@@ -36,11 +36,16 @@ class AnswerConfiguration implements Serializable
             final Answer.FormatType formatType,
             final String challengeText )
     {
-        this.caseInsensitive = caseInsensitive;
-        this.iterations = iterations;
-        this.saltCharCount = saltCharCount;
         this.formatType = formatType;
+        this.caseInsensitive = caseInsensitive;
         this.challengeText = challengeText;
+        this.iterations = iterations < 1
+                ? formatType.getDefaultIterations()
+                : iterations;
+        this.saltCharCount = saltCharCount < 1
+                ? formatType.getSaltLength()
+                : saltCharCount;
+
     }
 
     public boolean isCaseInsensitive()

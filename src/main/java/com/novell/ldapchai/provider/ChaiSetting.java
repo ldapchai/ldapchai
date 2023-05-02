@@ -536,6 +536,7 @@ public enum ChaiSetting
      *
      * <p>Each {@link Answer.FormatType} of answer has a {@link Answer.FormatType#getDefaultIterations() value.   This setting can override
      * the default iteration count.  If this setting value is a positive integer, it will override the default.}</p>
+     *
      * <table border="1"><caption><b>Setting Information</b></caption>
      * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.com.novell.ldapchai.cr.chai.iterations</td></tr>
      * <tr><td style="text-align: right"><i>Default: </i></td><td>0</td></tr>
@@ -545,6 +546,22 @@ public enum ChaiSetting
      * @see com.novell.ldapchai.util.ConfigObjectRecord
      */
     CR_CHAI_SALT_CHAR_COUNT( "chai.com.novell.ldapchai.cr.chai.saltCharCount", "0", true, SettingValidator.INTEGER_VALIDATOR ),
+
+    /**
+     * <p>Number of threads to use during multi-hash operations, such as creating a new response set via
+     * {@link com.novell.ldapchai.cr.ChaiCrFactory#newChaiResponseSet} and other functions.</p>
+     *
+     * <p>If zero, then {@link Runtime#availableProcessors()} will be used.</p>
+     *
+     * <table border="1"><caption><b>Setting Information</b></caption>
+     * <tr><td style="text-align: right"><i>Key: </i></td><td>chai.com.novell.ldapchai.cr.chai.hashTreadCount</td></tr>
+     * <tr><td style="text-align: right"><i>Default: </i></td><td>0</td></tr>
+     * </table>
+     *
+     * @see com.novell.ldapchai.cr.ChaiResponseSet
+     * @see com.novell.ldapchai.util.ConfigObjectRecord
+     */
+    CR_CHAI_HASH_THREAD_COUNT( "chai.com.novell.ldapchai.cr.chai.hashTreadCount", "0", true, SettingValidator.INTEGER_VALIDATOR ),
 
     /**
      * <p>If true, then during the {@link com.novell.ldapchai.ChaiUser#setPassword(String)} operation, the control for

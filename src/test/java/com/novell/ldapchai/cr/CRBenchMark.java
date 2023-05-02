@@ -49,16 +49,21 @@ import java.util.concurrent.TimeUnit;
         {
                 "-Xms1G", "-Xmx1G"
         }, value = 1 )
-@Warmup( iterations = 3 )
+@Warmup( iterations = 1 )
 @Measurement( iterations = 2 )
 public class CRBenchMark
 {
+    private static final String HASH_INPUT_VALUE = "dEmJXR0YGYoIuiAC1Z39pmm9Isc4cGepl8XSlSGzFTyKkWUJIIKLiH1LfThiIDs";
+    private static final int RESPONSE_SET_ANSWER_COUNT = 3;
+
     @Param( {
             "MD5",
             "SHA1",
             "SHA1_SALT",
             "SHA256_SALT",
             "SHA256_SALT",
+            "BCRYPT",
+            "SCRYPT",
             "PBKDF2",
             "PBKDF2_SHA256",
             "PBKDF2_SHA512"
@@ -75,7 +80,6 @@ public class CRBenchMark
         new Runner( opt ).run();
     }
 
-
     @Benchmark
     public void testResponseSetAnswers()
             throws Exception
@@ -83,16 +87,20 @@ public class CRBenchMark
         final Answer.FormatType formatType = Answer.FormatType.valueOf( hashFormatParam );
 
         final Map<Challenge, String> challengeAnswerMap = new HashMap<>();
-        challengeAnswerMap.put(
-                new ChaiChallenge(
-                        true,
-                        "challenge1",
-                        0,
-                        255,
-                        true,
-                        0,
-                        false ),
-                "response1" );
+
+        for ( int i = 0; i < RESPONSE_SET_ANSWER_COUNT; i++ )
+        {
+            challengeAnswerMap.put(
+                    new ChaiChallenge(
+                            true,
+                            HASH_INPUT_VALUE + "_" + i,
+                            0,
+                            255,
+                            true,
+                            0,
+                            false ),
+                    "response_" + i );
+        }
 
         final ChaiConfiguration chaiConfiguration = ChaiConfiguration.builder( "ldap://1", "bindDN", "bindPW" )
                 .setSetting( ChaiSetting.CR_DEFAULT_FORMAT_TYPE, formatType.name() )
@@ -103,6 +111,18 @@ public class CRBenchMark
 
         final boolean tested = responseSet.test( challengeAnswerMap );
         Assertions.assertTrue( tested );
-        //System.out.println( responseSet.stringValue() );
+    }
+
+    @Benchmark
+    public void testHashOperations()
+            throws Exception
+    {
+        final Answer.FormatType formatType = Answer.FormatType.valueOf( hashFormatParam );
+        final AnswerConfiguration answerConfiguration = AnswerConfiguration.builder()
+                .formatType( formatType )
+                .build();
+
+        final Answer answer = AnswerFactory.newAnswer( answerConfiguration, HASH_INPUT_VALUE );
+        Assertions.assertNotNull( answer );
     }
 }
