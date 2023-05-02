@@ -127,6 +127,14 @@ class WatchdogProviderHolder
             lastActivity = Instant.now();
             return result;
         }
+        catch ( final ChaiUnavailableException | ChaiOperationException e )
+        {
+            if ( closed )
+            {
+                LOGGER.debug( () -> " execution exception occurred while closed: " + e.getMessage() );
+            }
+            throw e;
+        }
         finally
         {
             usageLock.readLock().unlock();
@@ -253,7 +261,6 @@ class WatchdogProviderHolder
     {
         try
         {
-            LOGGER.trace( () -> "attempting to re-open ldap connection id=" + wrapperIdentifier );
             final Instant startTime = Instant.now();
             final ChaiProviderImplementor newProvider = chaiProviderFactory.createFailOverOrConcreteProvider( chaiConfiguration );
             miniHolder = new InternalHolder( newProvider );

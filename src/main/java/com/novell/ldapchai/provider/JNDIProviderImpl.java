@@ -32,6 +32,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.naming.CommunicationException;
 import javax.naming.Context;
+import javax.naming.InterruptedNamingException;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.ServiceUnavailableException;
@@ -1466,6 +1467,12 @@ public class JNDIProviderImpl extends AbstractProvider implements ChaiProviderIm
             {
                 return true;
             }
+        }
+
+        if ( e instanceof InterruptedException || e instanceof InterruptedNamingException )
+        {
+            LOGGER.trace( () -> "operation resulted in InterruptedNamingException, will retry; error=" + e.getMessage() );
+            return true;
         }
 
         return super.errorIsRetryable( e );
