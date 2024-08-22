@@ -86,7 +86,8 @@ class PBKDF2Answer implements Answer
             throw new IllegalArgumentException( "missing answerHash text" );
         }
 
-        this.hashedAnswer = hashValue( answer );
+        final String casedAnswer = this.caseInsensitive ? answer.toLowerCase() : answer;
+        this.hashedAnswer = hashValue( casedAnswer );
     }
 
 
