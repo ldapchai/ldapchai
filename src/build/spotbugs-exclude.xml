@@ -34,6 +34,10 @@
         <!-- overly aggressive checks in spotbugs 4.4.x -->
         <Bug pattern="EI_EXPOSE_REP2"/>
     </Match>
+    <Match>
+        <!-- new check in 4.8.x.x -->
+        <Bug pattern="CT_CONSTRUCTOR_THROW"/>
+    </Match>
 </FindBugsFilter>
 
 
