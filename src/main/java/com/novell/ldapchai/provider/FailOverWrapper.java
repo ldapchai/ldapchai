@@ -212,6 +212,11 @@ class FailOverWrapper implements InvocationHandler
             attempts++;
         }
 
-        throw new ChaiUnavailableException( "unable to reach any configured server, maximum retries exceeded", ChaiError.COMMUNICATION );
+        if ( originalConfiguration.bindURLsAsList().size() > 1 )
+        {
+            throw new ChaiUnavailableException( "unable to reach any configured ldap server, maximum retries exceeded", ChaiError.COMMUNICATION );
+        }
+
+        throw new ChaiUnavailableException( "unable to reach ldap server", ChaiError.COMMUNICATION );
     }
 }

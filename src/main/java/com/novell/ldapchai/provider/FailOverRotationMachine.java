@@ -196,12 +196,26 @@ class FailOverRotationMachine
         }
 
         final StringBuilder errorMsg = new StringBuilder();
-        errorMsg.append( "unable to connect to any configured ldap url" );
-        if ( lastConnectionException != null )
+        if ( originalConfiguration.bindURLsAsList().size() > 1 )
         {
-            errorMsg.append( ", last error: " );
-            errorMsg.append( lastConnectionException.getMessage() );
+            errorMsg.append( "unable to connect to any configured ldap url" );
+
+            if ( lastConnectionException != null )
+            {
+                errorMsg.append( ", last error: " );
+                errorMsg.append( lastConnectionException.getMessage() );
+            }
         }
+        else
+        {
+            errorMsg.append( ( "unable to connect to ldap url" ) );
+            if ( lastConnectionException != null )
+            {
+                errorMsg.append( ", error: " );
+                errorMsg.append( lastConnectionException.getMessage() );
+            }
+        }
+
         throw new ChaiUnavailableException( errorMsg.toString(), ChaiError.COMMUNICATION );
     }
 
