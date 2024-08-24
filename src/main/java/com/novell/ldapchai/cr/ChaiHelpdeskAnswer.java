@@ -37,8 +37,10 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
 {
     private final String challengeText;
     private final String answer;
+    private final boolean caseInsensitive;
 
-    ChaiHelpdeskAnswer( final String answer, final String challengeText )
+
+    ChaiHelpdeskAnswer( final String answer, final String challengeText, final boolean caseInsensitive )
     {
         if ( StringHelper.isEmpty( answer ) )
         {
@@ -47,6 +49,8 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
 
         this.answer = answer;
         this.challengeText = challengeText;
+        this.caseInsensitive = caseInsensitive;
+
     }
 
     @Override
@@ -73,7 +77,9 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
             return false;
         }
 
-        return answer.equalsIgnoreCase( testResponse );
+        return caseInsensitive
+                ? testResponse.equalsIgnoreCase( answer )
+                : testResponse.equals( answer );
     }
 
     private static String encryptValue( final String value, final String key )
@@ -149,13 +155,13 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         @Override
         public Answer newAnswer( final AnswerConfiguration answerConfiguration, final String answerText )
         {
-            return new ChaiHelpdeskAnswer( answerText, answerConfiguration.getChallengeText() );
+            return new ChaiHelpdeskAnswer( answerText, answerConfiguration.getChallengeText(), answerConfiguration.isCaseInsensitive() );
         }
 
         @Override
         public Answer fromAnswerBean( final AnswerBean input, final String challengeText )
         {
-            return new ChaiHelpdeskAnswer( input.getAnswerText(), challengeText );
+            return new ChaiHelpdeskAnswer( input.getAnswerText(), challengeText, input.isCaseInsensitive() );
         }
 
         @Override
@@ -163,7 +169,7 @@ class ChaiHelpdeskAnswer implements HelpdeskAnswer
         {
             final String hashedAnswer = element.getText().orElseThrow( () -> new IllegalArgumentException( "missing answer hash" ) );
             final String answerValue = decryptValue( hashedAnswer, challengeText );
-            return new ChaiHelpdeskAnswer( answerValue, challengeText );
+            return new ChaiHelpdeskAnswer( answerValue, challengeText, caseInsensitive );
         }
 
     }

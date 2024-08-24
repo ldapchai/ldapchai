@@ -56,8 +56,9 @@ class TextAnswer implements Answer
             return false;
         }
 
-        final String casedResponse = caseInsensitive ? testResponse.toLowerCase() : testResponse;
-        return answer.equalsIgnoreCase( casedResponse );
+        return caseInsensitive
+                ? testResponse.equalsIgnoreCase( answer )
+                : testResponse.equals( answer );
     }
 
     @Override
