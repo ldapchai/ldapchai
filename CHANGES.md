@@ -1,9 +1,13 @@
 # Changelog
 
+## [0.8.6]
+- Fix issue with PBKDF2 based hashes not handling case-insensitive non-lowercase answers (GH-29)
++ Improve ldap connection failure error messages
+
 ## [0.8.5] - Released 2023-05-02
 - Continued hash iteration count default improvements based on performance benchmarks
-- Improved JNDI error handling for some concurrency scenarios
-- Added support for concurrent hash generation during ResponseSet creation
+  - Improved JNDI error handling for some concurrency scenarios
+  - Added support for concurrent hash generation during ResponseSet creation
 
 ## [0.8.4] - Released 2023-02-08
 - Revert logging to Log4j and replace library with reload4j
