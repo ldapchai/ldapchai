@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.8.6]
+## [0.8.6] - Released 2024-008-26
 - Fix issue with PBKDF2 based hashes not handling case-insensitive non-lowercase answers (GH-29)
 + Improve ldap connection failure error messages
 
@@ -33,3 +33,4 @@
 + Javadoc additions and corrections
 + JDK 17 compatability 
 
+ 
