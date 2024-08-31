@@ -8,7 +8,7 @@
     </parent>
 
     <groupId>com.github.ldapchai</groupId>
-    <version>0.8.6</version>
+    <version>0.8.7-SNAPSHOT</version>
     <artifactId>ldapchai</artifactId>
     <packaging>jar</packaging>
     <name>LDAP Chai Library</name>
