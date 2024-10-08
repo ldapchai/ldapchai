@@ -34,6 +34,7 @@ import javax.naming.NamingException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
@@ -139,9 +140,35 @@ public class OpenLDAPUser extends AbstractChaiUser implements ChaiUser
     public boolean isPasswordLocked()
             throws ChaiOperationException, ChaiUnavailableException
     {
-        final Instant passwordAccountLockedTime = this.readDateAttribute( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME );
-        return passwordAccountLockedTime != null
-                && Instant.now().isAfter( passwordAccountLockedTime );
+        final Set<String> interestedAttributes = new HashSet<>();
+        interestedAttributes.add( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME );
+        interestedAttributes.add( ChaiConstant.ATTR_OPENLDAP_PASSWORD_END_TIME );
+
+        final Map<String, String> returnValues =
+        this.getChaiProvider().readStringAttributes( this.getEntryDN(), interestedAttributes );
+
+        {
+            final String value = returnValues.get( ChaiConstant.ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME );
+            if ( value != null && !value.isEmpty() )
+            {
+                return true;
+            }
+        }
+
+        {
+            final String value = returnValues.get( ChaiConstant.ATTR_OPENLDAP_PASSWORD_END_TIME );
+            if ( value != null && !value.isEmpty() )
+            {
+                final Instant timestamp = this.getChaiProvider().getDirectoryVendor().getVendorFactory().stringToInstant( value );
+                if ( timestamp != null && Instant.now().isAfter( timestamp ) )
+                {
+                    return true;
+                }
+            }
+
+        }
+
+        return false;
     }
 
     @Override

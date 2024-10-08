@@ -326,6 +326,7 @@ public abstract class ChaiConstant
     public static final String ATTR_OPENLDAP_PASSWORD_POLICY_MIN_SPECIAL_CHARACTERS = "minPunct";
 
     public static final String ATTR_OPENLDAP_PASSWORD_ACCOUNT_LOCKED_TIME = "pwdAccountLockedTime";
+    public static final String ATTR_OPENLDAP_PASSWORD_END_TIME = "pwdEndTime";
     public static final String ATTR_OPENLDAP_PASSWORD_CHANGED_TIME = "pwdChangedTime";
     public static final String ATTR_OPENLDAP_PASSWORD_FAILURE_TIME = "pwdFailureTime";
     public static final String ATTR_OPENLDAP_PASSWORD_GRACE_USE_TIME = "pwdGraceUseTime";

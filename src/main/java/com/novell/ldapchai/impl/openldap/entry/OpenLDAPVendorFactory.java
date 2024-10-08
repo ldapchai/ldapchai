@@ -24,6 +24,8 @@ import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ErrorMap;
+import com.novell.ldapchai.impl.TimeFormatConverter;
+import com.novell.ldapchai.impl.TimeFormatConverterFactory;
 import com.novell.ldapchai.impl.VendorFactory;
 import com.novell.ldapchai.impl.openldap.OpenLDAPErrorMap;
 import com.novell.ldapchai.provider.ChaiProvider;
@@ -31,6 +33,8 @@ import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +42,15 @@ import java.util.Set;
 
 public class OpenLDAPVendorFactory implements VendorFactory
 {
+    private static final String TIMESTAMP_PATTERN = "yyyyMMddHHmmss'Z'";
+    private static final TimeFormatConverter TIME_FORMAT_CONVERTER
+            = TimeFormatConverterFactory.simplePatternFormatConverter( TIMESTAMP_PATTERN );
+
+    private static final String TIMESTAMP_LOCK_PERM_PATTERN = "000001010000Z";
+    private static final Instant TIMESTAMP_LOCK_PERM_INSTANT = LocalDate.of( 0000, 1, 1 )
+            .atStartOfDay( ZoneOffset.UTC )
+            .toInstant();
+
     @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
@@ -92,17 +105,20 @@ public class OpenLDAPVendorFactory implements VendorFactory
         return false;
     }
 
-
     @Override
     public Instant stringToInstant( final String input )
     {
-        return OpenLDAPEntries.convertZuluToDate( input );
+        if ( TIMESTAMP_LOCK_PERM_PATTERN.equals( input ) )
+        {
+            return TIMESTAMP_LOCK_PERM_INSTANT;
+        }
+        return TIME_FORMAT_CONVERTER.convertZuluToInstant( input ).orElse( null );
     }
 
     @Override
     public String instantToString( final Instant input )
     {
-        return OpenLDAPEntries.convertDateToZulu( input );
+        return TIME_FORMAT_CONVERTER.convertInstantToZulu( input );
     }
 
     @Override
