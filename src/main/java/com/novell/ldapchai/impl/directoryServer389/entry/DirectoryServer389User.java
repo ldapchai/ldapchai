@@ -19,6 +19,8 @@
 
 package com.novell.ldapchai.impl.directoryServer389.entry;
 
+import com.novell.ldapchai.ChaiConstant;
+import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiPasswordPolicyException;
@@ -27,6 +29,9 @@ import com.novell.ldapchai.impl.AbstractChaiUser;
 import com.novell.ldapchai.provider.ChaiProvider;
 
 import java.time.Instant;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
 {
@@ -123,5 +128,32 @@ class DirectoryServer389User extends AbstractChaiUser implements ChaiUser
             throws ChaiOperationException, ChaiUnavailableException
     {
         return DirectoryServer389Entry.readGUIDImpl( this.getChaiProvider(), this.getEntryDN() );
+    }
+
+    @Override
+    public Set<ChaiGroup> getGroups()
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        final Set<ChaiGroup> returnGroups = new HashSet<>();
+        final Set<String> groups = this.readMultiStringAttribute( ChaiConstant.ATTR_LDAP_MEMBER_OF );
+        for ( final String group : groups )
+        {
+            returnGroups.add( chaiProvider.getEntryFactory().newChaiGroup( group ) );
+        }
+        return Collections.unmodifiableSet( returnGroups );
+    }
+
+    @Override
+    public void addGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        theGroup.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
+    }
+
+    @Override
+    public void removeGroupMembership( final ChaiGroup theGroup )
+            throws ChaiOperationException, ChaiUnavailableException
+    {
+        theGroup.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, this.getEntryDN() );
     }
 }
