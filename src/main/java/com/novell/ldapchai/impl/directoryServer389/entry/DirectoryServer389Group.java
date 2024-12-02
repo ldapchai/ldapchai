@@ -19,7 +19,9 @@
 
 package com.novell.ldapchai.impl.directoryServer389.entry;
 
+import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiGroup;
+import com.novell.ldapchai.ChaiUser;
 import com.novell.ldapchai.exception.ChaiOperationException;
 import com.novell.ldapchai.exception.ChaiUnavailableException;
 import com.novell.ldapchai.impl.AbstractChaiGroup;
@@ -37,5 +39,19 @@ class DirectoryServer389Group extends AbstractChaiGroup implements ChaiGroup
             throws ChaiOperationException, ChaiUnavailableException
     {
         return DirectoryServer389Entry.readGUIDImpl( this.getChaiProvider(), this.getEntryDN() );
+    }
+
+    @Override
+    public void addMember( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        this.addAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
+    }
+
+    @Override
+    public void removeMember( final ChaiUser theUser )
+            throws ChaiUnavailableException, ChaiOperationException
+    {
+        this.deleteAttribute( ChaiConstant.ATTR_LDAP_MEMBER, theUser.getEntryDN() );
     }
 }
