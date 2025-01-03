@@ -330,7 +330,6 @@
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
                                     <Implementation-Build-Java-Version>${maven.compiler.target}</Implementation-Build-Java-Version>
-                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
                                     <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
                                     <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
                                     <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
@@ -386,7 +385,6 @@
                                     <Implementation-Vendor>${project.organization.name}</Implementation-Vendor>
                                     <Implementation-URL>${project.organization.url}</Implementation-URL>
                                     <Implementation-Build-Java-Version>${maven.compiler.target}</Implementation-Build-Java-Version>
-                                    <SCM-Git-Branch>${git.branch}</SCM-Git-Branch>
                                     <SCM-Git-Commit-ID>${git.commit.id}</SCM-Git-Commit-ID>
                                     <SCM-Git-Commit-ID-Abbrev>${git.commit.id.abbrev}</SCM-Git-Commit-ID-Abbrev>
                                     <SCM-Git-Commit-ID-Description>${git.commit.id.describe}</SCM-Git-Commit-ID-Description>
