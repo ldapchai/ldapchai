@@ -17,36 +17,37 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.openldap.entry;
+package com.novell.ldapchai.impl.lldap;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 
-class OpenLDAPVendorFactoryTest
+/**
+ * Tests for "LLDAP" vendor (not generic LDAP).  <a href="https://github.com/lldap/lldap">https://github.com/lldap/lldap</a>.
+ */
+class LldapVendorFactoryTest
 {
     @Test
     public void stringToInstantTest()
     {
-        final OpenLDAPVendorFactory factory = new OpenLDAPVendorFactory();
-        final Instant expectedValue =  Instant.parse( "2022-10-19T19:57:31Z" );
-        Assertions.assertEquals( expectedValue, factory.stringToInstant( "20221019195731Z" ) );
-    }
+        final LldapVendorFactory factory = new LldapVendorFactory();
+        final Instant instant = factory.stringToInstant( "2022-10-20T21:46:12.000000000+00:00" );
+        final Instant expectedValue = Instant.parse(  "2022-10-20T21:46:12Z" );
 
-    @Test
-    public void magicValueStringToInstantTest()
-    {
-        final OpenLDAPVendorFactory factory = new OpenLDAPVendorFactory();
-        Assertions.assertEquals( Instant.parse( "0000-01-01T00:00:00Z" ), factory.stringToInstant( "000001010000Z" ) );
-        Assertions.assertEquals( "00010101000000Z", factory.instantToString( Instant.parse( "0000-01-01T00:00:00Z" ) ) );
+        Assertions.assertEquals( expectedValue, instant );
+
     }
 
     @Test
     public void instantToStringTest()
     {
-        final OpenLDAPVendorFactory factory = new OpenLDAPVendorFactory();
-        Assertions.assertEquals( "20221020214612Z", factory.instantToString( Instant.parse( "2022-10-20T21:46:12Z" ) ) );
+        final LldapVendorFactory factory = new LldapVendorFactory();
+        final Instant testInstant = Instant.parse( "2022-10-20T21:46:12Z" );
+        final String string =  factory.instantToString( testInstant );
+
+        Assertions.assertEquals( "2022-10-20T21:46:12.000000000+00:00", string );
     }
 
 }

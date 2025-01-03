@@ -17,14 +17,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl;
+package com.novell.ldapchai.impl.lldap;
 
-import java.time.Instant;
-import java.util.Optional;
+import com.novell.ldapchai.ChaiEntry;
+import com.novell.ldapchai.impl.AbstractChaiEntry;
+import com.novell.ldapchai.provider.ChaiProvider;
 
-public interface TimeFormatConverter
+class LldapLdapEntry extends AbstractChaiEntry implements ChaiEntry
 {
-    String outputInstantToString( Instant instant );
-
-    Optional<Instant> parseStringToInstant( String input );
+    LldapLdapEntry( final String entryDN, final ChaiProvider chaiProvider )
+    {
+        super( entryDN, chaiProvider );
+    }
 }

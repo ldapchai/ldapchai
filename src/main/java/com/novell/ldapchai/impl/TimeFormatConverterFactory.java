@@ -19,10 +19,10 @@
 
 package com.novell.ldapchai.impl;
 
+import com.novell.ldapchai.util.internal.ChaiLogger;
+
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
@@ -33,6 +33,8 @@ import java.util.TimeZone;
 
 public class TimeFormatConverterFactory
 {
+    private static final ChaiLogger LOGGER = ChaiLogger.getLogger( TimeFormatConverterFactory.class );
+
     public static TimeFormatConverter adTimeFormatConverter()
     {
         return new AdTimeFormatConverter();
@@ -41,6 +43,66 @@ public class TimeFormatConverterFactory
     public static TimeFormatConverter simplePatternFormatConverter( final String pattern )
     {
         return new SimpleParsingTimeFormatConverter( pattern );
+    }
+
+    public static TimeFormatConverter custom( final DateTimeFormatter parseConverter, final DateTimeFormatter outputConverter )
+    {
+        return new SimpleParsingTimeFormatConverter( parseConverter, outputConverter );
+    }
+
+    public static TimeFormatConverter isoConverter()
+    {
+        return new SimpleParsingTimeFormatConverter( DateTimeFormatter.ISO_OFFSET_DATE_TIME, DateTimeFormatter.ISO_OFFSET_DATE_TIME  );
+    }
+
+    private static class SimpleParsingTimeFormatConverter implements TimeFormatConverter
+    {
+        private final DateTimeFormatter parseConverter;
+        private final DateTimeFormatter outputConverter;
+
+        SimpleParsingTimeFormatConverter( final DateTimeFormatter parseConverter, final DateTimeFormatter outputConverter )
+        {
+            this.parseConverter = Objects.requireNonNull( parseConverter );
+            this.outputConverter = Objects.requireNonNull( outputConverter );
+        }
+
+        SimpleParsingTimeFormatConverter( final String patternFormat )
+        {
+            Objects.requireNonNull( patternFormat );
+            final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern( patternFormat ).withZone( ZoneOffset.UTC );
+            this.parseConverter = dateTimeFormatter;
+            this.outputConverter = dateTimeFormatter;
+        }
+
+        @Override
+        public String outputInstantToString( final Instant instant )
+        {
+            Objects.requireNonNull( instant );
+
+            try
+            {
+                return outputConverter.format( instant.atZone( ZoneOffset.UTC ) );
+            }
+            catch ( DateTimeParseException e )
+            {
+                throw new IllegalArgumentException( "unable to format zulu time-string: " + e.getMessage() );
+            }
+        }
+
+        @Override
+        public Optional<Instant> parseStringToInstant( final String input )
+        {
+            Objects.requireNonNull( input );
+
+            try
+            {
+                return Optional.of( Instant.from( parseConverter.parse( input ) ) );
+            }
+            catch ( DateTimeParseException e )
+            {
+                throw new IllegalArgumentException( "unable to parse time-string: " + e.getMessage() );
+            }
+        }
     }
 
     private static class AdTimeFormatConverter implements TimeFormatConverter
@@ -56,7 +118,7 @@ public class TimeFormatConverterFactory
         }
 
         @Override
-        public String convertInstantToZulu( final Instant instant )
+        public String outputInstantToString( final Instant instant )
         {
             Objects.requireNonNull( instant, "date must be non-null" );
 
@@ -68,7 +130,7 @@ public class TimeFormatConverterFactory
         }
 
         @Override
-        public Optional<Instant> convertZuluToInstant( final String input )
+        public Optional<Instant> parseStringToInstant( final String input )
         {
             if ( input == null )
             {
@@ -80,9 +142,18 @@ public class TimeFormatConverterFactory
                 return Optional.empty();
             }
 
-            final long timestampAsNs = Long.parseLong( input );
-            if ( timestampAsNs <= 0 )
+            final long timestampAsNs;
+            try
             {
+                timestampAsNs = Long.parseLong( input );
+                if ( timestampAsNs <= 0 )
+                {
+                    return Optional.empty();
+                }
+            }
+            catch ( final NumberFormatException e )
+            {
+                LOGGER.trace( () -> "error parsing expected AD time format value: " + e.getMessage() );
                 return Optional.empty();
             }
 
@@ -95,59 +166,17 @@ public class TimeFormatConverterFactory
                 return Optional.empty();
             }
 
-            return Optional.of( Instant.ofEpochMilli( timestampAsJavaMs ) );
+            try
+            {
+                return Optional.of( Instant.ofEpochMilli( timestampAsJavaMs ) );
+            }
+            catch ( final DateTimeParseException e )
+            {
+                LOGGER.trace( () -> "error parsing expected AD time format value: " + e.getMessage() );
+                return Optional.empty();
+            }
         }
     }
 
-    private static class SimpleParsingTimeFormatConverter implements TimeFormatConverter
-    {
-        private final DateTimeFormatter dateTimeFormatter;
-
-        SimpleParsingTimeFormatConverter( final String patternFormat )
-        {
-            Objects.requireNonNull( patternFormat );
-            dateTimeFormatter = DateTimeFormatter.ofPattern( patternFormat );
-        }
-
-        @Override
-        public String convertInstantToZulu( final Instant instant )
-        {
-            Objects.requireNonNull( instant );
-
-            try
-            {
-                return dateTimeFormatter.format( instant.atZone( ZoneOffset.UTC ) );
-            }
-            catch ( DateTimeParseException e )
-            {
-                throw new IllegalArgumentException( "unable to format zulu time-string: " + e.getMessage() );
-            }
-        }
-
-        /**
-         * Convert the commonly used eDirectory zulu time string to java Date object.
-         * See the <a href="http://developer.novell.com/documentation/ndslib/schm_enu/data/sdk5701.html">eDirectory Time attribute syntax definition</a> for more details.
-         *
-         * @param input a date string in the format of "yyyyMMddHHmmss'Z'", for example "19941216103200Z"
-         * @return A Date object representing the string date
-         * @throws IllegalArgumentException if dateString is incorrectly formatted
-         */
-        @Override
-        public Optional<Instant> convertZuluToInstant( final String input )
-        {
-            Objects.requireNonNull( input );
-
-            try
-            {
-                final LocalDateTime localDateTime = LocalDateTime.parse( input, dateTimeFormatter );
-                final ZonedDateTime zonedDateTime = localDateTime.atZone( ZoneOffset.UTC );
-                return Optional.of( Instant.from( zonedDateTime ) );
-            }
-            catch ( DateTimeParseException e )
-            {
-                throw new IllegalArgumentException( "unable to parse zulu time-string: " + e.getMessage() );
-            }
-        }
-    }
 
 }

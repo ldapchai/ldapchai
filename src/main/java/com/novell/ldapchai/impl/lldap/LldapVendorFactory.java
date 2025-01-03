@@ -17,9 +17,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-package com.novell.ldapchai.impl.openldap.entry;
+package com.novell.ldapchai.impl.lldap;
 
-import com.novell.ldapchai.ChaiConstant;
 import com.novell.ldapchai.ChaiEntry;
 import com.novell.ldapchai.ChaiGroup;
 import com.novell.ldapchai.ChaiUser;
@@ -33,40 +32,41 @@ import com.novell.ldapchai.provider.ChaiProviderImplementor;
 import com.novell.ldapchai.provider.DirectoryVendor;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class OpenLDAPVendorFactory implements VendorFactory
+public class LldapVendorFactory implements VendorFactory
 {
-    private static final String TIMESTAMP_PATTERN = "yyyyMMddHHmmss'Z'";
-    private static final TimeFormatConverter TIME_FORMAT_CONVERTER
-            = TimeFormatConverterFactory.simplePatternFormatConverter( TIMESTAMP_PATTERN );
 
-    private static final String TIMESTAMP_LOCK_PERM_PATTERN = "000001010000Z";
-    private static final Instant TIMESTAMP_LOCK_PERM_INSTANT = LocalDate.of( 0000, 1, 1 )
-            .atStartOfDay( ZoneOffset.UTC )
-            .toInstant();
+    private static final String LDAP_ATTR_VENDOR_NAME = "vendorName";
+    private static final String LLDAP_DS_VENDOR_NAME = "LLDAP";
+
+    private static final String TIMESTASMP_PATTERN_RFC_3339 = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSxxx";
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern( TIMESTASMP_PATTERN_RFC_3339 );
+
+
+    private static final TimeFormatConverter TIME_FORMAT_CONVERTER
+            = TimeFormatConverterFactory.custom( DATE_TIME_FORMATTER, DATE_TIME_FORMATTER );
 
     @Override
     public ChaiUser newChaiUser( final String entryDN, final ChaiProvider provider )
     {
-        return new OpenLDAPUser( entryDN, provider );
+        return new LldapLdapUser( entryDN, provider );
     }
 
     @Override
     public ChaiGroup newChaiGroup( final String entryDN, final ChaiProvider provider )
     {
-        return new OpenLDAPGroup( entryDN, provider );
+        return new LldapGroup( entryDN, provider );
     }
 
     @Override
     public ChaiEntry newChaiEntry( final String entryDN, final ChaiProvider provider )
     {
-        return new OpenLDAPEntry( entryDN, provider );
+        return new LldapLdapEntry( entryDN, provider );
     }
 
     @Override
@@ -84,18 +84,18 @@ public class OpenLDAPVendorFactory implements VendorFactory
     @Override
     public Set<String> interestedDseAttributes()
     {
-        return Collections.singleton( ChaiConstant.ATTR_LDAP_OBJECTCLASS );
+        return Collections.singleton( LDAP_ATTR_VENDOR_NAME );
     }
 
     @Override
     public boolean detectVendorFromRootDSEData( final Map<String, List<String>> rootDseAttributeValues )
     {
-        final String objectClassAttribute = ChaiConstant.ATTR_LDAP_OBJECTCLASS;
-        if ( rootDseAttributeValues != null && rootDseAttributeValues.containsKey( objectClassAttribute ) )
+        final String venderNameAttribute = LDAP_ATTR_VENDOR_NAME;
+        if ( venderNameAttribute != null && rootDseAttributeValues.containsKey( LDAP_ATTR_VENDOR_NAME ) )
         {
-            for ( final String objectClassVaue : rootDseAttributeValues.get( objectClassAttribute ) )
+            for ( final String vendorNames : rootDseAttributeValues.get( LDAP_ATTR_VENDOR_NAME ) )
             {
-                if ( objectClassVaue.contains( "OpenLDAProotDSE" ) )
+                if ( vendorNames.startsWith( LLDAP_DS_VENDOR_NAME ) )
                 {
                     return true;
                 }
@@ -108,10 +108,6 @@ public class OpenLDAPVendorFactory implements VendorFactory
     @Override
     public Instant stringToInstant( final String input )
     {
-        if ( TIMESTAMP_LOCK_PERM_PATTERN.equals( input ) )
-        {
-            return TIMESTAMP_LOCK_PERM_INSTANT;
-        }
         return TIME_FORMAT_CONVERTER.parseStringToInstant( input ).orElse( null );
     }
 

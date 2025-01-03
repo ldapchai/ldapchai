@@ -25,6 +25,7 @@ import com.novell.ldapchai.impl.apacheds.entry.ApacheDSVendorFactory;
 import com.novell.ldapchai.impl.directoryServer389.entry.DirectoryServer389VendorFactory;
 import com.novell.ldapchai.impl.edir.entry.EDirectoryVendorFactory;
 import com.novell.ldapchai.impl.generic.entry.GenericEntryFactory;
+import com.novell.ldapchai.impl.lldap.LldapVendorFactory;
 import com.novell.ldapchai.impl.openldap.entry.OpenLDAPVendorFactory;
 import com.novell.ldapchai.impl.oracleds.entry.OracleDSVendorFactory;
 import com.novell.ldapchai.impl.freeipa.entry.FreeIPAVendorFactory;
@@ -42,7 +43,8 @@ public enum DirectoryVendor
     ORACLE_DS ( new OracleDSVendorFactory() ),
     FREEIPA ( FreeIPAVendorFactory.getInstance() ),
     APACHE_DS( new ApacheDSVendorFactory() ),
-    GENERIC( new GenericEntryFactory() ),;
+    GENERIC( new GenericEntryFactory() ),
+    LLDAP( new LldapVendorFactory() );
 
     private final VendorFactory vendorFactory;
 
