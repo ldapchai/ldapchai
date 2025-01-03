@@ -1,5 +1,11 @@
 # Changelog
 
+
+## [0.8.7] 
++ Add support for LLDAP directory
+- Fix for 389DS group memebership attributes (pull request #31)
+- Update dependencies
+
 ## [0.8.6] - Released 2024-008-26
 - Fix issue with PBKDF2 based hashes not handling case-insensitive non-lowercase answers (GH-29)
 + Improve ldap connection failure error messages
